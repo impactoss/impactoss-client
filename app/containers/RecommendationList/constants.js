@@ -6,10 +6,14 @@ export const DEPENDENCIES = [
   'users',
   'taxonomies',
   'categories',
+  'indicators',
   'recommendations',
   'recommendation_measures',
   'recommendation_categories',
+  'recommendation_indicators',
   'measure_categories',
+  'frameworks',
+  'framework_taxonomies',
 ];
 
 export const CONFIG = {
@@ -21,12 +25,12 @@ export const CONFIG = {
       attribute: 'id', // proxy for created at
       type: 'number',
       order: 'desc',
-      default: true,
     },
     {
       attribute: 'reference',
       type: 'string',
       order: 'asc',
+      default: true,
     },
     {
       attribute: 'title',
@@ -39,13 +43,25 @@ export const CONFIG = {
       order: 'desc',
     },
   ],
+  frameworks: { // filter by framework
+    query: 'fwx',
+    key: 'framework_id',
+  },
   taxonomies: { // filter by each category
     query: 'cat',
     search: true,
     connectPath: 'recommendation_categories',
     key: 'category_id',
     ownKey: 'recommendation_id',
-    defaultGroupAttribute: 'groups_recommendations_default',
+    defaultGroupAttribute: 'groups_recommendations_default', // used when no framework is set
+    // TODO better store in database join table framework_taxonomies
+    defaultGroupsByFramework: {
+      1: { 1: '1', 2: '2' }, // framework 1 recs are grouped by taxonomies 1 & 2
+      2: { 1: '9', 2: '10' }, // framework 2 SDS are grouped by taxonomies 9 & 10
+      3: { 1: '7' }, // framework 3 SDGs are grouped by taxonomy 7
+    },
+    groupBy: 'framework_id',
+    editForFrameworks: true,
   },
   connections: { // filter by associated entity
     query: 'connected',
@@ -58,16 +74,31 @@ export const CONFIG = {
         key: 'measure_id',
         connectPath: 'recommendation_measures', // filter by recommendation connection
         ownKey: 'recommendation_id',
+        editForFrameworks: true,
+        frameworkFilter: 'has_measures',
+      },
+      {
+        search: true,
+        message: 'entities.indicators.plural',
+        path: 'indicators',
+        clientPath: 'indicators', // filter by recommendation connection
+        key: 'indicator_id',
+        connectPath: 'recommendation_indicators',
+        ownKey: 'recommendation_id',
+        editForFrameworks: true,
+        frameworkFilter: 'has_indicators',
       },
     ],
   },
-  attributes: {  // filter by attribute value
+  attributes: { // filter by attribute value
     options: [
       {
         search: false,
         message: 'attributes.accepted',
         attribute: 'accepted',
         options: ACCEPTED_STATUSES,
+        editForFrameworks: true,
+        frameworkFilter: 'has_response',
       },
       {
         search: false,

@@ -50,4 +50,20 @@ export default defineMessages({
     id: 'app.containers.HomePage.exploreMoreLead',
     defaultMessage: 'Complete lists of UN recommendations and progress indicators that track the outcome of government actions',
   },
+  exploreAllFrameworks: {
+    id: 'app.containers.HomePage.exploreAllFrameworks',
+    defaultMessage: 'Explore all frameworks',
+  },
+  signingIn: {
+    id: 'app.containers.HomePage.signingIn',
+    defaultMessage: 'Signing in...',
+  },
+  loading: {
+    id: 'app.containers.HomePage.loading',
+    defaultMessage: 'Loading initial data...',
+  },
+  selectFramework: {
+    id: 'app.containers.HomePage.selectFramework',
+    defaultMessage: 'Select an implementation framework to start exploring',
+  },
 });

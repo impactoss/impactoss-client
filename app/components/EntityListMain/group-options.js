@@ -2,30 +2,28 @@ import { List, Map } from 'immutable';
 import { sortEntities } from 'utils/sort';
 import appMessages from 'containers/App/messages';
 
-export const getGroupValue = (taxonomies, connectedTaxonomies, groupAttribute, level) => {
+export const getGroupValue = (taxonomies, groupAttribute, level) => {
   if (groupAttribute && taxonomies) {
-    const defaultTaxomony = taxonomies.find((tax) =>
-      tax.getIn(['attributes', groupAttribute]) === level
-    );
+    const defaultTaxomony = taxonomies.find((tax) => tax.getIn(['attributes', groupAttribute]) === level);
     if (defaultTaxomony) {
       return defaultTaxomony.get('id');
     }
   }
-  if (groupAttribute && connectedTaxonomies) {
-    const defaultCTaxomony = connectedTaxonomies.find((tax) =>
-      tax.getIn(['attributes', groupAttribute]) === level
-    );
-    if (defaultCTaxomony) {
-      return `x:${defaultCTaxomony.get('id')}`;
-    }
-  }
+  // if (groupAttribute && connectedTaxonomies) {
+  //   const defaultCTaxomony = connectedTaxonomies.find((tax) =>
+  //     tax.getIn(['attributes', groupAttribute]) === level
+  //   );
+  //   if (defaultCTaxomony) {
+  //     return `x:${defaultCTaxomony.get('id')}`;
+  //   }
+  // }
   return null;
 };
 
 const getTaxTitle = (id, contextIntl) => contextIntl ? contextIntl.formatMessage(appMessages.entities.taxonomies[id].single) : '';
 
 // args: immutable Maps
-export const getGroupOptions = (taxonomies, connectedTaxonomies, contextIntl) => {
+export const getGroupOptions = (taxonomies, contextIntl) => {
   let options = List();
 
   // taxonomy options
@@ -44,20 +42,20 @@ export const getGroupOptions = (taxonomies, connectedTaxonomies, contextIntl) =>
   }
 
   // connectedTaxonomies options
-  if (connectedTaxonomies) {
-    // first prepare taxonomy options
-    options = options.concat(
-      sortEntities(
-        connectedTaxonomies
-        .filter((taxonomy) => !taxonomies || !taxonomies.map((tax) => tax.get('id')).includes(taxonomy.get('id')))
-        .map((taxonomy) => Map({
-          value: `x:${taxonomy.get('id')}`, // filterOptionId
-          label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
-        })),
-        'asc',
-        'sortBy'
-      )
-    );
-  }
+  // if (connectedTaxonomies) {
+  //   // first prepare taxonomy options
+  //   options = options.concat(
+  //     sortEntities(
+  //       connectedTaxonomies
+  //       .filter((taxonomy) => !taxonomies || !taxonomies.map((tax) => tax.get('id')).includes(taxonomy.get('id')))
+  //       .map((taxonomy) => Map({
+  //         value: `x:${taxonomy.get('id')}`, // filterOptionId
+  //         label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
+  //       })),
+  //       'asc',
+  //       'sortBy'
+  //     )
+  //   );
+  // }
   return options;
 };

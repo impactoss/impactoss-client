@@ -1,70 +1,181 @@
 import { createSelector } from 'reselect';
+import { List } from 'immutable';
 
 import {
   selectEntity,
   selectEntities,
   selectMeasuresCategorised,
-  selectSdgTargetsCategorised,
   selectRecommendationsCategorised,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
+  selectTaxonomies,
 } from 'containers/App/selectors';
 
-import { USER_ROLES, ENABLE_SDGS } from 'themes/config';
+import { USER_ROLES } from 'themes/config';
 
 import {
   prepareCategory,
   usersByRole,
-  entitiesSetAssociated,
+  entitiesSetAssociatedCategory,
   prepareTaxonomiesMultiple,
 } from 'utils/entities';
-
+import { qe } from 'utils/quasi-equals';
 export const selectDomain = createSelector(
   (state) => state.get('categoryEdit'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
   (state) => selectEntities(state, 'users'),
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (entity, users, taxonomies) => prepareCategory(entity, users, taxonomies)
 );
+
+export const selectParentOptions = createSelector(
+  (state, id) => selectEntity(state, { path: 'categories', id }),
+  (state) => selectEntities(state, 'categories'),
+  selectTaxonomies,
+  (entity, categories, taxonomies) => {
+    if (entity && taxonomies && categories) {
+      const taxonomy = taxonomies.find(
+        (tax) => qe(
+          entity.getIn(['attributes', 'taxonomy_id']),
+          tax.get('id')
+        )
+      );
+      const taxonomyParentId = taxonomy
+        && taxonomy.getIn(['attributes', 'parent_id']);
+      return taxonomyParentId
+        ? categories.filter(
+          (otherCategory) => {
+            const otherTaxonomy = taxonomies.find(
+              (tax) => qe(
+                otherCategory.getIn(['attributes', 'taxonomy_id']),
+                tax.get('id'),
+              ),
+            );
+            return otherTaxonomy
+              ? qe(taxonomyParentId, otherTaxonomy.get('id'))
+              : null;
+          }
+        )
+        : null;
+    }
+    return null;
+  }
+);
+
+export const selectParentTaxonomy = createSelector(
+  (state, id) => selectEntity(state, { path: 'categories', id }),
+  selectTaxonomies,
+  (entity, taxonomies) => {
+    if (entity && taxonomies) {
+      // the category taxonomy
+      const taxonomy = taxonomies.find(
+        (tax) => qe(
+          entity.getIn(['attributes', 'taxonomy_id']),
+          tax.get('id'),
+        ),
+      );
+      // any parent taxonomies
+      return taxonomies.find(
+        (tax) => qe(
+          taxonomy.getIn(['attributes', 'parent_id']),
+          tax.get('id'),
+        ),
+      );
+    }
+    return null;
+  }
+);
+const selectIsParentTaxonomy = createSelector(
+  (state, id) => selectEntity(state, { path: 'categories', id }),
+  selectTaxonomies,
+  (entity, taxonomies) => {
+    if (entity && taxonomies) {
+      // the category taxonomy
+      const taxonomy = taxonomies.find(
+        (tax) => qe(
+          entity.getIn(['attributes', 'taxonomy_id']),
+          tax.get('id'),
+        ),
+      );
+      // has any child taxonomies?
+      return taxonomies.some(
+        (tax) => qe(
+          tax.getIn(['attributes', 'parent_id']),
+          taxonomy.get('id'),
+        ),
+      );
+    }
+    return false;
+  }
+);
+
 
 export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
-  (entities, associations) =>
-    usersByRole(entities, associations, USER_ROLES.MANAGER.value)
+  (entities, associations) => usersByRole(
+    entities,
+    associations,
+    USER_ROLES.MANAGER.value,
+  )
 );
 
 export const selectMeasures = createSelector(
   (state, id) => id,
-  (state) => selectMeasuresCategorised(state),
-  (state) => selectEntities(state, 'measure_categories'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'measure_id', associations, 'category_id', id)
+  selectMeasuresCategorised,
+  selectIsParentTaxonomy,
+  (id, entities, isParent) => {
+    if (isParent) return null;
+    return entitiesSetAssociatedCategory(
+      entities,
+      id,
+    );
+  }
 );
 
-export const selectSdgTargets = createSelector(
+export const selectRecommendationsByFw = createSelector(
   (state, id) => id,
-  (state) => selectSdgTargetsCategorised(state),
-  (state) => selectEntities(state, 'sdgtarget_categories'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'sdgtarget_id', associations, 'category_id', id)
-);
-
-export const selectRecommendations = createSelector(
-  (state, id) => id,
-  (state) => selectRecommendationsCategorised(state),
-  (state) => selectEntities(state, 'recommendation_categories'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'recommendation_id', associations, 'category_id', id)
+  (state, id) => selectEntity(state, { path: 'categories', id }),
+  (state) => selectEntities(state, 'framework_taxonomies'),
+  selectRecommendationsCategorised,
+  selectIsParentTaxonomy,
+  (id, category, fwTaxonomies, entities, isParent) => {
+    if (isParent || !category || !fwTaxonomies || !entities) {
+      return null;
+    }
+    // framework id for category
+    const frameworkIds = fwTaxonomies.reduce(
+      (memo, fwt) => qe(
+        fwt.getIn(['attributes', 'taxonomy_id']),
+        category.getIn(['attributes', 'taxonomy_id']),
+      )
+        ? memo.push(fwt.getIn(['attributes', 'framework_id']))
+        : memo,
+      List(),
+    );
+    const filtered = entities.filter(
+      (r) => frameworkIds.find(
+        (fwid) => qe(fwid, r.getIn(['attributes', 'framework_id']))
+      )
+    );
+    return entitiesSetAssociatedCategory(
+      filtered,
+      id,
+    ).groupBy(
+      (r) => r.getIn(['attributes', 'framework_id']).toString()
+    );
+  }
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => ENABLE_SDGS
-    ? prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_sdgtargets', 'tags_recommendations'])
-    : prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])
+  (taxonomies, categories) => prepareTaxonomiesMultiple(
+    taxonomies,
+    categories,
+    ['tags_measures', 'tags_recommendations']
+  )
 );

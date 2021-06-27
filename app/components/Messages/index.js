@@ -63,97 +63,110 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
       setTimeout(() => this.props.onDismiss(), this.props.autoDismiss);
     }
   }
-  translateMessages = (messages) =>
-    reduce(asArray(messages), (memo, message) => memo
-      ? `${memo} ${this.translateMessage(message)}`
-      : this.translateMessage(message)
-    , null);
+
+  translateMessages = (messages) => reduce(asArray(messages), (memo, message) => memo
+    ? `${memo} ${this.translateMessage(message)}`
+    : this.translateMessage(message),
+  null);
 
   translateMessage = (message) => {
+    const { intl } = this.context;
     if (message === SERVER_ERRORS.RECORD_OUTDATED) {
-      return this.context.intl && this.context.intl.formatMessage(appMessages.forms.outdatedError);
+      return intl && intl.formatMessage(appMessages.forms.outdatedError);
     }
     if (message === SERVER_ERRORS.EMAIL_FORMAT) {
-      return this.context.intl && this.context.intl.formatMessage(appMessages.forms.emailFormatError);
+      return intl && intl.formatMessage(appMessages.forms.emailFormatError);
     }
     if (message === SERVER_ERRORS.PASSWORD_MISMATCH) {
-      return this.context.intl && this.context.intl.formatMessage(appMessages.forms.passwordMismatchError);
+      return intl && intl.formatMessage(appMessages.forms.passwordMismatchError);
     }
     if (message === SERVER_ERRORS.PASSWORD_SHORT) {
-      return this.context.intl && this.context.intl.formatMessage(appMessages.forms.passwordShortError);
+      return intl && intl.formatMessage(appMessages.forms.passwordShortError);
     }
     if (message === SERVER_ERRORS.PASSWORD_INVALID) {
-      return this.context.intl && this.context.intl.formatMessage(appMessages.forms.passwordInvalidError);
+      return intl && intl.formatMessage(appMessages.forms.passwordInvalidError);
     }
     if (message === SERVER_ERRORS.TITLE_REQUIRED) {
-      return this.context.intl && this.context.intl.formatMessage(appMessages.forms.titleRequiredError);
+      return intl && intl.formatMessage(appMessages.forms.titleRequiredError);
     }
     if (message === SERVER_ERRORS.REFERENCE_REQUIRED) {
-      return this.context.intl && this.context.intl.formatMessage(appMessages.forms.referenceRequiredError);
+      return intl && intl.formatMessage(appMessages.forms.referenceRequiredError);
     }
     return message;
   }
 
   render() {
-    const { type, message, messageKey, messages, onDismiss, preMessage, details } = this.props;
+    const {
+      type, message, messageKey, messages, onDismiss, preMessage, details,
+    } = this.props;
 
     return !(message || messageKey || messages)
-    ? null
-    : (
-      <Styled palette={type} details={details} withoutShadow={details} spaceMessage={this.props.spaceMessage}>
-        <MessageWrapper details={details}>
-          { type === 'error' && preMessage &&
-            <PreMessage>
-              <strong>
-                <FormattedMessage {...componentMessages.preBold} />
-              </strong>
-              <FormattedMessage {...componentMessages.preAdditional} />
-            </PreMessage>
-          }
-          { message &&
-            <Message
-              palette={type}
-              details={details}
-              dismiss={!!onDismiss}
-            >
-              {this.translateMessages(message)}
-            </Message>
-          }
-          { messageKey &&
-            <div>
-              <FormattedMessage
-                values={this.props.messageArgs}
-                {...appMessages.messages[messageKey]}
-              />
-            </div>
-          }
-          { messages && messages.map((m, i) => (
-            <Message
-              key={i}
-              palette={type}
-              details={details}
-              dismiss={!!onDismiss}
-            >
-              {this.translateMessages(m)}
-            </Message>
-          ))}
-          { onDismiss && details &&
-            <DismissWrapperDetails>
+      ? null
+      : (
+        <Styled palette={type} details={details} withoutShadow={details} spaceMessage={this.props.spaceMessage}>
+          <MessageWrapper details={details}>
+            { type === 'error' && preMessage
+            && (
+              <PreMessage>
+                <strong>
+                  <FormattedMessage {...componentMessages.preBold} />
+                </strong>
+                <FormattedMessage {...componentMessages.preAdditional} />
+              </PreMessage>
+            )
+            }
+            { message
+            && (
+              <Message
+                palette={type}
+                details={details}
+                dismiss={!!onDismiss}
+              >
+                {this.translateMessages(message)}
+              </Message>
+            )
+            }
+            { messageKey
+            && (
+              <div>
+                <FormattedMessage
+                  values={this.props.messageArgs}
+                  {...appMessages.messages[messageKey]}
+                />
+              </div>
+            )
+            }
+            { messages && messages.map((m, i) => (
+              <Message
+                key={i}
+                palette={type}
+                details={details}
+                dismiss={!!onDismiss}
+              >
+                {this.translateMessages(m)}
+              </Message>
+            ))}
+            { onDismiss && details
+            && (
+              <DismissWrapperDetails>
+                <Dismiss onClick={onDismiss}>
+                  <Icon name="removeLarge" />
+                </Dismiss>
+              </DismissWrapperDetails>
+            )
+            }
+          </MessageWrapper>
+          { onDismiss && !details
+          && (
+            <DismissWrapper>
               <Dismiss onClick={onDismiss}>
                 <Icon name="removeLarge" />
               </Dismiss>
-            </DismissWrapperDetails>
+            </DismissWrapper>
+          )
           }
-        </MessageWrapper>
-        { onDismiss && !details &&
-          <DismissWrapper>
-            <Dismiss onClick={onDismiss}>
-              <Icon name="removeLarge" />
-            </Dismiss>
-          </DismissWrapper>
-        }
-      </Styled>
-    );
+        </Styled>
+      );
   }
 }
 

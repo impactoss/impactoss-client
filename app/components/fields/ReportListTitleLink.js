@@ -1,7 +1,7 @@
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { Link } from 'react-router';
+import Link from 'containers/Link';
 
 const ReportListTitleLink = styled(Link)`
   text-decoration: none;

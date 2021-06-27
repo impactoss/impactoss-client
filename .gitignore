@@ -5,6 +5,7 @@ node_modules
 stats.json
 functions
 firebase-debug.log
+.firebase/
 
 # Cruft
 .DS_Store

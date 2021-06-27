@@ -21,7 +21,6 @@ const Styled = styled.div`
 
 
 class NavAccount extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   onClick = (evt, path, currentPath) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     if (currentPath) {
@@ -39,6 +38,7 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
       this.props.onPageLink(evt, path);
     }
   }
+
   render() {
     const { isSignedIn, currentPath, user } = this.props;
 
@@ -46,46 +46,56 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
 
     return (
       <Styled>
-        {isSignedIn && user &&
-          <LinkAccount
-            href={userPath}
-            active={currentPath === userPath}
-            onClick={(evt) => this.onClick(evt, userPath)}
-          >
-            {user.name}
-          </LinkAccount>
+        {isSignedIn && user
+          && (
+            <LinkAccount
+              href={userPath}
+              active={currentPath === userPath}
+              onClick={(evt) => this.onClick(evt, userPath)}
+            >
+              {user.name}
+            </LinkAccount>
+          )
         }
-        {isSignedIn && !user &&
-          <LinkAccountLoading>
-            <FormattedMessage {...messages.userLoading} />
-          </LinkAccountLoading>
+        {isSignedIn && !user
+          && (
+            <LinkAccountLoading>
+              <FormattedMessage {...messages.userLoading} />
+            </LinkAccountLoading>
+          )
         }
-        {isSignedIn &&
-          <LinkAccount
-            href={PATHS.LOGOUT}
-            active={currentPath === PATHS.LOGOUT}
-            onClick={(evt) => this.onClick(evt, PATHS.LOGOUT)}
-          >
-            <FormattedMessage {...messages.logout} />
-          </LinkAccount>
+        {isSignedIn
+          && (
+            <LinkAccount
+              href={PATHS.LOGOUT}
+              active={currentPath === PATHS.LOGOUT}
+              onClick={(evt) => this.onClick(evt, PATHS.LOGOUT)}
+            >
+              <FormattedMessage {...messages.logout} />
+            </LinkAccount>
+          )
         }
-        {!isSignedIn &&
-          <LinkAccount
-            href={PATHS.REGISTER}
-            active={currentPath === PATHS.REGISTER}
-            onClick={(evt) => this.onClick(evt, PATHS.REGISTER, currentPath)}
-          >
-            <FormattedMessage {...messages.register} />
-          </LinkAccount>
+        {!isSignedIn
+          && (
+            <LinkAccount
+              href={PATHS.REGISTER}
+              active={currentPath === PATHS.REGISTER}
+              onClick={(evt) => this.onClick(evt, PATHS.REGISTER, currentPath)}
+            >
+              <FormattedMessage {...messages.register} />
+            </LinkAccount>
+          )
         }
-        {!isSignedIn &&
-          <LinkAccount
-            href={PATHS.LOGIN}
-            active={currentPath === PATHS.LOGIN}
-            onClick={(evt) => this.onClick(evt, PATHS.LOGIN, currentPath)}
-          >
-            <FormattedMessage {...messages.login} />
-          </LinkAccount>
+        {!isSignedIn
+          && (
+            <LinkAccount
+              href={PATHS.LOGIN}
+              active={currentPath === PATHS.LOGIN}
+              onClick={(evt) => this.onClick(evt, PATHS.LOGIN, currentPath)}
+            >
+              <FormattedMessage {...messages.login} />
+            </LinkAccount>
+          )
         }
       </Styled>
     );

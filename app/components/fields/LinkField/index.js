@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Link } from 'react-router';
+import Link from 'containers/Link';
 
 import { TEXT_TRUNCATE } from 'themes/config';
 import { truncateText } from 'utils/string';
@@ -18,23 +18,29 @@ class LinkField extends React.PureComponent { // eslint-disable-line react/prefe
     return (
       <FieldWrap>
         <Label>
-          <FormattedMessage {...(field.label || appMessages.attributes.url)} />
+          { field.labelFormatted || (
+            <FormattedMessage {...(field.label || appMessages.attributes.url)} />
+          )}
         </Label>
-        { !field.internal &&
-          <Url target="_blank" href={field.value} title={field.anchor || field.value}>
-            {field.aside
-              ? truncateText(field.anchor || field.value, field.length || TEXT_TRUNCATE.LINK_FIELD, false)
-              : field.anchor || field.value
-            }
-          </Url>
+        { !field.internal
+          && (
+            <Url target="_blank" href={field.value} title={field.anchor || field.value}>
+              {field.aside
+                ? truncateText(field.anchor || field.value, field.length || TEXT_TRUNCATE.LINK_FIELD, false)
+                : field.anchor || field.value
+              }
+            </Url>
+          )
         }
-        { field.internal &&
-          <Link to={field.value} title={field.anchor || field.value}>
-            {field.aside
-              ? truncateText(field.anchor || field.value, field.length || TEXT_TRUNCATE.LINK_FIELD, false)
-              : field.anchor || field.value
-            }
-          </Link>
+        { field.internal
+          && (
+            <Link to={field.value} title={field.anchor || field.value}>
+              {field.aside
+                ? truncateText(field.anchor || field.value, field.length || TEXT_TRUNCATE.LINK_FIELD, false)
+                : field.anchor || field.value
+              }
+            </Link>
+          )
         }
       </FieldWrap>
     );

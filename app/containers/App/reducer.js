@@ -65,9 +65,9 @@ function appReducer(state = initialState, payload) {
       return initialState.setIn(['user', 'isSignedIn'], false);
     case AUTHENTICATE_SUCCESS:
       return state
-          .setIn(['user', 'attributes'], payload.user)
-          .setIn(['user', 'isSignedIn'], true)
-          .setIn(['auth', 'sending'], false);
+        .setIn(['user', 'attributes'], payload.user)
+        .setIn(['user', 'isSignedIn'], true)
+        .setIn(['auth', 'sending'], false);
     case AUTHENTICATE_ERROR: {
       return state
         .setIn(['auth', 'error'], checkResponseError(payload.error))
@@ -77,39 +77,37 @@ function appReducer(state = initialState, payload) {
     }
     case AUTHENTICATE_SENDING:
       return state
-          .setIn(['auth', 'sending'], true)
-          .setIn(['auth', 'error'], false);
+        .setIn(['auth', 'sending'], true)
+        .setIn(['auth', 'error'], false);
     case SET_AUTHENTICATION_STATE:
       return state
-          .setIn(['user', 'isSignedIn'], payload.newAuthState);
+        .setIn(['user', 'isSignedIn'], payload.newAuthState);
     case ADD_ENTITY:
       return state
         .setIn(['entities', payload.path, payload.entity.id], fromJS(payload.entity));
     case UPDATE_ENTITIES:
-      return payload.entities.reduce((stateUpdated, entity) =>
-        stateUpdated.setIn(
-          ['entities', payload.path, entity.data.id, 'attributes'],
-          fromJS(entity.data.attributes)
-        )
-      , state);
+      return payload.entities.reduce((stateUpdated, entity) => stateUpdated.setIn(
+        ['entities', payload.path, entity.data.id, 'attributes'],
+        fromJS(entity.data.attributes)
+      ),
+      state);
     case UPDATE_CONNECTIONS:
-      return payload.updates.reduce((stateUpdated, connection) =>
-        connection.type === 'delete'
+      return payload.updates.reduce((stateUpdated, connection) => connection.type === 'delete'
         ? stateUpdated.deleteIn(['entities', payload.path, connection.id])
         : stateUpdated.setIn(
           ['entities', payload.path, connection.data.id],
           fromJS(connection.data)
-        )
-      , state);
+        ),
+      state);
     case UPDATE_ENTITY:
       return state
-          .setIn(['entities', payload.path, payload.entity.id, 'attributes'], fromJS(payload.entity.attributes));
+        .setIn(['entities', payload.path, payload.entity.id, 'attributes'], fromJS(payload.entity.attributes));
     case REMOVE_ENTITY:
       return state
-          .deleteIn(['entities', payload.path, payload.id]);
+        .deleteIn(['entities', payload.path, payload.id]);
     case ENTITIES_REQUESTED:
       return state
-          .setIn(['requested', payload.path], payload.time);
+        .setIn(['requested', payload.path], payload.time);
     case LOAD_ENTITIES_SUCCESS:
       return state
         .setIn(['entities', payload.path], fromJS(payload.entities))

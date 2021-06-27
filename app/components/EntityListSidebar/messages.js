@@ -58,9 +58,17 @@ export default defineMessages({
       id: 'app.components.EntityListSidebar.filterGroupLabel.attributes',
       defaultMessage: 'By attribute',
     },
+    frameworks: {
+      id: 'app.components.EntityListSidebar.filterGroupLabel.frameworks',
+      defaultMessage: 'By framework',
+    },
     taxonomies: {
       id: 'app.components.EntityListSidebar.filterGroupLabel.taxonomies',
       defaultMessage: 'By category',
+    },
+    taxonomiesByFw: {
+      id: 'app.components.EntityListSidebar.filterGroupLabel.taxonomiesByFw',
+      defaultMessage: 'By category ({fw})',
     },
     connections: {
       id: 'app.components.EntityListSidebar.filterGroupLabel.connections',
@@ -109,5 +117,4 @@ export default defineMessages({
     id: 'app.components.EntityListSidebar.entitiesNotSelected',
     defaultMessage: 'Please select one or more entities from the list for available edit options',
   },
-
 });

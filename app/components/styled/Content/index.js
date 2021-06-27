@@ -7,5 +7,8 @@ const Content = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 0 32px;
   }
+  @media print {
+    padding: 0;
+  }
 `;
 export default Content;

@@ -8,7 +8,6 @@ export const STATES = {
 };
 
 export default class IndeterminateCheckbox extends React.Component {
-
   static propTypes = {
     checked: PropTypes.oneOf(Object.values(STATES)),
     onChange: PropTypes.func.isRequired,

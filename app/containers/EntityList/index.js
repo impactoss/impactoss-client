@@ -18,9 +18,15 @@ import Loading from 'components/Loading';
 
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
+import EntityListPrintKey from 'components/EntityListPrintKey';
 import EntityListMain from 'components/EntityListMain';
+import PrintOnly from 'components/styled/PrintOnly';
 
-import { selectHasUserRole, selectCurrentPathname } from 'containers/App/selectors';
+import {
+  selectHasUserRole,
+  selectCurrentPathname,
+  selectAllTaxonomiesWithCategories,
+} from 'containers/App/selectors';
 
 import {
   updatePath,
@@ -36,6 +42,7 @@ import {
   selectProgress,
   selectActivePanel,
   selectSelectedEntities,
+  selectProgressTypes,
 } from './selectors';
 
 import messages from './messages';
@@ -43,11 +50,11 @@ import messages from './messages';
 import {
   resetProgress,
   showPanel,
-  save,
-  newConnection,
-  deleteConnection,
+  saveMultiple,
+  newMultipleConnections,
+  deleteMultipleConnections,
   selectEntity,
-  selectEntities,
+  selectMultipleEntities,
   updateQuery,
   updateGroup,
   updatePage,
@@ -57,6 +64,7 @@ import {
   updateSortOrder,
   setClientPath,
   dismissError,
+  dismissAllErrors,
   resetSearchQuery,
 } from './actions';
 
@@ -66,8 +74,6 @@ const Progress = styled.div`
   display: block;
   background: white;
   bottom: 0;
-  -webkit-box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
-  -moz-box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   background-color: ${palette('primary', 4)};
   padding: ${(props) => props.error ? 0 : 40}px;
@@ -81,20 +87,32 @@ const ProgressText = styled.div`
   margin-bottom: 0.25em;
   margin-top: -0.5em;
   overflow: hidden;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.updateClientPath();
   }
 
-  mapError = (error, key) =>
-    fromJS({
-      type: error.data.type,
-      error: error.error,
-      key,
-    });
+  getMessageForType = (type) => {
+    switch (type) {
+      case 'new':
+        return messages.createSuccess;
+      case 'delete':
+        return messages.deleteSuccess;
+      default:
+        return messages.updatesSuccess;
+    }
+  }
+
+  mapError = (error, key) => fromJS({
+    type: error.data.type,
+    error: error.error,
+    key,
+  });
 
   mapErrors = (errors) => errors.reduce((errorMap, error, key) => {
     const entityId = error.data.saveRef;
@@ -103,14 +121,19 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       : errorMap.set(entityId, List().push(this.mapError(error, key)));
   }, Map());
 
-  filterByError = (entities, errors) =>
-    entities.filter((entity) =>
-      errors.has(entity.get('id'))
-    );
+  filterByError = (entities, errors) => entities.filter((entity) => errors.has(entity.get('id')));
 
   render() {
+    const { intl } = this.context;
     // make sure selected entities are still actually on page
-    const { entityIdsSelected, progress, viewDomain } = this.props;
+    const {
+      entityIdsSelected,
+      progress, viewDomain,
+      canEdit,
+      progressTypes,
+      onDismissAllErrors,
+      allTaxonomies,
+    } = this.props;
 
     const sending = viewDomain.get('sending');
     const success = viewDomain.get('success');
@@ -124,45 +147,58 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       ? entityIdsSelected.filter((id) => entities.map((entity) => entity.get('id')).includes(id))
       : entityIdsSelected;
 
+    // detect print to avoid expensive rendering
+    const printing = !!(
+      typeof window !== 'undefined'
+      && window.matchMedia
+      && window.matchMedia('print').matches
+    );
+
     return (
       <div>
-        { !this.props.dataReady &&
-          <EntityListSidebarLoading />
-        }
-        { this.props.dataReady &&
+        {!this.props.dataReady && <EntityListSidebarLoading />}
+        {this.props.dataReady && this.props.showSidebar && !printing && (
           <EntityListSidebar
             listUpdating={progress !== null && progress >= 0 && progress < 100}
             entities={entities}
             taxonomies={this.props.taxonomies}
+            frameworks={this.props.frameworks}
             connections={this.props.connections}
             connectedTaxonomies={this.props.connectedTaxonomies}
             entityIdsSelected={
               entityIdsSelected.size === entityIdsSelectedFiltered.size
-              ? entityIdsSelected
-              : entityIdsSelectedFiltered
+                ? entityIdsSelected
+                : entityIdsSelectedFiltered
             }
             config={this.props.config}
             locationQuery={this.props.locationQuery}
-            canEdit={this.props.hasUserRole[USER_ROLES.MANAGER.value]}
+            canEdit={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
             hasUserRole={this.props.hasUserRole}
             activePanel={this.props.activePanel}
             onPanelSelect={this.props.onPanelSelect}
             onCreateOption={this.props.onCreateOption}
-            onUpdate={(associations, activeEditOption) =>
-              this.props.handleEditSubmit(associations, activeEditOption, this.props.entityIdsSelected, viewDomain.get('errors'))}
+            onUpdate={
+              (associations, activeEditOption) => this.props.handleEditSubmit(
+                associations,
+                activeEditOption,
+                this.props.entityIdsSelected,
+                viewDomain.get('errors'),
+              )}
           />
-        }
+        )}
         <EntityListMain
           listUpdating={progress !== null && progress >= 0 && progress < 100}
           entities={entities}
           errors={errors}
           taxonomies={this.props.taxonomies}
+          allTaxonomies={allTaxonomies}
+          frameworks={this.props.frameworks}
           connections={this.props.connections}
           connectedTaxonomies={this.props.connectedTaxonomies}
           entityIdsSelected={
             entityIdsSelected.size === entityIdsSelectedFiltered.size
-            ? entityIdsSelected
-            : entityIdsSelectedFiltered
+              ? entityIdsSelected
+              : entityIdsSelectedFiltered
           }
           locationQuery={this.props.locationQuery}
 
@@ -171,7 +207,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           entityTitle={this.props.entityTitle}
 
           dataReady={this.props.dataReady}
-          isManager={this.props.hasUserRole[USER_ROLES.MANAGER.value]}
+          isManager={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
           isContributor={this.props.hasUserRole[USER_ROLES.CONTRIBUTOR.value]}
 
           entityIcon={this.props.entityIcon}
@@ -185,56 +221,107 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onResetFilters={this.props.onResetFilters}
           onPageSelect={this.props.onPageSelect}
           onPageItemsSelect={this.props.onPageItemsSelect}
-          onEntityClick={(id, path) => this.props.onEntityClick(id, path, viewDomain.get('errors'))}
+          onEntityClick={(id, path) => this.props.onEntityClick(
+            id, path, viewDomain.get('errors')
+          )}
           onSortBy={this.props.onSortBy}
           onSortOrder={this.props.onSortOrder}
           onDismissError={this.props.onDismissError}
+          onDismissAllErrors={onDismissAllErrors}
         />
-        { (progress !== null && progress < 100) &&
-          <Progress>
-            <ProgressText>
-              <FormattedMessage
-                {...messages.processingUpdates}
-                values={{
-                  processNo: Math.min(success.size + errors.size + 1, sending.size),
-                  totalNo: sending.size,
-                }}
+        {this.props.dataReady && this.props.config.taxonomies && (
+          <PrintOnly>
+            <EntityListPrintKey
+              entities={entities}
+              taxonomies={this.props.taxonomies}
+              config={this.props.config}
+              locationQuery={this.props.locationQuery}
+            />
+          </PrintOnly>
+        )}
+        { (progress !== null && progress < 100)
+          && (
+            <Progress>
+              <ProgressText>
+                <FormattedMessage
+                  {...messages.processingUpdates}
+                  values={{
+                    processNo: Math.min(success.size + errors.size + 1, sending.size),
+                    totalNo: sending.size,
+                    types:
+                    intl.formatMessage(messages[
+                      `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
+                    ]),
+                  }}
+                />
+              </ProgressText>
+              <Loading
+                progress={progress}
               />
-            </ProgressText>
-            <Loading
-              progress={progress}
-            />
-          </Progress>
+            </Progress>
+          )
         }
-        {(viewDomain.get('errors').size > 0 && progress >= 100) &&
-          <Progress error>
-            <Messages
-              type="error"
-              message={this.context.intl.formatMessage(messages.updatesFailed, { errorNo: viewDomain.get('errors').size })}
-              onDismiss={this.props.resetProgress}
-              preMessage={false}
-            />
-          </Progress>
+        {(viewDomain.get('errors').size > 0 && progress >= 100)
+          && (
+            <Progress error>
+              <Messages
+                type="error"
+                message={
+                  intl.formatMessage(
+                    messages.updatesFailed,
+                    {
+                      errorNo: viewDomain.get('errors').size,
+                      types:
+                      intl.formatMessage(messages[
+                        `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
+                      ]),
+                    },
+                  )
+                }
+                onDismiss={this.props.resetProgress}
+                preMessage={false}
+              />
+            </Progress>
+          )
         }
-        {(viewDomain.get('errors').size === 0 && progress >= 100) &&
-          <Progress error>
-            <Messages
-              type="success"
-              message={this.context.intl.formatMessage(messages.updatesSuccess, { successNo: viewDomain.get('success').size })}
-              onDismiss={this.props.resetProgress}
-              autoDismiss={2000}
-            />
-          </Progress>
+        {(viewDomain.get('errors').size === 0 && progress >= 100)
+          && (
+            <Progress error>
+              <Messages
+                type="success"
+                message={
+                  intl.formatMessage(
+                    this.getMessageForType(
+                      progressTypes.size === 1 ? progressTypes.first() : 'save',
+                      viewDomain.get('success').size,
+                    ),
+                    {
+                      successNo: viewDomain.get('success').size,
+                    },
+                  )
+                }
+                onDismiss={this.props.resetProgress}
+                autoDismiss={2000}
+              />
+            </Progress>
+          )
         }
       </div>
     );
   }
 }
 
+EntityList.defaultProps = {
+  showSidebar: true,
+  canEdit: true,
+};
+
 EntityList.propTypes = {
   // wrapper props
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
+  allTaxonomies: PropTypes.instanceOf(Map),
+  frameworks: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   config: PropTypes.object,
@@ -249,6 +336,7 @@ EntityList.propTypes = {
   entityIdsSelected: PropTypes.object,
   viewDomain: PropTypes.object,
   progress: PropTypes.number,
+  progressTypes: PropTypes.instanceOf(List),
   // dispatch props
   onPanelSelect: PropTypes.func.isRequired,
   handleEditSubmit: PropTypes.func.isRequired,
@@ -269,6 +357,9 @@ EntityList.propTypes = {
   onSortOrder: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func.isRequired,
   onDismissError: PropTypes.func.isRequired,
+  onDismissAllErrors: PropTypes.func.isRequired,
+  canEdit: PropTypes.bool,
+  showSidebar: PropTypes.bool,
 };
 
 EntityList.contextTypes = {
@@ -281,7 +372,9 @@ const mapStateToProps = (state) => ({
   entityIdsSelected: selectSelectedEntities(state),
   viewDomain: selectDomain(state),
   progress: selectProgress(state),
+  progressTypes: selectProgressTypes(state),
   currentPath: selectCurrentPathname(state),
+  allTaxonomies: selectAllTaxonomiesWithCategories(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -289,6 +382,10 @@ function mapDispatchToProps(dispatch, props) {
     onDismissError: (key) => {
       dispatch(resetProgress());
       dispatch(dismissError(key));
+    },
+    onDismissAllErrors: () => {
+      dispatch(resetProgress());
+      dispatch(dismissAllErrors());
     },
     resetProgress: () => {
       dispatch(resetProgress());
@@ -314,7 +411,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(updatePath(`/${path || props.config.clientPath}/${id}`));
     },
     onEntitySelectAll: (ids) => {
-      dispatch(selectEntities(ids));
+      dispatch(selectMultipleEntities(ids));
     },
     onTagClick: (value) => {
       dispatch(updateQuery(fromJS([value])));
@@ -323,8 +420,7 @@ function mapDispatchToProps(dispatch, props) {
       // default expand by 1
       dispatch(updateExpand(typeof expandNoNew !== 'undefined'
         ? expandNoNew
-        : props.expandNo + 1
-      ));
+        : props.expandNo + 1));
     },
     onSearch: (value) => {
       dispatch(updateQuery(fromJS([
@@ -387,7 +483,6 @@ function mapDispatchToProps(dispatch, props) {
 
       // figure out changes
       const changes = formData.get('values').filter((option) => option.get('hasChanged'));
-
       // figure out updates (either new attribute values or new connections)
       const creates = changes
         .filter((option) => option.get('checked') === true)
@@ -396,9 +491,11 @@ function mapDispatchToProps(dispatch, props) {
       // attributes
       if (activeEditOption.group === 'attributes') {
         if (creates.size > 0) {
-          // take the first TODO multiselect should be run in single value mode and only return 1 value
+          // take the first
+          // TODO multiselect should be run in single value mode and only return 1 value
           const newValue = creates.first();
           entities.forEach((entity) => {
+            // not exactly sure what is happening here?
             if (errors && errors.size) {
               errors.forEach((error, key) => {
                 if (error.data.saveRef === entity.get('id')) {
@@ -406,16 +503,18 @@ function mapDispatchToProps(dispatch, props) {
                 }
               });
             }
-
-            if (entity.getIn(['attributes', activeEditOption.optionId]) !== newValue) {
-              dispatch(save(Map()
+          });
+          dispatch(saveMultiple(
+            props.config.serverPath,
+            entities.filter(
+              (entity) => entity.getIn(['attributes', activeEditOption.optionId]) !== newValue
+            ).map(
+              (entity) => Map()
                 .set('path', props.config.serverPath)
                 .set('entity', entity.setIn(['attributes', activeEditOption.optionId], newValue))
                 .set('saveRef', entity.get('id'))
-                .toJS()
-              ));
-            }
-          });
+            ).toJS()
+          ));
         }
       // connections
       } else {
@@ -424,58 +523,105 @@ function mapDispatchToProps(dispatch, props) {
           .filter((option) => option.get('checked') === false)
           .map((option) => option.get('value'));
 
-        entities.forEach((entity) => {
-          if (errors && errors.size) {
-            errors.forEach((error, key) => {
-              if (error.data.saveRef === entity.get('id')) {
-                dispatch(dismissError(key));
-              }
-            });
+        entities.forEach(
+          (entity) => {
+            if (errors && errors.size) {
+              errors.forEach((error, key) => {
+                if (error.data.saveRef === entity.get('id')) {
+                  dispatch(dismissError(key));
+                }
+              });
+            }
           }
-          let existingAssignments;
-          switch (activeEditOption.group) {
-            case ('taxonomies'):
-              existingAssignments = entity.get('categories');
-              break;
-            case ('connections'):
-              existingAssignments = entity.get(activeEditOption.optionId);
-              break;
-            default:
-              existingAssignments = List();
-              break;
-          }
-          // create connections
-          if (creates.size > 0) {
-            // exclude existing relations from the changeSet
-            const entityCreates = !!existingAssignments && existingAssignments.size > 0
-              ? creates.filter((id) => !existingAssignments.includes(parseInt(id, 10)))
-              : creates;
-
-            // associations
-            entityCreates.forEach((id) => dispatch(newConnection({
-              path: activeEditOption.path,
-              entity: {
-                attributes: {
-                  [activeEditOption.ownKey]: entity.get('id'),
-                  [activeEditOption.key]: id,
-                },
-              },
-              saveRef: entity.get('id'),
-            })));
-          }
-          // delete connections
-          if (deletes.size > 0) {
-            if (!!existingAssignments && existingAssignments.size > 0) {
-              existingAssignments
-                .filter((assigned) => deletes.includes(assigned.toString()))
-                .forEach((assigned, id) => dispatch(deleteConnection({
+        );
+        const updates = entities.reduce(
+          (memo, entity) => {
+            let entityCreates = List();
+            let entityDeletes = List();
+            let existingAssignments;
+            switch (activeEditOption.group) {
+              case ('taxonomies'):
+                existingAssignments = entity.get('categories');
+                break;
+              case ('connections'):
+                existingAssignments = entity.get(activeEditOption.connection);
+                break;
+              default:
+                existingAssignments = List();
+                break;
+            }
+            // create connections
+            if (creates.size > 0) {
+              // exclude existing relations from the changeSet
+              entityCreates = !!existingAssignments && existingAssignments.size > 0
+                ? creates.filter(
+                  (id) => !existingAssignments.includes(parseInt(id, 10))
+                )
+                : creates;
+              entityCreates = entityCreates.map(
+                (id) => fromJS({
+                  path: activeEditOption.path,
+                  entity: {
+                    attributes: {
+                      [activeEditOption.ownKey]: entity.get('id'),
+                      [activeEditOption.key]: id,
+                    },
+                  },
+                  saveRef: entity.get('id'),
+                })
+              );
+            }
+            // delete connections
+            if (
+              deletes.size > 0
+              && !!existingAssignments
+              && existingAssignments.size > 0
+            ) {
+              entityDeletes = existingAssignments.filter(
+                (assigned) => deletes.includes(assigned.toString())
+              ).map(
+                (assigned, id) => fromJS({
                   path: activeEditOption.path,
                   id,
                   saveRef: entity.get('id'),
-                })));
+                })
+              ).toList();
             }
-          }
-        }); // each entity
+            return memo
+              .set('creates', memo.get('creates').concat(entityCreates))
+              .set('deletes', memo.get('deletes').concat(entityDeletes));
+          },
+          Map().set('creates', List()).set('deletes', List()),
+        ); // reduce entities
+        // associations
+        if (updates.get('creates') && updates.get('creates').size > 0) {
+          dispatch(newMultipleConnections(
+            activeEditOption.path,
+            updates.get('creates').toJS(),
+          ));
+        }
+        if (updates.get('deletes') && updates.get('deletes').size > 0) {
+          dispatch(deleteMultipleConnections(
+            activeEditOption.path,
+            updates.get('deletes').toJS(),
+          ));
+        }
+        // entityCreates.forEach((id) => dispatch(newConnection({
+        //   path: activeEditOption.path,
+        //   entity: {
+        //     attributes: {
+        //       [activeEditOption.ownKey]: entity.get('id'),
+        //       [activeEditOption.key]: id,
+        //     },
+        //   },
+        //   saveRef: entity.get('id'),
+        // })));
+        // existingAssignments
+        //   .forEach((assigned, id) => dispatch(deleteConnection({
+        //     path: activeEditOption.path,
+        //     id,
+        //     saveRef: entity.get('id'),
+        //   })));
       }
     },
   };

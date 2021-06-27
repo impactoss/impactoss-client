@@ -19,10 +19,22 @@ import {
   getMarkdownField,
   getLinkField,
   getMeasureConnectionField,
+  getMeasureConnectionGroupsField,
   getRecommendationConnectionField,
-  getSdgTargetConnectionField,
+  getRecommendationConnectionGroupsField,
   getManagerField,
+  getEntityLinkField,
+  getTaxonomyFields,
+  hasTaxonomyCategories,
+  getDateField,
 } from 'utils/fields';
+
+import {
+  getEntityTitle,
+  getEntityTitleTruncated,
+  getEntityReference,
+} from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
@@ -37,9 +49,10 @@ import {
   selectReady,
   selectIsUserManager,
   selectMeasureConnections,
-  selectSdgTargetConnections,
   selectRecommendationConnections,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
+
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
@@ -48,48 +61,69 @@ import {
   selectViewEntity,
   selectRecommendations,
   selectMeasures,
-  selectSdgTargets,
-  selectTaxonomies,
+  selectTaxonomiesWithCategories,
+  selectParentTaxonomy,
+  selectChildTaxonomies,
+  selectChildRecommendations,
+  selectChildMeasures,
 } from './selectors';
 
 import { DEPENDENCIES } from './constants';
 
 export class CategoryView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
   }
-  getHeaderMainFields = (entity, isManager) => ([
-    { // fieldGroup
-      fields: [
-        getReferenceField(entity, isManager),
-        getTitleField(entity, isManager),
-        getCategoryShortTitleField(entity, isManager),
-      ],
-    },
-  ]);
+
+  getHeaderMainFields = (entity, isManager, parentTaxonomy) => {
+    const groups = [];
+    groups.push(
+      { // fieldGroup
+        fields: [
+          getReferenceField(entity, isManager),
+          getTitleField(entity, isManager),
+          getCategoryShortTitleField(entity, isManager),
+        ],
+      },
+    );
+    // include parent link
+    if (entity.get('category') && parentTaxonomy) {
+      groups.push({
+        label: appMessages.entities.taxonomies.parent,
+        icon: 'categories',
+        fields: [getEntityLinkField(entity.get('category'), '/category', '', getEntityTitle(parentTaxonomy))],
+      });
+    }
+    return groups;
+  };
+
   getHeaderAsideFields = (entity, isManager) => {
+    const { intl } = this.context;
     const fields = []; // fieldGroups
     if (isManager) {
       fields.push({
         fields: [
           getStatusField(entity),
-          getMetaField(entity, appMessages),
+          getMetaField(entity),
         ],
       });
     }
-    if (entity.getIn(['taxonomy', 'attributes', 'tags_users']) && entity.getIn(['attributes', 'user_only'])) {
+    if (
+      entity.getIn(['taxonomy', 'attributes', 'tags_users'])
+      && entity.getIn(['attributes', 'user_only'])
+    ) {
       fields.push({
         type: 'dark',
         fields: [{
           type: 'text',
-          value: this.context.intl.formatMessage(appMessages.textValues.user_only),
+          value: intl.formatMessage(appMessages.textValues.user_only),
           label: appMessages.attributes.user_only,
         }],
       });
@@ -99,42 +133,120 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
 
   getBodyMainFields = (
     entity,
-    recommendations,
+    recommendationsByFw,
+    childRecommendationsByFw,
     measures,
+    childMeasures,
     taxonomies,
-    sdgtargets,
     onEntityClick,
-    sdgtargetConnections,
     measureConnections,
-    recommendationConnections
+    recommendationConnections,
+    frameworks,
   ) => {
     const fields = [];
+    // own attributes
     fields.push({
-      fields: [getMarkdownField(entity, 'description', true, appMessages)],
+      fields: [getMarkdownField(entity, 'description', true)],
     });
+    // connections
     if (!entity.getIn(['attributes', 'user_only'])) {
+      // measures
+      // child categories related measures
+      const measuresConnections = [];
+      if (childMeasures) {
+        childMeasures.forEach((tax) => measuresConnections.push(
+          getMeasureConnectionGroupsField(
+            tax.get('categories'),
+            appMessages.entities.taxonomies[tax.get('id')].single,
+            taxonomies,
+            measureConnections,
+            onEntityClick,
+          )
+        ));
+      } else if (entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures) {
+        // related actions
+        measuresConnections.push(
+          getMeasureConnectionField(
+            measures,
+            taxonomies,
+            measureConnections,
+            onEntityClick,
+          ),
+        );
+      }
       fields.push({
-        label: appMessages.entities.connections.plural,
-        icon: 'connections',
-        fields: [
-          entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures &&
-            getMeasureConnectionField(measures, taxonomies, measureConnections, appMessages, onEntityClick),
-          entity.getIn(['taxonomy', 'attributes', 'tags_sdgtargets']) && sdgtargets &&
-            getSdgTargetConnectionField(sdgtargets, taxonomies, sdgtargetConnections, appMessages, onEntityClick),
-          entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendations &&
-            getRecommendationConnectionField(recommendations, taxonomies, recommendationConnections, appMessages, onEntityClick),
-        ],
+        label: appMessages.nav.measuresSuper,
+        icon: 'measures',
+        fields: measuresConnections,
+      });
+
+      // child taxonomies tag recs
+      // child categories related recommendations
+      const recConnections = [];
+      if (childRecommendationsByFw) {
+        childRecommendationsByFw.forEach((recs, fwid) => {
+          const framework = frameworks.find((fw) => qe(fw.get('id'), fwid));
+          const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
+          recs.forEach((tax) => {
+            recConnections.push(
+              getRecommendationConnectionGroupsField(
+                tax.get('categories'),
+                appMessages.entities.taxonomies[tax.get('id')].single,
+                taxonomies,
+                recommendationConnections,
+                onEntityClick,
+                fwid,
+                hasResponse,
+              )
+            );
+          });
+        });
+        // related recommendations
+      } else if (entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendationsByFw) {
+        recommendationsByFw.forEach((recs, fwid) => {
+          const framework = frameworks.find((fw) => qe(fw.get('id'), fwid));
+          const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
+          recConnections.push(
+            getRecommendationConnectionField(
+              recs,
+              taxonomies,
+              recommendationConnections,
+              onEntityClick,
+              fwid,
+              hasResponse,
+            ),
+          );
+        });
+      }
+      fields.push({
+        label: appMessages.nav.recommendationsSuper,
+        icon: 'recommendations',
+        fields: recConnections,
       });
     }
     return fields;
   };
 
-  getBodyAsideFields = (entity, isManager) => {
+  getBodyAsideFields = (entity, isManager, childTaxonomies) => {
     const fields = [];
-    if (entity.getIn(['attributes', 'url']) && entity.getIn(['attributes', 'url']).trim().length > 0) {
+    // include children links
+    if (childTaxonomies && hasTaxonomyCategories(childTaxonomies)) {
+      fields.push({ // fieldGroup
+        label: appMessages.entities.taxonomies.children,
+        icon: 'categories',
+        fields: getTaxonomyFields(childTaxonomies, true),
+      });
+    }
+    const showLink = entity.getIn(['attributes', 'url'])
+      && entity.getIn(['attributes', 'url']).trim().length > 0;
+    const showDate = entity.getIn(['taxonomy', 'attributes', 'has_date']);
+    if (showLink || showDate) {
       fields.push({
         type: 'dark',
-        fields: [getLinkField(entity)],
+        fields: [
+          showDate && getDateField(entity, 'date', true),
+          showLink && getLinkField(entity),
+        ],
       });
     }
     if (isManager && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
@@ -150,53 +262,74 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     return fields.length > 0 ? fields : null;
   };
 
-  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+  /* eslint-disable react/destructuring-assignment */
+  getTaxTitle = (id) => this.context.intl.formatMessage(
+    appMessages.entities.taxonomies[id].single
+  );
+  /* eslint-ensable react/destructuring-assignment */
 
   render() {
+    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
       isManager,
-      recommendations,
+      recommendationsByFw,
+      childRecommendationsByFw,
       measures,
+      childMeasures,
       taxonomies,
-      sdgtargets,
       onEntityClick,
-      sdgtargetConnections,
       measureConnections,
       recommendationConnections,
+      parentTaxonomy,
+      childTaxonomies,
+      frameworks,
     } = this.props;
-
     let buttons = [];
     if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
       buttons = isManager
-      ? [
-        {
-          type: 'edit',
-          onClick: () => this.props.handleEdit(this.props.params.id),
-        },
-        {
+        ? buttons.concat([
+          {
+            type: 'edit',
+            onClick: () => this.props.handleEdit(this.props.params.id),
+          },
+          {
+            type: 'close',
+            onClick: () => this.props.handleClose(this.props.viewEntity && this.props.viewEntity.getIn(['taxonomy', 'id'])),
+          },
+        ])
+        : buttons.concat([{
           type: 'close',
-          onClick: () => this.props.handleClose(this.props.viewEntity.getIn(['taxonomy', 'id'])),
-        },
-      ]
-      : [{
-        type: 'close',
-        onClick: () => this.props.handleClose(this.props.viewEntity.getIn(['taxonomy', 'id'])),
-      }];
+          onClick: () => this.props.handleClose(this.props.viewEntity && this.props.viewEntity.getIn(['taxonomy', 'id'])),
+        }]);
     }
 
-    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-    if (viewEntity && viewEntity.get('taxonomy')) {
+    let pageTitle = intl.formatMessage(messages.pageTitle);
+    let metaTitle = pageTitle;
+    if (
+      viewEntity
+      && viewEntity.get('taxonomy')
+    ) {
       pageTitle = this.getTaxTitle(viewEntity.getIn(['taxonomy', 'id']));
+      const ref = getEntityReference(viewEntity, false);
+      metaTitle = ref
+        ? `${pageTitle} ${ref}: ${getEntityTitleTruncated(viewEntity)}`
+        : `${pageTitle}: ${getEntityTitleTruncated(viewEntity)}`;
     }
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+          title={metaTitle}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
@@ -206,37 +339,46 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
             icon="categories"
             buttons={buttons}
           />
-          { !dataReady &&
-            <Loading />
+          { !dataReady
+            && <Loading />
           }
-          { !viewEntity && dataReady &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          { !viewEntity && dataReady
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          { viewEntity && dataReady &&
-            <EntityView
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(viewEntity, isManager),
-                  aside: this.getHeaderAsideFields(viewEntity, isManager),
-                },
-                body: {
-                  main: this.getBodyMainFields(
-                    viewEntity,
-                    recommendations,
-                    measures,
-                    taxonomies,
-                    sdgtargets,
-                    onEntityClick,
-                    sdgtargetConnections,
-                    measureConnections,
-                    recommendationConnections
-                  ),
-                  aside: this.getBodyAsideFields(viewEntity, isManager),
-                },
-              }}
-            />
+          { viewEntity && dataReady
+            && (
+              <EntityView
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(viewEntity, isManager, parentTaxonomy),
+                    aside: this.getHeaderAsideFields(viewEntity, isManager),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(
+                      viewEntity,
+                      recommendationsByFw,
+                      childRecommendationsByFw,
+                      measures,
+                      childMeasures,
+                      taxonomies,
+                      onEntityClick,
+                      measureConnections,
+                      recommendationConnections,
+                      frameworks,
+                    ),
+                    aside: this.getBodyAsideFields(
+                      viewEntity,
+                      isManager,
+                      childTaxonomies,
+                    ),
+                  },
+                }}
+              />
+            )
           }
         </Content>
       </div>
@@ -253,13 +395,16 @@ CategoryView.propTypes = {
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   isManager: PropTypes.bool,
-  recommendations: PropTypes.object,
+  parentTaxonomy: PropTypes.object,
+  recommendationsByFw: PropTypes.object,
+  childRecommendationsByFw: PropTypes.object,
   taxonomies: PropTypes.object,
+  childTaxonomies: PropTypes.object,
   measures: PropTypes.object,
-  sdgtargets: PropTypes.object,
+  childMeasures: PropTypes.object,
   measureConnections: PropTypes.object,
-  sdgtargetConnections: PropTypes.object,
   recommendationConnections: PropTypes.object,
+  frameworks: PropTypes.object,
 };
 
 CategoryView.contextTypes = {
@@ -270,13 +415,16 @@ const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
-  recommendations: selectRecommendations(state, props.params.id),
+  recommendationsByFw: selectRecommendations(state, props.params.id),
+  childRecommendationsByFw: selectChildRecommendations(state, props.params.id),
+  childMeasures: selectChildMeasures(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
-  sdgtargets: selectSdgTargets(state, props.params.id),
-  taxonomies: selectTaxonomies(state),
+  taxonomies: selectTaxonomiesWithCategories(state),
+  parentTaxonomy: selectParentTaxonomy(state, props.params.id),
+  childTaxonomies: selectChildTaxonomies(state, props.params.id),
   measureConnections: selectMeasureConnections(state),
-  sdgtargetConnections: selectSdgTargetConnections(state),
   recommendationConnections: selectRecommendationConnections(state),
+  frameworks: selectActiveFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -291,7 +439,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`${PATHS.CATEGORIES}${PATHS.EDIT}/${categoryId}`, { replace: true }));
     },
     handleClose: (taxonomyId) => {
-      dispatch(closeEntity(`${PATHS.TAXONOMIES}/${taxonomyId}`));
+      dispatch(closeEntity(taxonomyId ? `${PATHS.TAXONOMIES}/${taxonomyId}` : PATHS.OVERVIEW));
     },
   };
 }

@@ -35,7 +35,6 @@ const StyledForm = styled(Form)`
 `;
 
 class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   renderField = (field) => {
     const { id, model, ...props } = omit(field, nonControlProps);
     return (
@@ -54,25 +53,29 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
           <FieldGroupWrapper>
             {fields.map((field, i) => (
               <Field key={i}>
-                { field.label !== false &&
-                  <Label htmlFor={field.id}>
-                    {`${field.label || startCase(field.id)}`}
-                    { field.validators && field.validators.required &&
-                      <Required>*</Required>
-                    }
-                  </Label>
+                { field.label !== false
+                  && (
+                    <Label htmlFor={field.id}>
+                      {`${field.label || startCase(field.id)}`}
+                      { field.validators && field.validators.required
+                      && <Required>*</Required>
+                      }
+                    </Label>
+                  )
                 }
                 {this.renderField(field)}
                 {
-                  field.errorMessages &&
-                  <ErrorWrapper>
-                    <Errors
-                      className="errors"
-                      model={field.model}
-                      show="touched"
-                      messages={field.errorMessages}
-                    />
-                  </ErrorWrapper>
+                  field.errorMessages
+                  && (
+                    <ErrorWrapper>
+                      <Errors
+                        className="errors"
+                        model={field.model}
+                        show="touched"
+                        messages={field.errorMessages}
+                      />
+                    </ErrorWrapper>
+                  )
                 }
               </Field>
             ))}
@@ -83,10 +86,12 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
   );
 
   render() {
-    const { fields, model, handleSubmit, handleCancel, labels } = this.props;
+    const {
+      fields, model, handleSubmit, handleCancel, labels,
+    } = this.props;
     return (
       <FormWrapper>
-        <StyledForm model={model} onSubmit={handleSubmit} >
+        <StyledForm model={model} onSubmit={handleSubmit}>
           { fields && this.renderBody(fields) }
           <FormFooter>
             <FormFooterButtons>

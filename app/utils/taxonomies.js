@@ -1,6 +1,6 @@
 import { PATHS } from 'containers/App/constants';
-import { find } from 'lodash/collection';
-import { TAXONOMY_GROUPS } from 'themes/config';
+import { qe } from 'utils/quasi-equals';
+import { fromJS } from 'immutable';
 
 export const getTaxonomyTagList = (taxonomy) => {
   const tags = [];
@@ -16,62 +16,110 @@ export const getTaxonomyTagList = (taxonomy) => {
       icon: 'recommendations',
     });
   }
-  if (taxonomy.getIn(['attributes', 'tags_sdgtargets'])) {
-    tags.push({
-      type: 'sdgtargets',
-      icon: 'sdgtargets',
-    });
-  }
   return tags;
 };
-export const mapToTaxonomyList = (taxonomies, onLink, activeId, onMouseOver) => taxonomies.map((tax) => ({
-  id: tax.get('id'),
-  group: find(TAXONOMY_GROUPS, (taxGroup) => {
-    const priority = tax.getIn(['attributes', 'priority']);
-    return priority
-      ? priority <= taxGroup.priorityMax
-        && priority >= taxGroup.priorityMin
-      : taxGroup.default;
-  }),
-  count: tax.count,
-  onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${tax.get('id')}`),
-  onMouseOver: (isOver = true) => onMouseOver && onMouseOver(tax.get('id'), isOver),
-  active: parseInt(activeId, 10) === parseInt(tax.get('id'), 10),
-})).toArray();
 
-export const getDefaultTaxonomy = (taxonomies) => {
-  const taxGroup = TAXONOMY_GROUPS[0];
-  return taxonomies.reduce((memo, tax) => {
+const mapTaxonomy = (tax, childTaxonomies, activeId, onLink) => {
+  const children = childTaxonomies
+    .filter((t) => qe(t.getIn(['attributes', 'parent_id']), tax.get('id')))
+    .toList()
+    .toJS();
+  return fromJS({
+    id: tax.get('id'),
+    count: tax.count,
+    onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${tax.get('id')}`),
+    active: parseInt(activeId, 10) === parseInt(tax.get('id'), 10),
+    children: children && children.map((child) => ({
+      id: child.id,
+      child: true,
+      count: child.count,
+      onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${child.id}`),
+      active: parseInt(activeId, 10) === parseInt(child.id, 10),
+    })),
+  });
+};
+
+export const prepareTaxonomyGroups = (
+  taxonomies, // OrderedMap
+  activeId,
+  onLink,
+  frameworkId,
+  frameworks,
+) => {
+  const parentTaxonomies = taxonomies.filter((tax) => tax.getIn(['attributes', 'parent_id']) === ''
+    || tax.getIn(['attributes', 'parent_id']) === null);
+  const childTaxonomies = taxonomies.filter((tax) => !!tax.getIn(['attributes', 'parent_id']));
+  const groups = [];
+  if (frameworkId && frameworkId !== 'all') {
+    // single framework mode
+    groups.push({
+      id: frameworkId,
+      frameworkId,
+      taxonomies: parentTaxonomies
+        .filter((tax) => tax.get('frameworkIds').find((fw) => qe(fw, frameworkId)))
+        .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
+        .toList()
+        .toJS(),
+    });
+  } else {
+    // multi-framework mode
+    // exclusive taxonomies (one framework only)
+    frameworks.forEach((fw) => {
+      const fwTaxonomies = parentTaxonomies
+        .filter((tax) => {
+          const taxFwIds = tax.get('frameworkIds');
+          return tax.getIn(['attributes', 'tags_recommendations'])
+            && taxFwIds.size === 1
+            && taxFwIds.find((fwid) => qe(fwid, fw.get('id')));
+        })
+        .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
+        .toList()
+        .toJS();
+
+      if (fwTaxonomies && fwTaxonomies.length > 0) {
+        groups.push({
+          id: fw.get('id'),
+          frameworkId: fw.get('id'),
+          taxonomies: fwTaxonomies,
+        });
+      }
+    });
+    // common frameworks
+    groups.push({
+      id: 'common',
+      taxonomies: parentTaxonomies
+        .filter((tax) => tax.getIn(['attributes', 'tags_recommendations'])
+          && tax.get('frameworkIds').size > 1)
+        .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
+        .toList()
+        .toJS(),
+    });
+  }
+
+  const measureOnlyTaxonomies = parentTaxonomies
+    .filter((tax) => tax.getIn(['attributes', 'tags_measures'])
+      && !tax.getIn(['attributes', 'tags_recommendations']));
+  if (measureOnlyTaxonomies && measureOnlyTaxonomies.size > 0) {
+    groups.push({
+      id: 'measures',
+      taxonomies: measureOnlyTaxonomies
+        .map((tax) => mapTaxonomy(tax, taxonomies, activeId, onLink))
+        .toList()
+        .toJS(),
+    });
+  }
+  return groups;
+};
+
+export const getDefaultTaxonomy = (taxonomies, frameworkId) => taxonomies
+  .filter((tax) => qe(tax.getIn(['attributes', 'framework_id']), frameworkId))
+  .reduce((memo, tax) => {
     if (memo) {
       const priority = tax.getIn(['attributes', 'priority']);
-      if (priority
-        && priority <= taxGroup.priorityMax
-        && priority >= taxGroup.priorityMin
-        && priority < memo.getIn(['attributes', 'priority'])) {
+      if (priority && priority < memo.getIn(['attributes', 'priority'])) {
         return tax;
       }
       return memo;
     }
     return tax;
   }, null);
-};
-
-export const mapToCategoryList = (categories, onLink, countAttributes) =>
-  categories.map((cat) => ({
-    id: cat.get('id'),
-    reference: cat.getIn(['attributes', 'reference']) && cat.getIn(['attributes', 'reference']).trim() !== ''
-      ? cat.getIn(['attributes', 'reference'])
-      : null,
-    title: cat.getIn(['attributes', 'title']),
-    draft: cat.getIn(['attributes', 'draft']),
-    onLink: () => onLink(`${PATHS.CATEGORIES}/${cat.get('id')}`),
-    counts: countAttributes
-      ? countAttributes.map((countAttribute) => ({
-        total: cat.get(countAttribute.total),
-        public: cat.get(countAttribute.public),
-        draft: cat.get(countAttribute.total) - cat.get(countAttribute.public),
-        accepted: countAttribute.accepted ? cat.get(countAttribute.accepted) : null,
-        noted: countAttribute.accepted ? (cat.get(countAttribute.public) - cat.get(countAttribute.accepted)) : null,
-      }))
-      : null,
-  })).toArray();

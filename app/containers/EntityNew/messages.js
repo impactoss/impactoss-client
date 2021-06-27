@@ -31,13 +31,7 @@ export default defineMessages({
   recommendations: {
     pageTitle: {
       id: 'app.containers.EntityNew.recommendations.pageTitle',
-      defaultMessage: 'New Recommendation',
-    },
-  },
-  sdgtargets: {
-    pageTitle: {
-      id: 'app.containers.EntityNew.sdgtargets.pageTitle',
-      defaultMessage: 'New SDG target',
+      defaultMessage: 'New { type }',
     },
   },
 });

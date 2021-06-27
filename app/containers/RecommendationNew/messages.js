@@ -8,7 +8,7 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   pageTitle: {
     id: 'app.containers.RecommendationNew.pageTitle',
-    defaultMessage: 'New Recommendation',
+    defaultMessage: 'New {type}',
   },
   metaDescription: {
     id: 'app.containers.RecommendationNew.metaDescription',
@@ -16,6 +16,6 @@ export default defineMessages({
   },
   header: {
     id: 'app.containers.RecommendationNew.header',
-    defaultMessage: 'New Recommendation',
+    defaultMessage: 'New {type}',
   },
 });

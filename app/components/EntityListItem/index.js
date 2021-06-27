@@ -5,6 +5,7 @@ import { palette } from 'styled-theme';
 import { find } from 'lodash/collection';
 import { Map, List } from 'immutable';
 import asList from 'utils/as-list';
+import { COLUMN_WIDTHS } from 'themes/config';
 
 import Messages from 'components/Messages';
 import Component from 'components/styled/Component';
@@ -20,7 +21,10 @@ const Styled = styled.span`
   vertical-align: top;
   width: 100%;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
-    width: ${(props) => props.expanded ? 50 : 100}%;
+    width: ${(props) => props.expanded ? COLUMN_WIDTHS.HALF * 100 : 100}%;
+  }
+  @media print {
+    width: ${(props) => props.expanded ? COLUMN_WIDTHS.HALF * 100 : 100}%;
   }
 `;
 const Item = styled(Component)`
@@ -37,9 +41,14 @@ const MainWrapper = styled(Component)`
   width:100%;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     display: table-cell;
-    width: ${(props) => props.expandable ? 66 : 100}%;
-    border-right: ${(props) => props.expandable ? '1px solid' : '0'};
+    width: ${(props) => props.expandable ? COLUMN_WIDTHS.MAIN * 100 : 100}%;
+    border-right: ${(props) => props.expandable ? '3px solid' : '0'};
     border-right-color: ${palette('background', 1)};
+  }
+  @media print {
+    border: none;
+    display: table-cell;
+    width: ${(props) => props.expandable ? COLUMN_WIDTHS.MAIN * 100 : 100}%;
   }
 `;
 const MainInnerWrapper = styled(Component)`
@@ -47,7 +56,7 @@ const MainInnerWrapper = styled(Component)`
   width: 100%;
 `;
 
-class EntityListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class EntityListItem extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
     return this.props.entity !== nextProps.entity
       || this.props.isSelected !== nextProps.isSelected
@@ -57,14 +66,15 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
   }
 
   transformMessage = (type, msg) => {
+    const { intl } = this.context;
     if (type === 'delete') {
-      return this.context.intl
-        ? this.context.intl.formatMessage(messages.associationNotExistent)
+      return intl
+        ? intl.formatMessage(messages.associationNotExistent)
         : msg;
     }
     if (type === 'new') {
-      return this.context.intl
-        ? this.context.intl.formatMessage(messages.associationAlreadyPresent)
+      return intl
+        ? intl.formatMessage(messages.associationAlreadyPresent)
         : msg;
     }
     return msg;
@@ -94,7 +104,13 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
           <Messages
             key={i}
             type="error"
-            messages={updateError.getIn(['error', 'messages']).map((msg) => this.transformMessage(updateError.get('type'), msg)).toArray()}
+            messages={
+              updateError
+                .getIn(['error', 'messages'])
+                .map((msg) => this.transformMessage(updateError.get('type'), msg))
+                .valueSeq()
+                .toArray()
+            }
             onDismiss={() => this.props.onDismissError(updateError.get('key'))}
             preMessage={false}
             details
@@ -103,8 +119,8 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
         <Item error={error}>
           <MainWrapper expandable={entity.get('expandable')}>
             <MainInnerWrapper>
-              {isManager &&
-                <EntityListItemSelect checked={isSelected} onSelect={onSelect} />
+              {isManager
+                && <EntityListItemSelect checked={isSelected} onSelect={onSelect} />
               }
               <EntityListItemMain
                 entity={entity}
@@ -121,17 +137,17 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
             </MainInnerWrapper>
           </MainWrapper>
           {
-            entity.get('expandable') &&
-            asList(entity.get('expandable')).map((attribute, i, list) =>
+            entity.get('expandable')
+            && asList(entity.get('expandable')).map((attribute, i, list) => (
               <EntityListItemExpandable
                 key={i}
                 column={find(config.expandableColumns, (col) => col.type === attribute)}
                 count={entity.get(attribute) ? entity.get(attribute).size : 0}
                 dates={attribute === 'reports' ? entity.get('dates').toJS() : null}
                 onClick={() => onExpand(expandNo > i ? i : i + 1)}
-                width={(1 - 0.66) / list.size}
+                colWidth={COLUMN_WIDTHS.OTHER / list.size}
               />
-            )
+            ))
           }
         </Item>
       </Styled>

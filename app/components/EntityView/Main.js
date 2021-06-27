@@ -13,6 +13,11 @@ const Main = styled(Section)`
     display: table-cell;
     width: ${(props) => props.hasAside ? '70%' : '100%'};
   }
+  @media print {
+    display: ${({ hasAside, bottom }) => (hasAside && !bottom) ? 'table-cell' : 'block'};
+    width: ${({ hasAside, bottom }) => (hasAside && !bottom) ? '70%' : '100%'};
+    border-right-style: none;
+  }
 `;
 
 export default Main;

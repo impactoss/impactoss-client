@@ -41,38 +41,50 @@ class Loading extends React.PureComponent { // eslint-disable-line react/prefer-
     super();
     this.state = { progress: -ANIMATION_WIDTH };
   }
+
   componentDidMount() {
     // console.log('componentDidMount', this.state.progress)
     this.loadInterval = this.props.progress < 0
       ? setInterval(this.handleTimeout, ANIMATION_INTERVAL)
       : false;
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.loadInterval && nextProps.progress >= 0) {
       this.resetTimer();
     }
   }
+
   componentWillUnmount() {
     this.resetTimer();
   }
+
   resetTimer = () => {
     if (this.loadInterval) {
       clearInterval(this.loadInterval);
       this.loadInterval = false;
     }
   }
+
   handleTimeout = () => {
     // Added timeout
-    this.setState({ progress: this.state.progress < 100 ? (this.state.progress + ANIMATION_STEP) : 0 });
+    this.setState(
+      (prevState) => ({
+        progress: prevState.progress < 100
+          ? (prevState.progress + ANIMATION_STEP)
+          : 0,
+      })
+    );
   }
+
   render() {
     return (
       <Styled>
-        {this.props.progress >= 0 &&
-          <BarDeterminate progress={Math.max(this.props.progress, 5)} />
+        {this.props.progress >= 0
+          && <BarDeterminate progress={Math.max(this.props.progress, 5)} />
         }
-        {this.props.progress < 0 &&
-          <BarIndeterminate progress={this.state.progress} />
+        {this.props.progress < 0
+          && <BarIndeterminate progress={this.state.progress} />
         }
       </Styled>
     );

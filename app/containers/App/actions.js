@@ -37,8 +37,11 @@ import {
   UPDATE_CONNECTIONS,
   REMOVE_ENTITY,
   NEW_ENTITY,
+  NEW_MULTIPLE_ENTITIES,
   DELETE_ENTITY,
+  DELETE_MULTIPLE_ENTITIES,
   SAVE_ENTITY,
+  SAVE_MULTIPLE_ENTITIES,
   INVALIDATE_ENTITIES,
   SAVE_SENDING,
   SAVE_SUCCESS,
@@ -48,7 +51,6 @@ import {
   DELETE_SUCCESS,
   DELETE_ERROR,
   SAVE_CONNECTIONS,
-  SAVE_ENTITIES,
   UPDATE_ROUTE_QUERY,
   UPDATE_PATH,
   AUTHENTICATE_FORWARD,
@@ -65,6 +67,8 @@ import {
   RESET_PROGRESS,
   SUBMIT_INVALID,
   DISMISS_QUERY_MESSAGES,
+  SET_FRAMEWORK,
+  OPEN_BOOKMARK,
 } from './constants';
 
 export function submitInvalid(valid) {
@@ -220,11 +224,25 @@ export function deleteEntity(data) {
     data,
   };
 }
+export function deleteMultipleEntities(path, data) {
+  return {
+    type: DELETE_MULTIPLE_ENTITIES,
+    path,
+    data,
+  };
+}
 
 // server side
 export function saveEntity(data) {
   return {
     type: SAVE_ENTITY,
+    data,
+  };
+}
+export function saveMultipleEntities(path, data) {
+  return {
+    type: SAVE_MULTIPLE_ENTITIES,
+    path,
     data,
   };
 }
@@ -236,19 +254,17 @@ export function newEntity(data) {
     data,
   };
 }
-
+export function newMultipleEntities(path, data) {
+  return {
+    type: NEW_MULTIPLE_ENTITIES,
+    path,
+    data,
+  };
+}
 // server side
 export function saveConnections(data) {
   return {
     type: SAVE_CONNECTIONS,
-    data,
-  };
-}
-
-// server side
-export function saveEntities(data) {
-  return {
-    type: SAVE_ENTITIES,
     data,
   };
 }
@@ -478,5 +494,18 @@ export function openNewEntityModal(args) {
 export function dismissQueryMessages() {
   return {
     type: DISMISS_QUERY_MESSAGES,
+  };
+}
+
+export function setFramework(framework) {
+  return {
+    type: SET_FRAMEWORK,
+    framework,
+  };
+}
+export function openBookmark(bookmark) {
+  return {
+    type: OPEN_BOOKMARK,
+    bookmark,
   };
 }

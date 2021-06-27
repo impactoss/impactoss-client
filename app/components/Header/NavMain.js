@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import PrintHide from 'components/styled/PrintHide';
 
-export default styled.div`
+export default styled(PrintHide)`
   height:${(props) => props.theme.sizes.header.nav.heightMobile}px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     height:${(props) => props.theme.sizes.header.nav.height}px;
@@ -14,7 +15,4 @@ export default styled.div`
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   -ms-overflow-style: -ms-autohiding-scrollbar;
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    text-align: center;
-  }
 `;

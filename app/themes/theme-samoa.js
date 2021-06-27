@@ -15,10 +15,12 @@ import partner1 from 'themes/media/partner1.png';
 import partner2 from 'themes/media/partner2.png';
 import partner3 from 'themes/media/partner3.png';
 import partner4 from 'themes/media/partner4.png';
+import partner5 from 'themes/media/partner5.png';
 import partner1x2x from 'themes/media/partner1@2x.png';
 import partner2x2x from 'themes/media/partner2@2x.png';
 import partner3x2x from 'themes/media/partner3@2x.png';
 import partner4x2x from 'themes/media/partner4@2x.png';
+import partner5x2x from 'themes/media/partner5@2x.png';
 
 const theme = {};
 
@@ -37,6 +39,7 @@ theme.media = {
     [partner2, partner2x2x],
     [partner3, partner3x2x],
     [partner4, partner4x2x],
+    [partner5, partner5x2x],
   ],
 };
 
@@ -56,12 +59,12 @@ theme.breakpoints = {
 // 3: main colour, lighter (UNUSED)
 // 4: white
 const primary = coolorsToHex('https://coolors.co/d66149-eb6e51-ff9b69-ffb996-ffffff');
-  // secondary color palette: dark to light
-  // 0: dark header colour, darker
-  // 1: dark header colour
-  // 2: dark header colour, lighter (UNUSED)
-  // 3: white/placeholder
-  // 4: white/placeholder
+// secondary color palette: dark to light
+// 0: dark header colour, darker
+// 1: dark header colour
+// 2: dark header colour, lighter (UNUSED)
+// 3: white/placeholder
+// 4: white/placeholder
 const secondary = coolorsToHex('https://coolors.co/162331-182635-34404d-ffffff-ffffff');
 // dark grayscale: dark to light
 // 0:  darkest
@@ -102,23 +105,40 @@ theme.palette = {
   // info,
 
   // taxonomy/category colours
-  // [0: default, 1: Human Rights Body, 2: UN session, 3: Human right, 4: Affected persons, 5: Thematic cluster, 6: Organisation, 7: SDGs, 8: State, 9: SMART]
   // taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#40D7FF'],
   // taxonomiesAAL: ['#8C969B', '#6B3285', '#5149AD', '#31A573', '#26938C', '#4DA53B', '#0069A4', '#199CD4', '#8C969B'],
   // [#AA compliant]
   // taxonomiesHoverAAL: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
   // taxonomy/category colours
-  // 0: default/fallback
-  // 1: Human Rights Body
-  // 2: UN session
-  // 3: Human right
-  // 4: Affected persons
-  // 5: Thematic cluster
-  // 6: Organisation
-  // 7: SDGs
-  // 8: Progress status
-  taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#007c3a'],
-  taxonomiesHover: ['#DBDCDD', '#622E79', '#4A439E', '#65C99B', '#238680', '#4EA53C', '#006096', '#178EC1', '#007034'],
+
+  taxonomies: [
+    '#E8EAEB', // 0: default/fallback
+    '#6B3285', // 1: Human Rights Body
+    '#6B3285', // 2: UN cycle
+    '#75D6AC', // 3: Human right
+    '#26938C', // 4: Affected persons
+    '#0069A4', // 5: Thematic cluster
+    '#34404d', // 6: Organisation
+    '#199CD4', // 7: SDGs
+    '#007c3a', // 8: Progress status
+    '#55B542', // 9: SDS Key outcome
+    '#55B542', // 10: SDS priority area
+    '#182635', // 11: Provenance
+  ],
+  taxonomiesHover: [
+    '#DBDCDD', // 0: default/fallback
+    '#622E79', // 1: Human Rights Body
+    '#622E79', // 2: UN cycle
+    '#65C99B', // 3: Human right
+    '#238680', // 4: Affected persons
+    '#006096', // 5: Thematic cluster
+    '#182635', // 6: Organisation
+    '#178EC1', // 7: SDGs
+    '#007034', // 8: Progress status
+    '#4EA53', // 9: SDS Key outcome
+    '#4EA53', // 10: SDS priority area
+    '#162331', // 11: Provenance
+  ],
 
   // bg inactive, bg hover, icon
   smartInactive: [
@@ -134,8 +154,6 @@ theme.palette = {
   // other entities
   measures: ['#FFC107'],
   measuresHover: ['#F2B200'],
-  sdgtargets: ['#40D7FF'],
-  sdgtargetsHover: ['#08C4F8'],
   indicators: ['#EB6E51'],
   indicatorsHover: ['#D66149'],
   reports: ['#EB6E51'],
@@ -271,13 +289,30 @@ theme.sizes = {
   text: {
     aaLargeBold: '19px',
     aaLarge: '24px',
-    mainListItem: '18px',
-    nestedListItem: '15px',
-    listItemTop: '14px',
+    mainListItem: '20px',
+    nestedListItem: '16px',
+    listItemTop: '13px',
+    listItemBottom: '12px',
     markdown: '18px',
     markdownMobile: '16px',
-    small: '13px', // used for labels
+    small: '14px', // used for labels
+    smaller: '12px', // used for labels
     smallMobile: '11px', // used for labels
+    default: '16px', // used for labels
+  },
+  print: {
+    mainListItem: '10pt',
+    nestedListItem: '8pt',
+    listItemTop: '7pt',
+    listItemBottom: '7pt',
+    markdown: '10pt',
+    smallest: '7pt', // used for labels
+    smaller: '8pt', // used for labels
+    small: '9pt', // used for labels
+    default: '10pt', // used for labels
+    large: '11pt', // used for labels
+    larger: '12pt', // used for labels
+    largest: '14pt', // used for labels
   },
   // px only
   aside: {
@@ -291,29 +326,33 @@ theme.sizes = {
   },
   mainListItem: {
     paddingHorizontal: 15,
-    paddingTop: 5,
-    paddingBottom: 10,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
   header: {
     banner: {
-      height: 79,
-      heightMobile: 50,
+      height: 60,
+      heightMobile: 40,
     },
     nav: {
-      height: 38,
-      heightMobile: 24,
+      height: 50,
+      heightMobile: 40,
     },
     // px or em
     text: {
-      title: '2.2em',
-      titleMobile: '1em',
-      claim: '0.85em',
-      claimMobile: '1em',
+      title: '30px',
+      titleMobile: '20px',
+      claim: '12px',
+      claimMobile: '9px',
+    },
+    print: {
+      title: '14pt',
+      claim: '9pt',
     },
     paddingLeft: {
-      mobile: 6,
-      small: 12,
-      large: 20,
+      mobile: 8,
+      small: 8,
+      large: 10,
     },
   },
   home: {
@@ -323,6 +362,10 @@ theme.sizes = {
       titleMobile: '1.4em',
       claim: '1em',
       claimMobile: '0.8em',
+    },
+    print: {
+      title: '2.8em',
+      claim: '1em',
     },
   },
 };

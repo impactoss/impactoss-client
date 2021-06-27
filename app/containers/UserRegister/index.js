@@ -30,8 +30,6 @@ import A from 'components/styled/A';
 import { selectQueryMessages } from 'containers/App/selectors';
 import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
-import appMessages from 'containers/App/messages';
-
 import { PATHS } from 'containers/App/constants';
 
 import messages from './messages';
@@ -44,57 +42,65 @@ const BottomLinks = styled.div`
 `;
 
 export class UserRegister extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.initialiseForm();
   }
+
   render() {
-    const { registerError, registerSending } = this.props.viewDomain.page;
+    const { intl } = this.context;
+    const { registerError, registerSending } = this.props.viewDomain.get('page').toJS();
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
         <ContentNarrow>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
           />
-          {this.props.queryMessages.info &&
-            <Messages
-              type="info"
-              onDismiss={this.props.onDismissQueryMessages}
-              messageKey={this.props.queryMessages.info}
-            />
+          {this.props.queryMessages.info
+            && (
+              <Messages
+                type="info"
+                onDismiss={this.props.onDismissQueryMessages}
+                messageKey={this.props.queryMessages.info}
+              />
+            )
           }
-          {registerError &&
-            <Messages
-              type="error"
-              messages={registerError.messages}
-            />
+          {registerError
+            && (
+              <Messages
+                type="error"
+                messages={registerError.messages}
+              />
+            )
           }
-          {registerSending &&
-            <Loading />
+          {registerSending
+            && <Loading />
           }
-          { this.props.viewDomain.form &&
-            <AuthForm
-              model="userRegister.form.data"
-              sending={registerSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
-              handleCancel={this.props.handleCancel}
-              labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
-              fields={[
-                getNameField(this.context.intl.formatMessage, appMessages),
-                getEmailField(this.context.intl.formatMessage, appMessages),
-                getPasswordField(this.context.intl.formatMessage, appMessages),
-                getPasswordConfirmationField(this.context.intl.formatMessage, appMessages),
-              ]}
-            />
+          { this.props.viewDomain.get('form')
+            && (
+              <AuthForm
+                model="userRegister.form.data"
+                sending={registerSending}
+                handleSubmit={(formData) => this.props.handleSubmit(formData)}
+                handleCancel={this.props.handleCancel}
+                labels={{ submit: intl.formatMessage(messages.submit) }}
+                fields={[
+                  getNameField(intl.formatMessage),
+                  getEmailField(intl.formatMessage),
+                  getPasswordField(intl.formatMessage),
+                  getPasswordConfirmationField(intl.formatMessage),
+                ]}
+              />
+            )
           }
           <BottomLinks>
             <p>

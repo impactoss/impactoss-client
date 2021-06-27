@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "sadata-production"
+    "default": "sadata-dev",
+    "dev": "sadata-dev",
+    "stage": "sadata-staging",
+    "production": "sadata-production"
   }
 }

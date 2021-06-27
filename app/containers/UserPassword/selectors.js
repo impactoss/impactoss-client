@@ -16,7 +16,7 @@ const selectUserPasswordDomain = () => (state) => state.get('userPassword');
 
 const userPasswordSelector = createSelector(
   selectUserPasswordDomain(),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export default userPasswordSelector;

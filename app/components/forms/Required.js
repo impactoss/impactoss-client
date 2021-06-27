@@ -6,6 +6,9 @@ const Required = styled.span`
   font-weight: bold;
   font-size: 1.3em;
   padding-left: 3px;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
+  }
 `;
 
 export default Required;

@@ -13,7 +13,7 @@ import { actions as formActions } from 'react-redux-form/immutable';
 import { fromJS } from 'immutable';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES, MEASURE_SHAPE } from 'themes/config';
+import { USER_ROLES } from 'themes/config';
 import { getImportFields, getColumnAttribute } from 'utils/import';
 
 import {
@@ -44,12 +44,13 @@ import { save, resetForm } from './actions';
 import { FORM_INITIAL } from './constants';
 
 export class ActionImport extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (this.props.dataReady) {
       this.props.initialiseForm('measureImport.form.data', FORM_INITIAL);
     }
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -63,20 +64,21 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
   }
 
   render() {
+    const { intl } = this.context;
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="measures"
             buttons={[{
@@ -96,8 +98,44 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             success={this.props.success}
             progress={this.props.progress}
             template={{
-              filename: `${this.context.intl.formatMessage(messages.filename)}.csv`,
-              data: getImportFields(MEASURE_SHAPE, this.context.intl.formatMessage),
+              filename: `${intl.formatMessage(messages.filename)}.csv`,
+              data: getImportFields({
+                fields: [
+                  {
+                    attribute: 'title',
+                    type: 'text',
+                    required: true,
+                    import: true,
+                  },
+                  {
+                    attribute: 'description',
+                    type: 'markdown',
+                    import: true,
+                  },
+                  {
+                    disabled: true,
+                    attribute: 'outcome',
+                    type: 'markdown',
+                    import: true,
+                  },
+                  {
+                    disabled: true,
+                    attribute: 'indicator_summary',
+                    type: 'markdown',
+                    import: true,
+                  },
+                  {
+                    attribute: 'target_date',
+                    type: 'date',
+                    import: true,
+                  },
+                  {
+                    attribute: 'target_date_comment',
+                    type: 'text',
+                    import: true,
+                  },
+                ],
+              }, intl.formatMessage),
             }}
           />
         </Content>
@@ -131,9 +169,11 @@ const mapStateToProps = (state) => ({
   progress: selectProgress(state),
   errors: selectErrors(state),
   success: selectSuccess(state),
-  dataReady: selectReady(state, { path: [
-    'user_roles',
-  ] }),
+  dataReady: selectReady(state, {
+    path: [
+      'user_roles',
+    ],
+  }),
   authReady: selectReadyForAuthCheck(state),
 });
 

@@ -10,21 +10,32 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
-import { Map } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 import {
   taxonomyOptions,
   entityOptions,
   getCategoryUpdatesFromFormData,
   getConnectionUpdatesFromFormData,
-  getFields,
+  getTitleFormField,
+  getStatusField,
+  getMarkdownField,
+  renderIndicatorControl,
+  renderRecommendationsByFwControl,
+  getDateField,
+  getTextareaField,
+  renderTaxonomyControl,
 } from 'utils/forms';
+
+import {
+  getMetaField,
+} from 'utils/fields';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES, MEASURE_SHAPE } from 'themes/config';
+import { USER_ROLES } from 'themes/config';
 
 import {
   loadEntitiesIfNeeded,
@@ -49,38 +60,35 @@ import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
-import { getInitialFormData } from 'utils/entities';
+import appMessages from 'containers/App/messages';
 
 import {
   selectDomain,
   selectViewEntity,
   selectTaxonomies,
-  selectRecommendations,
+  selectRecommendationsByFw,
   selectIndicators,
-  selectSdgTargets,
   selectConnectedTaxonomies,
 } from './selectors';
 
 import messages from './messages';
 import { save } from './actions';
-import { DEPENDENCIES } from './constants';
+import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class ActionEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     if (this.props.dataReady && this.props.viewEntity) {
       this.props.initialiseForm('measureEdit.form.data', this.getInitialFormData());
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -93,127 +101,244 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer.current);
     }
   }
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { viewEntity, taxonomies, recommendations, indicators, sdgtargets } = props;
+    const {
+      viewEntity, taxonomies, recommendationsByFw, indicators,
+    } = props;
 
     return viewEntity
-    ? Map({
-      id: viewEntity.get('id'),
-      attributes: viewEntity.get('attributes').mergeWith(
-        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-        getInitialFormData(MEASURE_SHAPE).get('attributes')
-      ),
-      associatedTaxonomies: taxonomyOptions(taxonomies),
-      associatedRecommendations: entityOptions(recommendations, true),
-      associatedIndicators: entityOptions(indicators, true),
-      associatedSdgTargets: entityOptions(sdgtargets, true),
-    })
-    : Map();
+      ? Map({
+        id: viewEntity.get('id'),
+        attributes: viewEntity.get('attributes').mergeWith(
+          (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+          FORM_INITIAL.get('attributes')
+        ),
+        associatedTaxonomies: taxonomyOptions(taxonomies),
+        associatedRecommendationsByFw: recommendationsByFw
+          ? recommendationsByFw.map((recs) => entityOptions(recs, true))
+          : Map(),
+        associatedIndicators: entityOptions(indicators, true),
+      })
+      : Map();
   }
 
+  getHeaderMainFields = () => {
+    const { intl } = this.context;
+    return (
+      [ // fieldGroups
+        { // fieldGroup
+          fields: [
+            getTitleFormField(intl.formatMessage),
+          ],
+        },
+      ]
+    );
+  };
+
+  getHeaderAsideFields = (entity) => {
+    const { intl } = this.context;
+    return ([
+      {
+        fields: [
+          getStatusField(intl.formatMessage),
+          getMetaField(entity),
+        ],
+      },
+    ]);
+  };
+
+  getBodyMainFields = (
+    connectedTaxonomies,
+    indicators,
+    recommendationsByFw,
+    onCreateOption,
+  ) => {
+    const { intl } = this.context;
+    const groups = [];
+    groups.push(
+      {
+        fields: [
+          getMarkdownField(intl.formatMessage),
+          // getMarkdownField(intl.formatMessage, 'outcome'),
+          // getMarkdownField(intl.formatMessage, 'indicator_summary'),
+        ],
+      },
+    );
+    if (indicators) {
+      groups.push(
+        {
+          label: intl.formatMessage(appMessages.nav.indicatorsSuper),
+          icon: 'indicators',
+          fields: [
+            renderIndicatorControl(indicators, onCreateOption, intl),
+          ],
+        },
+      );
+    }
+    if (recommendationsByFw) {
+      const recConnections = renderRecommendationsByFwControl(
+        recommendationsByFw,
+        connectedTaxonomies,
+        onCreateOption,
+        intl,
+      );
+      if (recConnections) {
+        groups.push(
+          {
+            label: intl.formatMessage(appMessages.nav.recommendationsSuper),
+            icon: 'recommendations',
+            fields: recConnections,
+          },
+        );
+      }
+    }
+    return groups;
+  };
+
+  getBodyAsideFields = (taxonomies, onCreateOption) => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getDateField(
+            intl.formatMessage,
+            'target_date',
+          ),
+          getTextareaField(
+            intl.formatMessage,
+            'target_date_comment',
+          ),
+        ],
+      },
+      { // fieldGroup
+        label: intl.formatMessage(appMessages.entities.taxonomies.plural),
+        icon: 'categories',
+        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+      },
+    ]);
+  };
+
   render() {
-    const { viewEntity, dataReady, viewDomain, taxonomies, connectedTaxonomies, recommendations, indicators, sdgtargets, onCreateOption } = this.props;
+    const {
+      viewEntity,
+      dataReady,
+      viewDomain,
+      taxonomies,
+      connectedTaxonomies,
+      recommendationsByFw,
+      indicators,
+      onCreateOption,
+    } = this.props;
+    const { intl } = this.context;
     const reference = this.props.params.id;
-    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
+    const {
+      saveSending, saveError, deleteSending, deleteError, submitValid,
+    } = viewDomain.get('page').toJS();
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+          title={`${intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content
-          innerRef={(node) => {
-            if (!this.state.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="measures"
             buttons={
               viewEntity && dataReady
-              ? [{
-                type: 'cancel',
-                onClick: this.props.handleCancel,
-              },
-              {
-                type: 'save',
-                disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('measureEdit.form.data'),
-              }]
-              : null
+                ? [{
+                  type: 'cancel',
+                  onClick: this.props.handleCancel,
+                },
+                {
+                  type: 'save',
+                  disabled: saveSending,
+                  onClick: () => this.props.handleSubmitRemote('measureEdit.form.data'),
+                }]
+                : null
             }
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {deleteError &&
-            <Messages type="error" messages={deleteError} />
+          {deleteError
+            && <Messages type="error" messages={deleteError} />
           }
-          {(saveSending || deleteSending || !dataReady) &&
-            <Loading />
+          {(saveSending || deleteSending || !dataReady)
+            && <Loading />
           }
-          {!viewEntity && dataReady && !saveError && !deleteSending &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          {!viewEntity && dataReady && !saveError && !deleteSending
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          {viewEntity && dataReady && !deleteSending &&
-            <EntityForm
-              model="measureEdit.form.data"
-              formData={viewDomain.form.data}
-              saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(
-                formData,
-                taxonomies,
-                recommendations,
-                indicators,
-                sdgtargets
-              )}
-              handleSubmitFail={this.props.handleSubmitFail}
-              handleCancel={this.props.handleCancel}
-              handleUpdate={this.props.handleUpdate}
-              handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
-              fields={getFields({
-                entity: viewEntity,
-                associations: {
+          {viewEntity && dataReady && !deleteSending
+            && (
+              <EntityForm
+                model="measureEdit.form.data"
+                formData={viewDomain.getIn(['form', 'data'])}
+                saving={saveSending}
+                handleSubmit={(formData) => this.props.handleSubmit(
+                  formData,
                   taxonomies,
-                  connectedTaxonomies,
-                  recommendations,
+                  recommendationsByFw,
                   indicators,
-                  sdgtargets,
-                },
-                onCreateOption,
-                shape: MEASURE_SHAPE,
-                contextIntl: this.context.intl,
-              })}
-              scrollContainer={this.state.scrollContainer}
-            />
+                )}
+                handleSubmitFail={this.props.handleSubmitFail}
+                handleCancel={this.props.handleCancel}
+                handleUpdate={this.props.handleUpdate}
+                handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(),
+                    aside: this.getHeaderAsideFields(viewEntity),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(
+                      connectedTaxonomies,
+                      indicators,
+                      recommendationsByFw,
+                      onCreateOption,
+                    ),
+                    aside: this.getBodyAsideFields(
+                      taxonomies,
+                      onCreateOption,
+                    ),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
-          {(saveSending || deleteSending) &&
-            <Loading />
+          {(saveSending || deleteSending)
+            && <Loading />
           }
         </Content>
       </div>
@@ -239,9 +364,8 @@ ActionEdit.propTypes = {
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
-  recommendations: PropTypes.object,
+  recommendationsByFw: PropTypes.object,
   indicators: PropTypes.object,
-  sdgtargets: PropTypes.object,
   onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
@@ -259,9 +383,8 @@ const mapStateToProps = (state, props) => ({
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
-  sdgtargets: selectSdgTargets(state, props.params.id),
   indicators: selectIndicators(state, props.params.id),
-  recommendations: selectRecommendations(state, props.params.id),
+  recommendationsByFw: selectRecommendationsByFw(state, props.params.id),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -288,33 +411,13 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, taxonomies, recommendations, indicators, sdgtargets) => {
-      const saveData = formData
+    handleSubmit: (formData, taxonomies, recommendationsByFw, indicators) => {
+      let saveData = formData
         .set(
           'measureCategories',
           getCategoryUpdatesFromFormData({
             formData,
             taxonomies,
-            createKey: 'measure_id',
-          })
-        )
-        .set(
-          'recommendationMeasures',
-          getConnectionUpdatesFromFormData({
-            formData,
-            connections: recommendations,
-            connectionAttribute: 'associatedRecommendations',
-            createConnectionKey: 'recommendation_id',
-            createKey: 'measure_id',
-          })
-        )
-        .set(
-          'sdgtargetMeasures',
-          getConnectionUpdatesFromFormData({
-            formData,
-            connections: sdgtargets,
-            connectionAttribute: 'associatedSdgTargets',
-            createConnectionKey: 'sdgtarget_id',
             createKey: 'measure_id',
           })
         )
@@ -328,6 +431,30 @@ function mapDispatchToProps(dispatch, props) {
             createKey: 'measure_id',
           })
         );
+      saveData = saveData.set(
+        'recommendationMeasures',
+        recommendationsByFw
+          .map((recs, fwid) => getConnectionUpdatesFromFormData({
+            formData: !formData.getIn(['attributes', 'user_only']) ? formData : null,
+            connections: recs,
+            connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
+            createConnectionKey: 'recommendation_id',
+            createKey: 'measure_id',
+          }))
+          .reduce(
+            (memo, deleteCreateLists) => {
+              const deletes = memo.get('delete').concat(deleteCreateLists.get('delete'));
+              const creates = memo.get('create').concat(deleteCreateLists.get('create'));
+              return memo
+                .set('delete', deletes)
+                .set('create', creates);
+            },
+            fromJS({
+              delete: [],
+              create: [],
+            }),
+          )
+      );
 
       dispatch(save(saveData.toJS()));
     },

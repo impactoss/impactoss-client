@@ -6,8 +6,9 @@ import { find } from 'lodash/collection';
 
 import asList from 'utils/as-list';
 
-import Component from 'components/styled/Component';
+import { COLUMN_WIDTHS } from 'themes/config';
 
+import Component from 'components/styled/Component';
 import EntityListItemMain from 'components/EntityListItem/EntityListItemMain';
 import EntityListItemExpandable from 'components/EntityListItem/EntityListItemExpandable';
 
@@ -24,11 +25,15 @@ const Item = styled(Component)`
 `;
 const MainWrapper = styled(Component)`
   display: table-cell;
-  width: ${(props) => props.expandable ? 66 : 100}%;
-  border-right: 1px solid ${palette('background', 1)};
+  width: ${(props) => props.expandable ? COLUMN_WIDTHS.MAIN * 100 : 100}%;
+  border-left: 3px solid ${palette('background', 1)};
+  border-right: 3px solid ${palette('background', 1)};
+  @media print {
+    border: none;
+    padding: 0 5px
+  }
 `;
 export default class EntityListNestedItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   static propTypes = {
     entity: PropTypes.object.isRequired,
     expandNo: PropTypes.number,
@@ -60,8 +65,8 @@ export default class EntityListNestedItem extends React.PureComponent { // eslin
             />
           </MainWrapper>
           {
-            entity.get('expandable') &&
-            asList(entity.get('expandable')).map((attribute, i, list) =>
+            entity.get('expandable')
+            && asList(entity.get('expandable')).map((attribute, i, list) => (
               <EntityListItemExpandable
                 key={i}
                 column={find(config.expandableColumns, (col) => col.type === attribute)}
@@ -71,9 +76,9 @@ export default class EntityListNestedItem extends React.PureComponent { // eslin
                   const nestLevelCount = nestLevel + i;
                   onExpand(expandNo > nestLevelCount ? nestLevelCount : nestLevelCount + 1);
                 }}
-                width={(1 - 0.66) / list.size}
+                colWidth={COLUMN_WIDTHS.OTHER / list.size}
               />
-            )
+            ))
           }
         </Item>
       </Styled>

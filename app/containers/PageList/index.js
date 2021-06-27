@@ -22,12 +22,11 @@ import { selectPages } from './selectors';
 import messages from './messages';
 
 export class PageList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -35,17 +34,18 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
+    const { intl } = this.context;
     const { dataReady } = this.props;
 
     const headerOptions = {
-      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      supTitle: intl.formatMessage(messages.pageTitle),
       icon: 'pages',
       actions: [{
         type: 'add',
         title: [
-          this.context.intl.formatMessage(appMessages.buttons.add),
+          intl.formatMessage(appMessages.buttons.add),
           {
-            title: this.context.intl.formatMessage(appMessages.entities.pages.single),
+            title: intl.formatMessage(appMessages.entities.pages.single),
             hiddenSmall: true,
           },
         ],
@@ -56,9 +56,9 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
     return (
       <div>
         <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <EntityList
@@ -67,8 +67,8 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
-            single: this.context.intl.formatMessage(appMessages.entities.pages.single),
-            plural: this.context.intl.formatMessage(appMessages.entities.pages.plural),
+            single: intl.formatMessage(appMessages.entities.pages.single),
+            plural: intl.formatMessage(appMessages.entities.pages.plural),
           }}
           locationQuery={fromJS(this.props.location.query)}
         />
