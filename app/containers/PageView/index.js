@@ -49,6 +49,9 @@ const Styled = styled(ContainerWrapper)`
 
 const ViewContainer = styled(Container)`
   min-height: 100vH;
+  @media print {
+    min-height: 50vH;
+  }
 `;
 
 export class PageView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
