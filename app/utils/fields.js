@@ -266,6 +266,7 @@ const getConnectionField = ({
   showEmpty: appMessages.entities[entityType].empty,
   connectionOptions: connectionOptions.map((option) => ({
     label: appMessages.entities[option].plural,
+    groupByFramework: option === 'recommendations',
     path: option,
     clientPath: option === 'measures' ? 'actions' : option,
   })),
