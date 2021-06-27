@@ -1348,32 +1348,6 @@ export default defineMessages({
           defaultMessage: 'About tax 10',
         },
       },
-      12: {
-        single: {
-          id: 'app.containers.App.entities.taxonomies.12.single',
-          defaultMessage: 'Taxonomy 10',
-        },
-        plural: {
-          id: 'app.containers.App.entities.taxonomies.12.plural',
-          defaultMessage: 'Taxonomy 10s',
-        },
-        empty: {
-          id: 'app.containers.App.entities.taxonomies.12.empty',
-          defaultMessage: 'No Taxonomy 10 assigned yet',
-        },
-        shortSingle: {
-          id: 'app.containers.App.entities.taxonomies.12.shortSingle',
-          defaultMessage: 'Taxonomy 10',
-        },
-        shortPlural: {
-          id: 'app.containers.App.entities.taxonomies.12.shortPlural',
-          defaultMessage: 'Taxonomy 10s',
-        },
-        description: {
-          id: 'app.containers.App.entities.taxonomies.12.description',
-          defaultMessage: 'About tax 10',
-        },
-      },
     },
     due_dates: {
       single: {

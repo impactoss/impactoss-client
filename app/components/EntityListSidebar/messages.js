@@ -117,5 +117,4 @@ export default defineMessages({
     id: 'app.components.EntityListSidebar.entitiesNotSelected',
     defaultMessage: 'Please select one or more entities from the list for available edit options',
   },
-
 });
