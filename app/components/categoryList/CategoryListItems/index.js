@@ -19,7 +19,7 @@ const Styled = styled.div`
   position: relative;
 `;
 const CategoryListBody = styled.div`
-  padding-top: 1em
+  padding-top: 5px;
 `;
 const GroupHeaderLink = styled(Link)`
   color: ${palette('link', 2)};

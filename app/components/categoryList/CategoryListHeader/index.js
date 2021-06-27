@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { reduce } from 'lodash/collection';
 
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 import Icon from 'components/Icon';
@@ -66,8 +67,18 @@ class CategoryListHeader extends React.PureComponent { // eslint-disable-line re
     const { columns } = this.props;
     const keyCount = columns.reduce(
       (maxKeys, col) => {
-        if (col.keys && col.keys.length > maxKeys) {
-          return col.keys.length;
+        if (col.keys) {
+          const keyItemsMax = reduce(
+            col.keys,
+            (maxItems, key) => {
+              if (key.items && key.items.length > maxItems) {
+                return key.items.length;
+              }
+              return maxItems;
+            },
+            0,
+          );
+          if (keyItemsMax > maxKeys) return keyItemsMax;
         }
         return maxKeys;
       },
