@@ -25,6 +25,10 @@ const FooterMain = styled.div`
   background-color: ${palette('footer', 1)};
   color: ${palette('footer', 0)};
   padding: 0;
+  @media print {
+    color: ${palette('text', 0)};
+    background: transparent;
+  }
 `;
 
 const FooterLink = styled.a`
@@ -40,6 +44,10 @@ const ImpactLink = styled.a`
   &:hover {
     color: ${palette('footerLinksHover', 0)};
     opacity: 0.8;
+  }
+  @media print {
+    color: ${palette('text', 0)};
+    text-decoration: underline;
   }
 `;
 
@@ -60,9 +68,12 @@ const LogoItemLink = styled(A)`
   }
 `;
 const PartnerLogo = styled(NormalImg)`
-  height: 45px;
+  height: 55px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     height: 90px;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    height: 100px;
   }
 `;
 const ImpactLogo = styled(NormalImg)`
@@ -90,6 +101,9 @@ const Table = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     font-size: 1em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 
 const TableCell = styled.div`
@@ -98,7 +112,6 @@ const TableCell = styled.div`
   border-bottom: 1px solid ${palette('footer', 3)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: table-cell;
-    width: 100%;
     vertical-align: top;
     width: 50%;
     padding-left: 15px;
@@ -130,43 +143,50 @@ const PartnerNote = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.theme.sizes.text.small};
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 
 class Footer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
   render() {
+    const { intl } = this.context;
     const { theme } = this.props;
     return (
       <div>
-        { FOOTER.PARTNERS > 0 &&
-          <FooterLogos>
-            <Container noPaddingBottom>
-              { messages.partners.note && messages.partners.note !== '' &&
-                <PartnerNote>
-                  <FormattedMessage {...messages.partners.note} />
-                </PartnerNote>
-              }
-              <LogoList>
-                {
-                  theme.media.partnerLogos.map((src, i) => (
-                    <LogoItem key={i}>
-                      <LogoItemLink
-                        href={this.context.intl.formatMessage(messages.partners[`url${i + 1}`])}
-                        title={this.context.intl.formatMessage(messages.partners[`title${i + 1}`])}
-                        target="_blank"
-                      >
-                        <PartnerLogo src={src} alt={this.context.intl.formatMessage(messages.partners.title1)} />
-                      </LogoItemLink>
-                    </LogoItem>
-                  ))
+        { FOOTER.PARTNERS > 0
+          && (
+            <FooterLogos>
+              <Container noPaddingBottom>
+                { messages.partners.note && messages.partners.note !== ''
+                && (
+                  <PartnerNote>
+                    <FormattedMessage {...messages.partners.note} />
+                  </PartnerNote>
+                )
                 }
-              </LogoList>
-            </Container>
-          </FooterLogos>
+                <LogoList>
+                  {
+                    theme.media.partnerLogos.map((src, i) => (
+                      <LogoItem key={i}>
+                        <LogoItemLink
+                          href={intl.formatMessage(messages.partners[`url${i + 1}`])}
+                          title={intl.formatMessage(messages.partners[`title${i + 1}`])}
+                          target="_blank"
+                        >
+                          <PartnerLogo src={src} alt={intl.formatMessage(messages.partners.title1)} />
+                        </LogoItemLink>
+                      </LogoItem>
+                    ))
+                  }
+                </LogoList>
+              </Container>
+            </FooterLogos>
+          )
         }
         <FooterMain>
           <Container noPaddingBottom>
@@ -176,43 +196,49 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
                   <FormattedMessage {...messages.disclaimer} />
                   <FooterLink
                     target="_blank"
-                    href={`mailto:${this.context.intl.formatMessage(messages.contact.email)}`}
-                    title={this.context.intl.formatMessage(messages.contact.anchor)}
+                    href={`mailto:${intl.formatMessage(messages.contact.email)}`}
+                    title={intl.formatMessage(messages.contact.anchor)}
                   >
                     <FormattedMessage {...messages.contact.anchor} />
                   </FooterLink>
                 </TableCell>
                 <TableCellSmall>
-                  { FOOTER.LINK_TARGET_INTERNAL &&
-                    <FormattedMessage
-                      {...messages.responsible.textWithInternalLink}
-                      values={{ internalLink: (
+                  { FOOTER.LINK_TARGET_INTERNAL
+                    && (
+                      <FormattedMessage
+                        {...messages.responsible.textWithInternalLink}
+                        values={{
+                          internalLink: (
+                            <FooterLink
+                              onClick={(evt) => {
+                                if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                                this.props.onPageLink(`${PATHS.PAGES}/${FOOTER.LINK_TARGET_INTERNAL_ID}`);
+                              }}
+                              href={`${PATHS.PAGES}/${FOOTER.LINK_TARGET_INTERNAL_ID}`}
+                              title={intl.formatMessage(messages.responsible.anchor)}
+                            >
+                              <FormattedMessage {...messages.responsible.anchor} />
+                            </FooterLink>
+                          ),
+                        }}
+                      />
+                    )
+                  }
+                  { !FOOTER.LINK_TARGET_INTERNAL
+                    && <FormattedMessage {...messages.responsible.text} />
+                  }
+                  { !FOOTER.LINK_TARGET_INTERNAL
+                    && (
+                      <div>
                         <FooterLink
-                          onClick={(evt) => {
-                            if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                            this.props.onPageLink(`${PATHS.PAGES}/${FOOTER.LINK_TARGET_INTERNAL_ID}`);
-                          }}
-                          href={`${PATHS.PAGES}/${FOOTER.LINK_TARGET_INTERNAL_ID}`}
-                          title={this.context.intl.formatMessage(messages.responsible.anchor)}
+                          target="_blank"
+                          href={intl.formatMessage(messages.responsible.url)}
+                          title={intl.formatMessage(messages.responsible.anchor)}
                         >
                           <FormattedMessage {...messages.responsible.anchor} />
                         </FooterLink>
-                      ) }}
-                    />
-                  }
-                  { !FOOTER.LINK_TARGET_INTERNAL &&
-                    <FormattedMessage {...messages.responsible.text} />
-                  }
-                  { !FOOTER.LINK_TARGET_INTERNAL &&
-                    <div>
-                      <FooterLink
-                        target="_blank"
-                        href={this.context.intl.formatMessage(messages.responsible.url)}
-                        title={this.context.intl.formatMessage(messages.responsible.anchor)}
-                      >
-                        <FormattedMessage {...messages.responsible.anchor} />
-                      </FooterLink>
-                    </div>
+                      </div>
+                    )
                   }
                 </TableCellSmall>
                 <TableCellSmall>
@@ -220,13 +246,13 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
                   <div>
                     <ImpactLink
                       target="_blank"
-                      href={this.context.intl.formatMessage(messages.project.url)}
-                      title={this.context.intl.formatMessage(messages.project.anchor)}
+                      href={intl.formatMessage(messages.project.url)}
+                      title={intl.formatMessage(messages.project.anchor)}
                     >
                       <div>
                         <FormattedMessage {...messages.project.anchor} />
                       </div>
-                      <ImpactLogo src={theme.media.impactossLogo} alt={this.context.intl.formatMessage(messages.project.anchor)} />
+                      <ImpactLogo src={theme.media.impactossLogo} alt={intl.formatMessage(messages.project.anchor)} />
                     </ImpactLink>
                   </div>
                 </TableCellSmall>

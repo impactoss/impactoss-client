@@ -39,44 +39,48 @@ const BottomLinks = styled.div`
 `;
 
 export class UserPasswordRecover extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.initialiseForm();
   }
+
   render() {
-    const { error, sending } = this.props.viewDomain.page;
+    const { intl } = this.context;
+    const { error, sending } = this.props.viewDomain.get('page').toJS();
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
         <ContentNarrow>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
           />
-          {error &&
-            <Messages type="error" messages={error.messages} />
+          {error
+            && <Messages type="error" messages={error.messages} />
           }
-          {sending &&
-            <Loading />
+          {sending
+            && <Loading />
           }
-          { this.props.viewDomain.form &&
-            <AuthForm
-              model="userPasswordRecover.form.data"
-              sending={sending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
-              handleCancel={this.props.handleCancel}
-              labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
-              fields={[
-                getEmailField(this.context.intl.formatMessage, appMessages, '.email'),
-              ]}
-            />
+          { this.props.viewDomain.get('form')
+            && (
+              <AuthForm
+                model="userPasswordRecover.form.data"
+                sending={sending}
+                handleSubmit={(formData) => this.props.handleSubmit(formData)}
+                handleCancel={this.props.handleCancel}
+                labels={{ submit: intl.formatMessage(messages.submit) }}
+                fields={[
+                  getEmailField(intl.formatMessage, appMessages, '.email'),
+                ]}
+              />
+            )
           }
           <BottomLinks>
             <p>

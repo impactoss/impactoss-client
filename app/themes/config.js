@@ -15,7 +15,8 @@
 // default language locale
 export const DEFAULT_LOCALE = 'en-GB';
 // date format - change to format according to locale, only used for form error message
-export const DATE_FORMAT = 'dd/mm/yyyy';
+export const DATE_FORMAT = 'dd/MM/yyyy';
+export const NODE_ENV = sessionStorage.NODE_ENV || 'production';
 
 // UI settings ************************
 
@@ -51,34 +52,36 @@ export const FOOTER = {
 };
 
 // entitylists items-per-page options
-export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
+// export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100, 'all'];
+export const PAGE_ITEM_OPTIONS = [
+  {
+    value: 10,
+  },
+  {
+    value: 20,
+  },
+  {
+    value: 50,
+  },
+  {
+    value: 100,
+  },
+  {
+    value: 'all',
+    message: 'ui.pageItemOptions.all',
+  },
+];
 
 export const TEXT_TRUNCATE = {
   CONNECTION_TAG: 20,
   ATTRIBUTE_TAG: 10,
-  ENTITY_TAG: 10,
+  ENTITY_TAG: 7,
   CONNECTION_POPUP: 80,
   LINK_FIELD: 30,
+  FW_SELECT: 32,
+  GRACE: 2,
+  META_TITLE: 20,
 };
-
-export const TAXONOMY_GROUPS = [
-  {
-    id: 1,
-    priorityMin: 0,
-    priorityMax: 10,
-    default: true,
-  },
-  {
-    id: 2,
-    priorityMin: 11,
-    priorityMax: 20,
-  },
-  {
-    id: 3,
-    priorityMin: 21,
-    priorityMax: 30,
-  },
-];
 
 export const PROGRESS_TAXONOMY_ID = 8;
 
@@ -88,14 +91,20 @@ export const PROGRESS_CATEGORY_REFERENCES = {
   COMPLETED: 2,
 };
 
+export const CYCLE_TAXONOMY_ID = 2;
+
 /**
  * Server settings
- **/
+ * */
 
 // General ********************
 
 export const ENDPOINTS = {
-  API: 'https://undp-sadata-staging.herokuapp.com', // server API endpoint
+  API: (
+    NODE_ENV === 'production'
+      ? 'https://impactoss-dev.herokuapp.com'
+      : 'https://impactoss-dev.herokuapp.com'
+  ), // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
@@ -114,7 +123,7 @@ export const KEYS = {
 };
 
 // database date format
-export const DB_DATE_FORMAT = 'YYYY-MM-DD';
+export const DB_DATE_FORMAT = 'yyyy-MM-dd';
 
 
 // Map server messages *********************************
@@ -162,7 +171,7 @@ export const REPORT_FREQUENCIES = [
   { value: 12, message: 'ui.reportFrequencies.annual' },
 ];
 
-export const ENABLE_SDGS = true;
+export const DEFAULT_FRAMEWORK = 1;
 
 // Map server database tables **************************
 export const DB_TABLES = [
@@ -170,6 +179,7 @@ export const DB_TABLES = [
   'user_roles',
   'roles',
   'pages',
+  'bookmarks',
   'taxonomies',
   'categories',
   'indicators',
@@ -182,112 +192,14 @@ export const DB_TABLES = [
   'user_categories',
   'progress_reports',
   'due_dates',
-  'sdgtarget_categories',
-  'sdgtarget_indicators',
-  'sdgtarget_measures',
-  'sdgtargets',
+  'frameworks',
+  'framework_taxonomies',
+  'recommendation_indicators',
 ];
 
-// Table shapes
-// - define fields for each table
-// - set field location in entity forms and views (section/column)
-// - define fields for csv import (import)
-// - disable fields by setting 'disabled: true'
-
-// shape for table 'measures' (Actions)
-export const MEASURE_SHAPE = {
-  table: 'measures',
-  key: 'measures_id',
-  fields: [
-    {
-      attribute: 'title',
-      control: 'title',
-      type: 'text',
-      required: true,
-      import: true,
-      section: 'header',
-      column: 'main',
-    },
-    {
-      attribute: 'draft',
-      control: 'status',
-      type: 'bool',
-      default: true,
-      section: 'header',
-      column: 'aside',
-      role: USER_ROLES.MANAGER.value,
-    },
-    {
-      attribute: 'description',
-      control: 'markdown',
-      type: 'markdown',
-      import: true,
-      section: 'body',
-      column: 'main',
-    },
-    {
-      disabled: true,
-      attribute: 'outcome',
-      control: 'markdown',
-      type: 'markdown',
-      import: true,
-      section: 'body',
-      column: 'main',
-    },
-    {
-      disabled: true,
-      attribute: 'indicator_summary',
-      control: 'markdown',
-      type: 'markdown',
-      import: true,
-      section: 'body',
-      column: 'main',
-    },
-    {
-      attribute: 'target_date',
-      control: 'date',
-      type: 'date',
-      import: true,
-      section: 'body',
-      column: 'aside',
-      groupType: 'dark',
-    },
-    {
-      attribute: 'target_date_comment',
-      control: 'textarea',
-      type: 'text',
-      import: true,
-      section: 'body',
-      column: 'aside',
-      groupType: 'dark',
-    },
-  ],
-  taxonomies: {
-    table: 'measure_categories',
-    key: 'category_id',
-    section: 'body',
-    column: 'aside',
-    smart: true,
-  },
-  connections: {
-    tables: [
-      {
-        table: 'recommendations',
-        via: 'recommendation_measures',
-        key: 'recommendation_id',
-      },
-      {
-        table: 'indicators',
-        via: 'measure_indicators',
-        key: 'indicator_id',
-      },
-      {
-        table: 'sdgtargets',
-        via: 'sdgtarget_measures',
-        key: 'sdgtarget_id',
-      },
-    ],
-    section: 'body',
-    column: 'main',
-  },
+export const COLUMN_WIDTHS = {
+  FULL: 1,
+  HALF: 0.5,
+  MAIN: 0.72,
+  OTHER: 0.28,
 };

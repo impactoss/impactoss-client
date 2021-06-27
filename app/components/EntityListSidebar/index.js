@@ -26,6 +26,7 @@ import EntityListForm from 'containers/EntityListForm';
 import appMessages from 'containers/App/messages';
 import Sidebar from 'components/styled/Sidebar';
 import SidebarHeader from 'components/styled/SidebarHeader';
+import PrintHide from 'components/styled/PrintHide';
 
 import EntityListSidebarGroups from './EntityListSidebarGroups';
 
@@ -36,7 +37,7 @@ import { makeActiveEditOptions } from './editOptionsFactory';
 
 import messages from './messages';
 
-// const Styled = styled.div``;
+const Styled = styled(PrintHide)``;
 // const Main = styled.div``;
 const ScrollableWrapper = styled(Scrollable)`
   background-color: ${palette('aside', 0)};
@@ -46,6 +47,9 @@ const ListEntitiesEmpty = styled.div`
   font-size: 1.2em;
   padding: 1.5em;
   color: ${palette('text', 1)};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
+  }
 `;
 
 const ToggleShow = styled(ButtonDefault)`
@@ -60,7 +64,12 @@ const ToggleShow = styled(ButtonDefault)`
   font-size: 0.85em;
   width: 100%;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: 0.85em;
+    padding: 0.75em 1em;
     width: ${(props) => props.theme.sizes.aside.width.large}px;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
   }
 `;
 
@@ -77,40 +86,51 @@ const SidebarWrapper = styled.div`
   ${(props) => props.sidebarAbsolute
     ? 'position: absolute;width: 100%;top: 0;bottom: 0;left: 0;right: 0;background-color: rgba(0,0,0,0.2); z-index: 98;'
     : ''
-  }
+}
 `;
 
 const STATE_INITIAL = {
   activeOption: null,
   expandedGroups: {
+    frameworks: true,
     taxonomies: true,
+    taxonomies_1: true,
+    taxonomies_2: true,
+    taxonomies_3: true,
+    taxonomies_4: true,
+    taxonomies_5: true,
+    taxonomies_6: true,
+    taxonomies_7: true,
     connectedTaxonomies: true,
     connections: false,
-    attributes: true,
+    attributes: false,
   },
   visible: false,
   viewport: null,
 };
 
 export class EntityListSidebar extends React.Component { // eslint-disable-line react/prefer-stateless-function
-
   constructor() {
     super();
     this.state = STATE_INITIAL;
   }
-  componentWillMount() {
+
+  UNSAFE_componentWillMount() {
     this.setState(STATE_INITIAL);
   }
+
   componentDidMount() {
     this.updateViewport();
     window.addEventListener('resize', this.resize);
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.activePanel !== this.props.activePanel) {
       // close and reset option panel
       this.setState({ activeOption: null });
     }
   }
+
   shouldComponentUpdate(nextProps, nextState) {
     // console.log('shouldComponentUpdate')
     // console.log('locationQuery', isEqual(this.props.locationQuery, nextProps.locationQuery))
@@ -136,6 +156,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       || this.props.connections !== nextProps.connections
       || !isEqual(this.state, nextState);
   }
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
   }
@@ -143,10 +164,12 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   onShowForm = (option) => {
     this.setState({ activeOption: option.active ? null : option });
   };
+
   onShowSidebar = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ visible: true });
   };
+
   onHideSidebar = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.onHideForm(evt);
@@ -159,58 +182,55 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   };
 
   onToggleGroup = (groupId, expanded) => {
-    const expandedGroups = { ...this.state.expandedGroups };
-    expandedGroups[groupId] = expanded;
-    this.setState({
-      expandedGroups,
-      activeOption: null,
+    this.setState((prevState) => {
+      const expandedGroups = { ...prevState.expandedGroups };
+      expandedGroups[groupId] = expanded;
+      return ({
+        expandedGroups,
+        activeOption: null,
+      });
     });
   }
 
-  getSidebarButtons = () => ([
-    {
-      label: this.context.intl.formatMessage(messages.header.filterButton),
-      panel: FILTERS_PANEL,
-      icon: 'filter',
-    },
-    {
-      label: this.context.intl.formatMessage(messages.header.editButton),
-      panel: EDIT_PANEL,
-      icon: 'edit',
-    },
-  ]);
-
-  getFormButtons = (activeOption) => [
-    activeOption.create
-    ? {
-      type: 'addFromMultiselect',
-      position: 'left',
-      onClick: () => this.props.onCreateOption(activeOption.create),
-    }
-    : null,
-    {
-      type: 'simple',
-      title: this.context.intl.formatMessage(appMessages.buttons.cancel),
-      onClick: this.onHideForm,
-    },
-    {
-      type: 'primary',
-      title: this.context.intl.formatMessage(appMessages.buttons.assign),
-      submit: true,
-    },
-  ];
-
-  updateViewport() {
-    let viewport = VIEWPORTS.MOBILE;
-    if (window.innerWidth >= parseInt(this.props.theme.breakpoints.large, 10)) {
-      viewport = VIEWPORTS.LARGE;
-    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.medium, 10)) {
-      viewport = VIEWPORTS.MEDIUM;
-    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.small, 10)) {
-      viewport = VIEWPORTS.SMALL;
-    }
-    this.setState({ viewport });
+  getSidebarButtons = () => {
+    const { intl } = this.context;
+    return ([
+      {
+        label: intl.formatMessage(messages.header.filterButton),
+        panel: FILTERS_PANEL,
+        icon: 'filter',
+      },
+      {
+        label: intl.formatMessage(messages.header.editButton),
+        panel: EDIT_PANEL,
+        icon: 'edit',
+      },
+    ]);
   }
+
+  getFormButtons = (activeOption) => {
+    const { intl } = this.context;
+    const { onCreateOption } = this.props;
+    return [
+      activeOption.create
+        ? {
+          type: 'addFromMultiselect',
+          position: 'left',
+          onClick: () => onCreateOption(activeOption.create),
+        }
+        : null,
+      {
+        type: 'simple',
+        title: intl.formatMessage(appMessages.buttons.cancel),
+        onClick: this.onHideForm,
+      },
+      {
+        type: 'primary',
+        title: intl.formatMessage(appMessages.buttons.assign),
+        submit: true,
+      },
+    ];
+  };
 
   resize = () => {
     // reset
@@ -218,6 +238,19 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     this.updateViewport();
     this.forceUpdate();
   };
+
+  updateViewport() {
+    const { theme } = this.props;
+    let viewport = VIEWPORTS.MOBILE;
+    if (window.innerWidth >= parseInt(theme.breakpoints.large, 10)) {
+      viewport = VIEWPORTS.LARGE;
+    } else if (window.innerWidth >= parseInt(theme.breakpoints.medium, 10)) {
+      viewport = VIEWPORTS.MEDIUM;
+    } else if (window.innerWidth >= parseInt(theme.breakpoints.small, 10)) {
+      viewport = VIEWPORTS.SMALL;
+    }
+    this.setState({ viewport });
+  }
 
   render() {
     const {
@@ -233,14 +266,22 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       connectedTaxonomies,
       connections,
       entityIdsSelected,
+      frameworks,
     } = this.props;
-    const activeOption = this.state.activeOption;
+    const { intl } = this.context;
+    const { activeOption } = this.state;
 
     const hasSelected = entityIdsSelected && entityIdsSelected.size > 0;
     const hasEntities = entities && entities.size > 0;
     const formModel = activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL;
 
     let panelGroups = null;
+
+    const entitiesSelected = activePanel === EDIT_PANEL
+      && canEdit
+      && hasSelected
+      && entities.filter((entity) => entityIdsSelected.includes(entity.get('id')));
+
     if (activePanel === FILTERS_PANEL) {
       panelGroups = makeFilterGroups(
         config,
@@ -249,12 +290,22 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         activeOption,
         hasUserRole,
         {
-          attributes: this.context.intl.formatMessage(messages.filterGroupLabel.attributes),
-          taxonomyGroup: this.context.intl.formatMessage(messages.filterGroupLabel.taxonomies),
-          connections: this.context.intl.formatMessage(messages.filterGroupLabel.connections),
-          connectedTaxonomies: this.context.intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
+          attributes: intl.formatMessage(messages.filterGroupLabel.attributes),
+          taxonomyGroup: intl.formatMessage(messages.filterGroupLabel.taxonomies),
+          taxonomyGroupByFw:
+            (fw) => this.context.intl.formatMessage(
+              messages.filterGroupLabel.taxonomiesByFw,
+              {
+                fw: intl.formatMessage(appMessages.frameworks_short[fw]),
+              },
+            ),
+          frameworksGroup: intl.formatMessage(messages.filterGroupLabel.frameworks),
+          connections: intl.formatMessage(messages.filterGroupLabel.connections),
+          connectedTaxonomies: intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
           taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
+          frameworks: intl.formatMessage(appMessages.frameworks.plural),
         },
+        frameworks,
       );
     } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
       panelGroups = makeEditGroups(
@@ -263,11 +314,14 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         activeOption,
         hasUserRole,
         {
-          attributes: this.context.intl.formatMessage(messages.editGroupLabel.attributes),
-          taxonomyGroup: this.context.intl.formatMessage(messages.editGroupLabel.taxonomies),
-          connections: this.context.intl.formatMessage(messages.editGroupLabel.connections),
+          attributes: intl.formatMessage(messages.editGroupLabel.attributes),
+          taxonomyGroup: intl.formatMessage(messages.editGroupLabel.taxonomies),
+          connections: intl.formatMessage(messages.editGroupLabel.connections),
           taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
         },
+        frameworks,
+        // selectedFrameworkIds
+        entitiesSelected.groupBy((e) => e.getIn(['attributes', 'framework_id'])).keySeq(),
       );
     }
     let formOptions = null;
@@ -282,13 +336,13 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           connections,
           connectedTaxonomies,
           {
-            titlePrefix: this.context.intl.formatMessage(messages.filterFormTitlePrefix),
-            without: this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
+            titlePrefix: intl.formatMessage(messages.filterFormTitlePrefix),
+            without: intl.formatMessage(messages.filterFormWithoutPrefix),
           },
-          this.context.intl
+          intl,
+          frameworks,
         );
       } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
-        const entitiesSelected = entities.filter((entity) => entityIdsSelected.includes(entity.get('id')));
         formOptions = makeActiveEditOptions(
           entitiesSelected,
           config,
@@ -297,105 +351,122 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           connections,
           connectedTaxonomies,
           {
-            title: `${this.context.intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.size} ${this.context.intl.formatMessage(messages.editFormTitlePostfix)}`,
+            title: `${intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.size} ${intl.formatMessage(messages.editFormTitlePostfix)}`,
           },
-          this.context.intl
+          intl
         );
       }
     }
     return (
-      <div>
-        { (!this.state.visible && this.state.viewport < VIEWPORTS.LARGE) &&
-          <ToggleShow onClick={this.onShowSidebar}>
-            { canEdit &&
-              <FormattedMessage {...messages.sidebarToggle.showFilterEdit} />
-            }
-            { !canEdit &&
-              <FormattedMessage {...messages.sidebarToggle.showFilter} />
-            }
-          </ToggleShow>
-        }
-        { (this.state.visible || this.state.viewport === VIEWPORTS.LARGE) &&
-          <SidebarWrapper
-            sidebarAbsolute={this.state.viewport < VIEWPORTS.LARGE}
-            onClick={this.onHideSidebar}
-          >
-            <Sidebar onClick={(evt) => evt.stopPropagation()}>
-              <ScrollableWrapper>
-                <SidebarHeader hasButtons={canEdit}>
-                  {canEdit &&
-                    <ButtonToggle
-                      options={this.getSidebarButtons()}
-                      activePanel={activePanel}
-                      onSelect={onPanelSelect}
-                    />}
-                  {!canEdit &&
-                    <SupTitle title={this.context.intl.formatMessage(messages.header.filter)} />
-                  }
-                  { this.state.viewport < VIEWPORTS.LARGE &&
-                    <ToggleHide onClick={this.onHideSidebar} >
-                      <Icon name="close" />
-                    </ToggleHide>
-                  }
-                </SidebarHeader>
-                <div>
-                  { (activePanel === FILTERS_PANEL || (activePanel === EDIT_PANEL && hasSelected && hasEntities)) &&
-                    <EntityListSidebarGroups
-                      groups={fromJS(panelGroups)}
-                      onShowForm={this.onShowForm}
-                      onToggleGroup={this.onToggleGroup}
-                      expanded={this.state.expandedGroups}
-                    />
-                  }
-                  { activePanel === EDIT_PANEL && !hasEntities &&
-                    <ListEntitiesEmpty>
-                      <FormattedMessage {...messages.entitiesNotFound} />
-                    </ListEntitiesEmpty>
-                  }
-                  { activePanel === EDIT_PANEL && hasEntities && !hasSelected &&
-                    <ListEntitiesEmpty>
-                      <FormattedMessage {...messages.entitiesNotSelected} />
-                    </ListEntitiesEmpty>
-                  }
-                </div>
-              </ScrollableWrapper>
-            </Sidebar>
-          </SidebarWrapper>
-        }
-        { formOptions &&
-          <EntityListForm
-            model={formModel}
-            activeOptionId={activeOption.optionId}
-            formOptions={formOptions}
-            buttons={activePanel === EDIT_PANEL
-              ? this.getFormButtons(activeOption)
-              : null
-            }
-            onCancel={this.onHideForm}
-            showCancelButton={(activePanel === FILTERS_PANEL)}
-            onSelect={() => {
-              if (activePanel === FILTERS_PANEL) {
-                this.onHideForm();
-                this.onHideSidebar();
+      <Styled>
+        { (!this.state.visible && this.state.viewport < VIEWPORTS.LARGE)
+          && (
+            <ToggleShow onClick={this.onShowSidebar}>
+              { canEdit
+              && <FormattedMessage {...messages.sidebarToggle.showFilterEdit} />
               }
-            }}
-            onSubmit={activePanel === EDIT_PANEL
-              ? (associations) => {
+              { !canEdit
+              && <FormattedMessage {...messages.sidebarToggle.showFilter} />
+              }
+            </ToggleShow>
+          )
+        }
+        { (this.state.visible || this.state.viewport === VIEWPORTS.LARGE)
+          && (
+            <SidebarWrapper
+              sidebarAbsolute={this.state.viewport < VIEWPORTS.LARGE}
+              onClick={this.onHideSidebar}
+            >
+              <Sidebar onClick={(evt) => evt.stopPropagation()}>
+                <ScrollableWrapper>
+                  <SidebarHeader hasButtons={canEdit}>
+                    {canEdit
+                    && (
+                      <ButtonToggle
+                        options={this.getSidebarButtons()}
+                        activePanel={activePanel}
+                        onSelect={onPanelSelect}
+                      />
+                    )}
+                    {!canEdit
+                    && <SupTitle title={intl.formatMessage(messages.header.filter)} />
+                    }
+                    { this.state.viewport < VIEWPORTS.LARGE
+                    && (
+                      <ToggleHide onClick={this.onHideSidebar}>
+                        <Icon name="close" />
+                      </ToggleHide>
+                    )
+                    }
+                  </SidebarHeader>
+                  <div>
+                    { (activePanel === FILTERS_PANEL || (activePanel === EDIT_PANEL && hasSelected && hasEntities))
+                    && (
+                      <EntityListSidebarGroups
+                        groups={fromJS(panelGroups)}
+                        onShowForm={this.onShowForm}
+                        onToggleGroup={this.onToggleGroup}
+                        expanded={this.state.expandedGroups}
+                      />
+                    )
+                    }
+                    { activePanel === EDIT_PANEL && !hasEntities
+                    && (
+                      <ListEntitiesEmpty>
+                        <FormattedMessage {...messages.entitiesNotFound} />
+                      </ListEntitiesEmpty>
+                    )
+                    }
+                    { activePanel === EDIT_PANEL && hasEntities && !hasSelected
+                    && (
+                      <ListEntitiesEmpty>
+                        <FormattedMessage {...messages.entitiesNotSelected} />
+                      </ListEntitiesEmpty>
+                    )
+                    }
+                  </div>
+                </ScrollableWrapper>
+              </Sidebar>
+            </SidebarWrapper>
+          )
+        }
+        { formOptions
+          && (
+            <EntityListForm
+              model={formModel}
+              activeOptionId={activeOption.optionId}
+              formOptions={formOptions}
+              buttons={activePanel === EDIT_PANEL
+                ? this.getFormButtons(activeOption)
+                : null
+              }
+              onCancel={this.onHideForm}
+              showCancelButton={(activePanel === FILTERS_PANEL)}
+              onSelect={() => {
+                if (activePanel === FILTERS_PANEL) {
+                  this.onHideForm();
+                  this.onHideSidebar();
+                }
+              }}
+              onSubmit={activePanel === EDIT_PANEL
+                ? (associations) => {
                 // close and reset option panel
-                this.setState({ activeOption: null });
-                onUpdate(associations, activeOption);
+                  this.setState({ activeOption: null });
+                  onUpdate(associations, activeOption);
+                }
+                : null
               }
-              : null
-            }
-          />
+            />
+          )
         }
-      </div>
+      </Styled>
     );
   }
 }
 EntityListSidebar.propTypes = {
   entities: PropTypes.instanceOf(List),
   taxonomies: PropTypes.instanceOf(Map),
+  frameworks: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),

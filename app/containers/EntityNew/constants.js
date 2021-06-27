@@ -26,5 +26,7 @@ export const FORM_INITIAL = fromJS({
     due_date_id: '',
     document_url: '',
     document_public: true,
+    parent_id: '',
+    framework_id: '',
   },
 });

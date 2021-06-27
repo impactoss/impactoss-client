@@ -8,7 +8,7 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   pageTitle: {
     id: 'app.containers.RecommendationEdit.pageTitle',
-    defaultMessage: 'Edit Recommendation',
+    defaultMessage: 'Edit {type}',
   },
   metaDescription: {
     id: 'app.containers.RecommendationEdit.metaDescription',
@@ -16,10 +16,10 @@ export default defineMessages({
   },
   header: {
     id: 'app.containers.RecommendationEdit.header',
-    defaultMessage: 'Edit Recommendation',
+    defaultMessage: 'Edit {type}',
   },
   notFound: {
     id: 'app.containers.RecommendationEdit.notFound',
-    defaultMessage: 'Sorry no recommendation found',
+    defaultMessage: 'Sorry no objective found',
   },
 });

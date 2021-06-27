@@ -22,6 +22,9 @@ const Styled = styled.div`
 // padding: 0.75em 2em;
 const Group = styled(Button)`
   padding: 0 0.5em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0 0.5em;
+  }
 `;
 
 const GroupWrapper = styled.span`
@@ -63,6 +66,9 @@ const Label = styled.div`
   top: 1px;
   font-size: 0.9em;
   font-weight: bold;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 
 class TagFilters extends React.PureComponent {
@@ -74,60 +80,61 @@ class TagFilters extends React.PureComponent {
   }
 
   toggleGroup = (groupId) => {
-    this.setState({
-      active: this.state.active === groupId
-        ? null
-        : groupId,
-    });
+    this.setState(
+      (prevState) => ({
+        active: prevState.active === groupId
+          ? null
+          : groupId,
+      })
+    );
   };
 
-  prepareOptions = (options, queryTags) =>
-    sortOptions(
-      fromJS(options).map((option) => option.withMutations((o) =>
-        o.set('checked', queryTags.includes(option.get('value')))
-      ))
-    );
+  prepareOptions = (options, queryTags) => sortOptions(
+    fromJS(options).map((option) => option.withMutations((o) => o.set('checked', queryTags.includes(option.get('value')))))
+  );
 
   render() {
     return this.props.tagFilterGroups.length === 0
       ? null
       : (
         <Styled>
-          { this.props.tagFilterGroups.map((group, key) =>
-            group.options && group.options.length > 0
-            ? (<GroupWrapper key={key}>
-              <Group
-                onClick={(evt) => {
-                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.toggleGroup(key);
-                }}
-                active={key === this.state.active}
-              >
-                <DotWrapper>
-                  <Dot palette={group.palette[0]} pIndex={parseInt(group.palette[1], 10)} />
-                </DotWrapper>
-                <Label>
-                  {group.title}
-                </Label>
-                <Icon name={this.state.active === key ? 'dropdownClose' : 'dropdownOpen'} text textRight />
-              </Group>
-              { key === this.state.active &&
-                <Dropdown>
-                  <OptionList
-                    secondary
-                    options={this.prepareOptions(group.options, this.props.queryTags)}
-                    onCheckboxChange={(active, tagOption) => {
-                      this.setState({ active: null });
-                      this.props.onTagSelected(active, tagOption);
-                    }}
-                  />
-                </Dropdown>
-              }
-            </GroupWrapper>)
-            : null
-          )}
+          { this.props.tagFilterGroups.map((group, key) => group.options && group.options.length > 0
+            ? (
+              <GroupWrapper key={key}>
+                <Group
+                  onClick={(evt) => {
+                    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                    this.toggleGroup(key);
+                  }}
+                  active={key === this.state.active}
+                >
+                  <DotWrapper>
+                    <Dot palette={group.palette[0]} pIndex={parseInt(group.palette[1], 10)} />
+                  </DotWrapper>
+                  <Label>
+                    {group.title}
+                  </Label>
+                  <Icon name={this.state.active === key ? 'dropdownClose' : 'dropdownOpen'} text textRight />
+                </Group>
+                { key === this.state.active
+                && (
+                  <Dropdown>
+                    <OptionList
+                      secondary
+                      options={this.prepareOptions(group.options, this.props.queryTags)}
+                      onCheckboxChange={(active, tagOption) => {
+                        this.setState({ active: null });
+                        this.props.onTagSelected(active, tagOption);
+                      }}
+                    />
+                  </Dropdown>
+                )
+                }
+              </GroupWrapper>
+            )
+            : null)}
         </Styled>
-    );
+      );
   }
 }
 

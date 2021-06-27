@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { List } from 'immutable';
+import { Map, List } from 'immutable';
 import { Control } from 'react-redux-form/immutable';
 
 import MultiSelect from './MultiSelect';
@@ -28,7 +28,8 @@ const MultiSelectControl = (props) => {
     selectAll,
     tagFilterGroups,
     closeOnClickOutside,
-     ...otherProps
+    groups,
+    ...otherProps
   } = props;
 
   return (
@@ -54,6 +55,7 @@ const MultiSelectControl = (props) => {
         selectAll,
         tagFilterGroups,
         closeOnClickOutside,
+        groups,
       }}
       {...otherProps}
     />
@@ -70,6 +72,7 @@ MultiSelectControl.propTypes = {
   advanced: PropTypes.bool,
   closeOnClickOutside: PropTypes.bool,
   options: PropTypes.instanceOf(List),
+  groups: PropTypes.instanceOf(Map),
   title: PropTypes.string,
   panelId: PropTypes.string,
   buttons: PropTypes.array,

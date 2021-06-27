@@ -5,10 +5,8 @@ import { Map } from 'immutable';
 
 import Component from 'components/styled/Component';
 
-import EntityListItemMainBottomTaxonomies from './EntityListItemMainBottomTaxonomies';
-import EntityListItemMainBottomConnections from './EntityListItemMainBottomConnections';
-import EntityListItemMainBottomUser from './EntityListItemMainBottomUser';
-import EntityListItemMainBottomTargetDate from './EntityListItemMainBottomTargetDate';
+import EntityListItemMainConnections from './EntityListItemMainConnections';
+import EntityListItemMainTaxonomies from './EntityListItemMainTaxonomies';
 
 const Styled = styled(Component)`
   margin-bottom: -5px;
@@ -16,52 +14,52 @@ const Styled = styled(Component)`
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     display: block;
   }
+  @media print {
+    display: block !important;
+  }
 `;
 
 class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
-    const { categories, taxonomies, onEntityClick, connections, wrapper, user, targetDate } = this.props;
-    const smartTaxonomy = taxonomies && taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
-
+    const {
+      connections,
+      wrapper,
+      categories,
+      taxonomies,
+      onEntityClick,
+    } = this.props;
+    const smartTaxonomy = taxonomies && taxonomies.find(
+      (tax) => tax.getIn(['attributes', 'is_smart'])
+    );
+    const hasUpper = connections && connections.length > 0;
+    const hasLower = categories
+      && (categories.size > 0 || smartTaxonomy);
     return (
       <Styled>
-        { categories && (categories.size > 0 || smartTaxonomy) &&
-          <EntityListItemMainBottomTaxonomies
+        {hasLower && (
+          <EntityListItemMainTaxonomies
             categories={categories}
             taxonomies={taxonomies}
             onEntityClick={onEntityClick}
           />
-        }
-        { connections && connections.length > 0 &&
-          <EntityListItemMainBottomConnections
+        )}
+        {hasUpper && (
+          <EntityListItemMainConnections
             connections={connections}
             wrapper={wrapper}
           />
-        }
-        { user &&
-          <EntityListItemMainBottomUser
-            user={user}
-          />
-        }
-        { targetDate &&
-          <EntityListItemMainBottomTargetDate
-            targetDate={targetDate}
-          />
-        }
+        )}
       </Styled>
     );
   }
 }
 
 EntityListItemMainBottom.propTypes = {
+  connections: PropTypes.array,
+  wrapper: PropTypes.object,
   categories: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
   taxonomies: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
   onEntityClick: PropTypes.func,
-  connections: PropTypes.array,
-  wrapper: PropTypes.object,
-  user: PropTypes.object,
-  targetDate: PropTypes.string,
 };
 
 export default EntityListItemMainBottom;

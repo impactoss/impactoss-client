@@ -1,7 +1,7 @@
 import { Map, List } from 'immutable';
 import { sortEntities } from 'utils/sort';
 
-import { filter, reduce } from 'lodash/collection';
+import { filter } from 'lodash/collection';
 
 import {
   getEntityTitle,
@@ -23,7 +23,6 @@ import {
   DATE_FORMAT,
   DOC_PUBLISH_STATUSES,
   ACCEPTED_STATUSES,
-  MEASURE_SHAPE,
 } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
@@ -38,7 +37,9 @@ export const entityOption = (entity, defaultToId, hasTags) => Map({
 });
 
 export const entityOptions = (entities, defaultToId = true, hasTags = true) => entities
-  ? entities.toList().map((entity) => entityOption(entity, defaultToId, hasTags))
+  ? entities.toList().map(
+    (entity) => entityOption(entity, defaultToId, hasTags)
+  )
   : List();
 
 export const userOption = (entity, activeUserId) => Map({
@@ -48,8 +49,17 @@ export const userOption = (entity, activeUserId) => Map({
 });
 
 export const userOptions = (entities, activeUserId) => entities
-  ? entities.reduce((options, entity) =>
-    options.push(userOption(entity, activeUserId)), List())
+  ? entities.reduce((options, entity) => options.push(userOption(entity, activeUserId)), List())
+  : List();
+
+export const parentCategoryOption = (entity, activeParentId) => Map({
+  value: entity.get('id'),
+  label: entity.getIn(['attributes', 'title']),
+  checked: activeParentId ? entity.get('id') === activeParentId.toString() : false,
+});
+
+export const parentCategoryOptions = (entities, activeParentId) => entities
+  ? entities.reduce((options, entity) => options.push(parentCategoryOption(entity, activeParentId)), List())
   : List();
 
 export const dateOption = (entity, activeDateId) => Map({
@@ -58,253 +68,291 @@ export const dateOption = (entity, activeDateId) => Map({
   checked: activeDateId ? entity.get('id') === activeDateId.toString() : false,
 });
 
-// export const dateOptions = (entities, activeDateId) => entities
-//   ? entities.reduce((options, entity) => {
-//     // only allow active and those that are not associated
-//     if ((entity.has('reportCount') && entity.get('reportCount') === 0)
-//     || (activeDateId ? activeDateId.toString() === entity.get('id') : false)) {
-//       return options.push(dateOption(entity, activeDateId));
-//     }
-//     return options;
-//   }, List())
-//   : List();
-
 export const taxonomyOptions = (taxonomies) => taxonomies
-  ? sortEntities(taxonomies, 'asc', 'priority').reduce((values, tax) =>
-    values.set(tax.get('id'), entityOptions(tax.get('categories'), false, false)), Map())
+  ? sortEntities(taxonomies, 'asc', 'priority').reduce(
+    (values, tax) => values.set(
+      tax.get('id'),
+      entityOptions(tax.get('categories'), false, false)
+    ),
+    Map(),
+  )
   : Map();
 
 const getTaxTitle = (id, contextIntl) => contextIntl ? contextIntl.formatMessage(appMessages.entities.taxonomies[id].single) : '';
 
 // turn taxonomies into multiselect options
-export const makeTagFilterGroups = (taxonomies, contextIntl) =>
-  taxonomies && sortEntities(taxonomies, 'asc', 'priority').map((taxonomy) => ({
-    title: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
-    palette: ['taxonomies', parseInt(taxonomy.get('id'), 10)],
-    options: taxonomy.get('categories').map((category) => ({
-      reference: getEntityReference(category, false),
-      label: getEntityTitle(category),
-      filterLabel: getCategoryShortTitle(category),
-      showCount: false,
-      value: category.get('id'),
-    })).toList().toArray(),
-  })).toList().toArray();
+export const makeTagFilterGroups = (taxonomies, contextIntl) => taxonomies && sortEntities(taxonomies, 'asc', 'priority').map((taxonomy) => ({
+  title: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
+  palette: ['taxonomies', parseInt(taxonomy.get('id'), 10)],
+  options: taxonomy.get('categories').map((category) => ({
+    reference: getEntityReference(category, false),
+    label: getEntityTitle(category),
+    filterLabel: getCategoryShortTitle(category),
+    showCount: false,
+    value: category.get('id'),
+  })).valueSeq().toArray(),
+})).toArray();
 
 export const renderMeasureControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
-? {
-  id: 'actions',
-  model: '.associatedMeasures',
-  dataPath: ['associatedMeasures'],
-  label: 'Actions',
-  controlType: 'multiselect',
-  options: entityOptions(entities, true),
-  advanced: true,
-  selectAll: true,
-  tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
-  onCreate: onCreateOption
-    ? () => onCreateOption({ path: 'measures' })
-    : null,
-}
-: null;
+  ? {
+    id: 'actions',
+    model: '.associatedMeasures',
+    dataPath: ['associatedMeasures'],
+    label: contextIntl.formatMessage(appMessages.entities.measures.plural),
+    controlType: 'multiselect',
+    options: entityOptions(entities, true),
+    advanced: true,
+    selectAll: true,
+    tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
+    onCreate: onCreateOption
+      ? () => onCreateOption({ path: 'measures' })
+      : null,
+  }
+  : null;
 
-export const renderSdgTargetControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
-? {
-  id: 'sdgtargets',
-  model: '.associatedSdgTargets',
-  dataPath: ['associatedSdgTargets'],
-  label: 'SDG targets',
-  controlType: 'multiselect',
-  options: entityOptions(entities, true),
-  advanced: true,
-  selectAll: true,
-  tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
-  onCreate: onCreateOption
-    ? () => onCreateOption({ path: 'sdgtargets' })
-    : null,
-}
-: null;
+export const renderRecommendationControl = (
+  fwId,
+  entities,
+  taxonomies,
+  onCreateOption,
+  contextIntl,
+) => entities
+  ? {
+    id: `recommendations.${fwId}`,
+    model: `.associatedRecommendationsByFw.${fwId}`,
+    dataPath: ['associatedRecommendationsByFw', fwId],
+    label: contextIntl.formatMessage(appMessages.entities[`recommendations_${fwId}`].plural),
+    controlType: 'multiselect',
+    options: entityOptions(entities),
+    advanced: true,
+    selectAll: true,
+    tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
+    onCreate: onCreateOption
+      ? () => onCreateOption({ path: 'recommendations' })
+      : null,
+  }
+  : null;
 
+// recommendations grouped by framework
+export const renderRecommendationsByFwControl = (
+  entitiesByFw,
+  taxonomies,
+  onCreateOption,
+  contextIntl,
+) => entitiesByFw
+  ? entitiesByFw.reduce(
+    (controls, entities, fwid) => controls.concat({
+      id: `recommendations.${fwid}`,
+      model: `.associatedRecommendationsByFw.${fwid}`,
+      dataPath: ['associatedRecommendationsByFw', fwid],
+      label: contextIntl.formatMessage(appMessages.entities[`recommendations_${fwid}`].plural),
+      controlType: 'multiselect',
+      options: entityOptions(entities),
+      advanced: true,
+      selectAll: true,
+      tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
+      onCreate: onCreateOption
+        ? () => onCreateOption({
+          path: 'recommendations',
+          attributes: { framework_id: fwid },
+        })
+        : null,
+    }),
+    [],
+  )
+  : null;
 
-export const renderRecommendationControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
-? {
-  id: 'recommendations',
-  model: '.associatedRecommendations',
-  dataPath: ['associatedRecommendations'],
-  label: 'Recommendations',
-  controlType: 'multiselect',
-  options: entityOptions(entities),
-  advanced: true,
-  selectAll: true,
-  tagFilterGroups: makeTagFilterGroups(taxonomies, contextIntl),
-  onCreate: onCreateOption
-    ? () => onCreateOption({ path: 'recommendations' })
-    : null,
-}
-: null;
+// taxonomies with categories "embedded"
+export const renderTaxonomyControl = (
+  taxonomies,
+  onCreateOption,
+  contextIntl,
+) => taxonomies
+  ? sortEntities(taxonomies, 'asc', 'priority').reduce(
+    (controls, taxonomy) => controls.concat({
+      id: taxonomy.get('id'),
+      model: `.associatedTaxonomies.${taxonomy.get('id')}`,
+      dataPath: ['associatedTaxonomies', taxonomy.get('id')],
+      label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
+      controlType: 'multiselect',
+      multiple: taxonomy.getIn(['attributes', 'allow_multiple']),
+      options: entityOptions(taxonomy.get('categories'), false),
+      onCreate: onCreateOption
+        ? () => onCreateOption({
+          path: 'categories',
+          attributes: { taxonomy_id: taxonomy.get('id') },
+        })
+        : null,
+    }),
+    [],
+  )
+  : [];
 
-export const renderIndicatorControl = (entities, onCreateOption) => entities
-? {
-  id: 'indicators',
-  model: '.associatedIndicators',
-  dataPath: ['associatedIndicators'],
-  label: 'Indicators',
-  controlType: 'multiselect',
-  options: entityOptions(entities, true),
-  advanced: true,
-  selectAll: true,
-  onCreate: onCreateOption
-    ? () => onCreateOption({ path: 'indicators' })
-    : null,
-}
-: null;
+export const renderIndicatorControl = (entities, onCreateOption, contextIntl) => entities
+  ? {
+    id: 'indicators',
+    model: '.associatedIndicators',
+    dataPath: ['associatedIndicators'],
+    label: contextIntl.formatMessage(appMessages.entities.indicators.plural),
+    controlType: 'multiselect',
+    options: entityOptions(entities, true),
+    advanced: true,
+    selectAll: true,
+    onCreate: onCreateOption
+      ? () => onCreateOption({ path: 'indicators' })
+      : null,
+  }
+  : null;
 
 export const renderUserControl = (entities, label, activeUserId) => entities
-? {
-  id: 'users',
-  model: '.associatedUser',
-  dataPath: ['associatedUser'],
-  label,
-  controlType: 'multiselect',
-  multiple: false,
-  options: userOptions(entities, activeUserId),
-}
-: null;
+  ? {
+    id: 'users',
+    model: '.associatedUser',
+    dataPath: ['associatedUser'],
+    label,
+    controlType: 'multiselect',
+    multiple: false,
+    options: userOptions(entities, activeUserId),
+  }
+  : null;
 
-export const renderTaxonomyControl = (taxonomies, onCreateOption, contextIntl) => taxonomies
-? sortEntities(taxonomies, 'asc', 'priority').reduce((controls, taxonomy) => controls.concat({
-  id: taxonomy.get('id'),
-  model: `.associatedTaxonomies.${taxonomy.get('id')}`,
-  dataPath: ['associatedTaxonomies', taxonomy.get('id')],
-  label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
-  controlType: 'multiselect',
-  multiple: taxonomy.getIn(['attributes', 'allow_multiple']),
-  options: entityOptions(taxonomy.get('categories'), false),
-  onCreate: onCreateOption
-    ? () => onCreateOption({
-      path: 'categories',
-      attributes: { taxonomy_id: taxonomy.get('id') },
-    })
-    : null,
-}), [])
-: [];
+export const renderParentCategoryControl = (entities, label, activeParentId) => entities
+  ? {
+    id: 'associatedCategory',
+    model: '.associatedCategory',
+    dataPath: ['associatedCategory'],
+    label,
+    controlType: 'multiselect',
+    multiple: false,
+    options: parentCategoryOptions(entities, activeParentId),
+  }
+  : null;
 
 const getAssociatedCategories = (taxonomy) => taxonomy.get('categories')
   ? getAssociatedEntities(taxonomy.get('categories'))
   : Map();
 
-const getAssociatedEntities = (entities) =>
-  entities
+const getAssociatedEntities = (entities) => entities
   ? entities.reduce((entitiesAssociated, entity) => entity.get('associated')
     ? entitiesAssociated.set(entity.get('id'), entity.getIn(['associated', 'id']))
-    : entitiesAssociated
-  , Map())
+    : entitiesAssociated,
+  Map())
   : Map();
 
-export const getCategoryUpdatesFromFormData = ({ formData, taxonomies, createKey }) =>
-  taxonomies.reduce((updates, tax, taxId) => {
-    const formCategoryIds = getCheckedValuesFromOptions(formData.getIn(['associatedTaxonomies', taxId]));
+export const getCategoryUpdatesFromFormData = ({ formData, taxonomies, createKey }) => taxonomies.reduce((updates, tax, taxId) => {
+  const formCategoryIds = getCheckedValuesFromOptions(formData.getIn(['associatedTaxonomies', taxId]));
 
-    // store associated cats as { [cat.id]: [association.id], ... }
-    // then we can use keys for creating new associations and values for deleting
-    const associatedCategories = getAssociatedCategories(tax);
+  // store associated cats as { [cat.id]: [association.id], ... }
+  // then we can use keys for creating new associations and values for deleting
+  const associatedCategories = getAssociatedCategories(tax);
 
-    return Map({
-      delete: updates.get('delete').concat(associatedCategories.reduce((associatedIds, associatedId, catId) =>
-        !formCategoryIds.includes(catId)
-          ? associatedIds.push(associatedId)
-          : associatedIds
-      , List())),
-      create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) =>
-        !associatedCategories.has(catId)
-          ? payloads.push(Map({
-            category_id: catId,
-            [createKey]: formData.get('id'),
-          }))
-          : payloads
-      , List())),
-    });
-  }, Map({ delete: List(), create: List() }));
+  return Map({
+    delete: updates.get('delete').concat(associatedCategories.reduce((associatedIds, associatedId, catId) => !formCategoryIds.includes(catId)
+      ? associatedIds.push(associatedId)
+      : associatedIds,
+    List())),
+    create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) => !associatedCategories.has(catId)
+      ? payloads.push(Map({
+        category_id: catId,
+        [createKey]: formData.get('id'),
+      }))
+      : payloads,
+    List())),
+  });
+}, Map({ delete: List(), create: List() }));
 
-export const getConnectionUpdatesFromFormData = ({ formData, connections, connectionAttribute, createConnectionKey, createKey }) => {
-  const formConnectionIds = formData
-    ? getCheckedValuesFromOptions(formData.get(connectionAttribute))
-    : List();
+export const getConnectionUpdatesFromFormData = ({
+  formData,
+  connections,
+  connectionAttribute,
+  createConnectionKey,
+  createKey,
+}) => {
+  let formConnectionIds = List();
+  if (formData) {
+    if (Array.isArray(connectionAttribute)) {
+      formConnectionIds = getCheckedValuesFromOptions(formData.getIn(connectionAttribute));
+    } else {
+      formConnectionIds = getCheckedValuesFromOptions(formData.get(connectionAttribute));
+    }
+  }
 
   // store associated Actions as { [action.id]: [association.id], ... }
   const associatedConnections = getAssociatedEntities(connections);
 
   return Map({
-    delete: associatedConnections.reduce((associatedIds, associatedId, id) =>
-      !formConnectionIds.includes(id)
-        ? associatedIds.push(associatedId)
-        : associatedIds
-    , List()),
-    create: formConnectionIds.reduce((payloads, id) =>
-      !associatedConnections.has(id)
+    delete: associatedConnections.reduce((associatedIds, associatedId, id) => !formConnectionIds.includes(id)
+      ? associatedIds.push(associatedId)
+      : associatedIds,
+    List()),
+    create: formConnectionIds.reduce(
+      (payloads, id) => !associatedConnections.has(id)
         ? payloads.push(Map({
           [createConnectionKey]: id,
           [createKey]: formData.get('id'),
         }))
-        : payloads
-    , List()),
+        : payloads,
+      List(),
+    ),
   });
 };
 
 
 // only show the highest rated role (lower role ids means higher)
-export const getHighestUserRoleId = (roles) =>
-  roles.reduce((currentHighestRoleId, role) =>
-    role.get('associated') && parseInt(role.get('id'), 10) < parseInt(currentHighestRoleId, 10)
-      ? role.get('id').toString()
-      : currentHighestRoleId.toString()
-  , USER_ROLES.DEFAULT.value);
+export const getHighestUserRoleId = (roles) => roles.reduce((currentHighestRoleId, role) => role.get('associated') && parseInt(role.get('id'), 10) < parseInt(currentHighestRoleId, 10)
+  ? role.get('id').toString()
+  : currentHighestRoleId.toString(),
+USER_ROLES.DEFAULT.value);
 
-export const getRoleFormField = (formatMessage, obsoleteAppMessages, roleOptions) => ({
+export const getRoleFormField = (formatMessage, roleOptions) => ({
   id: 'role',
   controlType: 'select',
   model: '.associatedRole',
   label: formatMessage(appMessages.entities.roles.single),
-  value: getHighestUserRoleId(roleOptions).toString(),
-  options: Object.values(filter(USER_ROLES, (userRole) =>
-    roleOptions.map((roleOption) => parseInt(roleOption.get('id'), 10)).includes(userRole.value)
-    || userRole.value === USER_ROLES.DEFAULT.value
-  )),
+  options: Object.values(filter(USER_ROLES, (userRole) => roleOptions.map((roleOption) => parseInt(roleOption.get('id'), 10)).includes(userRole.value)
+    || userRole.value === USER_ROLES.DEFAULT.value)),
 });
 
-export const getAcceptedField = (formatMessage, obsoleteAppMessages, entity) => ({
+export const getAcceptedField = (formatMessage) => ({
   id: 'accepted',
   controlType: 'select',
   model: '.attributes.accepted',
   label: formatMessage(appMessages.attributes.accepted),
-  value: entity ? entity.getIn(['attributes', 'accepted']) : true,
   options: ACCEPTED_STATUSES,
 });
 
-export const getFrequencyField = (formatMessage, obsoleteAppMessages, entity) => ({
+export const getFrequencyField = (formatMessage) => ({
   id: 'frequency_months',
   controlType: 'select',
   model: '.attributes.frequency_months',
   label: formatMessage(appMessages.attributes.frequency_months),
-  value: entity ? parseInt(entity.getIn(['attributes', 'frequency_months']), 10) : 1,
   options: REPORT_FREQUENCIES,
 });
 
-export const getDocumentStatusField = (formatMessage, obsoleteAppMessages, entity) => ({
+export const getDocumentStatusField = (formatMessage) => ({
   id: 'document_public',
   controlType: 'select',
   model: '.attributes.document_public',
   label: formatMessage(appMessages.attributes.document_public),
-  value: entity ? entity.getIn(['attributes', 'document_public']) : false,
   options: DOC_PUBLISH_STATUSES,
 });
 
-export const getStatusField = (formatMessage, obsoleteAppMessages, entity) => ({
+export const getStatusField = (formatMessage) => ({
   id: 'status',
   controlType: 'select',
   model: '.attributes.draft',
   label: formatMessage(appMessages.attributes.draft),
-  value: entity ? entity.getIn(['attributes', 'draft']) : true,
   options: PUBLISH_STATUSES,
+});
+export const getFrameworkFormField = (formatMessage, fwOptions) => ({
+  id: 'framework',
+  controlType: 'select',
+  model: '.attributes.framework_id',
+  label: formatMessage(appMessages.attributes.framework_id),
+  options: Object.values(fwOptions.toJS()).map((fw) => ({
+    value: fw.id,
+    message: `frameworks.${fw.id}`,
+  })),
 });
 
 const getDueDateStatus = (date, formatMessage) => {
@@ -317,7 +365,7 @@ const getDueDateStatus = (date, formatMessage) => {
   return '';
 };
 
-export const getDueDateDateOptions = (dates, formatMessage, obsoleteAppMessages, formatDate, activeDateId = 'null') => {
+export const getDueDateDateOptions = (dates, formatMessage, formatDate, activeDateId = 'null') => {
   const NO_OF_REPORT_OPTIONS = 1;
   let excludeCount = 0;
   const dateOptions = dates
@@ -331,8 +379,8 @@ export const getDueDateDateOptions = (dates, formatMessage, obsoleteAppMessages,
           excludeCount += 1;
         }
         // exclude overdue and already assigned date from max no of date options
-        const label = formatDate &&
-          `${formatDate(new Date(date.getIn(['attributes', 'due_date'])))}${getDueDateStatus(date, formatMessage)}`;
+        const label = formatDate
+          && `${formatDate(new Date(date.getIn(['attributes', 'due_date'])))}${getDueDateStatus(date, formatMessage)}`;
         return memo.concat([
           {
             value: date.get('id'),
@@ -344,14 +392,14 @@ export const getDueDateDateOptions = (dates, formatMessage, obsoleteAppMessages,
       excludeCount += 1;
       return memo;
     }, [])
-  : [];
+    : [];
   return dateOptions.concat({
     value: '0',
     label: formatMessage && formatMessage(appMessages.entities.progress_reports.unscheduled_short),
   });
 };
 
-export const getDueDateOptionsField = (formatMessage, obsoleteAppMessages, dateOptions) => ({
+export const getDueDateOptionsField = (formatMessage, dateOptions) => ({
   id: 'due_date_id',
   controlType: 'radio',
   model: '.attributes.due_date_id',
@@ -361,38 +409,34 @@ export const getDueDateOptionsField = (formatMessage, obsoleteAppMessages, dateO
   },
 });
 
-export const getTitleFormField = (formatMessage, obsoleteAppMessages, controlType = 'title', attribute = 'title') =>
-  getFormField({
-    formatMessage,
-    controlType,
-    attribute,
-    required: true,
-  });
+export const getTitleFormField = (formatMessage, controlType = 'title', attribute = 'title') => getFormField({
+  formatMessage,
+  controlType,
+  attribute,
+  required: true,
+});
 
-export const getReferenceFormField = (formatMessage, obsoleteAppMessages, required = false, isAutoReference = false) =>
-  getFormField({
-    formatMessage,
-    controlType: 'short',
-    attribute: 'reference',
-    required,
-    label: required ? 'reference' : 'referenceOptional',
-    hint: isAutoReference ? formatMessage(appMessages.hints.autoReference) : null,
-  });
+export const getReferenceFormField = (formatMessage, required = false, isAutoReference = false) => getFormField({
+  formatMessage,
+  controlType: 'short',
+  attribute: 'reference',
+  required,
+  label: required ? 'reference' : 'referenceOptional',
+  hint: isAutoReference ? formatMessage(appMessages.hints.autoReference) : null,
+});
 
-export const getShortTitleFormField = (formatMessage) =>
-  getFormField({
-    formatMessage,
-    controlType: 'short',
-    attribute: 'short_title',
-  });
+export const getShortTitleFormField = (formatMessage) => getFormField({
+  formatMessage,
+  controlType: 'short',
+  attribute: 'short_title',
+});
 
-export const getMenuTitleFormField = (formatMessage) =>
-  getFormField({
-    formatMessage,
-    controlType: 'short',
-    attribute: 'menu_title',
-    required: true,
-  });
+export const getMenuTitleFormField = (formatMessage) => getFormField({
+  formatMessage,
+  controlType: 'short',
+  attribute: 'menu_title',
+  required: true,
+});
 
 export const getMenuOrderFormField = (formatMessage) => {
   const field = getFormField({
@@ -405,26 +449,25 @@ export const getMenuOrderFormField = (formatMessage) => {
   return field;
 };
 
-export const getMarkdownField = (formatMessage, obsoleteAppMessages, attribute = 'description', label, placeholder, hint) =>
-  getFormField({
-    formatMessage,
-    controlType: 'markdown',
-    attribute,
-    label: label || attribute,
-    placeholder: placeholder || attribute,
-    hint: hint
-      ? (appMessages.hints[hint] && formatMessage(appMessages.hints[hint]))
-      : (appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute])),
-  });
+export const getMarkdownField = (formatMessage, attribute = 'description', label, placeholder, hint) => getFormField({
+  formatMessage,
+  controlType: 'markdown',
+  attribute,
+  label: label || attribute,
+  placeholder: placeholder || attribute,
+  hint: hint
+    ? (appMessages.hints[hint] && formatMessage(appMessages.hints[hint]))
+    : (appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute])),
+});
 
-export const getTextareaField = (formatMessage, obsoleteAppMessages, attribute = 'description') =>
-  getFormField({
-    formatMessage,
-    controlType: 'textarea',
-    attribute,
-  });
+// unused
+export const getTextareaField = (formatMessage, attribute = 'description') => getFormField({
+  formatMessage,
+  controlType: 'textarea',
+  attribute,
+});
 
-export const getDateField = (formatMessage, obsoleteAppMessages, attribute, required = false, label, onChange) => {
+export const getDateField = (formatMessage, attribute, required = false, label, onChange) => {
   const field = getFormField({
     formatMessage,
     controlType: 'date',
@@ -438,26 +481,25 @@ export const getDateField = (formatMessage, obsoleteAppMessages, attribute, requ
   return field;
 };
 
-export const getCheckboxField = (formatMessage, obsoleteAppMessages, attribute, entity, onChange) => (
+export const getCheckboxField = (formatMessage, attribute, onChange) => (
   {
     id: attribute,
     controlType: 'checkbox',
     model: `.attributes.${attribute}`,
     label: appMessages.attributes[attribute] && formatMessage(appMessages.attributes[attribute]),
-    value: entity && entity.getIn(['attributes', attribute]) ? entity.getIn(['attributes', attribute]) : false,
+    // value: entity && entity.getIn(['attributes', attribute]) ? entity.getIn(['attributes', attribute]) : false,
     changeAction: onChange,
     hint: appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute]),
   });
 
-export const getUploadField = (formatMessage) =>
-  getFormField({
-    formatMessage,
-    controlType: 'uploader',
-    attribute: 'document_url',
-    placeholder: 'url',
-  });
+export const getUploadField = (formatMessage) => getFormField({
+  formatMessage,
+  controlType: 'uploader',
+  attribute: 'document_url',
+  placeholder: 'url',
+});
 
-export const getEmailField = (formatMessage, obsoleteAppMessages, model = '.attributes.email') => {
+export const getEmailField = (formatMessage, model = '.attributes.email') => {
   const field = getFormField({
     formatMessage,
     controlType: 'email',
@@ -471,7 +513,7 @@ export const getEmailField = (formatMessage, obsoleteAppMessages, model = '.attr
   return field;
 };
 
-export const getNameField = (formatMessage, obsoleteAppMessages, model = '.attributes.name') => {
+export const getNameField = (formatMessage, model = '.attributes.name') => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
@@ -482,7 +524,7 @@ export const getNameField = (formatMessage, obsoleteAppMessages, model = '.attri
   return field;
 };
 
-export const getPasswordField = (formatMessage, obsoleteAppMessages, model = '.attributes.password') => {
+export const getPasswordField = (formatMessage, model = '.attributes.password') => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
@@ -496,7 +538,7 @@ export const getPasswordField = (formatMessage, obsoleteAppMessages, model = '.a
   return field;
 };
 
-export const getPasswordCurrentField = (formatMessage, obsoleteAppMessages, model = '.attributes.password') => {
+export const getPasswordCurrentField = (formatMessage, model = '.attributes.password') => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
@@ -511,7 +553,7 @@ export const getPasswordCurrentField = (formatMessage, obsoleteAppMessages, mode
   return field;
 };
 
-export const getPasswordNewField = (formatMessage, obsoleteAppMessages, model = '.attributes.passwordNew') => {
+export const getPasswordNewField = (formatMessage, model = '.attributes.passwordNew') => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
@@ -525,7 +567,7 @@ export const getPasswordNewField = (formatMessage, obsoleteAppMessages, model = 
   return field;
 };
 
-export const getPasswordConfirmationField = (formatMessage, obsoleteAppMessages, model = '.attributes.passwordConfirmation') => {
+export const getPasswordConfirmationField = (formatMessage, model = '.attributes.passwordConfirmation') => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
@@ -584,7 +626,7 @@ const getCategoryFields = (args, formatMessage) => ({
     aside: args.taxonomy && args.taxonomy.getIn(['attributes', 'tags_users'])
       ? [{
         fields: [
-          getCheckboxField(formatMessage, null, 'user_only'),
+          getCheckboxField(formatMessage, 'user_only'),
           getStatusField(formatMessage),
         ],
       }]
@@ -597,21 +639,29 @@ const getCategoryFields = (args, formatMessage) => ({
       fields: [getMarkdownField(formatMessage)],
     }],
     aside: [{
-      fields: [getFormField({
-        formatMessage,
-        controlType: 'url',
-        attribute: 'url',
-      })],
+      fields: [
+        (args.categoryParentOptions && args.parentTaxonomy)
+          ? renderParentCategoryControl(
+            args.categoryParentOptions,
+            getEntityTitle(args.parentTaxonomy),
+          )
+          : null,
+        getFormField({
+          formatMessage,
+          controlType: 'url',
+          attribute: 'url',
+        }),
+      ],
     }],
   },
 });
 
-const getIndicatorFields = (args, formatMessage) => ({
+const getIndicatorFields = (formatMessage) => ({
   header: {
     main: [{ // fieldGroup
       fields: [
-        getReferenceFormField(formatMessage, null, false, true),
-        getTitleFormField(formatMessage, null, 'titleText'),
+        getReferenceFormField(formatMessage, false, true),
+        getTitleFormField(formatMessage, 'titleText'),
       ],
     }],
     aside: [{ // fieldGroup
@@ -627,12 +677,13 @@ const getIndicatorFields = (args, formatMessage) => ({
   },
 });
 
-const getRecommendationFields = (args, formatMessage) => ({
+const getRecommendationFields = ({ frameworks, hasResponse }, formatMessage) => ({
   header: {
     main: [{ // fieldGroup
       fields: [
-        getReferenceFormField(formatMessage, null, true), // required
-        getTitleFormField(formatMessage, null),
+        frameworks && getFrameworkFormField(formatMessage, frameworks),
+        getReferenceFormField(formatMessage, true), // required
+        getTitleFormField(formatMessage),
       ],
     }],
     aside: [{ // fieldGroup
@@ -644,19 +695,19 @@ const getRecommendationFields = (args, formatMessage) => ({
   body: {
     main: [{
       fields: [
-        getAcceptedField(formatMessage),
-        getMarkdownField(formatMessage, null, 'response'),
+        getMarkdownField(formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
+        hasResponse && getAcceptedField(formatMessage),
+        hasResponse && getMarkdownField(formatMessage, 'response'),
       ],
     }],
   },
 });
 
-const getSdgtargetFields = (args, formatMessage) => ({
+const getMeasureFields = (formatMessage) => ({
   header: {
     main: [{ // fieldGroup
       fields: [
-        getReferenceFormField(formatMessage, null, true), // required
-        getTitleFormField(formatMessage, null, 'titleText'),
+        getTitleFormField(formatMessage),
       ],
     }],
     aside: [{ // fieldGroup
@@ -667,155 +718,30 @@ const getSdgtargetFields = (args, formatMessage) => ({
   },
   body: {
     main: [{
-      fields: [getMarkdownField(formatMessage)],
+      fields: [
+        getMarkdownField(formatMessage),
+      ],
+    }],
+    aside: [{ // fieldGroup
+      fields: [
+        getDateField(formatMessage, 'target_date'),
+        getTextareaField(formatMessage, 'target_date_comment'),
+      ],
     }],
   },
 });
 
-export const getEntityFields = (path, args, contextIntl) => {
+export const getEntityAttributeFields = (path, args, contextIntl) => {
   switch (path) {
     case 'categories':
-      return getCategoryFields(args, contextIntl.formatMessage);
+      return getCategoryFields(args.categories, contextIntl.formatMessage);
     case 'measures':
-      return getFields({
-        shape: MEASURE_SHAPE,
-        contextIntl,
-      });
+      return getMeasureFields(contextIntl.formatMessage);
     case 'indicators':
-      return getIndicatorFields(args, contextIntl.formatMessage);
+      return getIndicatorFields(contextIntl.formatMessage);
     case 'recommendations':
-      return getRecommendationFields(args, contextIntl.formatMessage);
-    case 'sdgtargets':
-      return getSdgtargetFields(args, contextIntl.formatMessage);
+      return getRecommendationFields(args.recommendations, contextIntl.formatMessage);
     default:
       return {};
   }
 };
-
-
-const getSectionFields = (shape, section, column, entity, associations, onCreateOption, contextIntl) => {
-  const fields = filter(shape.fields, (field) =>
-    field.section === section
-    && field.column === column
-    && !field.disabled
-  );
-  const sectionGroups = [{
-    fields: reduce(fields, (memo, field) => {
-      if (field.control === 'title') {
-        return memo.concat([getTitleFormField(contextIntl.formatMessage)]);
-      }
-      if (field.control === 'status') {
-        return memo.concat([getStatusField(contextIntl.formatMessage, null, entity)]);
-      }
-      if (field.control === 'date') {
-        return memo.concat([getDateField(contextIntl.formatMessage, null, field.attribute)]);
-      }
-      if (field.control === 'markdown') {
-        return memo.concat([getMarkdownField(contextIntl.formatMessage, null, field.attribute)]);
-      }
-      return memo.concat([getFormField({
-        controlType: field.control,
-        attribute: field.attribute,
-        formatMessage: contextIntl.formatMessage,
-      })]);
-    }, []),
-  }];
-  if (associations && associations.taxonomies && shape.taxonomies && shape.taxonomies.section === section && shape.taxonomies.column === column) {
-    sectionGroups.push({ // fieldGroup
-      label: contextIntl.formatMessage(appMessages.entities.taxonomies.plural),
-      icon: 'categories',
-      fields: renderTaxonomyControl(associations.taxonomies, onCreateOption, contextIntl),
-    });
-  }
-  if (associations
-    && (
-      associations.measures
-      || associations.recommendations
-      || associations.indicators
-      || associations.sgdtargets
-    )
-    && shape.connections
-    && shape.connections.tables
-    && shape.connections.section === section
-    && shape.connections.column === column
-  ) {
-    sectionGroups.push({
-      label: contextIntl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: reduce(shape.connections.tables, (memo, table) => {
-        if (table.table === 'measures' && associations.measures) {
-          return memo.concat([renderMeasureControl(associations.measures, associations.connectedTaxonomies, onCreateOption, contextIntl)]);
-        }
-        if (table.table === 'recommendations' && associations.recommendations) {
-          return memo.concat([renderRecommendationControl(associations.recommendations, associations.connectedTaxonomies, onCreateOption, contextIntl)]);
-        }
-        if (table.table === 'sdgtargets' && associations.sdgtargets) {
-          return memo.concat([renderSdgTargetControl(associations.sdgtargets, associations.connectedTaxonomies, onCreateOption, contextIntl)]);
-        }
-        if (table.table === 'indicators' && associations.indicators) {
-          return memo.concat([renderIndicatorControl(associations.indicators, onCreateOption)]);
-        }
-        return memo;
-      }, []),
-    });
-  }
-  return sectionGroups;
-};
-
-// getHeaderAsideFields = (entity) => ([
-//   {
-//     fields: [
-//       getMetaField(entity, appMessages),
-//     ],
-//   },
-// ]);
-// Better handle in EntityForm
-
-export const getFields = ({
-  entity,
-  associations,
-  onCreateOption,
-  shape,
-  contextIntl,
-}) => ({
-  header: {
-    main: getSectionFields(
-      shape,
-      'header',
-      'main',
-      entity,
-      associations,
-      onCreateOption,
-      contextIntl
-    ),
-    aside: getSectionFields(
-      shape,
-      'header',
-      'aside',
-      entity,
-      associations,
-      onCreateOption,
-      contextIntl
-    ),
-  },
-  body: {
-    main: getSectionFields(
-      shape,
-      'body',
-      'main',
-      entity,
-      associations,
-      onCreateOption,
-      contextIntl
-    ),
-    aside: getSectionFields(
-      shape,
-      'body',
-      'aside',
-      entity,
-      associations,
-      onCreateOption,
-      contextIntl
-    ),
-  },
-});

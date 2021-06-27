@@ -59,6 +59,9 @@ const MultiselectActiveOptionListItem = styled.div`
     padding: 12px 0 12px 16px;
     font-size: 1em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 const MultiselectActiveOptionRemove = styled(Button)`
   position: absolute;
@@ -103,7 +106,11 @@ const MultiSelectDropdown = styled(Button)`
   }
   padding: 12px 0 12px 8px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding-left: 16px;
+    font-size: 0.85em;
+    padding: 12px 0 12px 16px;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
   }
 `;
 
@@ -127,43 +134,54 @@ const Reference = styled.div`
     color: ${palette('text', 0)};
   }
   font-size: 0.85em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const NON_CONTROL_PROPS = ['hint', 'label', 'component', 'controlType', 'children', 'errorMessages'];
 
 class MultiSelectField extends React.Component { // eslint-disable-line react/prefer-stateless-function
-
   constructor() {
     super();
     this.state = {
       multiselectOpen: null,
-      controlRef: null,
     };
+    this.controlRef = React.createRef();
   }
+
   componentDidUpdate() {
-    if (this.state.controlRef && this.props.scrollContainer) {
-      fitComponent(this.state.controlRef, this.props.scrollContainer);
+    if (
+      this.controlRef
+      && this.controlRef.current
+      && this.props.scrollContainer
+    ) {
+      fitComponent(this.controlRef.current, this.props.scrollContainer);
     }
   }
+
   // MULTISELECT
   onToggleMultiselect = (field) => {
-    this.setState({
-      multiselectOpen: this.state.multiselectOpen !== field.id ? field.id : null,
-    });
+    this.setState(
+      (prevState) => ({
+        multiselectOpen: prevState.multiselectOpen !== field.id
+          ? field.id
+          : null,
+      })
+    );
   }
+
   onCloseMultiselect = () => {
     this.setState({
       multiselectOpen: null,
-      controlRef: null,
     });
   }
-  onMultiSelectItemRemove = (option) =>
-    this.props.handleUpdate && this.props.handleUpdate(
-      this.props.fieldData.map((d) => option.get('value') === d.get('value')
-        ? d.set('checked', false)
-        : d
-      )
-    );
+
+  onMultiSelectItemRemove = (option) => this.props.handleUpdate && this.props.handleUpdate(
+    this.props.fieldData.map((d) => option.get('value') === d.get('value')
+      ? d.set('checked', false)
+      : d)
+  );
 
   getMultiSelectActiveOptions = (field, fieldData) => {
     // use form data if already loaded
@@ -173,6 +191,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
     // until then use initial options
     return this.sortOptions(field.options.filter((o) => o.get('checked')));
   }
+
   getOptionSortValueMapper = (option) => {
     if (option.get('order')) {
       return option.get('order');
@@ -182,6 +201,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
     }
     return option.get('label');
   }
+
   sortOptions = (options) => options.sortBy(
     (option) => this.getOptionSortValueMapper(option),
     (a, b) => getEntitySortComparator(a, b, 'asc')
@@ -190,11 +210,11 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
   renderMultiselectActiveOption = (option, field, i) => (
     <MultiselectActiveOptionListItem key={i}>
       <MultiselectActiveOption>
-        {option.get('draft') &&
-          <ItemStatus draft />
+        {option.get('draft')
+          && <ItemStatus draft />
         }
-        { option.get('reference') &&
-          <Reference>{option.get('reference')}</Reference>
+        { option.get('reference')
+          && <Reference>{option.get('reference')}</Reference>
         }
         {option.get('label')}
       </MultiselectActiveOption>
@@ -211,6 +231,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
 
   render() {
     const { field, fieldData } = this.props;
+    const { intl } = this.context;
     const { id, model, ...controlProps } = omit(field, NON_CONTROL_PROPS);
 
     const options = this.getMultiSelectActiveOptions(field, fieldData);
@@ -230,60 +251,66 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
         </MultiSelectDropdown>
         <MultiselectActiveOptions>
           { options.size > 0
-            ? (<MultiselectActiveOptionList>
-              {options.map((option, i) => this.renderMultiselectActiveOption(option, field, i))}
-            </MultiselectActiveOptionList>)
-            : (<MultiSelectWithout>
-              <FormattedMessage
-                {...messages.empty}
-                values={{ entities: lowerCase(field.label) }}
-              />
-              <MultiSelectWithoutLink
-                href="#add"
-                onClick={(evt) => {
-                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.onToggleMultiselect(field);
-                }}
-              >
-                <FormattedMessage {...messages.emptyLink} />
-              </MultiSelectWithoutLink>
-            </MultiSelectWithout>)
+            ? (
+              <MultiselectActiveOptionList>
+                {options.map((option, i) => this.renderMultiselectActiveOption(option, field, i))}
+              </MultiselectActiveOptionList>
+            )
+            : (
+              <MultiSelectWithout>
+                <FormattedMessage
+                  {...messages.empty}
+                  values={{ entities: lowerCase(field.label) }}
+                />
+                <MultiSelectWithoutLink
+                  href="#add"
+                  onClick={(evt) => {
+                    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                    this.onToggleMultiselect(field);
+                  }}
+                >
+                  <FormattedMessage {...messages.emptyLink} />
+                </MultiSelectWithoutLink>
+              </MultiSelectWithout>
+            )
           }
         </MultiselectActiveOptions>
-        { this.state.multiselectOpen === id &&
-          <MultiSelectWrapper
-            wrapperHeight={this.props.scrollContainer
-              ? this.props.scrollContainer.getBoundingClientRect().height - (SCROLL_PADDING * 2)
-              : 450
-            }
-            innerRef={(node) => {
-              if (!this.state.controlRef) {
-                this.setState({ controlRef: node });
+        { this.state.multiselectOpen === id
+          && (
+            <MultiSelectWrapper
+              ref={this.controlRef}
+              wrapperHeight={(
+                this.props.scrollContainer
+                && this.props.scrollContainer.current
+                && this.props.scrollContainer.current.getBoundingClientRect
+              )
+                ? this.props.scrollContainer.current.getBoundingClientRect().height - (SCROLL_PADDING * 2)
+                : 450
               }
-            }}
-          >
-            <MultiSelectControl
-              id={id}
-              model={model || `.${id}`}
-              title={this.context.intl.formatMessage(messages.update, { type: lowerCase(field.label) })}
-              onCancel={this.onCloseMultiselect}
-              closeOnClickOutside={this.props.closeOnClickOutside}
-              buttons={[
-                field.onCreate
-                  ? {
-                    type: 'addFromMultiselect',
-                    position: 'left',
-                    onClick: field.onCreate,
-                  }
-                  : null,
-                {
-                  type: 'closeText',
-                  onClick: this.onCloseMultiselect,
-                },
-              ]}
-              {...controlProps}
-            />
-          </MultiSelectWrapper>
+            >
+              <MultiSelectControl
+                id={id}
+                model={model || `.${id}`}
+                title={intl.formatMessage(messages.update, { type: lowerCase(field.label) })}
+                onCancel={this.onCloseMultiselect}
+                closeOnClickOutside={this.props.closeOnClickOutside}
+                buttons={[
+                  field.onCreate
+                    ? {
+                      type: 'addFromMultiselect',
+                      position: 'left',
+                      onClick: field.onCreate,
+                    }
+                    : null,
+                  {
+                    type: 'closeText',
+                    onClick: this.onCloseMultiselect,
+                  },
+                ]}
+                {...controlProps}
+              />
+            </MultiSelectWrapper>
+          )
         }
       </MultiSelectFieldWrapper>
     );

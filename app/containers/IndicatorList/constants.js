@@ -1,30 +1,19 @@
-import { PUBLISH_STATUSES, USER_ROLES, ENABLE_SDGS } from 'themes/config';
+import { PUBLISH_STATUSES, USER_ROLES } from 'themes/config';
 
-export const DEPENDENCIES = ENABLE_SDGS
-? [
+export const DEPENDENCIES = [
   'user_roles',
   'indicators',
   'users',
   'taxonomies',
+  'framework_taxonomies',
   'categories',
   'measures',
   'measure_indicators',
   'measure_categories',
-  'sdgtargets',
-  'sdgtarget_indicators',
-  'sdgtarget_categories',
-  'due_dates',
-  'progress_reports',
-]
-: [
-  'user_roles',
-  'indicators',
-  'users',
-  'taxonomies',
-  'categories',
-  'measures',
-  'measure_indicators',
-  'measure_categories',
+  'recommendations',
+  'recommendation_indicators',
+  'recommendation_categories',
+  'recommendation_measures',
   'due_dates',
   'progress_reports',
 ];
@@ -59,21 +48,12 @@ export const CONFIG = {
   connectedTaxonomies: { // filter by each category
     query: 'catx',
     search: true,
-    exclude: 'tags_indicators',
-    connections: ENABLE_SDGS
-    ? [
+    connections: [
       {
-        path: 'measures', // filter by recommendation connection
-        message: 'entities.measures.plural',
-        key: 'measure_id',
+        path: 'recommendations', // filter by recommendation connection
+        message: 'entities.recommendations.plural',
+        key: 'recommendation_id',
       },
-      {
-        path: 'sdgtargets', // filter by recommendation connection
-        message: 'entities.sdgtargets.plural',
-        key: 'sdgtarget_id',
-      },
-    ]
-    : [
       {
         path: 'measures', // filter by recommendation connection
         message: 'entities.measures.plural',
@@ -83,27 +63,18 @@ export const CONFIG = {
   },
   connections: { // filter by associated entity
     query: 'connected',
-    options: ENABLE_SDGS
-    ? [
+    options: [
       {
         search: true,
-        message: 'entities.measures.plural',
-        path: 'measures',
-        clientPath: 'actions',
-        key: 'measure_id',
-        connectPath: 'measure_indicators',
+        message: 'entities.recommendations_{fwid}.plural',
+        path: 'recommendations',
+        clientPath: 'recommendations',
+        key: 'recommendation_id',
+        connectPath: 'recommendation_indicators',
         ownKey: 'indicator_id',
+        groupByFramework: true,
+        frameworkFilter: 'has_indicators',
       },
-      {
-        search: true,
-        message: 'entities.sdgtargets.plural',
-        path: 'sdgtargets',
-        key: 'sdgtarget_id',
-        ownKey: 'indicator_id',
-        connectPath: 'sdgtarget_indicators',
-      },
-    ]
-    : [
       {
         search: true,
         message: 'entities.measures.plural',
@@ -115,7 +86,7 @@ export const CONFIG = {
       },
     ],
   },
-  attributes: {  // filter by attribute value
+  attributes: { // filter by attribute value
     options: [
       {
         search: false,

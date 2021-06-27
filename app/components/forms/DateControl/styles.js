@@ -1,8 +1,9 @@
 /* DayPicker styles */
-import { injectGlobal } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 
 /* eslint no-unused-expressions: 0 */
-injectGlobal`
+/* stylelint-disable */
+const DatePickerStyle = createGlobalStyle`
 
   .DayPicker {
     display: inline-block;
@@ -113,6 +114,7 @@ injectGlobal`
     text-align: center;
     cursor: pointer;
     vertical-align: middle;
+    white-space: nowrap;
     @media (min-width: 769px) {
       padding: .5rem;
     }
@@ -127,6 +129,9 @@ injectGlobal`
     font-size: 0.75em;
     cursor: pointer;
     color: #8b9898;
+    @media print {
+      font-size: ${(props) => props.theme.sizes.print.smallest};
+    }
   }
 
   .DayPicker--interactionDisabled .DayPicker-Day {
@@ -148,6 +153,9 @@ injectGlobal`
     cursor: pointer;
     color: #4A90E2;
     font-size: 0.875em;
+    @media print {
+      font-size: ${(props) => props.theme.sizes.print.large};
+    }
   }
 
   /* Default modifiers */
@@ -205,3 +213,5 @@ injectGlobal`
     }
   }
 `;
+
+export default DatePickerStyle;

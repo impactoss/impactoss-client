@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Field from 'components/fields/Field';
 
 import ConnectionsField from 'components/fields/ConnectionsField';
+import ConnectionGroupsField from 'components/fields/ConnectionGroupsField';
 import DateField from 'components/fields/DateField';
 import MarkdownField from 'components/fields/MarkdownField';
 import DownloadField from 'components/fields/DownloadField';
@@ -58,6 +59,8 @@ class FieldFactory extends React.PureComponent { // eslint-disable-line react/pr
         return (<MarkdownField field={field} />);
       case 'connections':
         return (<ConnectionsField field={field} />);
+      case 'connectionGroups':
+        return (<ConnectionGroupsField field={field} />);
       case 'reports':
         return (<ReportsField field={field} />);
       case 'smartTaxonomy':
@@ -67,6 +70,7 @@ class FieldFactory extends React.PureComponent { // eslint-disable-line react/pr
         return (<TextField field={field} />);
     }
   };
+
   render() {
     const { field, nested } = this.props;
     return ((typeof field.value !== 'undefined' && field.value !== null)
@@ -76,12 +80,12 @@ class FieldFactory extends React.PureComponent { // eslint-disable-line react/pr
       ))
       || (typeof field.fields !== 'undefined' && field.fields.length > 0)
       || typeof field.showEmpty !== 'undefined')
-    ? (
-      <Field nested={nested} noPadding={field.type === 'smartTaxonomy'}>
-        {this.renderField(field)}
-      </Field>
-    )
-    : null;
+      ? (
+        <Field nested={nested} noPadding={field.type === 'smartTaxonomy'}>
+          {this.renderField(field)}
+        </Field>
+      )
+      : null;
   }
 }
 FieldFactory.propTypes = {

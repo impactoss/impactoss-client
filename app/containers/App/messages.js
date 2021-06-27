@@ -16,22 +16,134 @@ export default defineMessages({
       defaultMessage: 'Samoa\'s home of human rights implementation',
     },
   },
-  taxonomyGroups: {
+  frameworks: {
+    single: {
+      id: 'app.containers.App.frameworks.single',
+      defaultMessage: 'Framework',
+    },
+    plural: {
+      id: 'app.containers.App.frameworks.plural',
+      defaultMessage: 'Frameworks',
+    },
+    all: {
+      id: 'app.containers.App.frameworks.all',
+      defaultMessage: 'All Frameworks',
+    },
     1: {
-      id: 'app.containers.App.taxonomyGroups.1',
-      defaultMessage: 'International classifications',
+      id: 'app.containers.App.frameworks.1',
+      defaultMessage: 'Human Rights Recommendations',
     },
     2: {
-      id: 'app.containers.App.taxonomyGroups.2',
-      defaultMessage: 'National classifications',
+      id: 'app.containers.App.frameworks.2',
+      defaultMessage: 'Sustainable Development Goals',
     },
     3: {
-      id: 'app.containers.App.taxonomyGroups.3',
-      defaultMessage: 'Other classifications',
+      id: 'app.containers.App.frameworks.3',
+      defaultMessage: 'Framework 3',
     },
     4: {
-      id: 'app.containers.App.taxonomyGroups.4',
-      defaultMessage: 'Yet other classifications',
+      id: 'app.containers.App.frameworks.4',
+      defaultMessage: 'Framework 4',
+    },
+    5: {
+      id: 'app.containers.App.frameworks.5',
+      defaultMessage: 'Framework 5',
+    },
+  },
+  frameworkObjectives: {
+    all: {
+      id: 'app.containers.App.frameworkObjectives.all',
+      defaultMessage: 'All frameworks',
+    },
+    1: {
+      id: 'app.containers.App.frameworkObjectives.1',
+      defaultMessage: 'Human Rights Recommendations',
+    },
+    2: {
+      id: 'app.containers.App.frameworkObjectives.2',
+      defaultMessage: 'SDG Targets',
+    },
+    3: {
+      id: 'app.containers.App.frameworkObjectives.3',
+      defaultMessage: 'Framework 3',
+    },
+    4: {
+      id: 'app.containers.App.frameworkObjectives.4',
+      defaultMessage: 'Framework 4',
+    },
+    5: {
+      id: 'app.containers.App.frameworkObjectives.5',
+      defaultMessage: 'Framework 5',
+    },
+  },
+  frameworkObjectivesShort: {
+    all: {
+      id: 'app.containers.App.frameworkObjectivesShort.all',
+      defaultMessage: 'All Frameworks',
+    },
+    1: {
+      id: 'app.containers.App.frameworkObjectivesShort.1',
+      defaultMessage: 'HR Recommendations',
+    },
+    2: {
+      id: 'app.containers.App.frameworkObjectivesShort.2',
+      defaultMessage: 'SDG Targets',
+    },
+    3: {
+      id: 'app.containers.App.frameworkObjectivesShort.3',
+      defaultMessage: 'Framework 3',
+    },
+    4: {
+      id: 'app.containers.App.frameworkObjectivesShort.4',
+      defaultMessage: 'Framework 4',
+    },
+    5: {
+      id: 'app.containers.App.frameworkObjectivesShort.5',
+      defaultMessage: 'Framework 5',
+    },
+  },
+  frameworks_short: {
+    common: {
+      id: 'app.containers.App.frameworks_short.common',
+      defaultMessage: 'multiple',
+    },
+    1: {
+      id: 'app.containers.App.frameworks_short.1',
+      defaultMessage: 'HR',
+    },
+    2: {
+      id: 'app.containers.App.frameworks_short.2',
+      defaultMessage: 'SDGs',
+    },
+    3: {
+      id: 'app.containers.App.frameworks_short.3',
+      defaultMessage: 'Framework 3',
+    },
+    4: {
+      id: 'app.containers.App.frameworks_short.4',
+      defaultMessage: 'Framework 4',
+    },
+    5: {
+      id: 'app.containers.App.frameworks_short.5',
+      defaultMessage: 'Framework 5',
+    },
+  },
+  taxonomyGroups: {
+    common: {
+      id: 'app.containers.App.taxonomyGroups.common',
+      defaultMessage: 'common',
+    },
+    measures: {
+      id: 'app.containers.App.taxonomyGroups.measures',
+      defaultMessage: 'measures',
+    },
+    objectives: {
+      id: 'app.containers.App.taxonomyGroups.objectives',
+      defaultMessage: '{type}',
+    },
+    users: {
+      id: 'app.containers.App.taxonomyGroups.users',
+      defaultMessage: '{type}',
     },
   },
   buttons: {
@@ -85,6 +197,10 @@ export default defineMessages({
       id: 'app.containers.App.labels.perPage',
       defaultMessage: 'Per page',
     },
+    groupedByTaxonomy: {
+      id: 'app.containers.App.labels.groupedByTaxonomy',
+      defaultMessage: ' (by {tax})',
+    },
     smart: {
       met: {
         id: 'app.containers.App.labels.smart.met',
@@ -94,6 +210,12 @@ export default defineMessages({
         id: 'app.containers.App.labels.smart.notMet',
         defaultMessage: 'Not met',
       },
+    },
+  },
+  fields: {
+    connectionsGrouped: {
+      id: 'app.containers.App.fields.connectionsGrouped',
+      defaultMessage: '{size} {type} grouped by {byType}',
     },
   },
   forms: {
@@ -163,6 +285,10 @@ export default defineMessages({
       id: 'app.containers.App.hints.fullRecommendation',
       defaultMessage: 'Note: use only if title field does not already contain full text',
     },
+    printListMore: {
+      id: 'app.containers.App.hints.printListMore',
+      defaultMessage: 'List only showing {no} items.',
+    },
   },
   textValues: {
     user_only: {
@@ -186,6 +312,10 @@ export default defineMessages({
     text: {
       id: 'app.containers.App.import.text',
       defaultMessage: 'text',
+    },
+    number: {
+      id: 'app.containers.App.import.number',
+      defaultMessage: 'number',
     },
     markdown: {
       id: 'app.containers.App.import.markdown',
@@ -244,6 +374,10 @@ export default defineMessages({
     target_date_comment: {
       id: 'app.containers.App.importFields.target_date_comment',
       defaultMessage: 'Target date comment',
+    },
+    framework_id: {
+      id: 'app.containers.App.importFields.framework_id',
+      defaultMessage: 'Framework id',
     },
   },
   placeholders: {
@@ -445,6 +579,10 @@ export default defineMessages({
       id: 'app.containers.App.attributes.repeat',
       defaultMessage: 'Repeat?',
     },
+    date_empty: {
+      id: 'app.containers.App.attributes.date_empty',
+      defaultMessage: 'No date set',
+    },
     target_date_empty: {
       id: 'app.containers.App.attributes.target_date_empty',
       defaultMessage: 'No target date set',
@@ -513,11 +651,19 @@ export default defineMessages({
         defaultMessage: 'Created',
       },
     },
+    framework_id: {
+      id: 'app.containers.App.attributes.framework_id',
+      defaultMessage: 'Framework',
+    },
   },
   nav: {
     overview: {
       id: 'app.containers.App.nav.overview',
-      defaultMessage: 'Overview',
+      defaultMessage: 'Classification',
+    },
+    overviewSuper: {
+      id: 'app.containers.App.nav.overviewSuper',
+      defaultMessage: 'Explore',
     },
     taxonomies: {
       id: 'app.containers.App.nav.taxonomies',
@@ -527,17 +673,21 @@ export default defineMessages({
       id: 'app.containers.App.nav.measures',
       defaultMessage: 'Actions',
     },
+    measuresSuper: {
+      id: 'app.containers.App.nav.measuresSuper',
+      defaultMessage: 'Implementation',
+    },
     indicators: {
       id: 'app.containers.App.nav.indicators',
       defaultMessage: 'Indicators',
     },
-    recommendations: {
-      id: 'app.containers.App.nav.recommendations',
-      defaultMessage: 'Recommendations',
+    indicatorsSuper: {
+      id: 'app.containers.App.nav.indicatorsSuper',
+      defaultMessage: 'Outcomes',
     },
-    sdgtargets: {
-      id: 'app.containers.App.nav.sdgtargets',
-      defaultMessage: 'SDG targets',
+    recommendationsSuper: {
+      id: 'app.containers.App.nav.recommendationsSuper',
+      defaultMessage: 'Objectives',
     },
     pages: {
       id: 'app.containers.App.nav.pages',
@@ -546,6 +696,10 @@ export default defineMessages({
     users: {
       id: 'app.containers.App.nav.users',
       defaultMessage: 'User admin',
+    },
+    bookmarks: {
+      id: 'app.containers.App.nav.bookmarks',
+      defaultMessage: 'Bookmarks',
     },
     search: {
       id: 'app.containers.App.nav.search',
@@ -595,6 +749,156 @@ export default defineMessages({
         defaultMessage: 'No recommendations yet',
       },
     },
+    recommendations_1: {
+      single: {
+        id: 'app.containers.App.entities.recommendations_1.single',
+        defaultMessage: 'Recommendation',
+      },
+      plural: {
+        id: 'app.containers.App.entities.recommendations_1.plural',
+        defaultMessage: 'Recommendations',
+      },
+      singleLong: {
+        id: 'app.containers.App.entities.recommendations_1.singleLong',
+        defaultMessage: 'Recommendation',
+      },
+      pluralLong: {
+        id: 'app.containers.App.entities.recommendations_1.pluralLong',
+        defaultMessage: 'Recommendations',
+      },
+      singleShort: {
+        id: 'app.containers.App.entities.recommendations_1.singleShort',
+        defaultMessage: 'Recommendation',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.recommendations_1.pluralShort',
+        defaultMessage: 'Recommendations',
+      },
+      empty: {
+        id: 'app.containers.App.entities.recommendations_1.empty',
+        defaultMessage: 'No recommendations yet',
+      },
+    },
+    recommendations_2: {
+      single: {
+        id: 'app.containers.App.entities.recommendations_2.single',
+        defaultMessage: 'Recommendation',
+      },
+      plural: {
+        id: 'app.containers.App.entities.recommendations_2.plural',
+        defaultMessage: 'Recommendations',
+      },
+      singleLong: {
+        id: 'app.containers.App.entities.recommendations_2.singleLong',
+        defaultMessage: 'Recommendation',
+      },
+      pluralLong: {
+        id: 'app.containers.App.entities.recommendations_2.pluralLong',
+        defaultMessage: 'Recommendations',
+      },
+      singleShort: {
+        id: 'app.containers.App.entities.recommendations_2.singleShort',
+        defaultMessage: 'Recommendation',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.recommendations_2.pluralShort',
+        defaultMessage: 'Recommendations',
+      },
+      empty: {
+        id: 'app.containers.App.entities.recommendations_2.empty',
+        defaultMessage: 'No recommendations yet',
+      },
+    },
+    recommendations_3: {
+      single: {
+        id: 'app.containers.App.entities.recommendations_3.single',
+        defaultMessage: 'Recommendation',
+      },
+      plural: {
+        id: 'app.containers.App.entities.recommendations_3.plural',
+        defaultMessage: 'Recommendations',
+      },
+      singleLong: {
+        id: 'app.containers.App.entities.recommendations_3.singleLong',
+        defaultMessage: 'Recommendation',
+      },
+      pluralLong: {
+        id: 'app.containers.App.entities.recommendations_3.pluralLong',
+        defaultMessage: 'Recommendations',
+      },
+      singleShort: {
+        id: 'app.containers.App.entities.recommendations_3.singleShort',
+        defaultMessage: 'Recommendation',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.recommendations_3.pluralShort',
+        defaultMessage: 'Recommendations',
+      },
+      empty: {
+        id: 'app.containers.App.entities.recommendations_3.empty',
+        defaultMessage: 'No recommendations yet',
+      },
+    },
+    recommendations_4: {
+      single: {
+        id: 'app.containers.App.entities.recommendations_4.single',
+        defaultMessage: 'Recommendation',
+      },
+      plural: {
+        id: 'app.containers.App.entities.recommendations_4.plural',
+        defaultMessage: 'Recommendations',
+      },
+      singleLong: {
+        id: 'app.containers.App.entities.recommendations_4.singleLong',
+        defaultMessage: 'Recommendation',
+      },
+      pluralLong: {
+        id: 'app.containers.App.entities.recommendations_4.pluralLong',
+        defaultMessage: 'Recommendations',
+      },
+      singleShort: {
+        id: 'app.containers.App.entities.recommendations_4.singleShort',
+        defaultMessage: 'Recommendation',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.recommendations_4.pluralShort',
+        defaultMessage: 'Recommendations',
+      },
+      empty: {
+        id: 'app.containers.App.entities.recommendations_4.empty',
+        defaultMessage: 'No recommendations yet',
+      },
+    },
+    recommendations_5: {
+      single: {
+        id: 'app.containers.App.entities.recommendations_5.single',
+        defaultMessage: 'Recommendation',
+      },
+      plural: {
+        id: 'app.containers.App.entities.recommendations_5.plural',
+        defaultMessage: 'Recommendations',
+      },
+      singleLong: {
+        id: 'app.containers.App.entities.recommendations_5.singleLong',
+        defaultMessage: 'Recommendation',
+      },
+      pluralLong: {
+        id: 'app.containers.App.entities.recommendations_5.pluralLong',
+        defaultMessage: 'Recommendations',
+      },
+      singleShort: {
+        id: 'app.containers.App.entities.recommendations_5.singleShort',
+        defaultMessage: 'Recommendation',
+      },
+      pluralShort: {
+        id: 'app.containers.App.entities.recommendations_5.pluralShort',
+        defaultMessage: 'Recommendations',
+      },
+      empty: {
+        id: 'app.containers.App.entities.recommendations_5.empty',
+        defaultMessage: 'No recommendations yet',
+      },
+    },
     measures: {
       single: {
         id: 'app.containers.App.entities.measures.single',
@@ -623,36 +927,6 @@ export default defineMessages({
       empty: {
         id: 'app.containers.App.entities.measures.empty',
         defaultMessage: 'No actions yet',
-      },
-    },
-    sdgtargets: {
-      single: {
-        id: 'app.containers.App.entities.sdgtargets.single',
-        defaultMessage: 'SDG target',
-      },
-      plural: {
-        id: 'app.containers.App.entities.sdgtargets.plural',
-        defaultMessage: 'SDG targets',
-      },
-      singleLong: {
-        id: 'app.containers.App.entities.sdgtargets.singleLong',
-        defaultMessage: 'SDG target',
-      },
-      pluralLong: {
-        id: 'app.containers.App.entities.sdgtargets.pluralLong',
-        defaultMessage: 'SDG targets',
-      },
-      singleShort: {
-        id: 'app.containers.App.entities.sdgtargets.singleShort',
-        defaultMessage: 'Target',
-      },
-      pluralShort: {
-        id: 'app.containers.App.entities.sdgtargets.pluralShort',
-        defaultMessage: 'Targets',
-      },
-      empty: {
-        id: 'app.containers.App.entities.sdgtargets.empty',
-        defaultMessage: 'No SDG targets yet',
       },
     },
     indicators: {
@@ -703,6 +977,16 @@ export default defineMessages({
       plural: {
         id: 'app.containers.App.entities.users.plural',
         defaultMessage: 'Users',
+      },
+    },
+    bookmarks: {
+      single: {
+        id: 'app.containers.App.entities.bookmarks.single',
+        defaultMessage: 'Bookmark',
+      },
+      plural: {
+        id: 'app.containers.App.entities.bookmarks.plural',
+        defaultMessage: 'Bookmarks',
       },
     },
     progress_reports: {
@@ -769,6 +1053,14 @@ export default defineMessages({
       plural: {
         id: 'app.containers.App.entities.taxonomies.plural',
         defaultMessage: 'Categories',
+      },
+      parent: {
+        id: 'app.containers.App.entities.taxonomies.parent',
+        defaultMessage: 'Parent category',
+      },
+      children: {
+        id: 'app.containers.App.entities.taxonomies.children',
+        defaultMessage: 'Child categories',
       },
       1: {
         single: {
@@ -1030,6 +1322,32 @@ export default defineMessages({
           defaultMessage: 'About tax 10',
         },
       },
+      11: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.11.single',
+          defaultMessage: 'Taxonomy 10',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.11.plural',
+          defaultMessage: 'Taxonomy 10s',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.11.empty',
+          defaultMessage: 'No Taxonomy 10 assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.11.shortSingle',
+          defaultMessage: 'Taxonomy 10',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.11.shortPlural',
+          defaultMessage: 'Taxonomy 10s',
+        },
+        description: {
+          id: 'app.containers.App.entities.taxonomies.11.description',
+          defaultMessage: 'About tax 10',
+        },
+      },
     },
     due_dates: {
       single: {
@@ -1203,6 +1521,12 @@ export default defineMessages({
       desc: {
         id: 'app.containers.App.ui.sortOrderOptions.desc',
         defaultMessage: 'Descending',
+      },
+    },
+    pageItemOptions: {
+      all: {
+        id: 'app.containers.App.ui.pageItemOptions.all',
+        defaultMessage: 'All',
       },
     },
   },

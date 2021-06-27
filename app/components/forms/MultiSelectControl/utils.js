@@ -1,4 +1,5 @@
 import { reduce } from 'lodash/collection';
+import { List } from 'immutable';
 
 import { cleanupSearchTarget, regExMultipleWords } from 'utils/string';
 import { testEntityEntityAssociation } from 'utils/entities';
@@ -46,36 +47,33 @@ export const sortOptions = (options) => options
     (a, b) => getEntitySortComparator(a, b, 'asc')
   );
 
-export const prepareOptionSearchTarget = (option, fields, queryLength) =>
-  reduce(
-    fields,
-    (target, field) => {
-      if (option.get(field)) {
-        if (field === 'id' || field === 'reference' || field === 'value') {
-          return `${target} ${option.get(field)}`;
-        } else if (queryLength > 1) {
-          return `${target} ${cleanupSearchTarget(option.get(field))}`;
-        }
-        return target;
+export const prepareOptionSearchTarget = (option, fields, queryLength) => reduce(
+  fields,
+  (target, field) => {
+    if (option.get(field)) {
+      if (field === 'id' || field === 'reference' || field === 'value') {
+        return `${target} ${option.get(field)}`;
+      } if (queryLength > 1) {
+        return `${target} ${cleanupSearchTarget(option.get(field))}`;
       }
       return target;
-    }, ''
-  );
+    }
+    return target;
+  }, ''
+);
 
 // compare to utils/entities.js filterEntitiesByKeywords
-export const filterOptionsByKeywords = (options, query) => {    // filter checkboxes if needed
+export const filterOptionsByKeywords = (options, query) => { // filter checkboxes if needed
   if (query) {
     try {
       const regex = new RegExp(regExMultipleWords(query), 'i');
-      return options.filter((option) =>
-        regex.test(prepareOptionSearchTarget(
-          option,
-          (option.get('searchFields') && option.get('searchFields').size > 0)
-            ? option.get('searchFields').toArray()
-            : ['id', 'reference', 'label', 'search'],
-          query.length
-        ))
-      );
+      return options.filter((option) => regex.test(prepareOptionSearchTarget(
+        option,
+        (option.get('searchFields') && option.get('searchFields').size > 0)
+          ? option.get('searchFields').toArray()
+          : ['id', 'reference', 'label', 'search'],
+        query.length
+      )));
     } catch (e) {
       // nothing
       return options;
@@ -84,17 +82,16 @@ export const filterOptionsByKeywords = (options, query) => {    // filter checkb
   return options;
 };
 
-export const filterOptionsByTags = (options, queryTags) =>
-  options.filter((option) =>
-    asArray(queryTags).reduce((passing, tag) =>
-      passing && testEntityEntityAssociation(option, 'tags', parseInt(tag, 10))
-    , true)
-  );
+export const filterOptionsByTags = (options, queryTags) => options.filter(
+  (option) => asArray(queryTags).every(
+    (tag) => testEntityEntityAssociation(option, 'tags', parseInt(tag, 10)),
+  )
+);
 
-export const getChangedOptions = (options) =>
-  options.filter((o) => o.get('hasChanged'));
+export const getChangedOptions = (options) => options.filter((o) => o.get('hasChanged'));
 
 export const getCheckedValuesFromOptions = (options, onlyChanged = false) => {
+  if (!options) return List();
   const opts = onlyChanged ? getChangedOptions(options) : options;
   return opts.filter((o) => o.get('checked')).map((o) => o.get('value'));
 };

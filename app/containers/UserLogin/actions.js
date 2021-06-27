@@ -3,11 +3,11 @@
  * UserLogin actions
  *
  */
- import { LOGIN } from './constants';
+import { LOGIN } from './constants';
 
- export function login(data) {
-   return {
-     type: LOGIN,
-     data,
-   };
- }
+export function login(data) {
+  return {
+    type: LOGIN,
+    data,
+  };
+}

@@ -25,6 +25,7 @@ export const RECOVER_PASSWORD = 'impactoss/App/RECOVER_PASSWORD';
 export const AUTHENTICATE_SUCCESS = 'impactoss/App/AUTHENTICATE_SUCCESS';
 export const AUTHENTICATE_ERROR = 'impactoss/App/AUTHENTICATE_ERROR';
 export const SET_AUTHENTICATION_STATE = 'impactoss/App/SET_AUTHENTICATION_STATE';
+export const OPEN_BOOKMARK = 'impactoss/App/OPEN_BOOKMARK';
 export const LOGOUT = 'impactoss/App/LOGOUT';
 export const LOGOUT_SUCCESS = 'impactoss/App/LOGOUT_SUCCESS';
 export const LOGOUT_ERROR = 'impactoss/App/LOGOUT_ERROR';
@@ -38,10 +39,12 @@ export const UPDATE_ENTITIES = 'impactoss/App/UPDATE_ENTITIES';
 export const UPDATE_CONNECTIONS = 'impactoss/App/UPDATE_CONNECTIONS';
 
 export const SAVE_ENTITY = 'impactoss/App/SAVE_ENTITY';
+export const SAVE_MULTIPLE_ENTITIES = 'impactoss/App/SAVE_MULTIPLE_ENTITIES';
 export const NEW_ENTITY = 'impactoss/App/NEW_ENTITY';
+export const NEW_MULTIPLE_ENTITIES = 'impactoss/App/NEW_MULTIPLE_ENTITIES';
 export const DELETE_ENTITY = 'impactoss/App/DELETE_ENTITY';
+export const DELETE_MULTIPLE_ENTITIES = 'impactoss/App/DELETE_MULTIPLE_ENTITIES';
 export const SAVE_CONNECTIONS = 'impactoss/App/SAVE_CONNECTIONS';
-export const SAVE_ENTITIES = 'impactoss/App/SAVE_ENTITIES';
 export const DUEDATE_ASSIGNED = 'impactoss/App/DUEDATE_ASSIGNED';
 export const DUEDATE_UNASSIGNED = 'impactoss/App/DUEDATE_UNASSIGNED';
 
@@ -72,6 +75,7 @@ export const OPEN_NEW_ENTITY_MODAL = 'impactoss/App/OPEN_NEW_ENTITY_MODAL';
 export const SUBMIT_INVALID = 'impactoss/App/SUBMIT_INVALID';
 
 export const DISMISS_QUERY_MESSAGES = 'impactoss/App/DISMISS_QUERY_MESSAGES';
+export const SET_FRAMEWORK = 'impactoss/App/SET_FRAMEWORK';
 
 export const FILTERS_PANEL = 'filters';
 export const EDIT_PANEL = 'edit';
@@ -84,10 +88,21 @@ export const CONTENT_MODAL = 'modal';
 export const DEPENDENCIES = [
   'user_roles',
   'pages',
+  'frameworks',
 ];
 export const SORT_ORDER_OPTIONS = [
-  { value: 'asc', icon: 'ascending', nextValue: 'desc', message: 'ui.sortOrderOptions.asc' },
-  { value: 'desc', icon: 'descending', nextValue: 'asc', message: 'ui.sortOrderOptions.desc' },
+  {
+    value: 'asc',
+    icon: 'ascending',
+    nextValue: 'desc',
+    message: 'ui.sortOrderOptions.asc',
+  },
+  {
+    value: 'desc',
+    icon: 'descending',
+    nextValue: 'asc',
+    message: 'ui.sortOrderOptions.desc',
+  },
 ];
 export const PARAMS = {
   GROUP_RESET: '0',
@@ -112,6 +127,7 @@ export const PATHS = {
   PASSWORD: '/password',
   OVERVIEW: '/overview',
   LOGIN: '/login',
+  BOOKMARKS: '/bookmarks',
   LOGOUT: '/logout',
   REGISTER: '/register',
   RESET_PASSWORD: '/resetpassword',
@@ -120,7 +136,6 @@ export const PATHS = {
   USERS: '/users',
   MEASURES: '/actions',
   INDICATORS: '/indicators',
-  SDG_TARGETS: '/sdgtargets',
   RECOMMENDATIONS: '/recommendations',
   PROGRESS_REPORTS: '/reports',
   TAXONOMIES: '/categories',

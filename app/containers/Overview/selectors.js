@@ -1,43 +1,56 @@
 import { createSelector } from 'reselect';
-import { ENABLE_SDGS } from 'themes/config';
 
 import {
-  selectEntitiesWhere,
+  selectRecommendationsWhere,
+  selectMeasuresWhere,
+  selectIndicatorsWhere,
+  // selectEntities,
 } from 'containers/App/selectors';
 
+// import { qe } from 'utils/quasi-equals';
+
 export const selectRecommendationCount = createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'recommendations', where: { draft: false } }),
-  (entities) => entities.size
+  (state) => selectRecommendationsWhere(state, { where: { draft: false } }),
+  (entities) => entities && entities
+    .groupBy((e) => e.getIn(['attributes', 'framework_id']))
+    .map((fwentities) => fwentities.size)
 );
-export const selectSdgtargetCount = ENABLE_SDGS
-? createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'sdgtargets', where: { draft: false } }),
-  (entities) => entities.size
-)
-: () => 0;
+// export const selectRecommendationAddressedCount = createSelector(
+//   (state) => selectRecommendationsWhere(state, { where: { draft: false } }),
+//   (state) => selectMeasuresWhere(state, { where: { draft: false } }),
+//   (state) => selectEntities(state, 'recommendation_measures'),
+//   (recommendations, measures, associations) =>
+//     recommendations && recommendations.filter((rec) => {
+//       const recAssociations = associations.filter((association) =>
+//         qe(rec.get('id'), association.getIn(['attributes', 'recommendation_id']))
+//       );
+//       return recAssociations.some((association) =>
+//         measures.find((measure) =>
+//           qe(measure.get('id'), association.getIn(['attributes', 'measure_id']))
+//         )
+//       );
+//     }).size
+// );
+
 export const selectMeasureCount = createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'measures', where: { draft: false } }),
+  (state) => selectMeasuresWhere(state, { where: { draft: false } }),
   (entities) => entities.size
 );
 export const selectIndicatorCount = createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'indicators', where: { draft: false } }),
+  (state) => selectIndicatorsWhere(state, { where: { draft: false } }),
   (entities) => entities.size
 );
 export const selectRecommendationDraftCount = createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'recommendations', where: { draft: true } }),
-  (entities) => entities.size
+  (state) => selectRecommendationsWhere(state, { where: { draft: true } }),
+  (entities) => entities && entities
+    .groupBy((e) => e.getIn(['attributes', 'framework_id']))
+    .map((fwentities) => fwentities.size)
 );
-export const selectSdgtargetDraftCount = ENABLE_SDGS
-? createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'sdgtargets', where: { draft: true } }),
-  (entities) => entities.size
-)
-: () => 0;
 export const selectMeasureDraftCount = createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'measures', where: { draft: true } }),
+  (state) => selectMeasuresWhere(state, { where: { draft: true } }),
   (entities) => entities.size
 );
 export const selectIndicatorDraftCount = createSelector(
-  (state) => selectEntitiesWhere(state, { path: 'indicators', where: { draft: true } }),
+  (state) => selectIndicatorsWhere(state, { where: { draft: true } }),
   (entities) => entities.size
 );

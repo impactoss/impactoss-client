@@ -65,13 +65,13 @@ function mapErrors(errors) {
 export function checkErrorMessagesExist(response) {
   if (response && response.json && response.json.errors && response.json.errors.full_messages) {
     return response.json.errors.full_messages;
-  } else if (response && response.json && response.json.errors) {
+  } if (response && response.json && response.json.errors) {
     return response.json.errors;
-  } else if (response && response.json && response.json.error) {
+  } if (response && response.json && response.json.error) {
     return response.json.error === Object(response.json.error)
       ? mapErrors(response.json.error)
       : [response.json.error];
-  } else if (response && response.json) {
+  } if (response && response.json) {
     return response.json === Object(response.json)
       ? mapErrors(response.json)
       : [response.json];

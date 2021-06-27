@@ -4,14 +4,14 @@
  *
  */
 
- import {
-   SAVE,
- } from './constants';
+import {
+  SAVE,
+} from './constants';
 
- export function save(data, id) {
-   return {
-     type: SAVE,
-     data,
-     id,
-   };
- }
+export function save(data, id) {
+  return {
+    type: SAVE,
+    data,
+    id,
+  };
+}

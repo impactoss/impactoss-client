@@ -1,12 +1,15 @@
 import { createSelector } from 'reselect';
-import { ENABLE_SDGS } from 'themes/config';
 
 import {
   selectEntity,
   selectEntities,
   selectRecommendationsCategorised,
-  selectSdgTargetsCategorised,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
+  selectFWIndicators,
+  selectFrameworks,
+  selectRecommendationMeasuresByMeasure,
+  selectMeasureIndicatorsByMeasure,
+  selectMeasureCategoriesByMeasure,
 } from 'containers/App/selectors';
 
 import {
@@ -15,10 +18,10 @@ import {
   prepareTaxonomiesAssociated,
   prepareTaxonomiesMultiple,
 } from 'utils/entities';
-
+import { qe } from 'utils/quasi-equals';
 export const selectDomain = createSelector(
   (state) => state.get('measureEdit'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export const selectViewEntity = createSelector(
@@ -28,40 +31,68 @@ export const selectViewEntity = createSelector(
 );
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  (state) => selectTaxonomiesSorted(state),
+  selectFWTaxonomiesSorted,
   (state) => selectEntities(state, 'categories'),
-  (state) => selectEntities(state, 'measure_categories'),
-  (id, taxonomies, categories, associations) =>
-    prepareTaxonomiesAssociated(taxonomies, categories, associations, 'tags_measures', 'measure_id', id)
+  selectMeasureCategoriesByMeasure,
+  (
+    id,
+    taxonomies,
+    categories,
+    associations,
+  ) => prepareTaxonomiesAssociated(
+    taxonomies,
+    categories,
+    associations,
+    'tags_measures',
+    id,
+    false,
+  )
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => ENABLE_SDGS
-    ? prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations', 'tags_sdgtargets'])
-    : prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations'])
+  (taxonomies, categories) => prepareTaxonomiesMultiple(
+    taxonomies,
+    categories,
+    ['tags_recommendations'],
+    false,
+  )
 );
 
-
-export const selectRecommendations = createSelector(
+export const selectRecommendationsByFw = createSelector(
   (state, id) => id,
-  (state) => selectRecommendationsCategorised(state),
-  (state) => selectEntities(state, 'recommendation_measures'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'recommendation_id', associations, 'measure_id', id)
-);
-export const selectSdgTargets = createSelector(
-  (state, id) => id,
-  (state) => selectSdgTargetsCategorised(state),
-  (state) => selectEntities(state, 'sdgtarget_measures'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'sdgtarget_id', associations, 'measure_id', id)
+  selectRecommendationsCategorised,
+  selectRecommendationMeasuresByMeasure,
+  selectFrameworks,
+  (id, recs, associations, frameworks) => {
+    const filtered = recs.filter(
+      (r) => {
+        const framework = frameworks.find(
+          (fw) => qe(
+            fw.get('id'),
+            r.getIn(['attributes', 'framework_id']),
+          )
+        );
+        return framework.getIn(['attributes', 'has_measures']);
+      }
+    );
+    return entitiesSetAssociated(
+      filtered,
+      associations,
+      id,
+    ).groupBy(
+      (r) => r.getIn(['attributes', 'framework_id']).toString()
+    );
+  }
 );
 export const selectIndicators = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'indicators'),
-  (state) => selectEntities(state, 'measure_indicators'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'indicator_id', associations, 'measure_id', id)
+  selectFWIndicators,
+  selectMeasureIndicatorsByMeasure,
+  (id, indicators, associations) => entitiesSetAssociated(
+    indicators,
+    associations,
+    id,
+  )
 );

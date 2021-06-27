@@ -19,7 +19,7 @@ class InputComponent extends React.Component {
   render() {
     return (
       <StyledInput
-        innerRef={(node) => { this.input = node; }}
+        ref={(node) => { this.input = node; }}
         {...this.props}
       />
     );

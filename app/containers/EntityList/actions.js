@@ -7,8 +7,11 @@
 import {
   SHOW_PANEL,
   SAVE,
+  SAVE_MULTIPLE,
   NEW_CONNECTION,
+  NEW_MULTIPLE_CONNECTIONS,
   DELETE_CONNECTION,
+  DELETE_MULTIPLE_CONNECTIONS,
   RESET_STATE,
   RESET_PROGRESS,
   ENTITY_SELECTED,
@@ -22,6 +25,7 @@ import {
   SORTORDER_CHANGE,
   PATH_CHANGE,
   DISMISS_ERROR,
+  DISMISS_ALL_ERRORS,
   RESET_SEARCH_QUERY,
 } from './constants';
 
@@ -44,15 +48,36 @@ export function save(data) {
     data,
   };
 }
+export function saveMultiple(path, data) {
+  return {
+    type: SAVE_MULTIPLE,
+    path,
+    data,
+  };
+}
 export function newConnection(data) {
   return {
     type: NEW_CONNECTION,
     data,
   };
 }
+export function newMultipleConnections(path, data) {
+  return {
+    type: NEW_MULTIPLE_CONNECTIONS,
+    path,
+    data,
+  };
+}
 export function deleteConnection(data) {
   return {
     type: DELETE_CONNECTION,
+    data,
+  };
+}
+export function deleteMultipleConnections(path, data) {
+  return {
+    type: DELETE_MULTIPLE_CONNECTIONS,
+    path,
     data,
   };
 }
@@ -77,7 +102,7 @@ export function selectEntity(data) {
   };
 }
 
-export function selectEntities(ids) {
+export function selectMultipleEntities(ids) {
   return {
     type: ENTITIES_SELECT,
     ids,
@@ -143,6 +168,12 @@ export function updateSortOrder(order) {
 export function dismissError(key) {
   return {
     type: DISMISS_ERROR,
+    key,
+  };
+}
+export function dismissAllErrors(key) {
+  return {
+    type: DISMISS_ALL_ERRORS,
     key,
   };
 }

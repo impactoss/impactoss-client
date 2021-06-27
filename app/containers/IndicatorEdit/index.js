@@ -11,13 +11,13 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import {
   userOptions,
   entityOptions,
   renderMeasureControl,
-  renderSdgTargetControl,
+  renderRecommendationsByFwControl,
   renderUserControl,
   getConnectionUpdatesFromFormData,
   getTitleFormField,
@@ -73,7 +73,7 @@ import {
   selectDomain,
   selectViewEntity,
   selectMeasures,
-  selectSdgTargets,
+  selectRecommendationsByFw,
   selectUsers,
   selectConnectedTaxonomies,
 } from './selectors';
@@ -86,19 +86,17 @@ import { DEPENDENCIES, FORM_INITIAL } from './constants';
 export class IndicatorEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     if (this.props.dataReady && this.props.viewEntity) {
       this.props.initialiseForm('indicatorEdit.form.data', this.getInitialFormData());
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -110,126 +108,158 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer.current);
     }
   }
 
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { measures, viewEntity, users, sdgtargets } = props;
+    const {
+      measures, viewEntity, users, recommendationsByFw,
+    } = props;
     let attributes = viewEntity.get('attributes');
     if (!attributes.get('reference')) {
       attributes = attributes.set('reference', viewEntity.get('id'));
     }
     return viewEntity
-    ? Map({
-      id: viewEntity.get('id'),
-      attributes: attributes.mergeWith(
-        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-        FORM_INITIAL.get('attributes')
-      ),
-      associatedMeasures: entityOptions(measures, true),
-      associatedSdgTargets: entityOptions(sdgtargets, true),
-      associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
+      ? Map({
+        id: viewEntity.get('id'),
+        attributes: attributes.mergeWith(
+          (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+          FORM_INITIAL.get('attributes')
+        ),
+        associatedMeasures: entityOptions(measures, true),
+        associatedRecommendationsByFw: recommendationsByFw
+          ? recommendationsByFw.map((recs) => entityOptions(recs, true))
+          : Map(),
+        associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
       // TODO allow single value for singleSelect
-    })
-    : Map();
+      })
+      : Map();
   }
 
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getReferenceFormField(this.context.intl.formatMessage, appMessages, false, true),
-        getTitleFormField(this.context.intl.formatMessage, appMessages, 'titleText'),
-      ],
-    },
-  ]);
+  getHeaderMainFields = () => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getReferenceFormField(intl.formatMessage, false, true),
+          getTitleFormField(intl.formatMessage, 'titleText'),
+        ],
+      },
+    ]);
+  };
 
-  getHeaderAsideFields = (entity) => ([
-    {
-      fields: [
-        getStatusField(this.context.intl.formatMessage, appMessages, entity),
-        getMetaField(entity, appMessages),
-      ],
-    },
-  ]);
+  getHeaderAsideFields = (entity) => {
+    const { intl } = this.context;
+    return ([
+      {
+        fields: [
+          getStatusField(intl.formatMessage),
+          getMetaField(entity),
+        ],
+      },
+    ]);
+  };
 
-  getBodyMainFields = (connectedTaxonomies, measures, sdgtargets, onCreateOption) => ([
-    {
-      fields: [getMarkdownField(this.context.intl.formatMessage, appMessages)],
-    },
-    {
-      label: this.context.intl.formatMessage(appMessages.entities.connections.plural),
-      icon: 'connections',
-      fields: [
-        renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
-        renderSdgTargetControl(sdgtargets, connectedTaxonomies, onCreateOption, this.context.intl),
-      ],
-    },
-  ]);
+  getBodyMainFields = (connectedTaxonomies, measures, recommendationsByFw, onCreateOption) => {
+    const { intl } = this.context;
+    const groups = [];
+    groups.push(
+      {
+        fields: [getMarkdownField(intl.formatMessage)],
+      },
+    );
+    if (measures) {
+      groups.push(
+        {
+          label: intl.formatMessage(appMessages.nav.measuresSuper),
+          icon: 'measures',
+          fields: [
+            renderMeasureControl(measures, connectedTaxonomies, onCreateOption, intl),
+          ],
+        },
+      );
+    }
+    if (recommendationsByFw) {
+      const recConnections = renderRecommendationsByFwControl(
+        recommendationsByFw,
+        connectedTaxonomies,
+        onCreateOption,
+        intl,
+      );
+      if (recConnections) {
+        groups.push(
+          {
+            label: intl.formatMessage(appMessages.nav.recommendationsSuper),
+            icon: 'recommendations',
+            fields: recConnections,
+          },
+        );
+      }
+    }
+    return groups;
+  };
 
-  getBodyAsideFields = (entity, users, repeat) => ([ // fieldGroups
-    { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
-      icon: 'reminder',
-      fields: [
-        getDateField(
-          this.context.intl.formatMessage,
-          appMessages,
-          'start_date',
-          repeat,
-          repeat ? 'start_date' : 'start_date_only',
-          (model, value) => this.props.onStartDateChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
-        ),
-        getCheckboxField(
-          this.context.intl.formatMessage,
-          appMessages,
-          'repeat',
-          entity,
-          (model, value) => this.props.onRepeatChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
-        ),
-        repeat ? getFrequencyField(this.context.intl.formatMessage, appMessages, entity) : null,
-        repeat ? getDateField(
-          this.context.intl.formatMessage,
-          appMessages,
-          'end_date',
-          repeat,
-          'end_date',
-          (model, value) => this.props.onEndDateChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
-        )
-        : null,
-        renderUserControl(
-          users,
-          this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
-          entity.getIn(['attributes', 'manager_id']),
-        ),
-      ],
-    },
-  ]);
+  getBodyAsideFields = (entity, users, repeat) => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        label: intl.formatMessage(appMessages.entities.due_dates.schedule),
+        icon: 'reminder',
+        fields: [
+          getDateField(
+            intl.formatMessage,
+            'start_date',
+            repeat,
+            repeat ? 'start_date' : 'start_date_only',
+            (model, value) => this.props.onStartDateChange(model, value, this.props.viewDomain.form.data, intl.formatMessage)
+          ),
+          getCheckboxField(
+            intl.formatMessage,
+            'repeat',
+            (model, value) => this.props.onRepeatChange(model, value, this.props.viewDomain.form.data, intl.formatMessage)
+          ),
+          repeat ? getFrequencyField(intl.formatMessage, entity) : null,
+          repeat ? getDateField(
+            intl.formatMessage,
+            'end_date',
+            repeat,
+            'end_date',
+            (model, value) => this.props.onEndDateChange(model, value, this.props.viewDomain.form.data, intl.formatMessage)
+          )
+            : null,
+          renderUserControl(
+            users,
+            intl.formatMessage(appMessages.attributes.manager_id.indicators),
+            entity.getIn(['attributes', 'manager_id']),
+          ),
+        ],
+      },
+    ]);
+  };
 
   render() {
-    const { viewEntity, dataReady, viewDomain, connectedTaxonomies, measures, users, sdgtargets, onCreateOption } = this.props;
-    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
-
+    const { intl } = this.context;
+    const {
+      viewEntity, dataReady, viewDomain, connectedTaxonomies, measures, recommendationsByFw, users, onCreateOption,
+    } = this.props;
+    const {
+      saveSending, saveError, deleteSending, deleteError, submitValid,
+    } = viewDomain.get('page').toJS();
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+          title={`${intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content
-          innerRef={(node) => {
-            if (!this.state.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="indicators"
             buttons={
@@ -244,64 +274,76 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               }] : null
             }
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {deleteError &&
-            <Messages type="error" messages={deleteError} />
+          {deleteError
+            && <Messages type="error" messages={deleteError} />
           }
-          {(saveSending || deleteSending || !dataReady) &&
-            <Loading />
+          {(saveSending || deleteSending || !dataReady)
+            && <Loading />
           }
-          {!viewEntity && dataReady && !saveError && !deleteSending &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          {!viewEntity && dataReady && !saveError && !deleteSending
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          {viewEntity && dataReady && !deleteSending &&
-            <EntityForm
-              model="indicatorEdit.form.data"
-              formData={viewDomain.form.data}
-              saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, measures, sdgtargets)}
-              handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
-              handleCancel={this.props.handleCancel}
-              handleUpdate={this.props.handleUpdate}
-              handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
-              validators={{
-                '': {
+          {viewEntity && dataReady && !deleteSending
+            && (
+              <EntityForm
+                model="indicatorEdit.form.data"
+                formData={viewDomain.getIn(['form', 'data'])}
+                saving={saveSending}
+                handleSubmit={(formData) => this.props.handleSubmit(
+                  formData,
+                  measures,
+                  recommendationsByFw,
+                )}
+                handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, intl.formatMessage)}
+                handleCancel={this.props.handleCancel}
+                handleUpdate={this.props.handleUpdate}
+                handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+                validators={{
+                  '': {
                   // Form-level validator
-                  endDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'end_date'])),
-                  startDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'start_date'])),
-                  endDateAfterStartDate: (vals) => vals.getIn(['attributes', 'repeat']) ? validateDateAfterDate(vals.getIn(['attributes', 'end_date']), vals.getIn(['attributes', 'start_date'])) : true,
-                },
-              }}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(viewEntity),
-                },
-                body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, measures, sdgtargets, onCreateOption),
-                  aside: this.getBodyAsideFields(viewEntity, users, viewDomain.form.data.getIn(['attributes', 'repeat'])),
-                },
-              }}
-              scrollContainer={this.state.scrollContainer}
-            />
+                    endDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'end_date'])),
+                    startDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'start_date'])),
+                    endDateAfterStartDate: (vals) => vals.getIn(['attributes', 'repeat']) ? validateDateAfterDate(vals.getIn(['attributes', 'end_date']), vals.getIn(['attributes', 'start_date'])) : true,
+                  },
+                }}
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(),
+                    aside: this.getHeaderAsideFields(viewEntity),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption),
+                    aside: this.getBodyAsideFields(viewEntity, users, viewDomain.getIn(['form', 'data', 'attributes', 'repeat'])),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
-          { (saveSending || deleteSending) &&
-            <Loading />
+          { (saveSending || deleteSending)
+            && <Loading />
           }
         </Content>
       </div>
@@ -328,7 +370,7 @@ IndicatorEdit.propTypes = {
   isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   measures: PropTypes.object,
-  sdgtargets: PropTypes.object,
+  recommendationsByFw: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
@@ -347,8 +389,8 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
-  sdgtargets: selectSdgTargets(state, props.params.id),
   measures: selectMeasures(state, props.params.id),
+  recommendationsByFw: selectRecommendationsByFw(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
   users: selectUsers(state),
 });
@@ -451,7 +493,7 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, measures, sdgtargets) => {
+    handleSubmit: (formData, measures, recommendationsByFw) => {
       let saveData = formData
         .set(
           'measureIndicators',
@@ -462,17 +504,31 @@ function mapDispatchToProps(dispatch, props) {
             createConnectionKey: 'measure_id',
             createKey: 'indicator_id',
           })
-        )
-        .set(
-          'sdgtargetIndicators',
-          getConnectionUpdatesFromFormData({
-            formData,
-            connections: sdgtargets,
-            connectionAttribute: 'associatedSdgTargets',
-            createConnectionKey: 'sdgtarget_id',
-            createKey: 'indicator_id',
-          })
         );
+      saveData = saveData.set(
+        'recommendationIndicators',
+        recommendationsByFw
+          .map((recs, fwid) => getConnectionUpdatesFromFormData({
+            formData: !formData.getIn(['attributes', 'user_only']) ? formData : null,
+            connections: recs,
+            connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
+            createConnectionKey: 'recommendation_id',
+            createKey: 'indicator_id',
+          }))
+          .reduce(
+            (memo, deleteCreateLists) => {
+              const deletes = memo.get('delete').concat(deleteCreateLists.get('delete'));
+              const creates = memo.get('create').concat(deleteCreateLists.get('create'));
+              return memo
+                .set('delete', deletes)
+                .set('create', creates);
+            },
+            fromJS({
+              delete: [],
+              create: [],
+            }),
+          )
+      );
 
       // TODO: remove once have singleselect instead of multiselect
       const formUserIds = getCheckedValuesFromOptions(formData.get('associatedUser'));

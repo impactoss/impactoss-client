@@ -56,12 +56,12 @@ theme.breakpoints = {
 // 3: white/placeholder
 // 4: white/placeholder
 const primary = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-ffffff-ffffff');
-  // secondary color palette: dark to light
-  // 0: secondary colour, dark / white/placeholder
-  // 1: secondary colour, medium / white/placeholder
-  // 2: secondary colour, main / white/placeholder
-  // 3: white/placeholder
-  // 4: white/placeholder
+// secondary color palette: dark to light
+// 0: secondary colour, dark / white/placeholder
+// 1: secondary colour, medium / white/placeholder
+// 2: secondary colour, main / white/placeholder
+// 3: white/placeholder
+// 4: white/placeholder
 const secondary = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-ffffff');
 // dark grayscale: dark to light
 // 0:  darkest (AA)
@@ -149,8 +149,6 @@ theme.palette = {
   measures: ['#ED7000'],
   recommendationsHover: ['#023066', '#426BA6'], // accepted, noted ['#FF9B69', '#FFB28B'],
   recommendations: ['#033A89', '#6889B8'],
-  sdgtargetsHover: ['#007FAD'],
-  sdgtargets: ['#009ED8'], // 40D7FF, 00A0CC
   indicatorsHover: ['#15881A'],
   indicators: ['#1BAC29'],
   reportsHover: [error[1]],
@@ -206,8 +204,8 @@ theme.palette = {
   // headerNavMain: [ '#bg', '#border'  ],
   headerNavMain: [secondary[4], secondary[4]],
   // headerNavMainItem: ['#color', '#colorActive', '#bg', '#bgActive'],
-  headerNavMainItem: [dark[3], primary[4], 'transparent', dark[2]],
-  headerNavMainItemHover: [dark[2], primary[4], 'transparent', dark[1]],
+  headerNavMainItem: [dark[3], primary[1], 'transparent', dark[2]],
+  headerNavMainItemHover: [primary[1], primary[1], 'transparent', dark[1]],
 
   //
   // SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
@@ -282,13 +280,28 @@ theme.sizes = {
   text: {
     aaLargeBold: '19px',
     aaLarge: '24px',
-    mainListItem: '18px',
-    nestedListItem: '15px',
-    listItemTop: '14px',
+    mainListItem: '20px',
+    nestedListItem: '16px',
+    listItemTop: '13px',
+    listItemBottom: '12px',
     markdown: '18px',
     markdownMobile: '16px',
     small: '13px', // used for labels
     smallMobile: '11px', // used for labels
+    default: '16px', // used for labels
+  },
+  print: {
+    aaLargeBold: '14pt',
+    aaLarge: '18pt',
+    mainListItem: '15pt',
+    nestedListItem: '12pt',
+    listItemTop: '10pt',
+    listItemBottom: '9pt',
+    markdown: '14pt',
+    markdownMobile: '12pt',
+    small: '10pt', // used for labels
+    smallMobile: '8pt', // used for labels
+    default: '12pt', // used for labels
   },
   // px only
   aside: {
@@ -302,8 +315,8 @@ theme.sizes = {
   },
   mainListItem: {
     paddingHorizontal: 15,
-    paddingTop: 5,
-    paddingBottom: 10,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
   header: {
     banner: {
@@ -311,8 +324,8 @@ theme.sizes = {
       heightMobile: 50,
     },
     nav: {
-      height: 38,
-      heightMobile: 24,
+      height: 50,
+      heightMobile: 32,
     },
     // px or em
     text: {
@@ -322,9 +335,9 @@ theme.sizes = {
       claimMobile: '1em',
     },
     paddingLeft: {
-      mobile: 6,
-      small: 12,
-      large: 20,
+      mobile: 3,
+      small: 6,
+      large: 10,
     },
   },
   home: {

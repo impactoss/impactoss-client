@@ -18,15 +18,21 @@ const Styled = styled.a`
   padding-bottom: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingBottom}px;
   position: relative;
   background-color: ${palette('mainListItem', 1)};
-  margin-bottom: 1px;
+  margin-bottom: 3px;
   display: block;
   color: ${palette('mainListItem', 0)};
   &:hover {
     color: ${palette('mainListItemHover', 0)};
   }
+  @media print {
+    border-top: 1px solid ${palette('light', 1)};
+  }
 `;
 const Top = styled.div`
-  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};  
+  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.listItemTop};
+  }
 `;
 
 const Reference = styled(Label)`
@@ -37,13 +43,15 @@ const Reference = styled(Label)`
 const Title = styled.div`
   text-decoration: none;
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.nestedListItem};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.nestedListItem};
+  }
 `;
 
 class EntityListNestedReportItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const { report, onEntityClick } = this.props;
-
+    const { intl } = this.context;
     return (
       <Styled
         onClick={(evt) => {
@@ -53,15 +61,19 @@ class EntityListNestedReportItem extends React.PureComponent { // eslint-disable
         href={`${PATHS.PROGRESS_REPORTS}/${report.get('id')}`}
       >
         <Top>
-          {report.get('date') &&
-            <Reference>
-              { this.context.intl && `${this.context.intl.formatMessage(appMessages.entities.progress_reports.singleShort)} ${this.context.intl.formatDate(new Date(report.getIn(['date', 'attributes', 'due_date'])))}`}
-            </Reference>
+          {report.get('date')
+            && (
+              <Reference>
+                { intl && `${intl.formatMessage(appMessages.entities.progress_reports.singleShort)} ${intl.formatDate(new Date(report.getIn(['date', 'attributes', 'due_date'])))}`}
+              </Reference>
+            )
           }
-          {!report.get('date') &&
-            <Reference>
-              { this.context.intl && `${this.context.intl.formatMessage(appMessages.entities.progress_reports.singleShort)} (${lowerCase(this.context.intl.formatMessage(appMessages.entities.progress_reports.unscheduled_short))})` }
-            </Reference>
+          {!report.get('date')
+            && (
+              <Reference>
+                { intl && `${intl.formatMessage(appMessages.entities.progress_reports.singleShort)} (${lowerCase(intl.formatMessage(appMessages.entities.progress_reports.unscheduled_short))})` }
+              </Reference>
+            )
           }
           <ItemStatus draft={report.getIn(['attributes', 'draft'])} />
         </Top>

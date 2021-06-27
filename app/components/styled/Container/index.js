@@ -16,5 +16,11 @@ const Container = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     max-width: ${(props) => props.isNarrow ? '960' : (parseInt(props.theme.breakpoints.large, 10) - 30)}px;
   }
+  @media print {
+    max-width: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
 `;
 export default Container;

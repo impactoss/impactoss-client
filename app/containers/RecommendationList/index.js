@@ -8,14 +8,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { find } from 'lodash/collection';
 import { Map, List, fromJS } from 'immutable';
 
+import { getAcceptanceStatus } from 'utils/entities';
+
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
-import { ACCEPTED_STATUSES } from 'themes/config';
 import {
   selectReady,
   selectRecommendationTaxonomies,
+  selectActiveFrameworks,
+  selectIsUserManager,
+  selectIsSignedIn,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -28,11 +31,11 @@ import { selectRecommendations, selectConnectedTaxonomies, selectConnections } f
 import messages from './messages';
 
 export class RecommendationList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -47,6 +50,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     // console.log('test connections', isEqual(this.props.connections, nextProps.connections));
     // console.log('test connections', this.props.connections === nextProps.connections);
   }
+
   // shouldComponentUpdate(nextProps, nextState) {
   //   // console.log('EntityListSidebar.shouldComponentUpdate')
   //   // console.log('props isEqual', isEqual(this.props, nextProps))
@@ -58,53 +62,86 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
   //     || !isEqual(this.state, nextState);
   // }
   render() {
-    const { dataReady } = this.props;
+    const { intl } = this.context;
+    const {
+      dataReady,
+      frameworks,
+      isManager,
+      isUserSignedIn,
+    } = this.props;
     // console.log('RecList:render')
-
+    const currentFramework = frameworks && frameworks.size === 1 && frameworks.first();
+    const type = currentFramework
+      ? `recommendations_${currentFramework.get('id')}`
+      : 'recommendations';
     const headerOptions = {
-      supTitle: this.context.intl.formatMessage(messages.pageTitle),
-      icon: 'recommendations',
-      actions: [{
+      supTitle: intl.formatMessage(messages.pageTitle),
+      icon: type,
+      actions: [],
+    };
+    if (isUserSignedIn) {
+      headerOptions.actions.push({
+        type: 'bookmarker',
+        title: intl.formatMessage(appMessages.entities[type].plural),
+        entityType: type,
+      });
+    }
+    if (window.print) {
+      headerOptions.actions.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+    }
+    if (isManager) {
+      headerOptions.actions.push({
         type: 'text',
-        title: this.context.intl.formatMessage(appMessages.buttons.import),
+        title: intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
-      }, {
+      });
+      headerOptions.actions.push({
         type: 'add',
         title: [
-          this.context.intl.formatMessage(appMessages.buttons.add),
+          intl.formatMessage(appMessages.buttons.add),
           {
-            title: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
+            title: intl.formatMessage(appMessages.entities[type].single),
             hiddenSmall: true,
           },
         ],
         onClick: () => this.props.handleNew(),
-      }],
-    };
-
+      });
+    }
+    // if (dataReady) {
+    //   console.log(this.props.entities.toJS())
+    //   console.log(this.props.connections.toJS())
+    //   console.log(this.props.taxonomies.toJS())
+    //   console.log(this.props.frameworks.toJS())
+    //   console.log(this.props.connectedTaxonomies.toJS())
+    // }
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <EntityList
           entities={this.props.entities}
           taxonomies={this.props.taxonomies}
           connections={this.props.connections}
+          frameworks={frameworks}
           connectedTaxonomies={this.props.connectedTaxonomies}
           config={CONFIG}
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
-            single: this.context.intl.formatMessage(appMessages.entities.recommendations.single),
-            plural: this.context.intl.formatMessage(appMessages.entities.recommendations.plural),
+            single: intl.formatMessage(appMessages.entities[type].single),
+            plural: intl.formatMessage(appMessages.entities[type].plural),
           }}
           entityIcon={(entity) => {
-            const status = find(ACCEPTED_STATUSES,
-              (option) => option.value === entity.getIn(['attributes', 'accepted'])
-            );
+            const status = getAcceptanceStatus(entity);
             return status ? status.icon : null;
           }}
           locationQuery={fromJS(this.props.location.query)}
@@ -119,11 +156,14 @@ RecommendationList.propTypes = {
   handleNew: PropTypes.func,
   handleImport: PropTypes.func,
   dataReady: PropTypes.bool,
+  isManager: PropTypes.bool,
   entities: PropTypes.instanceOf(List).isRequired,
   taxonomies: PropTypes.instanceOf(Map),
+  frameworks: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   location: PropTypes.object,
+  isUserSignedIn: PropTypes.bool,
 };
 
 RecommendationList.contextTypes = {
@@ -136,6 +176,9 @@ const mapStateToProps = (state, props) => ({
   taxonomies: selectRecommendationTaxonomies(state),
   connections: selectConnections(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
+  frameworks: selectActiveFrameworks(state),
+  isManager: selectIsUserManager(state),
+  isUserSignedIn: selectIsSignedIn(state),
 });
 
 function mapDispatchToProps(dispatch) {

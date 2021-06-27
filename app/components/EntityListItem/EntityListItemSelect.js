@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import PrintHide from 'components/styled/PrintHide';
 
-const Select = styled.div`
+const Select = styled(PrintHide)`
   display: table-cell;
   width: 20px;
   background-color: ${palette('mainListItem', 1)};
@@ -18,7 +19,6 @@ const Select = styled.div`
 `;
 
 export default class EntityListItemSelect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   static propTypes = {
     checked: PropTypes.bool,
     onSelect: PropTypes.func,

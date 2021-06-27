@@ -12,9 +12,9 @@ const Sidebar = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
     width: ${(props) => props.responsiveSmall
-      ? props.theme.sizes.aside.width.small
-      : props.theme.sizes.aside.width.large
-    }px;
+    ? props.theme.sizes.aside.width.small
+    : props.theme.sizes.aside.width.large
+}px;
     right: auto;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {

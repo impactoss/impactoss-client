@@ -14,10 +14,17 @@ const Styled = styled(Component)`
     display: table-cell;
     text-align: center;
     cursor: pointer;
-    width:${(props) => props.width * 100}%;
-    border-right: 1px solid ${palette('light', 0)};
+    width:${(props) => props.colWidth * 100}%;
+    border-right: 3px solid ${palette('light', 0)};
     vertical-align: middle;
     padding: 5px 10px;
+  }
+  @media print {
+    border: none;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    width:${(props) => props.colWidth * 100}%;
   }
 `;
 const IconWrap = styled.span`
@@ -32,6 +39,9 @@ const Count = styled.span`
   color: ${palette('text', 1)};
   padding: 0 8px;
   font-size: 1.5em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.larger};
+  }
 `;
 
 const Info = styled.div`
@@ -40,40 +50,38 @@ const Info = styled.div`
 `;
 
 class EntityListItemExpandable extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const {
       count,
       onClick,
       dates,
-      width,
+      colWidth,
+      column,
     } = this.props;
-    const { type, icon } = this.props.column;
-
+    const { type, icon } = column;
+    const { intl } = this.context;
     const info = [];
     if (dates) {
       if (dates.due) {
         info.push({
-          label: this.context.intl && this.context.intl.formatMessage(messages.due, { total: dates.due }),
+          label: intl && intl.formatMessage(messages.due, { total: dates.due }),
         });
       }
       if (dates.overdue) {
         info.push({
           style: type,
-          label: this.context.intl && this.context.intl.formatMessage(messages.overdue, { total: dates.overdue }),
+          label: intl && intl.formatMessage(messages.overdue, { total: dates.overdue }),
         });
       }
     }
     return (
-      <Styled width={width} onClick={onClick}>
+      <Styled colWidth={colWidth} onClick={onClick}>
         <IconWrap>
           <Icon name={icon} text iconRight />
         </IconWrap>
         <Count type={type} count={count}>{count}</Count>
-        { info &&
-          info.map((infoItem, i) =>
-            (<Info key={i} palette={infoItem.style}>{infoItem.label}</Info>)
-          )
+        { info
+          && info.map((infoItem, i) => (<Info key={i} palette={infoItem.style}>{infoItem.label}</Info>))
         }
       </Styled>
     );
@@ -84,7 +92,7 @@ EntityListItemExpandable.propTypes = {
   column: PropTypes.object,
   count: PropTypes.number,
   onClick: PropTypes.func,
-  width: PropTypes.number,
+  colWidth: PropTypes.number,
   dates: PropTypes.object,
 };
 

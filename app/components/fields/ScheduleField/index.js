@@ -20,6 +20,7 @@ class ScheduleField extends React.PureComponent { // eslint-disable-line react/p
       showAllDates: false,
     };
   }
+
   render() {
     const { field } = this.props;
     return (
@@ -32,38 +33,48 @@ class ScheduleField extends React.PureComponent { // eslint-disable-line react/p
             <ScheduleItem key={i} overdue={value.overdue}>
               <FormattedDate value={new Date(value.date)} />
               {
-                value.overdue &&
-                <ScheduleItemStatus overdue>
-                  <FormattedMessage {...appMessages.entities.due_dates.overdue} />
-                </ScheduleItemStatus>
+                value.overdue
+                && (
+                  <ScheduleItemStatus overdue>
+                    <FormattedMessage {...appMessages.entities.due_dates.overdue} />
+                  </ScheduleItemStatus>
+                )
               }
               {
-                value.due &&
-                <ScheduleItemStatus>
-                  <FormattedMessage {...appMessages.entities.due_dates.due} />
-                </ScheduleItemStatus>
+                value.due
+                && (
+                  <ScheduleItemStatus>
+                    <FormattedMessage {...appMessages.entities.due_dates.due} />
+                  </ScheduleItemStatus>
+                )
               }
             </ScheduleItem>
           ))
         }
-        { field.values && field.values.length > DATEMAX &&
-          <ToggleAllItems
-            onClick={() =>
-              this.setState({ showAllDates: !this.state.showAllDates })
-            }
-          >
-            { this.state.showAllDates &&
-              <FormattedMessage {...appMessages.entities.due_dates.showLess} />
-            }
-            { !this.state.showAllDates &&
-              <FormattedMessage {...appMessages.entities.due_dates.showAll} />
-            }
-          </ToggleAllItems>
+        { field.values && field.values.length > DATEMAX
+          && (
+            <ToggleAllItems
+              onClick={() => this.setState(
+                (prevState) => ({
+                  showAllDates: !prevState.showAllDates,
+                })
+              )}
+            >
+              { this.state.showAllDates
+              && <FormattedMessage {...appMessages.entities.due_dates.showLess} />
+              }
+              { !this.state.showAllDates
+              && <FormattedMessage {...appMessages.entities.due_dates.showAll} />
+              }
+            </ToggleAllItems>
+          )
         }
-        { (!field.values || field.values.length === 0) &&
-          <EmptyHint>
-            <FormattedMessage {...appMessages.entities.due_dates.empty} />
-          </EmptyHint>
+        { (!field.values || field.values.length === 0)
+          && (
+            <EmptyHint>
+              <FormattedMessage {...appMessages.entities.due_dates.empty} />
+            </EmptyHint>
+          )
         }
       </FieldWrap>
     );

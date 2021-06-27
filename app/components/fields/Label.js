@@ -7,6 +7,9 @@ const Label = styled.div`
   font-size: ${(props) => props.theme.sizes.text.small};
   position: relative;
   width: 100%;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 
 export default Label;

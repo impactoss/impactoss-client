@@ -2,18 +2,22 @@ import { createSelector } from 'reselect';
 
 import {
   selectEntities,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
 } from 'containers/App/selectors';
 import { prepareTaxonomiesMultiple } from 'utils/entities';
 
 export const selectDomain = createSelector(
   (state) => state.get('recommendationNew'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectTaxonomiesSorted(state),
+  (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'])
+  (taxonomies, categories) => prepareTaxonomiesMultiple(
+    taxonomies,
+    categories,
+    ['tags_measures'],
+    false,
+  )
 );

@@ -17,13 +17,18 @@ import {
   getMetaField,
   getMarkdownField,
   getMeasureConnectionField,
-  getSdgTargetConnectionField,
+  getRecommendationConnectionField,
   getManagerField,
   getScheduleField,
   getReportsField,
 } from 'utils/fields';
 
-import { loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages } from 'containers/App/actions';
+import { qe } from 'utils/quasi-equals';
+import { getEntityTitleTruncated, getEntityReference } from 'utils/entities';
+
+import {
+  loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages,
+} from 'containers/App/actions';
 
 import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
 
@@ -38,10 +43,11 @@ import {
   selectIsUserContributor,
   selectIsUserManager,
   selectMeasureTaxonomies,
-  selectSdgTargetTaxonomies,
   selectMeasureConnections,
-  selectSdgTargetConnections,
+  selectRecommendationTaxonomies,
+  selectRecommendationConnections,
   selectQueryMessages,
+  selectActiveFrameworks,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -50,7 +56,7 @@ import messages from './messages';
 import {
   selectViewEntity,
   selectMeasures,
-  selectSdgTargets,
+  selectRecommendations,
   selectReports,
   selectDueDates,
 } from './selectors';
@@ -58,11 +64,11 @@ import {
 import { DEPENDENCIES } from './constants';
 
 export class IndicatorView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -78,38 +84,83 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     },
   ]);
 
-  getHeaderAsideFields = (entity, isContributor) => isContributor &&
-    ([{
+  getHeaderAsideFields = (entity, isContributor) => isContributor
+    && ([{
       fields: [
         getStatusField(entity),
-        getMetaField(entity, appMessages),
+        getMetaField(entity),
       ],
     }]);
 
-  getBodyMainFields = (entity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick, sdgtargetConnections, measureConnections) => ([
-    {
+  getBodyMainFields = (
+    entity,
+    measures,
+    reports,
+    measureTaxonomies,
+    isContributor,
+    onEntityClick,
+    measureConnections,
+    recommendationsByFw,
+    recommendationTaxonomies,
+    recommendationConnections,
+    frameworks,
+  ) => {
+    const { intl } = this.context;
+    const fields = [];
+    // own attributes
+    fields.push({
       fields: [
-        getMarkdownField(entity, 'description', true, appMessages),
+        getMarkdownField(entity, 'description', true),
         getReportsField(
           reports,
-          appMessages,
           {
             type: 'add',
-            title: this.context.intl.formatMessage(messages.addReport),
+            title: intl.formatMessage(messages.addReport),
             onClick: this.props.handleNewReport,
           }
         ),
       ],
-    },
-    {
-      label: appMessages.entities.connections.plural,
-      icon: 'connections',
-      fields: [
-        measures && getMeasureConnectionField(measures, measureTaxonomies, measureConnections, appMessages, onEntityClick),
-        sdgtargets && getSdgTargetConnectionField(sdgtargets, sdgtargetTaxonomies, sdgtargetConnections, appMessages, onEntityClick),
-      ],
-    },
-  ]);
+    });
+    // measures
+    if (measures) {
+      fields.push({
+        label: appMessages.nav.measuresSuper,
+        icon: 'measures',
+        fields: [
+          getMeasureConnectionField(
+            measures,
+            measureTaxonomies,
+            measureConnections,
+            onEntityClick,
+          ),
+        ],
+      });
+    }
+    // recs
+    if (recommendationsByFw) {
+      const recConnections = [];
+      recommendationsByFw.forEach((recs, fwid) => {
+        const framework = frameworks.find((fw) => qe(fw.get('id'), fwid));
+        const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
+        recConnections.push(
+          getRecommendationConnectionField(
+            recs,
+            recommendationTaxonomies,
+            recommendationConnections,
+            onEntityClick,
+            fwid,
+            hasResponse,
+          ),
+        );
+      });
+      fields.push({
+        label: appMessages.nav.recommendationsSuper,
+        icon: 'recommendations',
+        fields: recConnections,
+      });
+    }
+    return fields;
+  };
 
   getBodyAsideFields = (entity, dates) => ([ // fieldGroups
     { // fieldGroup
@@ -117,10 +168,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       type: 'dark',
       icon: 'reminder',
       fields: [
-        getScheduleField(
-          dates,
-          appMessages,
-        ),
+        getScheduleField(dates),
         getManagerField(
           entity,
           appMessages.attributes.manager_id.indicators,
@@ -131,97 +179,130 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   ]);
 
   render() {
+    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
       isContributor,
       isManager,
       measures,
-      sdgtargets,
       reports,
       dates,
       measureTaxonomies,
-      sdgtargetTaxonomies,
       onEntityClick,
-      sdgtargetConnections,
       measureConnections,
+      recommendationsByFw,
+      recommendationTaxonomies,
+      recommendationConnections,
+      frameworks,
     } = this.props;
+    let buttons = [];
+    if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+      buttons = isManager
+        ? buttons.concat([
+          {
+            type: 'text',
+            title: intl.formatMessage(messages.addReport),
+            onClick: this.props.handleNewReport,
+          },
+          {
+            type: 'edit',
+            onClick: () => this.props.handleEdit(this.props.params.id),
+          },
+          {
+            type: 'close',
+            onClick: this.props.handleClose,
+          },
+        ])
+        : buttons.concat([
+          {
+            type: 'text',
+            title: intl.formatMessage(messages.addReport),
+            onClick: this.props.handleNewReport,
+          },
+          {
+            type: 'close',
+            onClick: this.props.handleClose,
+          },
+        ]);
+    }
 
-    const buttons = isManager
-    ? [
-      {
-        type: 'text',
-        title: this.context.intl.formatMessage(messages.addReport),
-        onClick: this.props.handleNewReport,
-      },
-      {
-        type: 'edit',
-        onClick: this.props.handleEdit,
-      },
-      {
-        type: 'close',
-        onClick: this.props.handleClose,
-      },
-    ]
-    : [
-      {
-        type: 'text',
-        title: this.context.intl.formatMessage(messages.addReport),
-        onClick: this.props.handleNewReport,
-      },
-      {
-        type: 'close',
-        onClick: this.props.handleClose,
-      },
-    ];
+    const pageTitle = intl.formatMessage(messages.pageTitle);
+    const metaTitle = viewEntity
+      ? `${pageTitle} ${getEntityReference(viewEntity)}: ${getEntityTitleTruncated(viewEntity)}`
+      : `${pageTitle} ${this.props.params.id}`;
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+          title={metaTitle}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={pageTitle}
             type={CONTENT_SINGLE}
             icon="indicators"
             buttons={buttons}
           />
-          { !viewEntity && dataReady &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          { !viewEntity && dataReady
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          {this.props.queryMessages.info && appMessages.entities[this.props.queryMessages.infotype] &&
-            <Messages
-              spaceMessage
-              type="success"
-              onDismiss={this.props.onDismissQueryMessages}
-              messageKey={this.props.queryMessages.info}
-              messageArgs={{
-                entityType: this.context.intl.formatMessage(appMessages.entities[this.props.queryMessages.infotype].single),
-              }}
-            />
+          {this.props.queryMessages.info && appMessages.entities[this.props.queryMessages.infotype]
+            && (
+              <Messages
+                spaceMessage
+                type="success"
+                onDismiss={this.props.onDismissQueryMessages}
+                messageKey={this.props.queryMessages.info}
+                messageArgs={{
+                  entityType: intl.formatMessage(appMessages.entities[this.props.queryMessages.infotype].single),
+                }}
+              />
+            )
           }
-          { !dataReady &&
-            <Loading />
+          { !dataReady
+            && <Loading />
           }
-          { viewEntity && dataReady &&
-            <EntityView
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(viewEntity, isContributor),
-                  aside: this.getHeaderAsideFields(viewEntity, isContributor),
-                },
-                body: {
-                  main: this.getBodyMainFields(viewEntity, measures, reports, sdgtargets, measureTaxonomies, sdgtargetTaxonomies, isContributor, onEntityClick, sdgtargetConnections, measureConnections),
-                  aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
-                },
-              }}
-            />
+          { viewEntity && dataReady
+            && (
+              <EntityView
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(viewEntity, isContributor),
+                    aside: this.getHeaderAsideFields(viewEntity, isContributor),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(
+                      viewEntity,
+                      measures,
+                      reports,
+                      measureTaxonomies,
+                      isContributor,
+                      onEntityClick,
+                      measureConnections,
+                      recommendationsByFw,
+                      recommendationTaxonomies,
+                      recommendationConnections,
+                      frameworks,
+                    ),
+                    aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
+                  },
+                }}
+              />
+            )
           }
         </Content>
       </div>
@@ -240,16 +321,17 @@ IndicatorView.propTypes = {
   isContributor: PropTypes.bool,
   isManager: PropTypes.bool,
   measures: PropTypes.object,
-  sdgtargets: PropTypes.object,
   reports: PropTypes.object,
   measureTaxonomies: PropTypes.object,
-  sdgtargetTaxonomies: PropTypes.object,
   dates: PropTypes.object,
   params: PropTypes.object,
   measureConnections: PropTypes.object,
-  sdgtargetConnections: PropTypes.object,
   queryMessages: PropTypes.object,
   onDismissQueryMessages: PropTypes.func,
+  recommendationTaxonomies: PropTypes.object,
+  recommendationConnections: PropTypes.object,
+  recommendationsByFw: PropTypes.object,
+  frameworks: PropTypes.object,
 };
 
 IndicatorView.contextTypes = {
@@ -262,15 +344,16 @@ const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
-  sdgtargets: selectSdgTargets(state, props.params.id),
-  sdgtargetTaxonomies: selectSdgTargetTaxonomies(state),
   measures: selectMeasures(state, props.params.id),
   measureTaxonomies: selectMeasureTaxonomies(state),
+  recommendationsByFw: selectRecommendations(state, props.params.id),
+  recommendationTaxonomies: selectRecommendationTaxonomies(state),
   reports: selectReports(state, props.params.id),
   dates: selectDueDates(state, props.params.id),
   measureConnections: selectMeasureConnections(state),
-  sdgtargetConnections: selectSdgTargetConnections(state),
+  recommendationConnections: selectRecommendationConnections(state),
   queryMessages: selectQueryMessages(state),
+  frameworks: selectActiveFrameworks(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
