@@ -57,9 +57,8 @@ export const testEntityAssociation = (entity, associatedPath) => {
   // check for fw
   if (associatedPath.indexOf('_') > -1) {
     const path = associatedPath.split('_');
-    if (entity.getIn([`${path[0]}ByFw`, path[1]])) {
-      return entity.getIn([`${path[0]}ByFw`, path[1]]).size > 0;
-    }
+    const associations = entity.getIn([`${path[0]}ByFw`, parseInt(path[1], 10)]);
+    return associations && associations.size > 0;
   }
   return entity.get(associatedPath) && entity.get(associatedPath).size > 0;
 };
