@@ -2,6 +2,7 @@
   "projects": {
     "default": "sadata-dev",
     "dev": "sadata-dev",
-    "stage": "sadata-staging"
+    "stage": "sadata-staging",
+    "production": "sadata-production"
   }
 }
