@@ -28,7 +28,6 @@ import { PATHS } from 'containers/App/constants';
 
 import { updatePath } from 'containers/App/actions';
 
-import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 import { recover } from './actions';
@@ -77,7 +76,7 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
                 handleCancel={this.props.handleCancel}
                 labels={{ submit: intl.formatMessage(messages.submit) }}
                 fields={[
-                  getEmailField(intl.formatMessage, appMessages, '.email'),
+                  getEmailField(intl.formatMessage, '.email'),
                 ]}
               />
             )
