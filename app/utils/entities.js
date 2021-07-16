@@ -244,7 +244,6 @@ const entitySetAssociatedCategory = (
   categoryId,
 ) => {
   if (entityCategorised.get('categories')) {
-    console.log(entityCategorised.get('categories').toJS());
     const associationKey = entityCategorised.get('categories').findKey(
       (id) => qe(id, categoryId)
     );
