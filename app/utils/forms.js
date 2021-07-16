@@ -228,29 +228,41 @@ export const renderParentCategoryControl = (entities, label, activeParentId) => 
   }
   : null;
 
+const getAssociatedEntities = (entities) => entities
+  ? entities.reduce(
+    (entitiesAssociated, entity) => {
+      if (entity && entity.get('associated')) {
+        return entitiesAssociated.set(entity.get('id'), entity.get('associated'));
+      }
+      return entitiesAssociated;
+    },
+    Map(),
+  )
+  : Map();
+
 const getAssociatedCategories = (taxonomy) => taxonomy.get('categories')
   ? getAssociatedEntities(taxonomy.get('categories'))
   : Map();
 
-const getAssociatedEntities = (entities) => entities
-  ? entities.reduce((entitiesAssociated, entity) => entity.get('associated')
-    ? entitiesAssociated.set(entity.get('id'), entity.getIn(['associated', 'id']))
-    : entitiesAssociated,
-  Map())
-  : Map();
-
-export const getCategoryUpdatesFromFormData = ({ formData, taxonomies, createKey }) => taxonomies.reduce((updates, tax, taxId) => {
+export const getCategoryUpdatesFromFormData = ({
+  formData,
+  taxonomies,
+  createKey,
+}) => taxonomies.reduce((updates, tax, taxId) => {
   const formCategoryIds = getCheckedValuesFromOptions(formData.getIn(['associatedTaxonomies', taxId]));
 
   // store associated cats as { [cat.id]: [association.id], ... }
   // then we can use keys for creating new associations and values for deleting
   const associatedCategories = getAssociatedCategories(tax);
-
   return Map({
-    delete: updates.get('delete').concat(associatedCategories.reduce((associatedIds, associatedId, catId) => !formCategoryIds.includes(catId)
-      ? associatedIds.push(associatedId)
-      : associatedIds,
-    List())),
+    delete: updates.get('delete').concat(
+      associatedCategories.reduce(
+        (associatedIds, associatedId, catId) => !formCategoryIds.includes(catId)
+          ? associatedIds.push(associatedId)
+          : associatedIds,
+        List(),
+      )
+    ),
     create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) => !associatedCategories.has(catId)
       ? payloads.push(Map({
         category_id: catId,
@@ -276,15 +288,15 @@ export const getConnectionUpdatesFromFormData = ({
       formConnectionIds = getCheckedValuesFromOptions(formData.get(connectionAttribute));
     }
   }
-
   // store associated Actions as { [action.id]: [association.id], ... }
   const associatedConnections = getAssociatedEntities(connections);
-
   return Map({
-    delete: associatedConnections.reduce((associatedIds, associatedId, id) => !formConnectionIds.includes(id)
-      ? associatedIds.push(associatedId)
-      : associatedIds,
-    List()),
+    delete: associatedConnections.reduce(
+      (associatedIds, associatedId, id) => !formConnectionIds.includes(id)
+        ? associatedIds.push(associatedId)
+        : associatedIds,
+      List()
+    ),
     create: formConnectionIds.reduce(
       (payloads, id) => !associatedConnections.has(id)
         ? payloads.push(Map({
