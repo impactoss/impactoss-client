@@ -71,13 +71,13 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     if (this.props.dataReady && this.props.indicator) {
       this.props.initialiseForm('reportNew.form.data', this.getInitialFormData());
     }
   }
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();

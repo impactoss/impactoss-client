@@ -181,14 +181,14 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     this.state = STATE_INITIAL;
   }
   // make sure to load all data from server
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
   componentDidMount() {
     this.updateViewport();
     window.addEventListener('resize', this.resize);
   }
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();

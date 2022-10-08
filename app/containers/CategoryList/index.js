@@ -55,7 +55,7 @@ const Description = styled.p`
 export class CategoryList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   // make sure to load all data from server
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     // redirect to default taxonomy if needed
     if (this.props.dataReady && typeof this.props.taxonomy === 'undefined') {
@@ -66,7 +66,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         ).get('id'));
     }
   }
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();

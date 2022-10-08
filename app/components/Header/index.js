@@ -184,7 +184,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     super();
     this.state = STATE_INITIAL;
   }
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.setState(STATE_INITIAL);
   }
   componentDidMount() {
@@ -232,7 +232,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         <ScreenReaderOnly>
           <FormattedMessage {...appMessages.buttons.showSecondaryNavigation} />
         </ScreenReaderOnly>
-        <Icon name="menu" stroke />
+        <Icon name="menu" isStroke />
       </ShowSecondary>
       <NavSecondary
         visible={this.state.showSecondary}

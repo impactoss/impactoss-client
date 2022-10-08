@@ -7,7 +7,7 @@ import SVG from './SVG';
 
 class Icon extends React.PureComponent {
   render() {
-    const { name, title, size, sizes, palette, paletteIndex, color, iconSize, text, textRight, textLeft, stroke } = this.props;
+    const { name, title, size, sizes, palette, paletteIndex, color, iconSize, text, textRight, textLeft, isStroke } = this.props;
     const icon = icons[name];
 
     if (icon) {
@@ -25,7 +25,7 @@ class Icon extends React.PureComponent {
           text={text}
           textLeft={textLeft}
           textRight={textRight}
-          stroke={stroke}
+          isStroke={isStroke}
           sizes={sizes}
         >
           <title>{title || `Icon: ${name}`}</title>
@@ -48,7 +48,7 @@ Icon.propTypes = {
   text: PropTypes.bool,
   textLeft: PropTypes.bool,
   textRight: PropTypes.bool,
-  stroke: PropTypes.bool,
+  isStroke: PropTypes.bool,
   sizes: PropTypes.object,
 };
 Icon.defaultProps = {

@@ -161,14 +161,14 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     super(props);
     this.state = STATE_INITIAL;
   }
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
   componentDidMount() {
     this.updateViewport();
     window.addEventListener('resize', this.resize);
   }
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();

@@ -33,7 +33,7 @@ const mapTaxonomy = (tax, childTaxonomies, activeId, onLink) => {
       count: child.count,
       onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${child.get('id')}`),
       active: parseInt(activeId, 10) === parseInt(child.get('id'), 10),
-    })).toArray(),
+    })),
   });
 };
 
@@ -60,7 +60,8 @@ export const prepareTaxonomyGroups = (
       taxonomies: parentTaxonomies
         .filter((tax) => tax.get('frameworkIds').find((fw) => attributesEqual(fw, frameworkId)))
         .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
-        .toArray(),
+        .toList()
+        .toJS(),
     });
   } else {
     // multi-framework mode
@@ -74,7 +75,8 @@ export const prepareTaxonomyGroups = (
             taxFwIds.find((fwid) => attributesEqual(fwid, fw.get('id')));
         })
         .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
-        .toArray();
+        .toList()
+        .toJS();
       if (fwTaxonomies && fwTaxonomies.length > 0) {
         groups.push({
           id: fw.get('id'),
@@ -92,7 +94,8 @@ export const prepareTaxonomyGroups = (
           tax.get('frameworkIds').size > 1
         )
         .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
-        .toArray(),
+        .toList()
+        .toJS(),
     });
   }
 
@@ -106,7 +109,8 @@ export const prepareTaxonomyGroups = (
       id: 'measures',
       taxonomies: measureOnlyTaxonomies
         .map((tax) => mapTaxonomy(tax, taxonomies, activeId, onLink))
-        .toArray(),
+        .toList()
+        .toJS(),
     });
   }
   return groups;

@@ -128,7 +128,7 @@ class MultiSelect extends React.Component {
     this.handleClickOutside = this.handleClickOutside.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     // remember initial options
     this.setState({
       optionsInitial: this.props.options,
@@ -137,7 +137,7 @@ class MultiSelect extends React.Component {
     document.addEventListener('mousedown', this.handleClickOutside);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.panelId && (nextProps.panelId !== this.state.panelId)) {
       this.setState({
         optionsInitial: nextProps.options,

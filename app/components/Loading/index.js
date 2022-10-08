@@ -47,7 +47,7 @@ class Loading extends React.PureComponent { // eslint-disable-line react/prefer-
       ? setInterval(this.handleTimeout, ANIMATION_INTERVAL)
       : false;
   }
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.loadInterval && nextProps.progress >= 0) {
       this.resetTimer();
     }

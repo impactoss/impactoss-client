@@ -7,9 +7,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Perf from 'react-addons-perf';
 import ReactModal from 'react-modal';
-
+import GlobalStyle from 'global-styles';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import Header from 'components/Header';
@@ -63,12 +62,12 @@ const Main = styled.div`
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.validateToken();
     this.props.loadEntitiesIfNeeded();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -173,7 +172,6 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 
   render() {
-    window.Perf = Perf;
     const {
       pages,
       onPageLink,
@@ -236,6 +234,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             />
           </ReactModal>
         }
+        <GlobalStyle />
       </div>
     );
   }

@@ -5,7 +5,6 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ScrollContainer } from 'scrollmonitor-react';
 import { Map, List } from 'immutable';
 import styled from 'styled-components';
 
@@ -42,6 +41,12 @@ const ListEntities = styled.div``;
 const ListWrapper = styled.div``;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.ScrollContainer = React.createRef();
+    this.ScrollTarget = React.createRef();
+    this.ScrollReference = React.createRef();
+  }
   shouldComponentUpdate(nextProps) {
     if (nextProps.listUpdating) {
       return false;
@@ -63,9 +68,9 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
   }
   scrollToTop = () => {
     jumpToComponent(
-      this.ScrollTarget,
-      this.ScrollReference,
-      this.ScrollContainer
+      this.ScrollTarget.current,
+      this.ScrollReference.current,
+      this.ScrollContainer.current
     );
   }
 
@@ -173,8 +178,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     }
 
     return (
-      <ContainerWithSidebar innerRef={(node) => { this.ScrollContainer = node; }} >
-        <Container innerRef={(node) => { this.ScrollReference = node; }}>
+      <ContainerWithSidebar ref={this.ScrollContainer} >
+        <Container ref={this.ScrollReference}>
           <Content>
             <ContentHeader
               type={CONTENT_LIST}
@@ -185,10 +190,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
               sortAttributes={config.sorting}
               buttons={(dataReady && isUserSignedIn) ? header.actions : []}
             />
-            { (!dataReady || !this.props.scrollContainer) &&
-              <Loading />
-            }
-            { dataReady && this.props.scrollContainer &&
+            {!dataReady && <Loading />}
+            {dataReady && (
               <ListEntities>
                 <EntityListSearch>
                   <TagSearch
@@ -223,7 +226,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                   expanded={config.expandableColumns && expandNo === config.expandableColumns.length}
                   expandable={config.expandableColumns && config.expandableColumns.length > 0}
                 />
-                <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
+                <ListWrapper ref={this.ScrollTarget}>
                   <EntityListGroups
                     entities={entities}
                     errors={errors}
@@ -259,7 +262,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                   />
                 </ListWrapper>
               </ListEntities>
-            }
+            )}
           </Content>
         </Container>
       </ContainerWithSidebar>
@@ -309,5 +312,5 @@ EntityListMain.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default ScrollContainer(EntityListMain);
+export default EntityListMain;
 // export default EntityListMain;

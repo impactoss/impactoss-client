@@ -48,14 +48,6 @@ const MainInnerWrapper = styled(Component)`
 `;
 
 class EntityListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  shouldComponentUpdate(nextProps) {
-    return this.props.entity !== nextProps.entity
-      || this.props.isSelected !== nextProps.isSelected
-      || this.props.wrapper !== nextProps.wrapper
-      || this.props.error !== nextProps.error
-      || this.props.expandNo !== nextProps.expandNo;
-  }
-
   transformMessage = (type, msg) => {
     if (type === 'delete') {
       return this.context.intl
@@ -87,7 +79,6 @@ class EntityListItem extends React.PureComponent { // eslint-disable-line react/
       error,
       isConnection,
     } = this.props;
-
     return (
       <Styled expanded={expandNo > 0}>
         { error && error.map((updateError, i) => (

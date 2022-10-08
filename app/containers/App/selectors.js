@@ -89,7 +89,7 @@ export const selectSessionUserRoles = createSelector(
       where: { user_id: sessionUserId },
     })
     .map((role) => role.getIn(['attributes', 'role_id']))
-    .toArray()
+    .toList()
     : Map()
 );
 
@@ -235,7 +235,7 @@ export const selectLocation = createSelector(
 
 export const selectLocationQuery = createSelector(
   selectLocation,
-  (location) => location && location.get('query')
+  (location) => location.get && location.get('query')
 );
 
 // TODO consider replacing all "(state, locationQuery) => locationQuery" with selectLocationQuery

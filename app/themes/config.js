@@ -177,3 +177,6 @@ export const DB_TABLES = [
   'recommendation_indicators',
   'recommendation_recommendations',
 ];
+
+// database date format
+export const API_DATE_FORMAT = 'yyyy-MM-dd';

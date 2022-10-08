@@ -4,7 +4,7 @@ import { palette } from 'styled-theme';
 const SVG = styled.svg`
   fill: ${(props) => props.palette ? palette(props.paletteIndex) : 'currentColor'};
   stroke: ${(props) => {
-    if (props.stroke) {
+    if (props.isStroke) {
       return props.palette ? palette(props.paletteIndex) : 'currentColor';
     }
     return 'none';

@@ -6,15 +6,14 @@
  */
 
 // Needed for redux-saga es6 generator support
-import 'babel-polyfill';
+import '@babel/polyfill';
 
 // Import all the third party stuff
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { applyRouterMiddleware, Router, browserHistory } from 'react-router';
+import { Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
-import { useScroll } from 'react-router-scroll';
 import 'sanitize.css/sanitize.css';
 
 // Import root app
@@ -47,9 +46,6 @@ import configureStore from './store';
 
 // Import i18n messages
 import { translationMessages } from './i18n';
-
-// Import CSS reset and Global Styles
-import './global-styles';
 
 // Import root routes
 import createRoutes from './routes';
@@ -84,11 +80,6 @@ const render = (messages) => {
           <Router
             history={history}
             routes={rootRoute}
-            render={
-              // Scroll to top when going to a new page, imitating default browser
-              // behaviour
-              applyRouterMiddleware(useScroll())
-            }
           />
         </ThemeProvider>
       </LanguageProvider>
@@ -126,5 +117,12 @@ if (!window.Intl) {
 // it's not most important operation and if main code fails,
 // we do not want it installed
 if (process.env.NODE_ENV === 'production') {
-  require('offline-plugin/runtime').install(); // eslint-disable-line global-require
+  const runtime = require('offline-plugin/runtime'); // eslint-disable-line global-require
+  runtime.install({
+    onUpdateReady: () => {
+      // console.log('SW Event:', 'onUpdateReady');
+      // Tells to new SW to take control immediately
+      runtime.applyUpdate();
+    },
+  });
 }

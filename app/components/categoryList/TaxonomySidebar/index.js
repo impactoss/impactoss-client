@@ -58,7 +58,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
     super();
     this.state = STATE_INITIAL;
   }
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.setState(STATE_INITIAL);
   }
   componentDidMount() {

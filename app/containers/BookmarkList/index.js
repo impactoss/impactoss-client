@@ -141,7 +141,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
     this.state = STATE_INITIAL;
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
@@ -150,7 +150,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
     window.addEventListener('resize', this.resize);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();

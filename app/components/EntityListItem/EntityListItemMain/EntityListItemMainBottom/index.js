@@ -20,7 +20,6 @@ class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-l
 
   render() {
     const { connections, wrapper, user, targetDate } = this.props;
-
     return (
       <Styled>
         { connections && connections.length > 0 &&

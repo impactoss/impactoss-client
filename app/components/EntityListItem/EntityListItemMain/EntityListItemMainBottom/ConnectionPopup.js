@@ -139,19 +139,21 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
     super(props);
     this.state = {
       popupOpen: false,
-      popupRef: null,
       listItem_0: 0,
       listItem_1: 0,
       listItem_2: 0,
     };
+    this.PopupRef = React.createRef();
   }
 
   getPopupAlign = (wrapper, popupRef) => {
-    if (wrapper.getBoundingClientRect().right < (popupRef.getBoundingClientRect().right + (POPUP_WIDTH / 2))) {
-      return 'right';
-    }
-    if (wrapper.getBoundingClientRect().left > (popupRef.getBoundingClientRect().left - (POPUP_WIDTH / 2))) {
-      return 'left';
+    if (wrapper.getBoundingClientRect && popupRef.getBoundingClientRect) {
+      if (wrapper.getBoundingClientRect().right < (popupRef.getBoundingClientRect().right + (POPUP_WIDTH / 2))) {
+        return 'right';
+      }
+      if (wrapper.getBoundingClientRect().left > (popupRef.getBoundingClientRect().left - (POPUP_WIDTH / 2))) {
+        return 'left';
+      }
     }
     return 'center';
   }
@@ -176,23 +178,17 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
     const { entities, option, wrapper, draft } = this.props;
 
     const entitiesTotal = entities ? entities.size : 0;
-
     return (
       <PopupWrapper
-        onFocus={false}
         onMouseOver={() => this.openPopup()}
         onMouseLeave={() => this.closePopup()}
         onClick={() => this.state.popupOpen ? this.closePopup() : this.openPopup()}
-        innerRef={(node) => {
-          if (!this.state.popupRef) {
-            this.setState({ popupRef: node });
-          }
-        }}
+        ref={this.PopupRef}
       >
         <Count pIndex={option.style} draft={draft}>{entitiesTotal}</Count>
         {this.state.popupOpen &&
           <Popup
-            align={this.getPopupAlign(wrapper, this.state.popupRef)}
+            align={this.getPopupAlign(wrapper.current, this.PopupRef.current)}
             total={entitiesTotal}
           >
             <PopupInner>
@@ -232,7 +228,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
                 }
               </PopupContent>
             </PopupInner>
-            <TriangleBottom align={this.getPopupAlign(wrapper, this.state.popupRef)} />
+            <TriangleBottom align={this.getPopupAlign(wrapper.current, this.PopupRef.current)} />
           </Popup>
         }
       </PopupWrapper>

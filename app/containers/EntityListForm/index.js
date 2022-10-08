@@ -49,11 +49,11 @@ const FormWrapper = styled.div`
 
 class EntityListForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.initialiseForm(this.props.model, this.props.formOptions.options);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
      // Todo this is not efficent, parent component is creating a new map every time so we can't hashCode compare :(
     if (!isEqual(nextProps.formOptions.options, this.props.formOptions.options)) {
       this.props.initialiseForm(nextProps.model, nextProps.formOptions.options);

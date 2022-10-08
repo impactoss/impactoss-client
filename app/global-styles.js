@@ -1,7 +1,7 @@
-import { injectGlobal } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 
 /* eslint no-unused-expressions: 0 */
-injectGlobal`
+const GlobalStyle = createGlobalStyle`
 
   html,
   body {
@@ -193,3 +193,6 @@ injectGlobal`
     display: inline-block;
   }
 `;
+
+
+export default GlobalStyle;

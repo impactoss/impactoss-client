@@ -71,7 +71,7 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.setState({ errors: [] });
   }
   onDismissErrors = (evt) => {

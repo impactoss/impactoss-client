@@ -83,14 +83,14 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     if (this.props.dataReady && this.props.viewEntity) {
       this.props.initialiseForm('recommendationEdit.form.data', this.getInitialFormData());
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();

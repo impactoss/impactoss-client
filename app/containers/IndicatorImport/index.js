@@ -45,12 +45,12 @@ import { save, resetForm } from './actions';
 import { FORM_INITIAL } from './constants';
 
 export class IndicatorImport extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (this.props.dataReady) {
       this.props.initialiseForm('indicatorImport.form.data', FORM_INITIAL);
     }
   }
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
