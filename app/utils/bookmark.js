@@ -7,32 +7,28 @@ const EXCLUDES = [
   'page',
 ];
 
-const getPathFromLocation = (location) =>
-  location.get('pathname').replace('/', '');
+const getPathFromLocation = (location) => location.get('pathname').replace('/', '');
 
-const getBookmarksForPath = (bookmarks, path) =>
-  bookmarks.filter(
-    (b) => b.getIn(['attributes', 'view', 'path']) === path,
-  );
+const getBookmarksForPath = (bookmarks, path) => bookmarks.filter(
+  (b) => b.getIn(['attributes', 'view', 'path']) === path,
+);
 
-const filterQueryForChecking = (query) =>
-  List(EXCLUDES).reduce(
-    (memo, arg) => memo.delete(arg),
-    query,
-  );
-const filterQueryForSaving = (query) =>
-  List(EXCLUDES).reduce(
-    (memo, arg) => memo.delete(arg),
-    query,
-  );
+const filterQueryForChecking = (query) => List(EXCLUDES).reduce(
+  (memo, arg) => memo.delete(arg),
+  query,
+);
+const filterQueryForSaving = (query) => List(EXCLUDES).reduce(
+  (memo, arg) => memo.delete(arg),
+  query,
+);
 
 const checkValues = (valueCheck, value) => {
   if (List.isList(valueCheck) && List.isList(value)) {
-    return valueCheck.isSubset(value) &&
-      valueCheck.isSuperset(value);
-  } else if (List.isList(valueCheck) && !List.isList(value)) {
+    return valueCheck.isSubset(value)
+      && valueCheck.isSuperset(value);
+  } if (List.isList(valueCheck) && !List.isList(value)) {
     return false;
-  } else if (!List.isList(valueCheck) && List.isList(value)) {
+  } if (!List.isList(valueCheck) && List.isList(value)) {
     return false;
   }
   return valueCheck === value;
@@ -48,9 +44,9 @@ export const getBookmarkForLocation = (location, bookmarks) => {
     (bookmark) => {
       const queryBM = bookmark.getIn(['attributes', 'view', 'query']);
       return queryCheck.every(
-          (valueCheck, key) => checkValues(valueCheck, queryBM.get(key))
-        ) &&
-        queryBM.every(
+        (valueCheck, key) => checkValues(valueCheck, queryBM.get(key))
+      )
+        && queryBM.every(
           (valueCheck, key) => checkValues(valueCheck, queryCheck.get(key))
         );
     }

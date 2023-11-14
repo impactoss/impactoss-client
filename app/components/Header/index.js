@@ -11,12 +11,14 @@ import {
   SHOW_HEADER_TITLE,
   SHOW_HEADER_PATTERN,
   SHOW_BRAND_ON_HOME,
+  TEXT_TRUNCATE,
 } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
+import PrintHide from 'components/styled/PrintHide';
 
 import Logo from './Logo';
 import Banner from './Banner';
@@ -54,29 +56,37 @@ const Styled = styled.div`
   }}px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     height:${(props) => {
-      if (props.hasBrand) {
-        if (props.hasNav) {
-          return props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height;
-        }
-        return props.theme.sizes.header.banner.height;
+    if (props.hasBrand) {
+      if (props.hasNav) {
+        return props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height;
       }
-      return 0;
-    }}px;
+      return props.theme.sizes.header.banner.height;
+    }
+    return 0;
+  }}px;
   }
   background-color: ${(props) => props.hasBackground ? palette('header', 0) : 'transparent'};
   box-shadow: ${(props) => props.hasShadow ? '0px 0px 15px 0px rgba(0,0,0,0.5)' : 'none'};
   z-index: 101;
+  @media print {
+    display: ${({ isHome }) => isHome ? 'none' : 'block'};
+    height: ${({ theme }) => theme.sizes.header.banner.height}px;
+    position: static;
+    box-shadow: none;
+    background: white;
+  }
 `;
 const HomeNavWrap = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  wdith: 100%;
+  width: 100%;
   z-index: 101;
+  color: ${palette('headerBrand', 0)};
 `;
 
-const NavSecondary = styled.div`
+const NavSecondary = styled(PrintHide)`
   display: ${(props) => props.visible ? 'block' : 'none'};
   position: fixed;
   top: 0;
@@ -118,26 +128,44 @@ const HideSecondaryWrap = styled.div`
 const HideSecondary = styled(Button)``;
 
 const LinkSuperTitle = styled.div`
-  font-size: 12px;
+  font-size: ${(props) => props.theme.sizes.text.smallMobile};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: ${(props) => props.theme.sizes.text.smaller};
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 const LinkTitle = styled.div`
-  font-size: 16px;
+  font-size: ${(props) => props.theme.sizes.text.small};
   font-weight: bold;
   color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: ${(props) => props.theme.sizes.text.default};
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 const SelectFrameworks = styled(LinkMain)`
-  min-width: ${({ theme }) => theme.sizes.aside.width.small}px;
+  display: none;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: inline-block;
+    min-width: ${({ theme }) => theme.sizes.aside.width.small}px;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     min-width: ${({ theme }) => theme.sizes.aside.width.large}px;
   }
 `;
 const Search = styled(LinkMain)`
+  display: none;
   color: ${(props) => props.active ? palette('headerNavMainItem', 1) : palette('headerNavMainItem', 0)};
   &:hover {
     color:${palette('headerNavMainItemHover', 0)};
   }
   padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: inline-block;
     min-width: auto;
     padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px 0;
     position: absolute;
@@ -150,12 +178,15 @@ const Search = styled(LinkMain)`
   }
 `;
 
-const FrameworkOptions = styled.div`
-  position: absolute;
-  top: 100%;
-  left: 0;
-  display: block;
-  min-width: ${({ theme }) => theme.sizes.aside.width.small}px;
+const FrameworkOptions = styled(PrintHide)`
+  display: none;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    display: block;
+    min-width: ${({ theme }) => theme.sizes.aside.width.small}px;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     min-width: ${({ theme }) => theme.sizes.aside.width.large}px;
   }
@@ -183,29 +214,61 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
   constructor() {
     super();
     this.state = STATE_INITIAL;
+    this.fwWrapperRef = React.createRef();
+    this.fwButtonRef = React.createRef();
+    this.handleClickOutside = this.handleClickOutside.bind(this);
   }
-  componentWillMount() {
+
+  UNSAFE_componentWillMount() {
     this.setState(STATE_INITIAL);
   }
+
   componentDidMount() {
     window.addEventListener('resize', this.resize);
+    window.addEventListener('mousedown', this.handleClickOutside);
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resize);
+    window.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
+  /**
+   * Alert if clicked on outside of element
+   * after https://stackoverflow.com/questions/32553158/detect-click-outside-react-component
+   */
+  handleClickOutside = (evt) => {
+    const wrapperContains = this.fwWrapperRef
+      && this.fwWrapperRef.current
+      && this.fwWrapperRef.current.contains(evt.target);
+    const buttonContains = this.fwButtonRef
+      && this.fwButtonRef.current
+      && this.fwButtonRef.current.contains(evt.target);
+    if (!wrapperContains && !buttonContains) {
+      this.setState({ showFrameworks: false });
+    }
+  }
+
   onShowSecondary = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ showSecondary: true });
   };
+
   onHideSecondary = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ showSecondary: false });
   };
+
   onShowFrameworks = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ showFrameworks: true });
   };
+
   onHideFrameworks = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ showFrameworks: false });
   };
+
   onClick = (evt, path, currentPath) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     if (currentPath) {
@@ -218,13 +281,15 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       this.props.onPageLink(path);
     }
   }
+
   resize = () => {
     // reset
     this.setState(STATE_INITIAL);
     this.forceUpdate();
   };
+
   renderSecondary = (navItemsAdmin) => (
-    <div>
+    <PrintHide>
       <ShowSecondary
         visible={!this.state.showSecondary}
         onClick={this.onShowSecondary}
@@ -232,7 +297,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         <ScreenReaderOnly>
           <FormattedMessage {...appMessages.buttons.showSecondaryNavigation} />
         </ScreenReaderOnly>
-        <Icon name="menu" stroke />
+        <Icon name="menu" hasStroke />
       </ShowSecondary>
       <NavSecondary
         visible={this.state.showSecondary}
@@ -261,23 +326,25 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
           }}
           currentPath={this.props.currentPath}
         />
-        { navItemsAdmin &&
-          <NavAdmin>
-            { navItemsAdmin.map((item, i) => (
-              <LinkAdmin
-                key={i}
-                href={item.path}
-                active={item.active}
-                onClick={(evt) => {
-                  evt.stopPropagation();
-                  this.onHideSecondary();
-                  this.onClick(evt, item.path);
-                }}
-              >
-                {item.title}
-              </LinkAdmin>
-            ))}
-          </NavAdmin>
+        { navItemsAdmin
+          && (
+            <NavAdmin>
+              { navItemsAdmin.map((item, i) => (
+                <LinkAdmin
+                  key={i}
+                  href={item.path}
+                  active={item.active}
+                  onClick={(evt) => {
+                    evt.stopPropagation();
+                    this.onHideSecondary();
+                    this.onClick(evt, item.path);
+                  }}
+                >
+                  {item.title}
+                </LinkAdmin>
+              ))}
+            </NavAdmin>
+          )
         }
         <NavPages>
           { this.props.pages && this.props.pages.map((page, i) => (
@@ -292,8 +359,9 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
           ))}
         </NavPages>
       </NavSecondary>
-    </div>
+    </PrintHide>
   );
+
   render() {
     const {
       isHome,
@@ -301,16 +369,17 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       onSelectFramework,
       search,
     } = this.props;
+    const { intl } = this.context;
     const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
     const navItemsAdmin = filter(this.props.navItems, (item) => item.isAdmin);
 
-    const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
+    const appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
 
-    const currentFrameworkOption =
-      frameworkOptions &&
-      frameworkOptions.find((option) => option.active);
+    const currentFrameworkOption = frameworkOptions
+      && frameworkOptions.find((option) => option.active);
     return (
       <Styled
+        isHome={isHome}
         fixed={isHome}
         sticky={!isHome}
         hasBackground={!isHome}
@@ -319,7 +388,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         hasBrand={SHOW_BRAND_ON_HOME || !isHome}
       >
         {this.state.showFrameworks && (
-          <FrameworkOptions>
+          <FrameworkOptions ref={this.fwWrapperRef}>
             {frameworkOptions && frameworkOptions.map((option) => (
               <FrameworkOption
                 key={option.value}
@@ -334,22 +403,24 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             ))}
           </FrameworkOptions>
         )}
-        { !SHOW_BRAND_ON_HOME && isHome &&
-          <HomeNavWrap>
-            { this.renderSecondary(navItemsAdmin) }
-          </HomeNavWrap>
+        { !SHOW_BRAND_ON_HOME && isHome
+          && (
+            <HomeNavWrap>
+              { this.renderSecondary(navItemsAdmin) }
+            </HomeNavWrap>
+          )
         }
-        { (SHOW_BRAND_ON_HOME || !isHome) &&
+        {(SHOW_BRAND_ON_HOME || !isHome) && (
           <Banner
             showPattern={(!isHome && SHOW_HEADER_PATTERN)}
           >
             <Brand
-              href={'/'}
+              href="/"
               onClick={(evt) => this.onClick(evt, '/')}
               title={appTitle}
             >
               <Logo src={this.props.theme.media.headerLogo} alt={appTitle} />
-              { SHOW_HEADER_TITLE &&
+              {SHOW_HEADER_TITLE && (
                 <BrandText>
                   <BrandTitle>
                     <FormattedMessage {...appMessages.app.title} />
@@ -358,32 +429,36 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                     <FormattedMessage {...appMessages.app.claim} />
                   </BrandClaim>
                 </BrandText>
-              }
+              )}
             </Brand>
-            { this.renderSecondary(navItemsAdmin) }
+            {this.renderSecondary(navItemsAdmin)}
           </Banner>
-        }
-        { !isHome &&
+        )}
+        {!isHome && (
           <NavMain hasBorder>
             <SelectFrameworks
               as="button"
-              onClick={(evt) =>
-                this.state.showFrameworks
+              ref={this.fwButtonRef}
+              onClick={(evt) => this.state.showFrameworks
                 ? this.onHideFrameworks(evt)
                 : this.onShowFrameworks(evt)
               }
             >
               <LinkSuperTitle>
-                {this.context.intl.formatMessage(appMessages.frameworks.single)}
+                {intl.formatMessage(appMessages.frameworks.single)}
               </LinkSuperTitle>
               {currentFrameworkOption && (
                 <LinkTitle active>
-                  {truncateText(currentFrameworkOption.label, 30, false)}
+                  {truncateText(
+                    currentFrameworkOption.label,
+                    TEXT_TRUNCATE.FW_SELECT,
+                    false,
+                  )}
                   {!this.state.showFrameworks && (
-                    <Icon name="dropdownOpen" text textRight size={'1em'} />
+                    <Icon name="dropdownOpen" text textRight size="1em" />
                   )}
                   {this.state.showFrameworks && (
-                    <Icon name="dropdownClose" text textRight size={'1em'} />
+                    <Icon name="dropdownClose" text textRight size="1em" />
                   )}
                 </LinkTitle>
               )}
@@ -411,13 +486,13 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 icon={search.icon}
               >
                 {search.title}
-                {search.icon &&
-                  <Icon title={search.title} name={search.icon} text textRight size={'1em'} />
+                {search.icon
+                && <Icon title={search.title} name={search.icon} text textRight size="1em" />
                 }
               </Search>
             )}
           </NavMain>
-        }
+        )}
       </Styled>
     );
   }

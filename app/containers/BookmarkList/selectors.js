@@ -13,8 +13,7 @@ import { CONFIG } from './constants';
 
 export const selectTypeQuery = createSelector(
   selectLocationQuery,
-  (locationQuery) =>
-    locationQuery && locationQuery.get('type')
+  (locationQuery) => locationQuery && locationQuery.get('type')
 );
 
 // kicks off series of cascading selectors

@@ -12,8 +12,6 @@ import ButtonTagCategoryInverse from 'components/buttons/ButtonTagCategoryInvers
 import { truncateText } from 'utils/string';
 import { TEXT_TRUNCATE } from 'themes/config';
 
-import TagGroup from './TagGroup';
-
 const SmartGroup = styled.div`
   display: inline-block;
   margin-right: 0.5em;
@@ -21,43 +19,54 @@ const SmartGroup = styled.div`
   border-right: ${(props) => props.border ? '1px solid' : 'none'};
   border-right-color: ${palette('light', 3)};
 `;
-
-const MyButtonTagCategory = styled(ButtonTagCategory)``;
-
-const MyButtonTagCategoryInverse = styled(ButtonTagCategoryInverse)``;
+const Styled = styled.div`
+  width: 100%;
+  display: block;
+  padding-top: 3px;
+  margin-top: 8px;
+  @media print {
+    padding-top: 2px;
+    margin-top: 3px;
+  }
+`;
+// border-top-color:;
 
 class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   getEntityTags = (categories, taxonomies, onClick) => {
     const tags = [];
     if (categories) {
       taxonomies
-      .filter((tax) => !tax.getIn(['attributes', 'is_smart']))
-      .forEach((tax) => {
-        tax
-        .get('categories')
-        .sortBy((category) => category.getIn(['attributes', 'draft']))
-        .forEach((category, catId) => {
-          if (categories.includes(parseInt(catId, 10))) {
-            const label = (category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
-              ? category.getIn(['attributes', 'short_title'])
-              : category.getIn(['attributes', 'title']));
-            tags.push({
-              taxId: tax.get('id'),
-              title: category.getIn(['attributes', 'title']),
-              inverse: category.getIn(['attributes', 'draft']),
-              label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG),
-              onClick: () => onClick(catId, 'category'),
+        .filter((tax) => !tax.getIn(['attributes', 'is_smart']))
+        .sortBy((tax) => tax.getIn(['attributes', 'priority']))
+        .forEach((tax) => {
+          tax
+            .get('categories')
+            .sortBy((category) => category.getIn(['attributes', 'draft']))
+            .forEach((category, catId) => {
+              if (categories.includes(parseInt(catId, 10))) {
+                const label = (category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
+                  ? category.getIn(['attributes', 'short_title'])
+                  : category.getIn(['attributes', 'title']));
+                tags.push({
+                  taxId: tax.get('id'),
+                  title: category.getIn(['attributes', 'title']),
+                  inverse: category.getIn(['attributes', 'draft']),
+                  label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG, categories.size < 5),
+                  onClick: () => onClick(catId, 'category'),
+                });
+              }
             });
-          }
         });
-      });
     }
     return tags;
   };
-  getSmartTitle = (title, isSmart) => this.context.intl
-    ? `${title}: ${this.context.intl.formatMessage(isSmart ? appMessages.labels.smart.met : appMessages.labels.smart.notMet)}`
-    : title;
+
+  getSmartTitle = (title, isSmart) => {
+    const { intl } = this.context;
+    return intl
+      ? `${title}: ${intl.formatMessage(isSmart ? appMessages.labels.smart.met : appMessages.labels.smart.notMet)}`
+      : title;
+  };
 
   getEntitySmartTags = (categories, smartTaxonomy, onClick) => {
     const tags = [];
@@ -72,7 +81,7 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
           taxId: smartTaxonomy.get('id'),
           title: this.getSmartTitle(category.getIn(['attributes', 'title']), isSmart),
           isSmart,
-          label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG),
+          label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG, false),
           onClick: () => onClick(catId, 'category'),
         });
       });
@@ -86,12 +95,12 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
     const entityTags = this.getEntityTags(categories, taxonomies, onEntityClick);
 
     return (
-      <TagGroup>
-        <span>
-          { smartTaxonomy &&
+      <Styled>
+        { smartTaxonomy
+          && (
             <SmartGroup border={entityTags && entityTags.length > 0}>
-              { this.getEntitySmartTags(categories, smartTaxonomy, onEntityClick).map((tag, i) =>
-                <MyButtonTagCategory
+              { this.getEntitySmartTags(categories, smartTaxonomy, onEntityClick).map((tag, i) => (
+                <ButtonTagCategory
                   key={i}
                   onClick={tag.onClick}
                   taxId={parseInt(tag.taxId, 10)}
@@ -100,36 +109,35 @@ class EntityListItemMainBottomTaxonomies extends React.PureComponent { // eslint
                   isSmart={tag.isSmart}
                 >
                   {tag.label}
-                </MyButtonTagCategory>
-              )}
+                </ButtonTagCategory>
+              ))}
             </SmartGroup>
-          }
-          { entityTags.map((tag, i) => tag.inverse
-            ? (
-              <MyButtonTagCategoryInverse
-                key={i}
-                onClick={tag.onClick}
-                taxId={parseInt(tag.taxId, 10)}
-                disabled={!tag.onClick}
-                title={tag.title}
-              >
-                {tag.label}
-              </MyButtonTagCategoryInverse>
-            )
-            : (
-              <MyButtonTagCategory
-                key={i}
-                onClick={tag.onClick}
-                taxId={parseInt(tag.taxId, 10)}
-                disabled={!tag.onClick}
-                title={tag.title}
-              >
-                {tag.label}
-              </MyButtonTagCategory>
-            )
-          )}
-        </span>
-      </TagGroup>
+          )
+        }
+        { entityTags.map((tag, i) => tag.inverse
+          ? (
+            <ButtonTagCategoryInverse
+              key={i}
+              onClick={tag.onClick}
+              taxId={parseInt(tag.taxId, 10)}
+              disabled={!tag.onClick}
+              title={tag.title}
+            >
+              {tag.label}
+            </ButtonTagCategoryInverse>
+          )
+          : (
+            <ButtonTagCategory
+              key={i}
+              onClick={tag.onClick}
+              taxId={parseInt(tag.taxId, 10)}
+              disabled={!tag.onClick}
+              title={tag.title}
+            >
+              {tag.label}
+            </ButtonTagCategory>
+          ))}
+      </Styled>
     );
   }
 }

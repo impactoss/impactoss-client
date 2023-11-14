@@ -16,9 +16,8 @@ import {
   filterEntitiesByConnection,
   filterEntitiesByCategories,
   filterEntitiesWithoutAssociation,
-  attributesEqual,
 } from 'utils/entities';
-
+import { qe } from 'utils/quasi-equals';
 import { sortEntities, getSortOption } from 'utils/sort';
 
 import { CONFIG } from './constants';
@@ -31,26 +30,38 @@ const selectUsersNested = createSelector(
   }),
   (state) => selectEntities(state, 'user_categories'),
   (state) => selectEntities(state, 'user_roles'),
-  (entities, entityCategories, entityRoles) =>
-    entities.map((entity) => {
-      const entityRoleIds = entityRoles
-        .filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
-        .map((association) => association.getIn(['attributes', 'role_id']));
-      const entityHighestRoleId = entityRoleIds.reduce((memo, roleId) => roleId < memo ? roleId : memo, USER_ROLES.DEFAULT.value);
-      return entity
-        .set(
-          'categories',
-          entityCategories
-          .filter((association) => attributesEqual(association.getIn(['attributes', 'user_id']), entity.get('id')))
-          .map((association) => association.getIn(['attributes', 'category_id']))
+  (entities, entityCategories, entityRoles) => entities.map(
+    (entity) => {
+      const entityRoleIds = entityRoles.filter(
+        (association) => qe(
+          association.getIn(['attributes', 'user_id']),
+          entity.get('id')
         )
-        .set(
-          'roles',
-          entityHighestRoleId !== USER_ROLES.DEFAULT.value
-            ? Map({ 0: entityHighestRoleId })
-            : Map()
-        );
-    })
+      ).map(
+        (association) => association.getIn(['attributes', 'role_id'])
+      );
+      const entityHighestRoleId = entityRoleIds.reduce(
+        (memo, roleId) => roleId < memo ? roleId : memo,
+        USER_ROLES.DEFAULT.value,
+      );
+      return entity.set(
+        'categories',
+        entityCategories.filter(
+          (association) => qe(
+            association.getIn(['attributes', 'user_id']),
+            entity.get('id')
+          )
+        ).map(
+          (association) => association.getIn(['attributes', 'category_id'])
+        )
+      ).set(
+        'roles',
+        entityHighestRoleId !== USER_ROLES.DEFAULT.value
+          ? Map({ 0: entityHighestRoleId })
+          : Map()
+      );
+    }
+  )
 );
 const selectUsersWithout = createSelector(
   selectUsersNested,

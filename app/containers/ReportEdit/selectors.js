@@ -6,16 +6,13 @@ import {
   selectFWIndicators,
 } from 'containers/App/selectors';
 
-import {
-  entitySetUser,
-  attributesEqual,
-} from 'utils/entities';
-
+import { entitySetUser } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 import { sortEntities } from 'utils/sort';
 
 export const selectDomain = createSelector(
   (state) => state.get('reportEdit'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export const selectViewEntity = createSelector(
@@ -25,13 +22,25 @@ export const selectViewEntity = createSelector(
   (state) => selectEntities(state, 'due_dates'),
   (entity, users, indicators, dates) => {
     if (entity) {
-      let indicatorAssociated = indicators
-        .find((indicator) => attributesEqual(entity.getIn(['attributes', 'indicator_id']), indicator.get('id')));
+      let indicatorAssociated = indicators.find(
+        (indicator) => qe(
+          entity.getIn(['attributes', 'indicator_id']),
+          indicator.get('id')
+        )
+      );
       // reports should alwasy have an indicator but checking here just in case (eg report is )
-      const indicatorDates = indicatorAssociated && dates
-        .filter((date) => attributesEqual(date.getIn(['attributes', 'indicator_id']), indicatorAssociated.get('id')));
-      indicatorAssociated = indicatorDates && indicatorAssociated && indicatorAssociated
-        .set('dates', sortEntities(indicatorDates, 'asc', 'due_date', 'date'));
+      const indicatorDates = indicatorAssociated && dates.filter(
+        (date) => qe(
+          date.getIn(['attributes', 'indicator_id']),
+          indicatorAssociated.get('id')
+        )
+      );
+      indicatorAssociated = indicatorDates
+        && indicatorAssociated
+        && indicatorAssociated.set(
+          'dates',
+          sortEntities(indicatorDates, 'asc', 'due_date', 'date')
+        );
       return entitySetUser(entity.set('indicator', indicatorAssociated), users);
     }
     return entity;

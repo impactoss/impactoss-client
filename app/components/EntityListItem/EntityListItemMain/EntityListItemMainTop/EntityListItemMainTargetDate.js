@@ -4,34 +4,36 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import Icon from 'components/Icon';
-import BottomIconWrap from './BottomIconWrap';
+import IconWrap from './IconWrap';
 
 const Styled = styled.span`
+  float: left;
   display: inline-block;
-  margin-right: 1em;
+  margin-left: 1em;
   color: ${palette('text', 1)};
-  margin-bottom: 3px;
-  margin-top: 3px;
+  margin-top: -2px;
   &:last-child: {
     margin-right: 0;
   }
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemBottom};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.listItemBottom};
+  }
 `;
 
-const DateWrap = styled.span`
-  vertical-align: bottom;
-`;
+const DateWrap = styled.span``;
 
-export default class EntityListItemMainBottomTargetDate extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export default class EntityListItemMainTargetDate extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     targetDate: PropTypes.string.isRequired,
   };
+
   render() {
     return (
       <Styled>
-        <BottomIconWrap>
+        <IconWrap>
           <Icon name="calendar" text />
-        </BottomIconWrap>
+        </IconWrap>
         <DateWrap>
           {this.props.targetDate}
         </DateWrap>

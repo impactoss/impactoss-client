@@ -24,6 +24,9 @@ const Title = styled.div`
   display: table-cell;
   width: 99%;
   vertical-align: middle;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 const CloseWrap = styled.div`
   display: table-cell;
@@ -36,10 +39,12 @@ const Header = (props) => (
     <Title>
       { props.title }
     </Title>
-    { props.onCancel &&
-      <CloseWrap>
-        <Close onCancel={props.onCancel} />
-      </CloseWrap>
+    { props.onCancel
+      && (
+        <CloseWrap>
+          <Close onCancel={props.onCancel} />
+        </CloseWrap>
+      )
     }
   </Styled>
 );

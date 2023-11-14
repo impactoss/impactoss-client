@@ -11,6 +11,9 @@ const FieldGroupLabel = styled.div`
   font-size: ${(props) => props.theme.sizes.text.small};
   margin-bottom: ${(props) => props.basic ? 0 : 20}px;
   width: 100%;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 
 export default FieldGroupLabel;

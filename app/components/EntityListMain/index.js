@@ -5,12 +5,13 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ScrollContainer } from 'scrollmonitor-react';
 import { Map, List } from 'immutable';
 import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
 import { jumpToComponent } from 'utils/scroll-to-component';
 import { lowerCase } from 'utils/string';
+import { qe } from 'utils/quasi-equals';
 
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
@@ -18,6 +19,7 @@ import Content from 'components/styled/Content';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
+import PrintOnly from 'components/styled/PrintOnly';
 
 import { CONTENT_LIST, PARAMS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -40,8 +42,20 @@ const EntityListSearch = styled.div`
 
 const ListEntities = styled.div``;
 const ListWrapper = styled.div``;
+const PrintHintKey = styled(PrintOnly)`
+  font-style: italic;
+  font-size: ${(props) => props.theme.sizes.print.smaller};
+  margin-bottom: 20px;
+`;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.ScrollContainer = React.createRef();
+    this.ScrollTarget = React.createRef();
+    this.ScrollReference = React.createRef();
+  }
+
   shouldComponentUpdate(nextProps) {
     if (nextProps.listUpdating) {
       return false;
@@ -53,19 +67,14 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       || this.props.entityIdsSelected !== nextProps.entityIdsSelected
       || this.props.dataReady !== nextProps.dataReady
       || this.props.locationQuery !== nextProps.locationQuery
-      || this.props.errors !== nextProps.errors
-      || typeof this.props.scrollContainer !== typeof nextProps.scrollContainer;
+      || this.props.errors !== nextProps.errors;
   }
-  componentDidUpdate() {
-    if (this.props.scrollContainer) {
-      this.props.scrollContainer.recalculateLocations();
-    }
-  }
+
   scrollToTop = () => {
     jumpToComponent(
-      this.ScrollTarget,
-      this.ScrollReference,
-      this.ScrollContainer
+      this.ScrollTarget.current,
+      this.ScrollReference.current,
+      this.ScrollContainer.current
     );
   }
 
@@ -76,7 +85,6 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       entityTitle,
       dataReady,
       isManager,
-      isUserSignedIn,
       isContributor,
       onGroupSelect,
       onSubgroupSelect,
@@ -85,6 +93,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       onResetFilters,
       onTagClick,
       taxonomies,
+      allTaxonomies,
       connections,
       connectedTaxonomies,
       locationQuery,
@@ -92,20 +101,23 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       entities,
       errors,
       frameworks,
+      onDismissAllErrors,
     } = this.props;
+    const { intl } = this.context;
     const expandNo = config.expandableColumns && locationQuery.get('expand')
       ? parseInt(locationQuery.get('expand'), 10)
       : 0;
 
     let groupSelectValue = locationQuery.get('group');
-    const groupforFramework =
-      config.taxonomies &&
-      config.taxonomies.defaultGroupsByFramework &&
-      frameworks &&
-      frameworks.size === 1;
+    const groupforFramework = config.taxonomies
+      && config.taxonomies.defaultGroupsByFramework
+      && frameworks
+      && frameworks.size === 1;
     if (config.taxonomies && !groupSelectValue) {
       if (groupforFramework) {
+        /* eslint-disable prefer-destructuring */
         groupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][1];
+        /* eslint-enable prefer-destructuring */
       } else {
         groupSelectValue = getGroupValue(
           taxonomies,
@@ -118,16 +130,18 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     let subgroupSelectValue;
     if (groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET) {
       subgroupSelectValue = locationQuery.get('subgroup');
-      if (config.taxonomies) {
-        if (groupforFramework) {
-          subgroupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][2];
-        } else {
-          subgroupSelectValue = getGroupValue(
-            taxonomies,
-            config.taxonomies.defaultGroupAttribute,
-            2,
-          );
-        }
+      if (
+        config.taxonomies
+        && !subgroupSelectValue
+        && groupforFramework
+        && qe(
+          groupSelectValue,
+          config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][1],
+        )
+      ) {
+        /* eslint-disable prefer-destructuring */
+        subgroupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][2];
+        /* eslint-enable prefer-destructuring */
       }
     }
 
@@ -136,9 +150,10 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       : entityTitle.plural;
 
     // group all entities, regardless of page items
-    const entityGroups =
-      groupSelectValue &&
-      groupSelectValue !== PARAMS.GROUP_RESET
+    const entityGroups = groupSelectValue
+      && taxonomies
+      && taxonomies.get(groupSelectValue)
+      && groupSelectValue !== PARAMS.GROUP_RESET
       ? groupEntities(
         entities,
         taxonomies,
@@ -146,35 +161,35 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
         config,
         groupSelectValue,
         subgroupSelectValue !== PARAMS.GROUP_RESET && subgroupSelectValue,
-        this.context.intl || null,
+        intl || null,
         frameworks,
       )
       : null;
 
     let subtitle = null;
-    if (dataReady && entityGroups && groupSelectValue && this.context.intl) {
+    if (dataReady && entityGroups && groupSelectValue && intl) {
       const isPlural = entityGroups.size !== 1;
       // disable broken support for connectedTaxonomies
       // let taxId = groupSelectValue;
       // if (taxId.indexOf('x:') > -1 && taxId.split(':').length > 1) {
       //   taxId = taxId.split(':')[1];
       // }
-      subtitle = this.context.intl.formatMessage(messages.groupSubtitle, {
+      subtitle = intl.formatMessage(messages.groupSubtitle, {
         size: entityGroups.size,
         type:
           lowerCase(
-            this.context.intl.formatMessage(
+            intl.formatMessage(
               isPlural
-                ? appMessages.entities.taxonomies[groupSelectValue].single
-                : appMessages.entities.taxonomies[groupSelectValue].plural
+                ? appMessages.entities.taxonomies[groupSelectValue].plural
+                : appMessages.entities.taxonomies[groupSelectValue].single
             )
           ),
       });
     }
-
+    const headerActions = dataReady ? header.actions : [];
     return (
-      <ContainerWithSidebar innerRef={(node) => { this.ScrollContainer = node; }} >
-        <Container innerRef={(node) => { this.ScrollReference = node; }}>
+      <ContainerWithSidebar ref={this.ScrollContainer}>
+        <Container ref={this.ScrollReference}>
           <Content>
             <ContentHeader
               type={CONTENT_LIST}
@@ -183,47 +198,50 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
               title={headerTitle}
               subTitle={subtitle}
               sortAttributes={config.sorting}
-              buttons={(dataReady && isUserSignedIn) ? header.actions : []}
+              buttons={headerActions}
             />
-            { (!dataReady || !this.props.scrollContainer) &&
-              <Loading />
-            }
-            { dataReady && this.props.scrollContainer &&
+            {!dataReady && <Loading />}
+            {dataReady && (
               <ListEntities>
+                <PrintHintKey>
+                  <FormattedMessage {...messages.printHintKey} />
+                </PrintHintKey>
                 <EntityListSearch>
                   <TagSearch
                     filters={currentFilters(
                       {
                         config,
                         entities,
-                        taxonomies,
+                        taxonomies: allTaxonomies,
                         connections,
-                        connectedTaxonomies,
                         locationQuery,
                         onTagClick,
                         errors,
                         frameworks,
                       },
-                      this.context.intl.formatMessage(messages.filterFormWithoutPrefix),
-                      this.context.intl.formatMessage(messages.filterFormError),
+                      intl.formatMessage(messages.filterFormWithoutPrefix),
+                      intl.formatMessage(messages.filterFormError),
                     )}
                     searchQuery={locationQuery.get('search') || ''}
                     onSearch={onSearch}
-                    onClear={() => onResetFilters(currentFilterArgs(config, locationQuery))}
+                    onClear={() => {
+                      onResetFilters(currentFilterArgs(config, locationQuery));
+                      onDismissAllErrors();
+                    }}
                   />
                 </EntityListSearch>
                 <EntityListOptions
-                  groupOptions={getGroupOptions(taxonomies, this.context.intl)}
-                  subgroupOptions={getGroupOptions(taxonomies, this.context.intl)}
-                  groupSelectValue={groupSelectValue}
-                  subgroupSelectValue={subgroupSelectValue}
+                  groupOptions={getGroupOptions(taxonomies, intl)}
+                  subgroupOptions={getGroupOptions(taxonomies, intl)}
+                  groupSelectValue={(taxonomies && taxonomies.get(groupSelectValue)) ? groupSelectValue : ''}
+                  subgroupSelectValue={(taxonomies && taxonomies.get(subgroupSelectValue)) ? subgroupSelectValue : ''}
                   onGroupSelect={onGroupSelect}
                   onSubgroupSelect={onSubgroupSelect}
                   onExpand={() => onExpand(expandNo < config.expandableColumns.length ? config.expandableColumns.length : 0)}
                   expanded={config.expandableColumns && expandNo === config.expandableColumns.length}
                   expandable={config.expandableColumns && config.expandableColumns.length > 0}
                 />
-                <ListWrapper innerRef={(node) => { this.ScrollTarget = node; }}>
+                <ListWrapper ref={this.ScrollTarget}>
                   <EntityListGroups
                     entities={entities}
                     errors={errors}
@@ -233,8 +251,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     connections={connections}
                     entityIdsSelected={this.props.entityIdsSelected}
                     locationQuery={this.props.locationQuery}
-                    groupSelectValue={groupSelectValue}
-                    subgroupSelectValue={subgroupSelectValue}
+                    groupSelectValue={(taxonomies && taxonomies.get(groupSelectValue)) ? groupSelectValue : ''}
+                    subgroupSelectValue={(taxonomies && taxonomies.get(subgroupSelectValue)) ? subgroupSelectValue : ''}
                     onEntityClick={this.props.onEntityClick}
                     entityTitle={entityTitle}
                     config={config}
@@ -253,13 +271,12 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     }}
                     onEntitySelect={this.props.onEntitySelect}
                     onEntitySelectAll={this.props.onEntitySelectAll}
-                    scrollContainer={this.props.scrollContainer}
                     onSortBy={this.props.onSortBy}
                     onSortOrder={this.props.onSortOrder}
                   />
                 </ListWrapper>
               </ListEntities>
-            }
+            )}
           </Content>
         </Container>
       </ContainerWithSidebar>
@@ -270,6 +287,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
 EntityListMain.propTypes = {
   entities: PropTypes.instanceOf(List),
   taxonomies: PropTypes.instanceOf(Map),
+  allTaxonomies: PropTypes.instanceOf(Map),
   frameworks: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
@@ -284,7 +302,6 @@ EntityListMain.propTypes = {
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   isContributor: PropTypes.bool,
-  isUserSignedIn: PropTypes.bool,
   entityIcon: PropTypes.func,
   // functions
   onEntityClick: PropTypes.func.isRequired,
@@ -301,7 +318,7 @@ EntityListMain.propTypes = {
   onSortOrder: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
   onDismissError: PropTypes.func.isRequired,
-  scrollContainer: PropTypes.object,
+  onDismissAllErrors: PropTypes.func.isRequired,
   listUpdating: PropTypes.bool,
 };
 
@@ -309,5 +326,5 @@ EntityListMain.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default ScrollContainer(EntityListMain);
+export default EntityListMain;
 // export default EntityListMain;

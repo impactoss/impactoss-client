@@ -74,17 +74,15 @@ import { DEPENDENCIES, FORM_INITIAL } from './constants';
 export class IndicatorNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     this.props.initialiseForm('indicatorNew.form.data', FORM_INITIAL);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -92,27 +90,33 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer.current);
     }
   }
 
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getReferenceFormField(this.context.intl.formatMessage, false, true),
-        getTitleFormField(this.context.intl.formatMessage, 'titleText'),
-      ],
-    },
-  ]);
+  getHeaderMainFields = () => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getReferenceFormField(intl.formatMessage, false, true),
+          getTitleFormField(intl.formatMessage, 'titleText'),
+        ],
+      },
+    ]);
+  };
 
-  getHeaderAsideFields = () => ([
-    {
-      fields: [
-        getStatusField(this.context.intl.formatMessage),
-      ],
-    },
-  ]);
+  getHeaderAsideFields = () => {
+    const { intl } = this.context;
+    return ([
+      {
+        fields: [
+          getStatusField(intl.formatMessage),
+        ],
+      },
+    ]);
+  };
 
   getBodyMainFields = (
     connectedTaxonomies,
@@ -120,16 +124,17 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     recommendationsByFw,
     onCreateOption,
   ) => {
+    const { intl } = this.context;
     const groups = [];
     groups.push({
-      fields: [getMarkdownField(this.context.intl.formatMessage)],
+      fields: [getMarkdownField(intl.formatMessage)],
     });
     if (measures) {
       groups.push({
-        label: this.context.intl.formatMessage(appMessages.nav.measuresSuper),
+        label: intl.formatMessage(appMessages.nav.measuresSuper),
         icon: 'measures',
         fields: [
-          renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+          renderMeasureControl(measures, connectedTaxonomies, onCreateOption, intl),
         ],
       });
     }
@@ -138,12 +143,12 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
         recommendationsByFw,
         connectedTaxonomies,
         onCreateOption,
-        this.context.intl,
+        intl,
       );
       if (recConnections) {
         groups.push(
           {
-            label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+            label: intl.formatMessage(appMessages.nav.recommendationsSuper),
             icon: 'recommendations',
             fields: recConnections,
           },
@@ -153,42 +158,45 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     return groups;
   };
 
-  getBodyAsideFields = (users, repeat) => ([ // fieldGroups
-    { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
-      icon: 'reminder',
-      fields: [
-        getDateField(
-          this.context.intl.formatMessage,
-          'start_date',
-          repeat,
-          repeat ? 'start_date' : 'start_date_only',
-          (model, value) => this.props.onStartDateChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
-        ),
-        getCheckboxField(
-          this.context.intl.formatMessage,
-          'repeat',
-          null,
-          (model, value) => this.props.onRepeatChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
-        ),
-        repeat ? getFrequencyField(this.context.intl.formatMessage) : null,
-        repeat ? getDateField(
-          this.context.intl.formatMessage,
-          'end_date',
-          repeat,
-          'end_date',
-          (model, value) => this.props.onEndDateChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
-        )
-        : null,
-        renderUserControl(
-          users,
-          this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
-        ),
-      ],
-    },
-  ]);
+  getBodyAsideFields = (users, repeat) => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        label: intl.formatMessage(appMessages.entities.due_dates.schedule),
+        icon: 'reminder',
+        fields: [
+          getDateField(
+            intl.formatMessage,
+            'start_date',
+            repeat,
+            repeat ? 'start_date' : 'start_date_only',
+            (model, value) => this.props.onStartDateChange(model, value, this.props.viewDomain.form.data, intl.formatMessage)
+          ),
+          getCheckboxField(
+            intl.formatMessage,
+            'repeat',
+            (model, value) => this.props.onRepeatChange(model, value, this.props.viewDomain.form.data, intl.formatMessage)
+          ),
+          repeat ? getFrequencyField(intl.formatMessage) : null,
+          repeat ? getDateField(
+            intl.formatMessage,
+            'end_date',
+            repeat,
+            'end_date',
+            (model, value) => this.props.onEndDateChange(model, value, this.props.viewDomain.form.data, intl.formatMessage)
+          )
+            : null,
+          renderUserControl(
+            users,
+            intl.formatMessage(appMessages.attributes.manager_id.indicators),
+          ),
+        ],
+      },
+    ]);
+  };
 
   render() {
+    const { intl } = this.context;
     const {
       dataReady,
       viewDomain,
@@ -198,28 +206,22 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       users,
       onCreateOption,
     } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
-        <Content
-          innerRef={(node) => {
-            if (!this.state.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="indicators"
             buttons={
@@ -234,52 +236,58 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
               }] : null
             }
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {(saveSending || !dataReady) &&
-            <Loading />
+          {(saveSending || !dataReady)
+            && <Loading />
           }
-          {dataReady &&
-            <EntityForm
-              model="indicatorNew.form.data"
-              formData={viewDomain.form.data}
-              saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
-              handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
-              handleCancel={this.props.handleCancel}
-              handleUpdate={this.props.handleUpdate}
-              validators={{
-                '': {
+          {dataReady
+            && (
+              <EntityForm
+                model="indicatorNew.form.data"
+                formData={viewDomain.getIn(['form', 'data'])}
+                saving={saveSending}
+                handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
+                handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, intl.formatMessage)}
+                handleCancel={this.props.handleCancel}
+                handleUpdate={this.props.handleUpdate}
+                validators={{
+                  '': {
                   // Form-level validator
-                  endDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'end_date'])),
-                  startDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'start_date'])),
-                  endDateAfterStartDate: (vals) => vals.getIn(['attributes', 'repeat']) ? validateDateAfterDate(vals.getIn(['attributes', 'end_date']), vals.getIn(['attributes', 'start_date'])) : true,
-                },
-              }}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(),
-                },
-                body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption),
-                  aside: this.getBodyAsideFields(users, viewDomain.form.data.getIn(['attributes', 'repeat'])),
-                },
-              }}
-              scrollContainer={this.state.scrollContainer}
-            />
+                    endDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'end_date'])),
+                    startDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'start_date'])),
+                    endDateAfterStartDate: (vals) => vals.getIn(['attributes', 'repeat']) ? validateDateAfterDate(vals.getIn(['attributes', 'end_date']), vals.getIn(['attributes', 'start_date'])) : true,
+                  },
+                }}
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(),
+                    aside: this.getHeaderAsideFields(),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption),
+                    aside: this.getBodyAsideFields(users, viewDomain.getIn(['form', 'data', 'attributes', 'repeat'])),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
         </Content>
       </div>
@@ -432,24 +440,22 @@ function mapDispatchToProps(dispatch) {
           .set('measureIndicators', Map({
             delete: List(),
             create: getCheckedValuesFromOptions(formData.get('associatedMeasures'))
-            .map((id) => Map({
-              measure_id: id,
-            })),
+              .map((id) => Map({
+                measure_id: id,
+              })),
           }));
       }
       if (formData.get('associatedRecommendationsByFw') && recommendationsByFw) {
         saveData = saveData.set(
           'recommendationIndicators',
           recommendationsByFw
-            .map((recs, fwid) =>
-              getConnectionUpdatesFromFormData({
-                formData,
-                connections: recs,
-                connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
-                createConnectionKey: 'recommendation_id',
-                createKey: 'indicator_id',
-              })
-            )
+            .map((recs, fwid) => getConnectionUpdatesFromFormData({
+              formData,
+              connections: recs,
+              connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
+              createConnectionKey: 'recommendation_id',
+              createKey: 'indicator_id',
+            }))
             .reduce(
               (memo, deleteCreateLists) => {
                 const creates = memo.get('create').concat(deleteCreateLists.get('create'));

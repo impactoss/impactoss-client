@@ -13,4 +13,12 @@ export default defineMessages({
     id: 'app.components.TagSearch.searchPlaceholderMultiSelect',
     defaultMessage: 'Filter options by reference or title',
   },
+  labelPrintFilters: {
+    id: 'app.components.TagSearch.labelPrintFilters',
+    defaultMessage: 'Filters:',
+  },
+  labelPrintKeywords: {
+    id: 'app.components.TagSearch.labelPrintKeywords',
+    defaultMessage: 'Keyword search:',
+  },
 });

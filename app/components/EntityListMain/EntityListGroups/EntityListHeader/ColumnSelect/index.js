@@ -10,12 +10,16 @@ import Icon from 'components/Icon';
 
 import A from 'components/styled/A';
 import ColumnHeader from 'components/styled/ColumnHeader';
+import PrintHide from 'components/styled/PrintHide';
 
 import messages from './messages';
 
 const SortButton = styled(ButtonFlatIconOnly)`
   padding: 0;
   color: inherit;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0;
+  }
 `;
 const Styled = styled(ColumnHeader)`
   padding-right: 0;
@@ -27,7 +31,7 @@ const LabelWrap = styled.div`
     padding-left: ${(props) => props.isSelect ? 0 : 7}px;
   }
 `;
-const CheckboxWrap = styled.div`
+const CheckboxWrap = styled(PrintHide)`
   display: table-cell;
   text-align: center;
   width: 20px;
@@ -56,76 +60,87 @@ const SelectAll = styled(A)`
 `;
 
 class ColumnSelect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
-    const { isSelect, isSelected, onSelect, width, label, hasSelectAll, onSelectAll, entitiesTotal } = this.props;
-
+    const {
+      isSelect, isSelected, onSelect, width, label, hasSelectAll, onSelectAll, entitiesTotal,
+    } = this.props;
+    const { intl } = this.context;
     const sortOptions = this.props.sortOptions && this.props.sortOptions.map((option) => ({
       value: option.attribute,
-      label: this.context.intl.formatMessage(messages.sortAttributes[option.attribute]),
+      label: intl.formatMessage(messages.sortAttributes[option.attribute]),
     }));
 
     const sortOrderOption = this.props.sortOrderOptions.find((option) => this.props.sortOrder === option.value);
     const nextSortOrderOption = sortOrderOption && this.props.sortOrderOptions.find((option) => sortOrderOption.nextValue === option.value);
 
     return (
-      <Styled
-        width={width}
-      >
+      <Styled colWidth={width * 100}>
         <Wrapper>
-          {isSelect &&
-            <CheckboxWrap>
-              <Checkbox
-                id="select-all"
-                checked={isSelected}
-                onChange={onSelect}
-              />
-            </CheckboxWrap>
+          {isSelect
+            && (
+              <CheckboxWrap>
+                <Checkbox
+                  id="select-all"
+                  checked={isSelected}
+                  onChange={onSelect}
+                />
+              </CheckboxWrap>
+            )
           }
-          {isSelect &&
-            <LabelWrap isSelect={isSelect}>
-              <Label htmlFor="select-all">{label}</Label>
-              {hasSelectAll &&
-                <SelectAll
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onSelectAll();
-                  }}
-                  href="/"
-                >
-                  <FormattedMessage
-                    {...messages.selectAll}
-                    values={{ number: entitiesTotal }}
-                  />
-                </SelectAll>
-              }
-            </LabelWrap>
+          {isSelect
+            && (
+              <LabelWrap isSelect={isSelect}>
+                <Label htmlFor="select-all">{label}</Label>
+                {hasSelectAll
+                && (
+                  <SelectAll
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onSelectAll();
+                    }}
+                    href="/"
+                  >
+                    <FormattedMessage
+                      {...messages.selectAll}
+                      values={{ number: entitiesTotal }}
+                    />
+                  </SelectAll>
+                )
+                }
+              </LabelWrap>
+            )
           }
-          {!isSelect &&
-            <LabelWrap>
-              <Label>{label}</Label>
-            </LabelWrap>
+          {!isSelect
+            && (
+              <LabelWrap>
+                <Label>{label}</Label>
+              </LabelWrap>
+            )
           }
-          { sortOptions &&
-            <SelectWrapper>
-              <SelectReset
-                value={this.props.sortBy}
-                index="sortby"
-                options={sortOptions}
-                isReset={false}
-                onChange={this.props.onSortBy}
-              />
-              {nextSortOrderOption &&
-                <SortButton
-                  onClick={(e) => {
-                    e.preventDefault();
-                    this.props.onSortOrder(nextSortOrderOption.value);
-                  }}
-                >
-                  <Icon name={sortOrderOption.icon} />
-                </SortButton>
-              }
-            </SelectWrapper>
+          { sortOptions
+            && (
+              <SelectWrapper>
+                <SelectReset
+                  value={this.props.sortBy}
+                  index="sortby"
+                  options={sortOptions}
+                  isReset={false}
+                  onChange={this.props.onSortBy}
+                />
+                {nextSortOrderOption
+                && (
+                  <SortButton
+                    onClick={(e) => {
+                      e.preventDefault();
+                      this.props.onSortOrder(nextSortOrderOption.value);
+                    }}
+                  >
+                    <Icon name={sortOrderOption.icon} />
+                  </SortButton>
+                )
+                }
+              </SelectWrapper>
+            )
           }
         </Wrapper>
       </Styled>

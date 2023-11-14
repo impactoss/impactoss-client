@@ -1,7 +1,7 @@
-import { injectGlobal } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 
 /* eslint no-unused-expressions: 0 */
-injectGlobal`
+const GlobalStyle = createGlobalStyle`
 
   html,
   body {
@@ -12,31 +12,44 @@ injectGlobal`
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 1.428571429;
-    color: #1c2121;
+    color: #344547;
   }
   button, input, select, textarea {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: transparent;
+    border-style: none;
+    color: inherit;
+    font-size: 1em;
+    margin: 0;
   }
   :focus, :visited:focus {
     outline: 5px auto rgb(77, 144, 254); /* TODO: improve focus styles and individualise for specific buttons and links */
   }
   #app {
-    background-color: #ffffff;
+    background-color: #F1F3F3;
     min-height: 100%;
     min-width: 100%;
   }
 
+  button {
+    background: transparent;
+    border: none;
+    text-align: left;
+  }
   a {
-    color: #0077d8;
+    background: transparent;
+    border: none;
+    text-align: left;
+    color: #eb6e51;
     text-decoration: none;
 
     &:hover {
-      color: #0063b5;
+      color: #d66149;
     }
   }
   h1, h2, h3, h4, h5, h6 {
     line-height: 1.25;
-    font-weight: 500;
+    font-weight: 700;
     margin-top: 20px;
     margin-bottom: 10px;
   }
@@ -94,8 +107,6 @@ injectGlobal`
   }
 
   * {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
 
@@ -192,4 +203,77 @@ injectGlobal`
   ._react-file-reader-input {
     display: inline-block;
   }
+
+  @media print and (color){
+    #app {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color-adjust: exact;
+    }
+  }
+  @media print {
+    @page {
+      margin: 1.5cm 1.2cm 1.5cm;
+    }
+    body {
+      font-size: 10pt;
+    }
+    button, input, select, textarea {
+      font-size: 10pt;
+      page-break-inside: avoid;
+    }
+    a {
+      page-break-inside: avoid;
+    }
+    #app {
+      background-color: white;
+    }
+    h1 {
+      font-size: 20pt;
+    }
+    h2 {
+      font-size: 16pt;
+    }
+    h3 {
+      font-size: 13pt;
+    }
+    h4 {
+      font-size: 11pt;
+    }
+    h5 {
+      font-size: 10pt;
+    }
+    h6 {
+      font-size: 9pt;
+    }
+    blockquote {
+      page-break-inside: avoid;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      page-break-after: avoid;
+      page-break-inside: avoid;
+    }
+    img {
+      page-break-inside: avoid;
+      page-break-after: avoid;
+    }
+    table, pre {
+      page-break-inside: avoid;
+    }
+    ul, ol, dl {
+      page-break-before: avoid;
+    }
+
+    .content-page {
+      .react-markdown {
+        p {
+          &:first-child{
+            font-size: 12pt;
+          }
+        }
+      }
+    }
+  }
 `;
+
+export default GlobalStyle;

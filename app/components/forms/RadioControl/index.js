@@ -9,6 +9,9 @@ const Option = styled.div`
 `;
 const Hint = styled.div`
   font-size: 0.85em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 // see also ScheduleItem
 const Label = styled.label`
@@ -36,17 +39,20 @@ export class RadioControl extends React.PureComponent { // eslint-disable-line r
                 <LabelInner>{option.label}</LabelInner>
               </Label>
             </Option>
+          ))}
+        { hints && options.length === 0
+          && (
+            <Hint>
+              {hints[0]}
+            </Hint>
           )
-        )}
-        { hints && options.length === 0 &&
-          <Hint>
-            {hints[0]}
-          </Hint>
         }
-        { hints && options.length === 1 &&
-          <Hint>
-            {hints[1]}
-          </Hint>
+        { hints && options.length === 1
+          && (
+            <Hint>
+              {hints[1]}
+            </Hint>
+          )
         }
       </Field>
     );

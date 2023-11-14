@@ -44,12 +44,13 @@ import { save, resetForm } from './actions';
 import { FORM_INITIAL } from './constants';
 
 export class ActionImport extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (this.props.dataReady) {
       this.props.initialiseForm('measureImport.form.data', FORM_INITIAL);
     }
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -63,20 +64,21 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
   }
 
   render() {
+    const { intl } = this.context;
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="measures"
             buttons={[{
@@ -96,7 +98,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             success={this.props.success}
             progress={this.props.progress}
             template={{
-              filename: `${this.context.intl.formatMessage(messages.filename)}.csv`,
+              filename: `${intl.formatMessage(messages.filename)}.csv`,
               data: getImportFields({
                 fields: [
                   {
@@ -133,7 +135,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
                     import: true,
                   },
                 ],
-              }, this.context.intl.formatMessage),
+              }, intl.formatMessage),
             }}
           />
         </Content>
@@ -167,9 +169,11 @@ const mapStateToProps = (state) => ({
   progress: selectProgress(state),
   errors: selectErrors(state),
   success: selectSuccess(state),
-  dataReady: selectReady(state, { path: [
-    'user_roles',
-  ] }),
+  dataReady: selectReady(state, {
+    path: [
+      'user_roles',
+    ],
+  }),
   authReady: selectReadyForAuthCheck(state),
 });
 

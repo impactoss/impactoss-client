@@ -3,8 +3,9 @@ import { upperFirst } from 'lodash/string';
 
 import { TEXT_TRUNCATE } from 'themes/config';
 
-import { getCategoryShortTitle, attributesEqual } from 'utils/entities';
-import { sortEntities } from 'utils/sort';
+import { getCategoryShortTitle } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
+
 import { truncateText } from 'utils/string';
 import isNumber from 'utils/is-number';
 import asList from 'utils/as-list';
@@ -37,19 +38,19 @@ export const currentFilterArgs = (config, locationQuery) => {
 };
 
 
-export const currentFilters = ({
-  config,
-  entities,
-  taxonomies,
-  connections,
-  connectedTaxonomies,
-  locationQuery,
-  onTagClick,
-  errors,
-  frameworks,
-},
-withoutLabel,
-errorLabel,
+export const currentFilters = (
+  {
+    config,
+    entities,
+    taxonomies,
+    connections,
+    locationQuery,
+    onTagClick,
+    errors,
+    frameworks,
+  },
+  withoutLabel,
+  errorLabel,
 ) => {
   let filterTags = [];
   if (errors && errors.size > 0) {
@@ -66,16 +67,16 @@ errorLabel,
   if (config.taxonomies && taxonomies) {
     filterTags = filterTags.concat(getCurrentTaxonomyFilters(
       config.taxonomies,
-      sortEntities(taxonomies, 'asc', 'priority'),
+      taxonomies,
       locationQuery,
       onTagClick,
       withoutLabel
     ));
   }
-  if (config.connectedTaxonomies && connectedTaxonomies) {
+  if (config.connectedTaxonomies && taxonomies) {
     filterTags = filterTags.concat(getCurrentConnectedTaxonomyFilters(
       config.connectedTaxonomies,
-      sortEntities(connectedTaxonomies, 'asc', 'priority'),
+      taxonomies,
       locationQuery,
       onTagClick
     ));
@@ -112,8 +113,7 @@ const getConnectionLabel = (connection, value) => {
     : upperFirst(value);
   return truncateText(label, TEXT_TRUNCATE.CONNECTION_TAG);
 };
-const getCategoryLabel = (category) =>
-  truncateText(getCategoryShortTitle(category), TEXT_TRUNCATE.ENTITY_TAG);
+const getCategoryLabel = (category) => truncateText(getCategoryShortTitle(category), TEXT_TRUNCATE.ENTITY_TAG);
 
 const getCurrentTaxonomyFilters = (
   taxonomyFilters,
@@ -125,25 +125,27 @@ const getCurrentTaxonomyFilters = (
   const tags = [];
   if (locationQuery.get(taxonomyFilters.query)) {
     const locationQueryValue = locationQuery.get(taxonomyFilters.query);
-    taxonomies.forEach((taxonomy) => {
-      asList(locationQueryValue).forEach((queryValue) => {
-        const value = queryValue.toString();
-        if (taxonomy.getIn(['categories', value])) {
-          const category = taxonomy.getIn(['categories', value]);
-          tags.push({
-            label: getCategoryLabel(category),
-            type: 'taxonomies',
-            id: taxonomy.get('id'),
-            inverse: category.getIn(['attributes', 'draft']),
-            onClick: () => onClick({
-              value,
-              query: taxonomyFilters.query,
-              checked: false,
-            }),
-          });
-        }
-      });
-    });
+    taxonomies.forEach(
+      (taxonomy) => {
+        asList(locationQueryValue).forEach((queryValue) => {
+          const value = queryValue.toString();
+          if (taxonomy.getIn(['categories', value])) {
+            const category = taxonomy.getIn(['categories', value]);
+            tags.push({
+              label: getCategoryLabel(category),
+              type: 'taxonomies',
+              id: taxonomy.get('id'),
+              inverse: category.getIn(['attributes', 'draft']),
+              onClick: () => onClick({
+                value,
+                query: taxonomyFilters.query,
+                checked: false,
+              }),
+            });
+          }
+        });
+      }
+    );
   }
   if (locationQuery.get('without')) {
     const locationQueryValue = locationQuery.get('without');
@@ -185,7 +187,7 @@ const getCurrentFrameworkFilter = (
   const tags = [];
   if (locationQuery.get(config.query)) {
     const locationQueryValue = locationQuery.get(config.query);
-    const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), locationQueryValue));
+    const framework = frameworks.find((fw) => qe(fw.get('id'), locationQueryValue));
     if (framework) {
       tags.push({
         message: `frameworks_short.${framework.get('id')}`,
@@ -205,14 +207,14 @@ const getCurrentFrameworkFilter = (
 
 const getCurrentConnectedTaxonomyFilters = (
   taxonomyFilters,
-  connectedTaxonomies,
+  taxonomies,
   locationQuery,
   onClick
 ) => {
   const tags = [];
   if (locationQuery.get(taxonomyFilters.query)) {
     const locationQueryValue = locationQuery.get(taxonomyFilters.query);
-    connectedTaxonomies.forEach((taxonomy) => {
+    taxonomies.forEach((taxonomy) => {
       asList(locationQueryValue).forEach((queryValue) => {
         const valueSplit = queryValue.split(':');
         if (valueSplit.length > 0) {
@@ -286,9 +288,9 @@ const getCurrentConnectionFilters = (
               {
                 appMessage: true,
                 label: (
-                  option.groupByFramework &&
-                  option.message &&
-                  option.message.indexOf('{fwid}') > -1
+                  option.groupByFramework
+                  && option.message
+                  && option.message.indexOf('{fwid}') > -1
                 )
                   ? option.message.replace('{fwid}', fwid)
                   : option.message,
@@ -335,15 +337,15 @@ const getCurrentAttributeFilters = (entities, attributeFiltersOptions, locationQ
                   }),
                 });
               } else {
-                const referenceEntity = entities.find((entity) => attributesEqual(entity.getIn(['attributes', option.attribute]), value));
+                const referenceEntity = entities.find((entity) => qe(entity.getIn(['attributes', option.attribute]), value));
                 const label = referenceEntity && referenceEntity.getIn([option.reference.key, 'attributes', option.reference.label]);
                 tags.push({
                   labels: label
-                  ? [{ label }]
-                  : [
-                    { appMessage: !!option.message, label: option.message || option.label, postfix: ':' },
-                    { label: value },
-                  ],
+                    ? [{ label }]
+                    : [
+                      { appMessage: !!option.message, label: option.message || option.label, postfix: ':' },
+                      { label: value },
+                    ],
                   type: 'attributes',
                   onClick: () => onClick({
                     value: queryValue,

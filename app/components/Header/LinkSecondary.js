@@ -18,4 +18,7 @@ export default styled(Link)`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     font-size: 0.9em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;

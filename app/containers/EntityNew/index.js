@@ -11,7 +11,7 @@ import { actions as formActions } from 'react-redux-form/immutable';
 import { Map, List } from 'immutable';
 
 import { getEntityAttributeFields } from 'utils/forms';
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
@@ -48,21 +48,22 @@ import messages from './messages';
 export class EntityNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
-  componentWillMount() {
+
+  UNSAFE_componentWillMount() {
     this.props.initialiseForm('entityNew.form.data', this.getInitialFormData());
   }
-  componentWillReceiveProps(nextProps) {
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer.current);
     }
     if (!this.props.frameworkId && nextProps.frameworkId) {
       this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData(nextProps));
     }
   }
+
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
     const { frameworkId } = props;
@@ -74,9 +75,12 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
     ));
   }
 
+  /* eslint-disable react/destructuring-assignment */
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+  /* eslint-enable react/destructuring-assignment */
 
   render() {
+    const { intl } = this.context;
     const {
       viewDomain,
       path,
@@ -89,56 +93,51 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
       framework,
       frameworkId,
     } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
     let pageTitle;
     let hasResponse;
     let fwSpecified;
     let icon = path;
     if (path === 'categories' && taxonomy && taxonomy.get('attributes')) {
-      pageTitle = this.context.intl.formatMessage(messages[path].pageTitleTaxonomy, {
+      pageTitle = intl.formatMessage(messages[path].pageTitleTaxonomy, {
         taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
     } else if (path === 'recommendations') {
       // figure out framework id from form if not set
-      const currentFrameworkId =
-        (framework && framework.get('id')) ||
-        frameworkId ||
-        viewDomain.form.data.getIn(['attributes', 'framework_id']) ||
-        DEFAULT_FRAMEWORK;
+      const currentFrameworkId = (framework && framework.get('id'))
+        || frameworkId
+        || viewDomain.getIn(['form', 'data', 'attributes', 'framework_id'])
+        || DEFAULT_FRAMEWORK;
       // check if single framework set
       fwSpecified = (currentFrameworkId && currentFrameworkId !== 'all');
       // get current framework
-      const currentFramework =
-        framework ||
-        (
-          fwSpecified &&
-          frameworks &&
-          frameworks.find((fw) => attributesEqual(fw.get('id'), currentFrameworkId))
+      const currentFramework = framework
+        || (
+          fwSpecified
+          && frameworks
+          && frameworks.find((fw) => qe(fw.get('id'), currentFrameworkId))
         );
       // check if response is required
       hasResponse = currentFramework && currentFramework.getIn(['attributes', 'has_response']);
       // figure out title and icon
-      pageTitle = this.context.intl.formatMessage(
+      pageTitle = intl.formatMessage(
         messages[path].pageTitle,
         {
-          type: this.context.intl.formatMessage(
+          type: intl.formatMessage(
             appMessages.entities[fwSpecified ? `${path}_${currentFrameworkId}` : path].single
           ),
-        });
+        }
+      );
       icon = fwSpecified ? `${path}_${currentFrameworkId}` : path;
     } else {
-      pageTitle = this.context.intl.formatMessage(messages[path].pageTitle);
+      pageTitle = intl.formatMessage(messages[path].pageTitle);
     }
 
     return (
       <div>
         <Content
-          innerRef={(node) => {
-            if (!this.state.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
+          ref={this.scrollContainer}
           inModal={inModal}
         >
           <ContentHeader
@@ -155,26 +154,30 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
               onClick: () => this.props.handleSubmitRemote('entityNew.form.data'),
             }]}
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {(saveSending) &&
-            <Loading />
+          {(saveSending)
+            && <Loading />
           }
           <EntityForm
             model="entityNew.form.data"
-            formData={viewDomain.form.data}
+            formData={viewDomain.getIn(['form', 'data'])}
             inModal={inModal}
             saving={saveSending}
             handleSubmit={(formData) => this.props.handleSubmit(
@@ -183,7 +186,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             )}
             handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}
-            scrollContainer={this.state.scrollContainer}
+            scrollContainer={this.scrollContainer.current}
             fields={getEntityAttributeFields(
               path,
               {
@@ -197,11 +200,11 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
                   hasResponse,
                 },
               },
-              this.context.intl,
+              intl,
             )}
           />
-          {saveSending &&
-            <Loading />
+          {saveSending
+            && <Loading />
           }
         </Content>
       </div>
@@ -282,9 +285,8 @@ function mapDispatchToProps(dispatch, props) {
       // saveData = saveData.setIn(['attributes', 'taxonomy_id'], taxonomy.get('id'));
 
       if (props.path === 'categories') {
-        const formCategoryIds =
-          formData.get('associatedCategory') &&
-          getCheckedValuesFromOptions(formData.get('associatedCategory'));
+        const formCategoryIds = formData.get('associatedCategory')
+          && getCheckedValuesFromOptions(formData.get('associatedCategory'));
         if (List.isList(formCategoryIds) && formCategoryIds.size) {
           saveData = saveData.setIn(['attributes', 'parent_id'], formCategoryIds.first());
         } else {

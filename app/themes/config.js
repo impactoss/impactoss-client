@@ -15,7 +15,7 @@
 // default language locale
 export const DEFAULT_LOCALE = 'en-GB';
 // date format - change to format according to locale, only used for form error message
-export const DATE_FORMAT = 'dd/mm/yyyy';
+export const DATE_FORMAT = 'dd/MM/yyyy';
 export const NODE_ENV = sessionStorage.NODE_ENV || 'production';
 
 // UI settings ************************
@@ -24,7 +24,7 @@ export const NODE_ENV = sessionStorage.NODE_ENV || 'production';
 // set in translations/[LOCALE].js
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
-export const SHOW_HEADER_TITLE = false;
+export const SHOW_HEADER_TITLE = true;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.header
@@ -41,28 +41,49 @@ export const SHOW_SIDEBAR_HEADER_PATTERN = false;
 // - app.containers.App.app.claim
 export const SHOW_HOME_TITLE = true;
 
-export const SHOW_BRAND_ON_HOME = true;
-export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = true;
+export const SHOW_BRAND_ON_HOME = false;
+export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
 
 // show footer logo section
 export const FOOTER = {
   PARTNERS: true,
-  LINK_TARGET_INTERNAL: false,
+  LINK_TARGET_INTERNAL: true,
   LINK_TARGET_INTERNAL_ID: 1,
 };
 
 // entitylists items-per-page options
-export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
+// export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100, 'all'];
+export const PAGE_ITEM_OPTIONS = [
+  {
+    value: 10,
+  },
+  {
+    value: 20,
+  },
+  {
+    value: 50,
+  },
+  {
+    value: 100,
+  },
+  {
+    value: 'all',
+    message: 'ui.pageItemOptions.all',
+  },
+];
 
 export const TEXT_TRUNCATE = {
   CONNECTION_TAG: 20,
   ATTRIBUTE_TAG: 10,
-  ENTITY_TAG: 10,
+  ENTITY_TAG: 7,
   CONNECTION_POPUP: 80,
   LINK_FIELD: 30,
+  FW_SELECT: 32,
+  GRACE: 2,
+  META_TITLE: 20,
 };
 
-export const PROGRESS_TAXONOMY_ID = 10;
+export const PROGRESS_TAXONOMY_ID = 8;
 
 // WARNING: references as assigned by user
 export const PROGRESS_CATEGORY_REFERENCES = {
@@ -74,15 +95,15 @@ export const CYCLE_TAXONOMY_ID = 2;
 
 /**
  * Server settings
- **/
+ * */
 
 // General ********************
 
 export const ENDPOINTS = {
   API: (
     NODE_ENV === 'production'
-    ? 'https://impactoss-dev.herokuapp.com/'
-    : 'https://impactoss-dev.herokuapp.com/'
+      ? 'https://undp-sadata-staging.herokuapp.com'
+      : 'https://undp-sadata-staging.herokuapp.com'
   ), // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
@@ -102,7 +123,7 @@ export const KEYS = {
 };
 
 // database date format
-export const DB_DATE_FORMAT = 'YYYY-MM-DD';
+export const DB_DATE_FORMAT = 'yyyy-MM-dd';
 
 
 // Map server messages *********************************
@@ -173,7 +194,12 @@ export const DB_TABLES = [
   'due_dates',
   'frameworks',
   'framework_taxonomies',
-  'framework_frameworks',
   'recommendation_indicators',
-  'recommendation_recommendations',
 ];
+
+export const COLUMN_WIDTHS = {
+  FULL: 1,
+  HALF: 0.5,
+  MAIN: 0.72,
+  OTHER: 0.28,
+};

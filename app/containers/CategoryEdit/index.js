@@ -88,12 +88,10 @@ import { DEPENDENCIES, FORM_INITIAL } from './constants';
 export class CategoryEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
 
     if (this.props.dataReady && this.props.viewEntity) {
@@ -101,7 +99,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -112,44 +110,47 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer.current);
     }
   }
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
-    const { viewEntity, users, measures, recommendationsByFw, parentOptions } = props;
+    const {
+      viewEntity, users, measures, recommendationsByFw, parentOptions,
+    } = props;
     return viewEntity
-    ? Map({
-      id: viewEntity.get('id'),
-      attributes: viewEntity.get('attributes').mergeWith(
-        (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-        FORM_INITIAL.get('attributes')
-      ),
-      associatedMeasures: measures && entityOptions(measures, true),
-      associatedRecommendationsByFw: recommendationsByFw
-        ? recommendationsByFw.map((recs) => entityOptions(recs, true))
-        : Map(),
-      associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
-      associatedCategory: parentCategoryOptions(parentOptions, viewEntity.getIn(['attributes', 'parent_id'])),
+      ? Map({
+        id: viewEntity.get('id'),
+        attributes: viewEntity.get('attributes').mergeWith(
+          (oldVal, newVal) => oldVal === null ? newVal : oldVal,
+          FORM_INITIAL.get('attributes')
+        ),
+        associatedMeasures: measures && entityOptions(measures, true),
+        associatedRecommendationsByFw: recommendationsByFw
+          ? recommendationsByFw.map((recs) => entityOptions(recs, true))
+          : Map(),
+        associatedUser: userOptions(users, viewEntity.getIn(['attributes', 'manager_id'])),
+        associatedCategory: parentCategoryOptions(parentOptions, viewEntity.getIn(['attributes', 'parent_id'])),
       // TODO allow single value for singleSelect
-    })
-    : Map();
+      })
+      : Map();
   }
 
   getHeaderMainFields = (entity, parentOptions, parentTaxonomy) => {
+    const { intl } = this.context;
     const groups = [];
     groups.push({ // fieldGroup
       fields: [
-        getReferenceFormField(this.context.intl.formatMessage),
-        getTitleFormField(this.context.intl.formatMessage),
-        getShortTitleFormField(this.context.intl.formatMessage),
+        getReferenceFormField(intl.formatMessage),
+        getTitleFormField(intl.formatMessage),
+        getShortTitleFormField(intl.formatMessage),
       ],
     });
     if (parentOptions && parentTaxonomy) {
       groups.push({
-        label: this.context.intl.formatMessage(appMessages.entities.taxonomies.parent),
+        label: intl.formatMessage(appMessages.entities.taxonomies.parent),
         icon: 'categories',
         fields: [renderParentCategoryControl(
           parentOptions,
@@ -163,10 +164,11 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 
 
   getHeaderAsideFields = (entity) => {
+    const { intl } = this.context;
     const fields = []; // fieldGroups
     fields.push({
       fields: [
-        getStatusField(this.context.intl.formatMessage, entity),
+        getStatusField(intl.formatMessage),
         getMetaField(entity),
       ],
     });
@@ -174,9 +176,8 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       fields.push({
         fields: [
           getCheckboxField(
-            this.context.intl.formatMessage,
+            intl.formatMessage,
             'user_only',
-            null
           ),
         ],
       });
@@ -192,36 +193,37 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     onCreateOption,
     userOnly,
   ) => {
+    const { intl } = this.context;
     const fields = [];
     fields.push({
-      fields: [getMarkdownField(this.context.intl.formatMessage)],
+      fields: [getMarkdownField(intl.formatMessage)],
     });
     if (!userOnly) {
       if (entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures) {
         fields.push(
           {
-            label: this.context.intl.formatMessage(appMessages.nav.measuresSuper),
+            label: intl.formatMessage(appMessages.nav.measuresSuper),
             icon: 'measures',
             fields: [
-              renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+              renderMeasureControl(measures, connectedTaxonomies, onCreateOption, intl),
             ],
           },
         );
       }
       if (
-        entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) &&
-        recommendationsByFw
+        entity.getIn(['taxonomy', 'attributes', 'tags_recommendations'])
+        && recommendationsByFw
       ) {
         const recConnections = renderRecommendationsByFwControl(
           recommendationsByFw,
           connectedTaxonomies,
           onCreateOption,
-          this.context.intl,
+          intl,
         );
         if (recConnections) {
           fields.push(
             {
-              label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+              label: intl.formatMessage(appMessages.nav.recommendationsSuper),
               icon: 'recommendations',
               fields: recConnections,
             },
@@ -231,14 +233,16 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     }
     return fields;
   };
+
   getBodyAsideFields = (entity, users, isAdmin) => {
+    const { intl } = this.context;
     const fields = []; // fieldGroups
     if (isAdmin && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
       fields.push({
         fields: [
           renderUserControl(
             users,
-            this.context.intl.formatMessage(appMessages.attributes.manager_id.categories),
+            intl.formatMessage(appMessages.attributes.manager_id.categories),
             entity.getIn(['attributes', 'manager_id'])
           ),
         ],
@@ -246,13 +250,13 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     }
     fields.push({
       fields: [
-        entity.getIn(['taxonomy', 'attributes', 'has_date']) &&
-          getDateField(
-            this.context.intl.formatMessage,
+        entity.getIn(['taxonomy', 'attributes', 'has_date'])
+          && getDateField(
+            intl.formatMessage,
             'date',
           ),
         getFormField({
-          formatMessage: this.context.intl.formatMessage,
+          formatMessage: intl.formatMessage,
           controlType: 'url',
           attribute: 'url',
         }),
@@ -264,6 +268,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
 
   render() {
+    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -278,11 +283,17 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       parentTaxonomy,
     } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError, deleteSending, deleteError, submitValid } = viewDomain.page;
+    const {
+      saveSending,
+      saveError,
+      deleteSending,
+      deleteError,
+      submitValid,
+    } = viewDomain.get('page').toJS();
 
-    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
+    let pageTitle = intl.formatMessage(messages.pageTitle);
     if (viewEntity && viewEntity.get('taxonomy')) {
-      pageTitle = this.context.intl.formatMessage(messages.pageTitleTaxonomy, {
+      pageTitle = intl.formatMessage(messages.pageTitleTaxonomy, {
         taxonomy: this.getTaxTitle(viewEntity.getIn(['taxonomy', 'id'])),
       });
     }
@@ -290,18 +301,12 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+          title={`${intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content
-          innerRef={(node) => {
-            if (!this.state.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
@@ -318,75 +323,83 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
               }] : null
             }
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {deleteError &&
-            <Messages type="error" messages={deleteError} />
+          {deleteError
+            && <Messages type="error" messages={deleteError} />
           }
-          {(saveSending || deleteSending || !dataReady) &&
-            <Loading />
+          {(saveSending || deleteSending || !dataReady)
+            && <Loading />
           }
-          {!viewEntity && dataReady && !saveError && !deleteSending &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          {!viewEntity && dataReady && !saveError && !deleteSending
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          {viewEntity && dataReady && !deleteSending &&
-            <EntityForm
-              model="categoryEdit.form.data"
-              formData={viewDomain.form.data}
-              saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(
-                formData,
-                measures,
-                recommendationsByFw,
-                viewEntity.get('taxonomy'),
-              )}
-              handleSubmitFail={this.props.handleSubmitFail}
-              handleCancel={() => this.props.handleCancel(reference)}
-              handleUpdate={this.props.handleUpdate}
-              handleDelete={() => isAdmin
-                ? this.props.handleDelete(viewEntity.getIn(['attributes', 'taxonomy_id']))
-                : null
-              }
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(
-                    viewEntity,
-                    parentOptions,
-                    parentTaxonomy,
-                  ),
-                  aside: this.getHeaderAsideFields(viewEntity),
-                },
-                body: {
-                  main: this.getBodyMainFields(
-                    viewEntity,
-                    connectedTaxonomies,
-                    recommendationsByFw,
-                    measures,
-                    onCreateOption,
-                    viewDomain.form.data.getIn(['attributes', 'user_only']),
-                  ),
-                  aside: this.getBodyAsideFields(viewEntity, users, isAdmin),
-                },
-              }}
-              scrollContainer={this.state.scrollContainer}
-            />
+          {viewEntity && dataReady && !deleteSending
+            && (
+              <EntityForm
+                model="categoryEdit.form.data"
+                formData={viewDomain.getIn(['form', 'data'])}
+                saving={saveSending}
+                handleSubmit={(formData) => this.props.handleSubmit(
+                  formData,
+                  measures,
+                  recommendationsByFw,
+                  viewEntity.get('taxonomy'),
+                )}
+                handleSubmitFail={this.props.handleSubmitFail}
+                handleCancel={() => this.props.handleCancel(reference)}
+                handleUpdate={this.props.handleUpdate}
+                handleDelete={() => isAdmin
+                  ? this.props.handleDelete(viewEntity.getIn(['attributes', 'taxonomy_id']))
+                  : null
+                }
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(
+                      viewEntity,
+                      parentOptions,
+                      parentTaxonomy,
+                    ),
+                    aside: this.getHeaderAsideFields(viewEntity),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(
+                      viewEntity,
+                      connectedTaxonomies,
+                      recommendationsByFw,
+                      measures,
+                      onCreateOption,
+                      viewDomain.getIn(['form', 'data', 'attributes', 'user_only']),
+                    ),
+                    aside: this.getBodyAsideFields(viewEntity, users, isAdmin),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
-          {(saveSending || deleteSending) &&
-            <Loading />
+          {(saveSending || deleteSending)
+            && <Loading />
           }
         </Content>
       </div>
@@ -477,19 +490,17 @@ function mapDispatchToProps(dispatch, props) {
           })
         );
       }
-      if (taxonomy.getIn(['attributes', 'tags_recommendations'])) {
+      if (recommendationsByFw && taxonomy.getIn(['attributes', 'tags_recommendations'])) {
         saveData = saveData.set(
           'recommendationCategories',
           recommendationsByFw
-            .map((recs, fwid) =>
-              getConnectionUpdatesFromFormData({
-                formData: !formData.getIn(['attributes', 'user_only']) ? formData : null,
-                connections: recs,
-                connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
-                createConnectionKey: 'recommendation_id',
-                createKey: 'category_id',
-              })
-            )
+            .map((recs, fwid) => getConnectionUpdatesFromFormData({
+              formData: !formData.getIn(['attributes', 'user_only']) ? formData : null,
+              connections: recs,
+              connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
+              createConnectionKey: 'recommendation_id',
+              createKey: 'category_id',
+            }))
             .reduce(
               (memo, deleteCreateLists) => {
                 const deletes = memo.get('delete').concat(deleteCreateLists.get('delete'));

@@ -4,7 +4,7 @@ import { palette } from 'styled-theme';
 const SVG = styled.svg`
   fill: ${(props) => props.palette ? palette(props.paletteIndex) : 'currentColor'};
   stroke: ${(props) => {
-    if (props.stroke) {
+    if (props.hasStroke) {
       return props.palette ? palette(props.paletteIndex) : 'currentColor';
     }
     return 'none';
@@ -28,6 +28,9 @@ const SVG = styled.svg`
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.large : '1200px'}) {
     width: ${(props) => (props.sizes && props.sizes.large) ? props.sizes.large : props.size};
     height: ${(props) => (props.sizes && props.sizes.large) ? props.sizes.large : props.size};
+  }
+  @media print {
+    display: ${({ hidePrint }) => (hidePrint ? 'none' : 'inline-block')};
   }
 `;
 

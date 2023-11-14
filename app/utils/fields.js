@@ -29,8 +29,7 @@ export const getReferenceField = (entity, isManager, defaultToId) => {
   }
   return false;
 };
-const getLinkAnchor = (url) =>
-  truncateText(url.replace(/^https?:\/\//i, ''), TEXT_TRUNCATE.LINK_FIELD);
+const getLinkAnchor = (url) => truncateText(url.replace(/^https?:\/\//i, ''), TEXT_TRUNCATE.LINK_FIELD);
 
 export const getLinkField = (entity) => ({
   type: 'link',
@@ -62,9 +61,9 @@ export const getStatusField = (entity, attribute = 'draft', options, label, defa
   controlType: 'info',
   type: 'status',
   value: (
-    entity &&
-    entity.getIn(['attributes', attribute]) !== null &&
-    typeof entity.getIn(['attributes', attribute]) !== 'undefined'
+    entity
+    && entity.getIn(['attributes', attribute]) !== null
+    && typeof entity.getIn(['attributes', attribute]) !== 'undefined'
   )
     ? entity.getIn(['attributes', attribute])
     : defaultValue,
@@ -73,10 +72,8 @@ export const getStatusField = (entity, attribute = 'draft', options, label, defa
 });
 
 // only show the highest rated role (lower role ids means higher)
-const getHighestUserRoleId = (roles) =>
-roles.reduce((memo, role) =>
-    role.get('id') < memo ? role.get('id') : memo
-  , USER_ROLES.DEFAULT.value);
+const getHighestUserRoleId = (roles) => roles.reduce((memo, role) => role.get('id') < memo ? role.get('id') : memo,
+  USER_ROLES.DEFAULT.value);
 
 export const getRoleField = (entity) => ({
   controlType: 'info',
@@ -111,40 +108,36 @@ export const getMetaField = (entity) => {
   };
 };
 
-export const getMarkdownField = (entity, attribute, hasLabel = true, label) =>
-  !!entity.getIn(['attributes', attribute]) &&
-  (entity.getIn(['attributes', attribute]).trim().length > 0) &&
-  ({
+export const getMarkdownField = (entity, attribute, hasLabel = true, label) => !!entity.getIn(['attributes', attribute])
+  && (entity.getIn(['attributes', attribute]).trim().length > 0)
+  && ({
     type: 'markdown',
     value: entity.getIn(['attributes', attribute]),
     label: hasLabel && (appMessages.attributes[label || attribute]),
   });
 
-export const getDateField = (entity, attribute, showEmpty, emptyMessage) =>
-  (showEmpty || (
-    !!entity.getIn(['attributes', attribute]) &&
-    (entity.getIn(['attributes', attribute]).trim().length > 0)
-  )) &&
-  ({
+export const getDateField = (entity, attribute, showEmpty, emptyMessage) => (showEmpty || (
+  !!entity.getIn(['attributes', attribute])
+    && (entity.getIn(['attributes', attribute]).trim().length > 0)
+))
+  && ({
     type: 'date',
     value: !!entity.getIn(['attributes', attribute]) && entity.getIn(['attributes', attribute]),
     label: appMessages.attributes[attribute],
     showEmpty: showEmpty && (emptyMessage || appMessages.attributes[`${attribute}_empty`]),
   });
 
-export const getDateRelatedField = (value, attribute, showEmpty, emptyMessage) =>
-  (showEmpty || (!!value && (value.trim().length > 0))) &&
-  ({
+export const getDateRelatedField = (value, attribute, showEmpty, emptyMessage) => (showEmpty || (!!value && (value.trim().length > 0)))
+  && ({
     type: 'date',
     value: !!value && value,
     label: appMessages.attributes[attribute],
     showEmpty: showEmpty && (emptyMessage || appMessages.attributes[`${attribute}_empty`]),
   });
 
-export const getTextField = (entity, attribute) =>
-  !!entity.getIn(['attributes', attribute]) &&
-  (entity.getIn(['attributes', attribute]).trim().length > 0) &&
-  ({
+export const getTextField = (entity, attribute) => !!entity.getIn(['attributes', attribute])
+  && (entity.getIn(['attributes', attribute]).trim().length > 0)
+  && ({
     type: 'text',
     value: entity.getIn(['attributes', attribute]),
     label: appMessages.attributes[attribute],
@@ -158,15 +151,15 @@ const mapCategoryOptions = (categories, taxId) => categories
       draft: cat.getIn(['attributes', 'draft']) || null,
       linkTo: `${PATHS.CATEGORIES}/${cat.get('id')}`,
     }))
-    .toArray()
+    .valueSeq().toArray()
   : [];
 
 const mapSmartCategoryOptions = (categories) => categories
   ? sortEntities(
-      categories,
-      'asc',
-      'referenceThenTitle',
-    )
+    categories,
+    'asc',
+    'referenceThenTitle',
+  )
     .map((cat) => ({
       label: cat.getIn(['attributes', 'title']),
       isSmart: cat.get('associated') && cat.get('associated').size > 0,
@@ -174,7 +167,7 @@ const mapSmartCategoryOptions = (categories) => categories
       draft: cat.getIn(['attributes', 'draft']) || null,
       linkTo: `${PATHS.CATEGORIES}/${cat.get('id')}`,
     }))
-    .toArray()
+    .valueSeq().toArray()
   : [];
 
 const mapReports = (reports) => reports
@@ -186,7 +179,7 @@ const mapReports = (reports) => reports
     draft: report.getIn(['attributes', 'draft']),
     linkTo: `${PATHS.PROGRESS_REPORTS}/${report.get('id')}`,
     updatedBy: report.get('user') && report.getIn(['user', 'attributes']).toJS(),
-  })).toArray()
+  })).valueSeq().toArray()
   : [];
 
 export const getReportsField = (reports, button) => ({
@@ -201,7 +194,7 @@ const mapDates = (dates) => dates
     date: date.getIn(['attributes', 'due_date']),
     due: date.getIn(['attributes', 'due']),
     overdue: date.getIn(['attributes', 'overdue']),
-  })).toArray()
+  })).valueSeq().toArray()
   : [];
 
 export const getScheduleField = (dates) => ({
@@ -209,14 +202,20 @@ export const getScheduleField = (dates) => ({
   values: mapDates(dates),
 });
 
-export const getTaxonomyFields = (taxonomies) =>
-  taxonomies && sortEntities(taxonomies, 'asc', 'priority').map((taxonomy) => ({
-    type: 'taxonomy',
-    label: appMessages.entities.taxonomies[taxonomy.get('id')].plural,
-    entityType: 'taxonomies',
-    id: taxonomy.get('id'),
-    values: mapCategoryOptions(taxonomy.get('categories'), taxonomy.get('id')),
-  })).toArray();
+export const getTaxonomyFields = (taxonomies) => taxonomies
+  && sortEntities(
+    taxonomies,
+    'asc',
+    'priority',
+  ).map(
+    (taxonomy) => ({
+      type: 'taxonomy',
+      label: appMessages.entities.taxonomies[taxonomy.get('id')].plural,
+      entityType: 'taxonomies',
+      id: taxonomy.get('id'),
+      values: mapCategoryOptions(taxonomy.get('categories'), taxonomy.get('id')),
+    })
+  ).valueSeq().toArray();
 
 export const getSmartTaxonomyField = (taxonomy) => ({
   type: 'smartTaxonomy',
@@ -225,8 +224,7 @@ export const getSmartTaxonomyField = (taxonomy) => ({
   values: mapSmartCategoryOptions(taxonomy.get('categories')),
 });
 
-export const hasTaxonomyCategories = (taxonomies) =>
-  taxonomies
+export const hasTaxonomyCategories = (taxonomies) => taxonomies
   ? taxonomies.reduce((memo, taxonomy) => memo || (taxonomy.get('categories') && taxonomy.get('categories').size > 0), false)
   : false;
 
@@ -268,20 +266,20 @@ const getConnectionField = ({
   showEmpty: appMessages.entities[entityType].empty,
   connectionOptions: connectionOptions.map((option) => ({
     label: appMessages.entities[option].plural,
+    groupByFramework: option === 'recommendations',
     path: option,
     clientPath: option === 'measures' ? 'actions' : option,
   })),
 });
 
-export const getIndicatorConnectionField = (entities, connections, onEntityClick) =>
-  getConnectionField({
-    entities: sortEntities(entities, 'asc', 'reference'),
-    taxonomies: null,
-    connections,
-    connectionOptions: ['measures', 'recommendations'],
-    entityType: 'indicators',
-    onEntityClick,
-  });
+export const getIndicatorConnectionField = (entities, connections, onEntityClick) => getConnectionField({
+  entities: sortEntities(entities, 'asc', 'reference'),
+  taxonomies: null,
+  connections,
+  connectionOptions: ['measures', 'recommendations'],
+  entityType: 'indicators',
+  onEntityClick,
+});
 
 export const getRecommendationConnectionField = (
   entities,
@@ -290,31 +288,29 @@ export const getRecommendationConnectionField = (
   onEntityClick,
   fwid, // framework id
   hasResponse,
-) =>
-  getConnectionField({
-    entities: sortEntities(entities, 'asc', 'reference'),
-    taxonomies: filterTaxonomies(taxonomies, 'tags_recommendations'),
-    connections,
-    connectionOptions: ['measures', 'indicators'],
-    entityType: fwid ? `recommendations_${fwid}` : 'recommendations',
-    entityPath: 'recommendations',
-    onEntityClick,
-    entityIcon: (entity) => {
-      if (!hasResponse) return null;
-      const status = getAcceptanceStatus(entity);
-      return status ? status.icon : null;
-    },
-  });
-export const getMeasureConnectionField = (entities, taxonomies, connections, onEntityClick) =>
-  getConnectionField({
-    entities: sortEntities(entities, 'asc', 'id'),
-    taxonomies: filterTaxonomies(taxonomies, 'tags_measures'),
-    connections,
-    connectionOptions: ['indicators', 'recommendations'],
-    entityType: 'measures',
-    entityPath: 'actions',
-    onEntityClick,
-  });
+) => getConnectionField({
+  entities: sortEntities(entities, 'asc', 'reference'),
+  taxonomies: filterTaxonomies(taxonomies, 'tags_recommendations'),
+  connections,
+  connectionOptions: ['measures', 'indicators'],
+  entityType: fwid ? `recommendations_${fwid}` : 'recommendations',
+  entityPath: 'recommendations',
+  onEntityClick,
+  entityIcon: (entity) => {
+    if (!hasResponse) return null;
+    const status = getAcceptanceStatus(entity);
+    return status ? status.icon : null;
+  },
+});
+export const getMeasureConnectionField = (entities, taxonomies, connections, onEntityClick) => getConnectionField({
+  entities: sortEntities(entities, 'asc', 'id'),
+  taxonomies: filterTaxonomies(taxonomies, 'tags_measures'),
+  connections,
+  connectionOptions: ['indicators', 'recommendations'],
+  entityType: 'measures',
+  entityPath: 'actions',
+  onEntityClick,
+});
 
 const getConnectionGroupsField = ({
   entityGroups,
@@ -351,41 +347,38 @@ export const getRecommendationConnectionGroupsField = (
   onEntityClick,
   fwid, // framework id
   hasResponse,
-) =>
-  getConnectionGroupsField({
-    entityGroups,
-    groupedBy,
-    taxonomies: filterTaxonomies(taxonomies, 'tags_recommendations'),
-    connections,
-    connectionOptions: ['measures'],
-    entityType: fwid ? `recommendations_${fwid}` : 'recommendations',
-    entityPath: 'recommendations',
-    onEntityClick,
-    entityIcon: (entity) => {
-      if (!hasResponse) return null;
-      const status = getAcceptanceStatus(entity);
-      return status ? status.icon : null;
-    },
-  });
-export const getMeasureConnectionGroupsField = (entityGroups, groupedBy, taxonomies, connections, onEntityClick) =>
-  getConnectionGroupsField({
-    entityGroups,
-    groupedBy,
-    taxonomies: filterTaxonomies(taxonomies, 'tags_measures'),
-    connections,
-    connectionOptions: ['indicators', 'recommendations'],
-    entityType: 'measures',
-    entityPath: 'actions',
-    onEntityClick,
-  });
+) => getConnectionGroupsField({
+  entityGroups,
+  groupedBy,
+  taxonomies: filterTaxonomies(taxonomies, 'tags_recommendations'),
+  connections,
+  connectionOptions: ['measures'],
+  entityType: fwid ? `recommendations_${fwid}` : 'recommendations',
+  entityPath: 'recommendations',
+  onEntityClick,
+  entityIcon: (entity) => {
+    if (!hasResponse) return null;
+    const status = getAcceptanceStatus(entity);
+    return status ? status.icon : null;
+  },
+});
+export const getMeasureConnectionGroupsField = (entityGroups, groupedBy, taxonomies, connections, onEntityClick) => getConnectionGroupsField({
+  entityGroups,
+  groupedBy,
+  taxonomies: filterTaxonomies(taxonomies, 'tags_measures'),
+  connections,
+  connectionOptions: ['indicators', 'recommendations'],
+  entityType: 'measures',
+  entityPath: 'actions',
+  onEntityClick,
+});
 
-export const getManagerField = (entity, messageLabel, messageEmpty) =>
-  ({
-    label: messageLabel,
-    type: 'manager',
-    value: entity.get('manager') && entity.getIn(['manager', 'attributes', 'name']),
-    showEmpty: messageEmpty,
-  });
+export const getManagerField = (entity, messageLabel, messageEmpty) => ({
+  label: messageLabel,
+  type: 'manager',
+  value: entity.get('manager') && entity.getIn(['manager', 'attributes', 'name']),
+  showEmpty: messageEmpty,
+});
 
 export const getDownloadField = (entity, isManager) => ({
   type: 'download',

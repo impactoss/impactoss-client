@@ -29,45 +29,49 @@ import { reset } from './actions';
 import { selectDomain } from './selectors';
 
 export class UserPasswordReset extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.initialiseForm();
   }
+
   render() {
-    const { resetSending, resetError } = this.props.viewDomain.page;
+    const { intl } = this.context;
+    const { resetSending, resetError } = this.props.viewDomain.get('page').toJS();
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
         <ContentNarrow>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
           />
-          {resetError &&
-            <Messages type="error" messages={resetError.messages} />
+          {resetError
+            && <Messages type="error" messages={resetError.messages} />
           }
-          {resetSending &&
-            <Loading />
+          {resetSending
+            && <Loading />
           }
-          { this.props.viewDomain.form &&
-            <AuthForm
-              model="userPasswordReset.form.data"
-              sending={resetSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
-              handleCancel={this.props.handleCancel}
-              labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
-              fields={[
-                getPasswordField(this.context.intl.formatMessage, '.password'),
-                getPasswordConfirmationField(this.context.intl.formatMessage, '.passwordConfirmation'),
-              ]}
-            />
+          { this.props.viewDomain.get('form')
+            && (
+              <AuthForm
+                model="userPasswordReset.form.data"
+                sending={resetSending}
+                handleSubmit={(formData) => this.props.handleSubmit(formData)}
+                handleCancel={this.props.handleCancel}
+                labels={{ submit: intl.formatMessage(messages.submit) }}
+                fields={[
+                  getPasswordField(intl.formatMessage, '.password'),
+                  getPasswordConfirmationField(intl.formatMessage, '.passwordConfirmation'),
+                ]}
+              />
+            )
           }
         </ContentNarrow>
       </div>

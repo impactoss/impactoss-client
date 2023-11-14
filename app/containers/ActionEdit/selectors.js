@@ -7,6 +7,9 @@ import {
   selectFWTaxonomiesSorted,
   selectFWIndicators,
   selectFrameworks,
+  selectRecommendationMeasuresByMeasure,
+  selectMeasureIndicatorsByMeasure,
+  selectMeasureCategoriesByMeasure,
 } from 'containers/App/selectors';
 
 import {
@@ -14,12 +17,11 @@ import {
   entitySetUser,
   prepareTaxonomiesAssociated,
   prepareTaxonomiesMultiple,
-  attributesEqual,
 } from 'utils/entities';
-
+import { qe } from 'utils/quasi-equals';
 export const selectDomain = createSelector(
   (state) => state.get('measureEdit'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export const selectViewEntity = createSelector(
@@ -29,45 +31,68 @@ export const selectViewEntity = createSelector(
 );
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  (state) => selectFWTaxonomiesSorted(state),
+  selectFWTaxonomiesSorted,
   (state) => selectEntities(state, 'categories'),
-  (state) => selectEntities(state, 'measure_categories'),
-  (id, taxonomies, categories, associations) =>
-    prepareTaxonomiesAssociated(taxonomies, categories, associations, 'tags_measures', 'measure_id', id, false)
+  selectMeasureCategoriesByMeasure,
+  (
+    id,
+    taxonomies,
+    categories,
+    associations,
+  ) => prepareTaxonomiesAssociated(
+    taxonomies,
+    categories,
+    associations,
+    'tags_measures',
+    id,
+    false,
+  )
 );
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_recommendations'], false)
+  (taxonomies, categories) => prepareTaxonomiesMultiple(
+    taxonomies,
+    categories,
+    ['tags_recommendations'],
+    false,
+  )
 );
 
 export const selectRecommendationsByFw = createSelector(
   (state, id) => id,
-  (state) => selectRecommendationsCategorised(state),
-  (state) => selectEntities(state, 'recommendation_indicators'),
-  (state) => selectFrameworks(state),
-  (id, entities, associations, frameworks) =>
-    entitiesSetAssociated(entities, 'recommendation_id', associations, 'indicator_id', id)
-    .filter((r) => {
-      const framework = frameworks.find(
-        (fw) =>
-          attributesEqual(
+  selectRecommendationsCategorised,
+  selectRecommendationMeasuresByMeasure,
+  selectFrameworks,
+  (id, recs, associations, frameworks) => {
+    const filtered = recs.filter(
+      (r) => {
+        const framework = frameworks.find(
+          (fw) => qe(
             fw.get('id'),
             r.getIn(['attributes', 'framework_id']),
           )
         );
-      return framework.getIn(['attributes', 'has_measures']);
-    })
-    .groupBy(
+        return framework.getIn(['attributes', 'has_measures']);
+      }
+    );
+    return entitiesSetAssociated(
+      filtered,
+      associations,
+      id,
+    ).groupBy(
       (r) => r.getIn(['attributes', 'framework_id']).toString()
-    )
+    );
+  }
 );
 export const selectIndicators = createSelector(
   (state, id) => id,
   selectFWIndicators,
-  (state) => selectEntities(state, 'measure_indicators'),
-  (id, entities, associations) =>
-    entitiesSetAssociated(entities, 'indicator_id', associations, 'measure_id', id)
+  selectMeasureIndicatorsByMeasure,
+  (id, indicators, associations) => entitiesSetAssociated(
+    indicators,
+    associations,
+    id,
+  )
 );

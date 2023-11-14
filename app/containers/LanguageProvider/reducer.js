@@ -7,11 +7,11 @@
 import { fromJS } from 'immutable';
 
 import {
-  CHANGE_LOCALE,
-} from './constants';
-import {
   DEFAULT_LOCALE,
 } from 'themes/config'; // eslint-disable-line
+import {
+  CHANGE_LOCALE,
+} from './constants';
 
 const initialState = fromJS({
   locale: DEFAULT_LOCALE,

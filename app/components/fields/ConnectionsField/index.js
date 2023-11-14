@@ -12,11 +12,17 @@ import ConnectionLabelWrap from 'components/fields/ConnectionLabelWrap';
 // import EntityListItemsWrap from 'components/fields/EntityListItemsWrap';
 import ToggleAllItems from 'components/fields/ToggleAllItems';
 import EmptyHint from 'components/fields/EmptyHint';
+import PrintOnly from 'components/styled/PrintOnly';
 
 const CONNECTIONMAX = 5;
 
 const StyledFieldWrap = styled(FieldWrap)`
   padding-top: 15px;
+`;
+
+const PrintHint = styled(PrintOnly)`
+  font-size: ${({ theme }) => theme.sizes.print.smaller};
+  font-style: italic;
 `;
 
 class ConnectionsField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -27,10 +33,11 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
 
   render() {
     const { field } = this.props;
-    const label = `${field.values.size} ${this.context.intl.formatMessage(
+    const { intl } = this.context;
+    const label = `${field.values.size} ${intl.formatMessage(
       field.values.size === 1
-      ? appMessages.entities[field.entityType].single
-      : appMessages.entities[field.entityType].plural
+        ? appMessages.entities[field.entityType].single
+        : appMessages.entities[field.entityType].plural
     )}`;
 
     return (
@@ -40,8 +47,21 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
             {label}
           </ConnectionLabel>
         </ConnectionLabelWrap>
-        { (field.values && field.values.size > 0) &&
+        {(field.values && field.values.size > 0) && (
           <div>
+            {field.values.size > CONNECTIONMAX
+              && !this.state.showAllConnections
+              && (
+                <PrintHint>
+                  <FormattedMessage
+                    {...appMessages.hints.printListMore}
+                    values={{
+                      no: CONNECTIONMAX,
+                    }}
+                  />
+                </PrintHint>
+              )
+            }
             <EntityListItems
               taxonomies={field.taxonomies}
               connections={field.connections}
@@ -56,24 +76,30 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
               entityPath={field.entityPath}
               isConnection
             />
-            { field.values.size > CONNECTIONMAX &&
+            {field.values.size > CONNECTIONMAX && (
               <ToggleAllItems
-                onClick={() => this.setState({ showAllConnections: !this.state.showAllConnections })}
+                onClick={() => this.setState(
+                  (prevState) => (
+                    { showAllConnections: !prevState.showAllConnections }
+                  )
+                )}
               >
-                { this.state.showAllConnections &&
-                  <FormattedMessage {...appMessages.entities.showLess} />
+                { this.state.showAllConnections
+                && <FormattedMessage {...appMessages.entities.showLess} />
                 }
-                { !this.state.showAllConnections &&
-                  <FormattedMessage {...appMessages.entities.showAll} />
+                { !this.state.showAllConnections
+                && <FormattedMessage {...appMessages.entities.showAll} />
                 }
               </ToggleAllItems>
-            }
+            )}
           </div>
-        }
-        { (!field.values || field.values.size === 0) &&
-          <EmptyHint>
-            <FormattedMessage {...field.showEmpty} />
-          </EmptyHint>
+        )}
+        { (!field.values || field.values.size === 0)
+          && (
+            <EmptyHint>
+              <FormattedMessage {...field.showEmpty} />
+            </EmptyHint>
+          )
         }
       </StyledFieldWrap>
     );

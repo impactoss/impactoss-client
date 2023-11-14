@@ -86,7 +86,7 @@ export const CONFIG = {
       },
     ],
   },
-  attributes: {  // filter by attribute value
+  attributes: { // filter by attribute value
     options: [
       {
         search: false,

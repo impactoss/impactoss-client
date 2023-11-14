@@ -56,12 +56,12 @@ theme.breakpoints = {
 // 3: white/placeholder
 // 4: white/placeholder
 const primary = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-ffffff-ffffff');
-  // secondary color palette: dark to light
-  // 0: secondary colour, dark / white/placeholder
-  // 1: secondary colour, medium / white/placeholder
-  // 2: secondary colour, main / white/placeholder
-  // 3: white/placeholder
-  // 4: white/placeholder
+// secondary color palette: dark to light
+// 0: secondary colour, dark / white/placeholder
+// 1: secondary colour, medium / white/placeholder
+// 2: secondary colour, main / white/placeholder
+// 3: white/placeholder
+// 4: white/placeholder
 const secondary = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-ffffff');
 // dark grayscale: dark to light
 // 0:  darkest (AA)
@@ -288,6 +288,20 @@ theme.sizes = {
     markdownMobile: '16px',
     small: '13px', // used for labels
     smallMobile: '11px', // used for labels
+    default: '16px', // used for labels
+  },
+  print: {
+    aaLargeBold: '14pt',
+    aaLarge: '18pt',
+    mainListItem: '15pt',
+    nestedListItem: '12pt',
+    listItemTop: '10pt',
+    listItemBottom: '9pt',
+    markdown: '14pt',
+    markdownMobile: '12pt',
+    small: '10pt', // used for labels
+    smallMobile: '8pt', // used for labels
+    default: '12pt', // used for labels
   },
   // px only
   aside: {
@@ -301,7 +315,7 @@ theme.sizes = {
   },
   mainListItem: {
     paddingHorizontal: 15,
-    paddingTop: 10,
+    paddingTop: 12,
     paddingBottom: 12,
   },
   header: {

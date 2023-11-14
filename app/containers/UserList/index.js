@@ -32,12 +32,11 @@ import { selectUsers } from './selectors';
 import messages from './messages';
 
 export class UserList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -48,18 +47,19 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
+    const { intl } = this.context;
     const { dataReady } = this.props;
     const headerOptions = {
-      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      supTitle: intl.formatMessage(messages.pageTitle),
       icon: 'users',
     };
 
     return (
       <div>
         <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <EntityList
@@ -70,8 +70,8 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
-            single: this.context.intl.formatMessage(appMessages.entities.users.single),
-            plural: this.context.intl.formatMessage(appMessages.entities.users.plural),
+            single: intl.formatMessage(appMessages.entities.users.single),
+            plural: intl.formatMessage(appMessages.entities.users.plural),
           }}
           locationQuery={fromJS(this.props.location.query)}
         />

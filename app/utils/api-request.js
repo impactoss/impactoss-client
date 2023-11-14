@@ -19,7 +19,7 @@ export function getAuthValues() {
       ...headers,
       [key]: value,
     }
-    : headers; // no value found, return existing headers
+      : headers; // no value found, return existing headers
   }, {});
 }
 
@@ -52,7 +52,7 @@ function addAuthHeaders(headers = {}) {
     ...authValues,
     authorization: `Bearer ${authValues[KEYS.ACCESS_TOKEN]}`,
   }
-  : headers; // can't find access-token, no auth headers to add
+    : headers; // can't find access-token, no auth headers to add
 }
 
 

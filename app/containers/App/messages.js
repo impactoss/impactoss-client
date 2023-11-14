@@ -197,6 +197,10 @@ export default defineMessages({
       id: 'app.containers.App.labels.perPage',
       defaultMessage: 'Per page',
     },
+    groupedByTaxonomy: {
+      id: 'app.containers.App.labels.groupedByTaxonomy',
+      defaultMessage: ' (by {tax})',
+    },
     smart: {
       met: {
         id: 'app.containers.App.labels.smart.met',
@@ -280,6 +284,10 @@ export default defineMessages({
     fullRecommendation: {
       id: 'app.containers.App.hints.fullRecommendation',
       defaultMessage: 'Note: use only if title field does not already contain full text',
+    },
+    printListMore: {
+      id: 'app.containers.App.hints.printListMore',
+      defaultMessage: 'List only showing {no} items.',
     },
   },
   textValues: {
@@ -570,6 +578,10 @@ export default defineMessages({
     repeat: {
       id: 'app.containers.App.attributes.repeat',
       defaultMessage: 'Repeat?',
+    },
+    date_empty: {
+      id: 'app.containers.App.attributes.date_empty',
+      defaultMessage: 'No date set',
     },
     target_date_empty: {
       id: 'app.containers.App.attributes.target_date_empty',
@@ -1310,6 +1322,32 @@ export default defineMessages({
           defaultMessage: 'About tax 10',
         },
       },
+      11: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.11.single',
+          defaultMessage: 'Taxonomy 10',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.11.plural',
+          defaultMessage: 'Taxonomy 10s',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.11.empty',
+          defaultMessage: 'No Taxonomy 10 assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.11.shortSingle',
+          defaultMessage: 'Taxonomy 10',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.11.shortPlural',
+          defaultMessage: 'Taxonomy 10s',
+        },
+        description: {
+          id: 'app.containers.App.entities.taxonomies.11.description',
+          defaultMessage: 'About tax 10',
+        },
+      },
     },
     due_dates: {
       single: {
@@ -1483,6 +1521,12 @@ export default defineMessages({
       desc: {
         id: 'app.containers.App.ui.sortOrderOptions.desc',
         defaultMessage: 'Descending',
+      },
+    },
+    pageItemOptions: {
+      all: {
+        id: 'app.containers.App.ui.pageItemOptions.all',
+        defaultMessage: 'All',
       },
     },
   },

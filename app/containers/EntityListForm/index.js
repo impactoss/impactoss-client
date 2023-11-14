@@ -48,25 +48,27 @@ const FormWrapper = styled.div`
 // z-index:-1;
 
 class EntityListForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.initialiseForm(this.props.model, this.props.formOptions.options);
   }
 
-  componentWillReceiveProps(nextProps) {
-     // Todo this is not efficent, parent component is creating a new map every time so we can't hashCode compare :(
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    // Todo this is not efficent, parent component is creating a new map every time so we can't hashCode compare :(
     if (!isEqual(nextProps.formOptions.options, this.props.formOptions.options)) {
       this.props.initialiseForm(nextProps.model, nextProps.formOptions.options);
     }
   }
 
   render() {
-    const { model, onSubmit, onCancel, buttons, formOptions, activeOptionId, showCancelButton } = this.props;
+    const { intl } = this.context;
+    const {
+      model, onSubmit, onCancel, buttons, formOptions, activeOptionId, showCancelButton,
+    } = this.props;
     let formTitle;
     if (formOptions.message) {
       formTitle = formOptions.messagePrefix
-        ? `${formOptions.messagePrefix} ${lowerCase(appMessage(this.context.intl, formOptions.message))}`
-        : appMessage(this.context.intl, formOptions.message);
+        ? `${formOptions.messagePrefix} ${lowerCase(appMessage(intl, formOptions.message))}`
+        : appMessage(intl, formOptions.message);
     } else {
       formTitle = formOptions.title;
     }

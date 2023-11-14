@@ -16,6 +16,7 @@ import {
   selectMeasureTaxonomies,
   selectActiveFrameworks,
   selectIsUserManager,
+  selectIsSignedIn,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -28,12 +29,11 @@ import { selectConnections, selectMeasures, selectConnectedTaxonomies } from './
 import messages from './messages';
 
 export class ActionList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -50,41 +50,52 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       connectedTaxonomies,
       location,
       isManager,
+      isUserSignedIn,
     } = this.props;
-
+    const { intl } = this.context;
     const headerOptions = {
-      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      supTitle: intl.formatMessage(messages.pageTitle),
       icon: 'measures',
       actions: [],
     };
+    if (isUserSignedIn) {
+      headerOptions.actions.push({
+        type: 'bookmarker',
+        title: intl.formatMessage(messages.pageTitle),
+      });
+    }
+    if (window.print) {
+      headerOptions.actions.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+    }
     if (isManager) {
       headerOptions.actions.push({
         type: 'text',
-        title: this.context.intl.formatMessage(appMessages.buttons.import),
+        title: intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
       });
       headerOptions.actions.push({
         type: 'add',
         title: [
-          this.context.intl.formatMessage(appMessages.buttons.add),
+          intl.formatMessage(appMessages.buttons.add),
           {
-            title: this.context.intl.formatMessage(appMessages.entities.measures.single),
+            title: intl.formatMessage(appMessages.entities.measures.single),
             hiddenSmall: true,
           },
         ],
         onClick: () => this.props.handleNew(),
       });
     }
-    headerOptions.actions.push({
-      type: 'bookmarker',
-      title: this.context.intl.formatMessage(messages.pageTitle),
-    });
     return (
       <div>
         <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <EntityList
@@ -97,8 +108,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
-            single: this.context.intl.formatMessage(appMessages.entities.measures.single),
-            plural: this.context.intl.formatMessage(appMessages.entities.measures.plural),
+            single: intl.formatMessage(appMessages.entities.measures.single),
+            plural: intl.formatMessage(appMessages.entities.measures.plural),
           }}
           locationQuery={fromJS(location.query)}
         />
@@ -119,6 +130,7 @@ ActionList.propTypes = {
   frameworks: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
+  isUserSignedIn: PropTypes.bool,
 };
 
 ActionList.contextTypes = {
@@ -133,6 +145,7 @@ const mapStateToProps = (state, props) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectActiveFrameworks(state),
   isManager: selectIsUserManager(state),
+  isUserSignedIn: selectIsSignedIn(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

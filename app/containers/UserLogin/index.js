@@ -39,55 +39,63 @@ const BottomLinks = styled.div`
 `;
 
 export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.initialiseForm();
   }
+
   render() {
-    const { authError, authSending } = this.props.viewDomain.page;
+    const { intl } = this.context;
+    const { authError, authSending } = this.props.viewDomain.get('page').toJS();
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
         <ContentNarrow>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
           />
-          {this.props.queryMessages.info &&
-            <Messages
-              type="info"
-              onDismiss={this.props.onDismissQueryMessages}
-              messageKey={this.props.queryMessages.info}
-            />
+          {this.props.queryMessages.info
+            && (
+              <Messages
+                type="info"
+                onDismiss={this.props.onDismissQueryMessages}
+                messageKey={this.props.queryMessages.info}
+              />
+            )
           }
-          {authError &&
-            <Messages
-              type="error"
-              messages={authError.messages}
-            />
+          {authError
+            && (
+              <Messages
+                type="error"
+                messages={authError.messages}
+              />
+            )
           }
-          {authSending &&
-            <Loading />
+          {authSending
+            && <Loading />
           }
-          { this.props.viewDomain.form &&
-            <AuthForm
-              model="userLogin.form.data"
-              sending={authSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
-              handleCancel={this.props.handleCancel}
-              labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
-              fields={[
-                getEmailField(this.context.intl.formatMessage, '.email'),
-                getPasswordField(this.context.intl.formatMessage, '.password'),
-              ]}
-            />
+          { this.props.viewDomain.get('form')
+            && (
+              <AuthForm
+                model="userLogin.form.data"
+                sending={authSending}
+                handleSubmit={(formData) => this.props.handleSubmit(formData)}
+                handleCancel={this.props.handleCancel}
+                labels={{ submit: intl.formatMessage(messages.submit) }}
+                fields={[
+                  getEmailField(intl.formatMessage, '.email'),
+                  getPasswordField(intl.formatMessage, '.password'),
+                ]}
+              />
+            )
           }
           <BottomLinks>
             <p>

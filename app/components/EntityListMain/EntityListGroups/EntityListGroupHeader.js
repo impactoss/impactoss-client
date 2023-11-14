@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import Link from 'containers/Link';
+import { PATHS } from 'containers/App/constants';
 
 const ListEntitiesGroupHeaderLink = styled(Link)`
   color: ${palette('link', 2)};
@@ -19,7 +20,7 @@ const ListEntitiesGroupHeader = styled.h3`
   margin-bottom: 5px;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     margin-top: 30px;
-    margin-bottom: 20px;
+    margin-bottom: 8px;
   }
 `;
 const ListEntitiesSubgroupHeader = styled.h5`
@@ -28,43 +29,42 @@ const ListEntitiesSubgroupHeader = styled.h5`
   margin-bottom: 5px;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     margin-top: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 8px;
   }
 `;
 
 export class EntityListGroupHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const { group, level } = this.props;
 
     if (group.get('id') === 'without') {
       return level === 1
-      ? (
-        <ListEntitiesGroupHeader>
-          {group.get('label')}
-        </ListEntitiesGroupHeader>
-      )
-      : (
-        <ListEntitiesSubgroupHeader>
-          {group.get('label')}
-        </ListEntitiesSubgroupHeader>
-      );
+        ? (
+          <ListEntitiesGroupHeader>
+            {group.get('label')}
+          </ListEntitiesGroupHeader>
+        )
+        : (
+          <ListEntitiesSubgroupHeader>
+            {group.get('label')}
+          </ListEntitiesSubgroupHeader>
+        );
     }
     return level === 1
-    ? (
-      <ListEntitiesGroupHeaderLink to={`/category/${group.get('id')}`}>
-        <ListEntitiesGroupHeader>
-          {group.get('label')}
-        </ListEntitiesGroupHeader>
-      </ListEntitiesGroupHeaderLink>
-    )
-    : (
-      <ListEntitiesGroupHeaderLink to={`/category/${group.get('id')}`}>
-        <ListEntitiesSubgroupHeader>
-          {group.get('label')}
-        </ListEntitiesSubgroupHeader>
-      </ListEntitiesGroupHeaderLink>
-    );
+      ? (
+        <ListEntitiesGroupHeaderLink to={`${PATHS.CATEGORIES}/${group.get('id')}`}>
+          <ListEntitiesGroupHeader>
+            {group.get('label')}
+          </ListEntitiesGroupHeader>
+        </ListEntitiesGroupHeaderLink>
+      )
+      : (
+        <ListEntitiesGroupHeaderLink to={`${PATHS.CATEGORIES}/${group.get('id')}`}>
+          <ListEntitiesSubgroupHeader>
+            {group.get('label')}
+          </ListEntitiesSubgroupHeader>
+        </ListEntitiesGroupHeaderLink>
+      );
   }
 }
 EntityListGroupHeader.propTypes = {

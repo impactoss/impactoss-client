@@ -24,7 +24,7 @@ import {
 
 import { getStatusField as getStatusInfoField } from 'utils/fields';
 
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
@@ -66,18 +66,19 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   constructor(props) {
     super(props);
     this.state = {
-      scrollContainer: null,
       guestDismissed: false,
     };
+    this.scrollContainer = React.createRef();
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     if (this.props.dataReady && this.props.indicator) {
       this.props.initialiseForm('reportNew.form.data', this.getInitialFormData());
     }
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -85,17 +86,21 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     if (nextProps.dataReady && !this.props.dataReady && nextProps.indicator) {
       this.props.initialiseForm('reportNew.form.data', this.getInitialFormData(nextProps));
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer.current);
     }
   }
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getTitleFormField(this.context.intl.formatMessage),
-      ],
-    },
-  ]);
+
+  getHeaderMainFields = () => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getTitleFormField(intl.formatMessage),
+        ],
+      },
+    ]);
+  };
 
   getInitialFormData = (nextProps) => {
     const props = nextProps || this.props;
@@ -108,51 +113,62 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     ));
   }
 
-  getHeaderAsideFields = (canUserPublish) => ([{
-    fields: [
-      canUserPublish
-      ? getStatusField(this.context.intl.formatMessage)
-      : getStatusInfoField(),
-    ],
-  }]);
-
-  getBodyMainFields = () => ([
-    {
+  getHeaderAsideFields = (canUserPublish) => {
+    const { intl } = this.context;
+    return ([{
       fields: [
-        getMarkdownField(this.context.intl.formatMessage),
-        getUploadField(this.context.intl.formatMessage),
-        getDocumentStatusField(this.context.intl.formatMessage),
+        canUserPublish
+          ? getStatusField(intl.formatMessage)
+          : getStatusInfoField(),
       ],
-    },
-  ]);
+    }]);
+  };
 
-  getBodyAsideFields = (indicator) => ([ // fieldGroups
-    { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.due_dates.single),
-      icon: 'calendar',
-      fields: indicator &&
-        [getDueDateOptionsField(
-          this.context.intl.formatMessage,
-          getDueDateDateOptions(
-            indicator.get('dates'),
-            this.context.intl.formatMessage,
-            this.context.intl.formatDate
-          )
-        )],
-    },
-  ]);
+  getBodyMainFields = () => {
+    const { intl } = this.context;
+    return ([
+      {
+        fields: [
+          getMarkdownField(intl.formatMessage),
+          getUploadField(intl.formatMessage),
+          getDocumentStatusField(intl.formatMessage),
+        ],
+      },
+    ]);
+  };
+
+  getBodyAsideFields = (indicator) => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        label: intl.formatMessage(appMessages.entities.due_dates.single),
+        icon: 'calendar',
+        fields: indicator
+          && [getDueDateOptionsField(
+            intl.formatMessage,
+            getDueDateDateOptions(
+              indicator.get('dates'),
+              intl.formatMessage,
+              intl.formatDate
+            )
+          )],
+      },
+    ]);
+  };
 
   dismissGuestMessage = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ guestDismissed: true });
   }
 
-  canUserPublish = (isUserContributor, isUserManager, userId, indicator) =>
-    isUserManager || (isUserContributor && attributesEqual(userId, indicator.getIn(['attributes', 'manager_id'])));
+  canUserPublish = (isUserContributor, isUserManager, userId, indicator) => isUserManager || (isUserContributor && qe(userId, indicator.getIn(['attributes', 'manager_id'])));
 
   render() {
-    const { dataReady, indicator, viewDomain, isUserContributor, isUserManager, userId } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const { intl } = this.context;
+    const {
+      dataReady, indicator, viewDomain, isUserContributor, isUserManager, userId,
+    } = this.props;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const indicatorReference = this.props.params.id;
     const canUserPublish = dataReady && this.canUserPublish(
       isUserContributor,
@@ -161,7 +177,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
       indicator
     );
 
-    const pageTitle = this.context.intl.formatMessage(messages.pageTitle, { indicatorReference });
+    const pageTitle = intl.formatMessage(messages.pageTitle, { indicatorReference });
 
     return (
       <div>
@@ -170,17 +186,11 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
-        <Content
-          innerRef={(node) => {
-            if (!this.state.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
@@ -200,61 +210,69 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               }] : null
             }
           />
-          { !canUserPublish && !this.state.guestDismissed && dataReady && !saveError && !!submitValid &&
-            <Messages
-              type="info"
-              message={this.context.intl.formatMessage(messages.guestNote)}
-              onDismiss={this.dismissGuestMessage}
-            />
+          { !canUserPublish && !this.state.guestDismissed && dataReady && !saveError && !!submitValid
+            && (
+              <Messages
+                type="info"
+                message={intl.formatMessage(messages.guestNote)}
+                onDismiss={this.dismissGuestMessage}
+              />
+            )
           }
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {(saveSending || !dataReady) &&
-            <Loading />
+          {(saveSending || !dataReady)
+            && <Loading />
           }
-          {dataReady &&
-            <EntityForm
-              model="reportNew.form.data"
-              formData={viewDomain.form.data}
-              saving={saveSending}
-              handleSubmit={(formData) => {
-                this.dismissGuestMessage();
-                this.props.handleSubmit(
-                  formData,
-                  indicatorReference,
-                  canUserPublish
-                );
-              }}
-              handleSubmitFail={this.props.handleSubmitFail}
-              handleCancel={() => this.props.handleCancel(indicatorReference)}
-              handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(canUserPublish),
-                },
-                body: {
-                  main: this.getBodyMainFields(),
-                  aside: canUserPublish && this.getBodyAsideFields(indicator),
-                },
-              }}
-              scrollContainer={this.state.scrollContainer}
-            />
+          {dataReady
+            && (
+              <EntityForm
+                model="reportNew.form.data"
+                formData={viewDomain.getIn(['form', 'data'])}
+                saving={saveSending}
+                handleSubmit={(formData) => {
+                  this.dismissGuestMessage();
+                  this.props.handleSubmit(
+                    formData,
+                    indicatorReference,
+                    canUserPublish
+                  );
+                }}
+                handleSubmitFail={this.props.handleSubmitFail}
+                handleCancel={() => this.props.handleCancel(indicatorReference)}
+                handleUpdate={this.props.handleUpdate}
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(),
+                    aside: this.getHeaderAsideFields(canUserPublish),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(),
+                    aside: canUserPublish && this.getBodyAsideFields(indicator),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
-          { saveSending &&
-            <Loading />
+          { saveSending
+            && <Loading />
           }
         </Content>
       </div>

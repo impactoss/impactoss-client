@@ -21,7 +21,8 @@ import {
   getTaxonomyFields,
   hasTaxonomyCategories,
 } from 'utils/fields';
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
+import { getEntityTitleTruncated, getEntityReference } from 'utils/entities';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
@@ -69,10 +70,11 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   //     || this.props.dataReady !== nextProps.dataReady
   //     || this.props.measures !== nextProps.measures
   // }
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -157,15 +159,16 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
 
   getBodyAsideFields = (taxonomies) => ([ // fieldGroups
     hasTaxonomyCategories(taxonomies)
-    ? { // fieldGroup
-      label: appMessages.entities.taxonomies.plural,
-      icon: 'categories',
-      fields: getTaxonomyFields(taxonomies),
-    }
-    : null,
+      ? { // fieldGroup
+        label: appMessages.entities.taxonomies.plural,
+        icon: 'categories',
+        fields: getTaxonomyFields(taxonomies),
+      }
+      : null,
   ]);
 
   render() {
+    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -180,75 +183,104 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       frameworks,
     } = this.props;
     const frameworkId = viewEntity && viewEntity.getIn(['attributes', 'framework_id']);
-    const type = this.context.intl.formatMessage(
+    const type = intl.formatMessage(
       appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single
     );
 
-    const currentFramework = dataReady && frameworks.find((fw) => attributesEqual(fw.get('id'), frameworkId));
-    const hasResponse = dataReady && currentFramework.getIn(['attributes', 'has_response']);
-    const hasMeasures = dataReady && currentFramework.getIn(['attributes', 'has_measures']);
-    const hasIndicators = dataReady && currentFramework.getIn(['attributes', 'has_indicators']);
-    const buttons = isManager
-    ? [
-      {
-        type: 'edit',
-        onClick: this.props.handleEdit,
-      },
-      {
-        type: 'close',
-        onClick: this.props.handleClose,
-      },
-    ]
-    : [{
-      type: 'close',
-      onClick: this.props.handleClose,
-    }];
+    const currentFramework = dataReady
+      && (
+        frameworks.find(
+          (fw) => qe(fw.get('id'), frameworkId)
+        )
+        || frameworks.first()
+      );
+    const hasResponse = dataReady
+      && currentFramework
+      && currentFramework.getIn(['attributes', 'has_response']);
+    const hasMeasures = dataReady
+      && currentFramework
+      && currentFramework.getIn(['attributes', 'has_measures']);
+    const hasIndicators = dataReady
+      && currentFramework
+      && currentFramework.getIn(['attributes', 'has_indicators']);
+    let buttons = [];
+    if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+      buttons = isManager
+        ? buttons.concat([
+          {
+            type: 'edit',
+            onClick: () => this.props.handleEdit(this.props.params.id),
+          },
+          {
+            type: 'close',
+            onClick: this.props.handleClose,
+          },
+        ])
+        : buttons.concat([{
+          type: 'close',
+          onClick: this.props.handleClose,
+        }]);
+    }
+    const pageTitle = intl.formatMessage(messages.pageTitle, { type });
+    const metaTitle = viewEntity
+      ? `${pageTitle} ${getEntityReference(viewEntity)}: ${getEntityTitleTruncated(viewEntity)}`
+      : `${pageTitle} ${this.props.params.id}`;
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle, { type })}: ${this.props.params.id}`}
+          title={metaTitle}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle, { type })}
+            title={pageTitle}
             type={CONTENT_SINGLE}
             icon={frameworkId ? `recommendations_${frameworkId}` : 'recommendations'}
             buttons={buttons}
           />
-          { !dataReady &&
-            <Loading />
+          { !dataReady
+            && <Loading />
           }
-          { !viewEntity && dataReady &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          { !viewEntity && dataReady
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          { viewEntity && dataReady &&
-            <EntityView
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(viewEntity, isManager),
-                  aside: isManager && this.getHeaderAsideFields(viewEntity, isManager),
-                },
-                body: {
-                  main: this.getBodyMainFields(
-                    viewEntity,
-                    hasMeasures && measures,
-                    measureTaxonomies,
-                    measureConnections,
-                    hasIndicators && indicators,
-                    indicatorConnections,
-                    onEntityClick,
-                    hasResponse,
-                  ),
-                  aside: this.getBodyAsideFields(taxonomies),
-                },
-              }}
-            />
+          { viewEntity && dataReady
+            && (
+              <EntityView
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(viewEntity, isManager),
+                    aside: isManager && this.getHeaderAsideFields(viewEntity, isManager),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(
+                      viewEntity,
+                      hasMeasures && measures,
+                      measureTaxonomies,
+                      measureConnections,
+                      hasIndicators && indicators,
+                      indicatorConnections,
+                      onEntityClick,
+                      hasResponse,
+                    ),
+                    aside: this.getBodyAsideFields(taxonomies),
+                  },
+                }}
+              />
+            )
           }
         </Content>
       </div>

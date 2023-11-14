@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import BottomTagGroup from './BottomTagGroup';
 import ConnectionPopup from './ConnectionPopup';
 
 const ConnectionWrap = styled.span`
@@ -18,12 +17,28 @@ const ConnectionWrap = styled.span`
   }
 `;
 const ConnectionLabel = styled.span`
-  vertical-align: middle;
   color: ${palette('text', 1)};
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemBottom};
+  padding-top: 2px;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.listItemBottom};
+  }
+`;
+const Styled = styled.div`
+  width: 100%;
+  display: block;
+  border-top: 1px solid ${palette('light', 1)};
+  margin-top: 8px;
+  margin-bottom: 5px;
+  padding-top: 5px;
+  @media print {
+    border-top: none;
+    margin-top: 3px;
+    margin-bottom: 2px;
+  }
 `;
 
-export default class EntityListItemMainBottomConnections extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export default class EntityListItemMainConnections extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     connections: PropTypes.array.isRequired,
     wrapper: PropTypes.object,
@@ -31,25 +46,29 @@ export default class EntityListItemMainBottomConnections extends React.PureCompo
 
   render() {
     return (
-      <BottomTagGroup>
+      <Styled>
         {
           this.props.connections.map((connection, i) => {
-            const draftEntities = connection.entities.filter((entity) => entity.getIn(['attributes', 'draft']));
+            const draftEntities = connection.entities.filter(
+              (entity) => entity && entity.getIn(['attributes', 'draft'])
+            );
             const entitiesTotal = connection.entities ? connection.entities.size : 0;
             return (
               <ConnectionWrap key={i}>
                 <ConnectionPopup
-                  entities={connection.entities.filter((entity) => !entity.getIn(['attributes', 'draft']))}
+                  entities={connection.entities.filter((entity) => entity && !entity.getIn(['attributes', 'draft']))}
                   option={connection.option}
                   wrapper={this.props.wrapper}
                 />
-                { draftEntities.size > 0 &&
-                  <ConnectionPopup
-                    entities={draftEntities}
-                    option={connection.option}
-                    wrapper={this.props.wrapper}
-                    draft
-                  />
+                { draftEntities.size > 0
+                  && (
+                    <ConnectionPopup
+                      entities={draftEntities}
+                      option={connection.option}
+                      wrapper={this.props.wrapper}
+                      draft
+                    />
+                  )
                 }
                 <ConnectionLabel>
                   {connection.option.label(entitiesTotal)}
@@ -58,7 +77,7 @@ export default class EntityListItemMainBottomConnections extends React.PureCompo
             );
           })
         }
-      </BottomTagGroup>
+      </Styled>
     );
   }
 }

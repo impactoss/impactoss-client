@@ -67,19 +67,17 @@ import { DEPENDENCIES, FORM_INITIAL } from './constants';
 export class UserEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
     if (this.props.dataReady && this.props.viewEntity) {
       this.props.initialiseForm('userEdit.form.data', this.getInitialFormData());
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -87,8 +85,8 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.initialiseForm('userEdit.form.data', this.getInitialFormData(nextProps));
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer.current);
     }
   }
 
@@ -107,72 +105,80 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     });
   }
 
-  getHeaderMainFields = () => ([{ // fieldGroup
-    fields: [getTitleFormField(this.context.intl.formatMessage, 'title', 'name')],
-  }]);
+  getHeaderMainFields = () => {
+    const { intl } = this.context;
+    return ([{ // fieldGroup
+      fields: [getTitleFormField(intl.formatMessage, 'title', 'name')],
+    }]);
+  };
 
-  getHeaderAsideFields = (entity, roles) => ([
-    {
-      fields: (roles && roles.size > 0) ? [
-        getRoleFormField(this.context.intl.formatMessage, roles),
-        getMetaField(entity),
-      ]
-      : [
-        getRoleField(entity),
-        getMetaField(entity),
-      ],
-    },
-  ]);
+  getHeaderAsideFields = (entity, roles) => {
+    const { intl } = this.context;
+    return ([
+      {
+        fields: (roles && roles.size > 0) ? [
+          getRoleFormField(intl.formatMessage, roles),
+          getMetaField(entity),
+        ]
+          : [
+            getRoleField(entity),
+            getMetaField(entity),
+          ],
+      },
+    ]);
+  };
 
-  getBodyMainFields = () => ([{
-    fields: [getEmailField(this.context.intl.formatMessage)],
-  }]);
+  getBodyMainFields = () => {
+    const { intl } = this.context;
+    return ([{
+      fields: [getEmailField(intl.formatMessage)],
+    }]);
+  };
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
-    { // fieldGroup
-      fields: renderTaxonomyControl(taxonomies, onCreateOption, this.context.intl),
-    },
-  ]);
+  getBodyAsideFields = (taxonomies, onCreateOption) => {
+    const { intl } = this.context;
+    return ([ // fieldGroups
+      { // fieldGroup
+        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+      },
+    ]);
+  };
 
   getEditableUserRoles = (roles, sessionUserHighestRoleId) => {
     if (roles) {
       const userHighestRoleId = getHighestUserRoleId(roles);
-        // roles are editable by the session user (logged on user) if
-        // unless the session user is an ADMIN
-        // the session user can only assign roles "lower" (that is higher id) than his/her own role
-        // and when the session user has a "higher" (lower id) role than the user profile being edited
+      // roles are editable by the session user (logged on user) if
+      // unless the session user is an ADMIN
+      // the session user can only assign roles "lower" (that is higher id) than his/her own role
+      // and when the session user has a "higher" (lower id) role than the user profile being edited
       return roles
         .filter((role) => sessionUserHighestRoleId === USER_ROLES.ADMIN.value
-          || (sessionUserHighestRoleId < userHighestRoleId && sessionUserHighestRoleId < parseInt(role.get('id'), 10))
-        );
+          || (sessionUserHighestRoleId < userHighestRoleId && sessionUserHighestRoleId < parseInt(role.get('id'), 10)));
     }
     return Map();
   }
 
   render() {
-    const { viewEntity, dataReady, viewDomain, taxonomies, roles, sessionUserHighestRoleId, onCreateOption } = this.props;
+    const { intl } = this.context;
+    const {
+      viewEntity, dataReady, viewDomain, taxonomies, roles, sessionUserHighestRoleId, onCreateOption,
+    } = this.props;
     const reference = this.props.params.id;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
     const editableRoles = this.getEditableUserRoles(roles, sessionUserHighestRoleId);
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+          title={`${intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content
-          innerRef={(node) => {
-            if (!this.state.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="users"
             buttons={
@@ -187,56 +193,64 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               }]
             }
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {(saveSending || !dataReady) &&
-            <Loading />
+          {(saveSending || !dataReady)
+            && <Loading />
           }
-          {!viewEntity && dataReady && !saveError &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          {!viewEntity && dataReady && !saveError
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          {viewEntity && dataReady &&
-            <EntityForm
-              model="userEdit.form.data"
-              formData={viewDomain.form.data}
-              saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(
-                formData,
-                taxonomies,
-                roles,
-              )}
-              handleSubmitFail={this.props.handleSubmitFail}
-              handleCancel={() => this.props.handleCancel(reference)}
-              handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(viewEntity, editableRoles),
-                },
-                body: {
-                  main: this.getBodyMainFields(),
-                  aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER.value) && this.getBodyAsideFields(taxonomies, onCreateOption),
-                },
-              }}
-              scrollContainer={this.state.scrollContainer}
-            />
+          {viewEntity && dataReady
+            && (
+              <EntityForm
+                model="userEdit.form.data"
+                formData={viewDomain.getIn(['form', 'data'])}
+                saving={saveSending}
+                handleSubmit={(formData) => this.props.handleSubmit(
+                  formData,
+                  taxonomies,
+                  roles,
+                )}
+                handleSubmitFail={this.props.handleSubmitFail}
+                handleCancel={() => this.props.handleCancel(reference)}
+                handleUpdate={this.props.handleUpdate}
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(),
+                    aside: this.getHeaderAsideFields(viewEntity, editableRoles),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(),
+                    aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER.value) && this.getBodyAsideFields(taxonomies, onCreateOption),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
-          { saveSending &&
-            <Loading />
+          { saveSending
+            && <Loading />
           }
         </Content>
       </div>
@@ -316,25 +330,22 @@ function mapDispatchToProps(dispatch) {
       // store all higher roles
       const newRoleIds = newHighestRole === USER_ROLES.DEFAULT.value
         ? List()
-        : roles.reduce((memo, role) =>
-          newHighestRole <= parseInt(role.get('id'), 10)
-            ? memo.push(role.get('id'))
-            : memo
-        , List());
+        : roles.reduce((memo, role) => newHighestRole <= parseInt(role.get('id'), 10)
+          ? memo.push(role.get('id'))
+          : memo,
+        List());
 
       saveData = saveData.set('userRoles', Map({
-        delete: roles.reduce((memo, role) =>
-          role.get('associated')
+        delete: roles.reduce((memo, role) => role.get('associated')
             && !newRoleIds.includes(role.get('id'))
             && !newRoleIds.includes(parseInt(role.get('id'), 10))
-              ? memo.push(role.getIn(['associated', 'id']))
-              : memo
-          , List()),
-        create: newRoleIds.reduce((memo, id) =>
-          roles.find((role) => role.get('id') === id && !role.get('associated'))
-            ? memo.push(Map({ role_id: id, user_id: formData.get('id') }))
-            : memo
-        , List()),
+          ? memo.push(role.getIn(['associated', 'id']))
+          : memo,
+        List()),
+        create: newRoleIds.reduce((memo, id) => roles.find((role) => role.get('id') === id && !role.get('associated'))
+          ? memo.push(Map({ role_id: id, user_id: formData.get('id') }))
+          : memo,
+        List()),
       }));
 
       dispatch(save(saveData.toJS()));

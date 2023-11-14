@@ -22,11 +22,18 @@ const Styled = styled(Button)`
   color: ${palette('asideListGroup', 0)};
   background-color: ${palette('asideListGroup', 1)};
   padding: 0.25em 8px 0.25em 16px;
+  font-size: 0.9em;
   &:hover {
     color: ${palette('asideListGroupHover', 0)};
     background-color: ${palette('asideListGroupHover', 1)};
   }
-  font-size: 0.9em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0.25em 8px 0.25em 16px;
+    font-size: 0.9em;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
 `;
 const GroupLabel = styled.div`
   display: table-cell;
@@ -43,12 +50,14 @@ const GroupIcon = styled.div`
 
 class EntityListSidebarGroupLabel extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { label, icon, onToggle, expanded } = this.props;
-
+    const {
+      label, icon, onToggle, expanded,
+    } = this.props;
+    const { intl } = this.context;
     return (
       <Styled
         onClick={onToggle}
-        title={this.context.intl.formatMessage(
+        title={intl.formatMessage(
           expanded ? messages.groupExpand.hide : messages.groupExpand.show
         )}
       >

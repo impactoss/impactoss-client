@@ -1,10 +1,15 @@
 /**
-*
-* {{ properCase name }}
-*
-*/
+ *
+ * {{ properCase name }}
+ *
+ */
 
+{{#if memo}}
+import React, { memo } from 'react';
+{{else}}
 import React from 'react';
+{{/if}}
+// import PropTypes from 'prop-types';
 // import styled from 'styled-components';
 
 {{#if wantMessages}}
@@ -22,8 +27,10 @@ function {{ properCase name }}() {
   );
 }
 
-{{ properCase name }}.propTypes = {
+{{ properCase name }}.propTypes = {};
 
-};
-
+{{#if memo}}
+export default memo({{ properCase name }});
+{{else}}
 export default {{ properCase name }};
+{{/if}}

@@ -9,6 +9,10 @@ const FieldGroupWrapper = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: ${(props) => props.seamless ? '30px 30px 20px 0' : '30px'};
   }
+  @media print {
+    padding: ${({ aside, bottom }) => (aside && !bottom) ? '15px 0 10px 20px' : '15px 0 10px'};
+    background-color: transparent;
+  }
 `;
 
 export default FieldGroupWrapper;

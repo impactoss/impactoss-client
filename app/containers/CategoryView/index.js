@@ -29,7 +29,12 @@ import {
   getDateField,
 } from 'utils/fields';
 
-import { attributesEqual, getEntityTitle } from 'utils/entities';
+import {
+  getEntityTitle,
+  getEntityTitleTruncated,
+  getEntityReference,
+} from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
@@ -66,16 +71,17 @@ import {
 import { DEPENDENCIES } from './constants';
 
 export class CategoryView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
   }
+
   getHeaderMainFields = (entity, isManager, parentTaxonomy) => {
     const groups = [];
     groups.push(
@@ -97,7 +103,9 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     }
     return groups;
   };
+
   getHeaderAsideFields = (entity, isManager) => {
+    const { intl } = this.context;
     const fields = []; // fieldGroups
     if (isManager) {
       fields.push({
@@ -108,14 +116,14 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       });
     }
     if (
-      entity.getIn(['taxonomy', 'attributes', 'tags_users']) &&
-      entity.getIn(['attributes', 'user_only'])
+      entity.getIn(['taxonomy', 'attributes', 'tags_users'])
+      && entity.getIn(['attributes', 'user_only'])
     ) {
       fields.push({
         type: 'dark',
         fields: [{
           type: 'text',
-          value: this.context.intl.formatMessage(appMessages.textValues.user_only),
+          value: intl.formatMessage(appMessages.textValues.user_only),
           label: appMessages.attributes.user_only,
         }],
       });
@@ -146,17 +154,15 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       // child categories related measures
       const measuresConnections = [];
       if (childMeasures) {
-        childMeasures.forEach((tax) =>
-          measuresConnections.push(
-            getMeasureConnectionGroupsField(
-              tax.get('categories'),
-              appMessages.entities.taxonomies[tax.get('id')].single,
-              taxonomies,
-              measureConnections,
-              onEntityClick,
-            )
+        childMeasures.forEach((tax) => measuresConnections.push(
+          getMeasureConnectionGroupsField(
+            tax.get('categories'),
+            appMessages.entities.taxonomies[tax.get('id')].single,
+            taxonomies,
+            measureConnections,
+            onEntityClick,
           )
-        );
+        ));
       } else if (entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures) {
         // related actions
         measuresConnections.push(
@@ -179,7 +185,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       const recConnections = [];
       if (childRecommendationsByFw) {
         childRecommendationsByFw.forEach((recs, fwid) => {
-          const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+          const framework = frameworks.find((fw) => qe(fw.get('id'), fwid));
           const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
           recs.forEach((tax) => {
             recConnections.push(
@@ -198,7 +204,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         // related recommendations
       } else if (entity.getIn(['taxonomy', 'attributes', 'tags_recommendations']) && recommendationsByFw) {
         recommendationsByFw.forEach((recs, fwid) => {
-          const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+          const framework = frameworks.find((fw) => qe(fw.get('id'), fwid));
           const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
           recConnections.push(
             getRecommendationConnectionField(
@@ -213,7 +219,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         });
       }
       fields.push({
-        label: appMessages.nav.recommendations,
+        label: appMessages.nav.recommendationsSuper,
         icon: 'recommendations',
         fields: recConnections,
       });
@@ -231,11 +237,9 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         fields: getTaxonomyFields(childTaxonomies, true),
       });
     }
-    const showLink =
-      entity.getIn(['attributes', 'url']) &&
-      entity.getIn(['attributes', 'url']).trim().length > 0;
-    const showDate =
-      entity.getIn(['taxonomy', 'attributes', 'has_date']);
+    const showLink = entity.getIn(['attributes', 'url'])
+      && entity.getIn(['attributes', 'url']).trim().length > 0;
+    const showDate = entity.getIn(['taxonomy', 'attributes', 'has_date']);
     if (showLink || showDate) {
       fields.push({
         type: 'dark',
@@ -258,9 +262,14 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     return fields.length > 0 ? fields : null;
   };
 
-  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+  /* eslint-disable react/destructuring-assignment */
+  getTaxTitle = (id) => this.context.intl.formatMessage(
+    appMessages.entities.taxonomies[id].single
+  );
+  /* eslint-ensable react/destructuring-assignment */
 
   render() {
+    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -279,34 +288,48 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     } = this.props;
     let buttons = [];
     if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
       buttons = isManager
-      ? [
-        {
-          type: 'edit',
-          onClick: () => this.props.handleEdit(this.props.params.id),
-        },
-        {
+        ? buttons.concat([
+          {
+            type: 'edit',
+            onClick: () => this.props.handleEdit(this.props.params.id),
+          },
+          {
+            type: 'close',
+            onClick: () => this.props.handleClose(this.props.viewEntity && this.props.viewEntity.getIn(['taxonomy', 'id'])),
+          },
+        ])
+        : buttons.concat([{
           type: 'close',
           onClick: () => this.props.handleClose(this.props.viewEntity && this.props.viewEntity.getIn(['taxonomy', 'id'])),
-        },
-      ]
-      : [{
-        type: 'close',
-        onClick: () => this.props.handleClose(this.props.viewEntity && this.props.viewEntity.getIn(['taxonomy', 'id'])),
-      }];
+        }]);
     }
 
-    let pageTitle = this.context.intl.formatMessage(messages.pageTitle);
-    if (viewEntity && viewEntity.get('taxonomy')) {
+    let pageTitle = intl.formatMessage(messages.pageTitle);
+    let metaTitle = pageTitle;
+    if (
+      viewEntity
+      && viewEntity.get('taxonomy')
+    ) {
       pageTitle = this.getTaxTitle(viewEntity.getIn(['taxonomy', 'id']));
+      const ref = getEntityReference(viewEntity, false);
+      metaTitle = ref
+        ? `${pageTitle} ${ref}: ${getEntityTitleTruncated(viewEntity)}`
+        : `${pageTitle}: ${getEntityTitleTruncated(viewEntity)}`;
     }
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+          title={metaTitle}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
@@ -316,42 +339,46 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
             icon="categories"
             buttons={buttons}
           />
-          { !dataReady &&
-            <Loading />
+          { !dataReady
+            && <Loading />
           }
-          { !viewEntity && dataReady &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          { !viewEntity && dataReady
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          { viewEntity && dataReady &&
-            <EntityView
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(viewEntity, isManager, parentTaxonomy),
-                  aside: this.getHeaderAsideFields(viewEntity, isManager),
-                },
-                body: {
-                  main: this.getBodyMainFields(
-                    viewEntity,
-                    recommendationsByFw,
-                    childRecommendationsByFw,
-                    measures,
-                    childMeasures,
-                    taxonomies,
-                    onEntityClick,
-                    measureConnections,
-                    recommendationConnections,
-                    frameworks,
-                  ),
-                  aside: this.getBodyAsideFields(
-                    viewEntity,
-                    isManager,
-                    childTaxonomies,
-                  ),
-                },
-              }}
-            />
+          { viewEntity && dataReady
+            && (
+              <EntityView
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(viewEntity, isManager, parentTaxonomy),
+                    aside: this.getHeaderAsideFields(viewEntity, isManager),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(
+                      viewEntity,
+                      recommendationsByFw,
+                      childRecommendationsByFw,
+                      measures,
+                      childMeasures,
+                      taxonomies,
+                      onEntityClick,
+                      measureConnections,
+                      recommendationConnections,
+                      frameworks,
+                    ),
+                    aside: this.getBodyAsideFields(
+                      viewEntity,
+                      isManager,
+                      childTaxonomies,
+                    ),
+                  },
+                }}
+              />
+            )
           }
         </Content>
       </div>

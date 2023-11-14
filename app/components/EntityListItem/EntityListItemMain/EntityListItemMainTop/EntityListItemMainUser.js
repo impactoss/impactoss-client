@@ -4,22 +4,26 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import Icon from 'components/Icon';
-import BottomIconWrap from './BottomIconWrap';
+import IconWrap from './IconWrap';
 
 const Styled = styled.span`
+  float: left;
   display: inline-block;
-  margin-right: 1em;
+  margin-left: 1em;
   color: ${palette('text', 1)};
+  margin-top: -2px;
   &:last-child: {
     margin-right: 0;
   }
+  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemBottom};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.listItemBottom};
+  }
 `;
 
-const UserWrap = styled.span`
-  vertical-align: bottom;
-`;
+const UserWrap = styled.span``;
 
-export default class EntityListItemMainBottomUser extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export default class EntityListItemMainUser extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     user: PropTypes.object.isRequired,
   };
@@ -27,9 +31,9 @@ export default class EntityListItemMainBottomUser extends React.PureComponent { 
   render() {
     return (
       <Styled>
-        <BottomIconWrap>
+        <IconWrap>
           <Icon name="reminder" text />
-        </BottomIconWrap>
+        </IconWrap>
         <UserWrap>
           {this.props.user.name}
         </UserWrap>

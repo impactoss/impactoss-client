@@ -10,8 +10,8 @@ import checkStore from './checkStore';
 
 export function replaceIfNotSignedIn(redirectOnAuthSuccess, replace, info = PARAMS.NOT_SIGNED_IN, replacePath) {
   return replacePath
-  ? replace(replacePath)
-  : replace({ pathname: PATHS.LOGIN, query: { redirectOnAuthSuccess, info } });
+    ? replace(replacePath)
+    : replace({ pathname: PATHS.LOGIN, query: { redirectOnAuthSuccess, info } });
 }
 
 export function replaceUnauthorised(replace, replacePath) {
@@ -29,8 +29,7 @@ export function hasRoleRequired(roleIds, roleRequired) {
 }
 
 function redirectIfSignedIn(store) {
-  return (nextState, replace) =>
-    selectIsSignedIn(store.getState()) && replaceAlreadySignedIn(replace);
+  return (nextState, replace) => selectIsSignedIn(store.getState()) && replaceAlreadySignedIn(replace);
 }
 
 function redirectIfNotSignedIn(store, info = PARAMS.NOT_SIGNED_IN) {

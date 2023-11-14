@@ -27,12 +27,18 @@ import messages from './messages';
 
 const Styled = styled.div`
   position: absolute;
-  top: 100%;
-  right: 0;
-  width: 340px;
   display: block;
   text-align: left;
   margin-top: 3px;
+  width: 100%;
+  top: 0;
+  z-index: 10;
+  left: 0;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    top: 100%;
+    right: 0;
+    width: 340px;
+  }
 `;
 const StyledForm = styled.form`
   position: relative;
@@ -53,6 +59,9 @@ const StyledFieldGroupWrapper = styled(FieldGroupWrapper)`
 `;
 const StyledGroupLabel = styled(GroupLabel)`
   font-size: 1.2em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
+  }
 `;
 const ButtonIcon = styled(ButtonFlatWithIcon)`
   position: absolute;
@@ -72,14 +81,18 @@ class BookmarkForm extends React.PureComponent { // eslint-disable-line react/pr
       valid: true,
     };
   }
-  componentWillMount() {
+
+  UNSAFE_componentWillMount() {
     if (this.props.bookmark) {
       this.setState({ title: this.props.bookmark.getIn(['attributes', 'title']) });
     }
   }
+
   render() {
-    const { bookmark, handleUpdateTitle, handleDelete, handleCancel, isNew } = this.props;
-    const { formatMessage } = this.context.intl;
+    const {
+      bookmark, handleUpdateTitle, handleDelete, handleCancel, isNew,
+    } = this.props;
+    const { intl } = this.context;
 
     return (
       <Styled>
@@ -100,26 +113,23 @@ class BookmarkForm extends React.PureComponent { // eslint-disable-line react/pr
                   </FieldGroupLabel>
                   <Field>
                     <FormFieldWrap>
-                      <FieldLabel htmlFor="titleField" >
+                      <FieldLabel htmlFor="titleField">
                         <FormattedMessage {...messages.labelTitle} />
                       </FieldLabel>
                       <Input
                         id="titleField"
                         type="text"
                         value={this.state.title}
-                        placeholder={this.context.intl.formatMessage(messages.placeholder)}
+                        placeholder={intl.formatMessage(messages.placeholder)}
                         autoFocus
                         onFocus={(e) => {
                           e.currentTarget.select();
-                          this.setState({ active: true });
                         }}
-                        onBlur={() => this.setState({ active: false })}
-                        onChange={(e) =>
-                          this.setState({
-                            title: e.target.value,
-                            edited: e.target.value.trim() !== bookmark.getIn(['attributes', 'title']),
-                            valid: e.target.value.trim().length > 0,
-                          })}
+                        onChange={(e) => this.setState({
+                          title: e.target.value,
+                          edited: e.target.value.trim() !== bookmark.getIn(['attributes', 'title']),
+                          valid: e.target.value.trim().length > 0,
+                        })}
                       />
                     </FormFieldWrap>
                   </Field>
@@ -152,7 +162,7 @@ class BookmarkForm extends React.PureComponent { // eslint-disable-line react/pr
                   icon="trash"
                   strong
                   iconRight={false}
-                  title={formatMessage(messages.buttonDelete)}
+                  title={intl.formatMessage(messages.buttonDelete)}
                   onClick={() => {
                     handleDelete();
                   }}

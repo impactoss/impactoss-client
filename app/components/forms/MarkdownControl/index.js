@@ -11,11 +11,14 @@ const MarkdownHint = styled.div`
   text-align: right;
   color: ${palette('text', 1)};
   font-size: 0.85em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 export class MarkdownControl extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const { model, ...props } = this.props;
+    const { intl } = this.context;
     return (
       <span>
         <ControlTextAreaLarge
@@ -24,13 +27,13 @@ export class MarkdownControl extends React.PureComponent { // eslint-disable-lin
         />
         <MarkdownHint>
           <A
-            href={this.context.intl.formatMessage(messages.url)}
+            href={intl.formatMessage(messages.url)}
             target="_blank"
-            onLightBackground
+            isOnLightBackground
           >
-            {this.context.intl.formatMessage(messages.anchor)}
+            {intl.formatMessage(messages.anchor)}
           </A>
-          {this.context.intl.formatMessage(messages.hint)}
+          {intl.formatMessage(messages.hint)}
         </MarkdownHint>
       </span>
     );

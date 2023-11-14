@@ -15,6 +15,7 @@ import {
   selectReady,
   selectActiveFrameworks,
   selectIsUserManager,
+  selectIsSignedIn,
 } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 import { PATHS } from 'containers/App/constants';
@@ -26,12 +27,11 @@ import { selectConnections, selectIndicators, selectConnectedTaxonomies } from '
 import messages from './messages';
 
 export class IndicatorList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -39,43 +39,54 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
   }
 
   render() {
-    const { dataReady, isManager } = this.props;
+    const { intl } = this.context;
+    const { dataReady, isManager, isUserSignedIn } = this.props;
 
     // specify the filter and query  options
     const headerOptions = {
-      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      supTitle: intl.formatMessage(messages.pageTitle),
       icon: 'indicators',
       actions: [],
     };
+    if (isUserSignedIn) {
+      headerOptions.actions.push({
+        type: 'bookmarker',
+        title: intl.formatMessage(messages.pageTitle),
+      });
+    }
+    if (window.print) {
+      headerOptions.actions.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: 'Print',
+        icon: 'print',
+      });
+    }
     if (isManager) {
       headerOptions.actions.push({
         type: 'text',
-        title: this.context.intl.formatMessage(appMessages.buttons.import),
+        title: intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
       });
       headerOptions.actions.push({
         type: 'add',
         title: [
-          this.context.intl.formatMessage(appMessages.buttons.add),
+          intl.formatMessage(appMessages.buttons.add),
           {
-            title: this.context.intl.formatMessage(appMessages.entities.indicators.single),
+            title: intl.formatMessage(appMessages.entities.indicators.single),
             hiddenSmall: true,
           },
         ],
         onClick: () => this.props.handleNew(),
       });
     }
-    headerOptions.actions.push({
-      type: 'bookmarker',
-      title: this.context.intl.formatMessage(messages.pageTitle),
-    });
 
     return (
       <div>
         <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <EntityList
@@ -87,8 +98,8 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
-            single: this.context.intl.formatMessage(appMessages.entities.indicators.single),
-            plural: this.context.intl.formatMessage(appMessages.entities.indicators.plural),
+            single: intl.formatMessage(appMessages.entities.indicators.single),
+            plural: intl.formatMessage(appMessages.entities.indicators.plural),
           }}
           locationQuery={fromJS(this.props.location.query)}
         />
@@ -108,6 +119,7 @@ IndicatorList.propTypes = {
   frameworks: PropTypes.instanceOf(Map),
   location: PropTypes.object,
   isManager: PropTypes.bool,
+  isUserSignedIn: PropTypes.bool,
 };
 
 IndicatorList.contextTypes = {
@@ -121,6 +133,7 @@ const mapStateToProps = (state, props) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectActiveFrameworks(state),
   isManager: selectIsUserManager(state),
+  isUserSignedIn: selectIsSignedIn(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

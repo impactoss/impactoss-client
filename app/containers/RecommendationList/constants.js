@@ -14,25 +14,23 @@ export const DEPENDENCIES = [
   'measure_categories',
   'frameworks',
   'framework_taxonomies',
-  'framework_frameworks',
-  'recommendation_recommendations',
 ];
 
 export const CONFIG = {
   serverPath: 'recommendations',
   clientPath: 'recommendations',
-  search: ['reference', 'title', 'description'],
+  search: ['reference', 'title', 'description', 'response'],
   sorting: [
     {
       attribute: 'id', // proxy for created at
       type: 'number',
       order: 'desc',
-      default: true,
     },
     {
       attribute: 'reference',
       type: 'string',
       order: 'asc',
+      default: true,
     },
     {
       attribute: 'title',
@@ -59,7 +57,8 @@ export const CONFIG = {
     // TODO better store in database join table framework_taxonomies
     defaultGroupsByFramework: {
       1: { 1: '1', 2: '2' }, // framework 1 recs are grouped by taxonomies 1 & 2
-      2: { 1: '7' }, // framework 2 recs are grouped by taxonomy 7
+      2: { 1: '9', 2: '10' }, // framework 2 SDS are grouped by taxonomies 9 & 10
+      3: { 1: '7' }, // framework 3 SDGs are grouped by taxonomy 7
     },
     groupBy: 'framework_id',
     editForFrameworks: true,
@@ -91,7 +90,7 @@ export const CONFIG = {
       },
     ],
   },
-  attributes: {  // filter by attribute value
+  attributes: { // filter by attribute value
     options: [
       {
         search: false,

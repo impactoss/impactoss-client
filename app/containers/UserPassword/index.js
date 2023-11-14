@@ -31,47 +31,51 @@ import { save } from './actions';
 import userPasswordSelector from './selectors';
 
 export class UserPassword extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.initialiseForm();
   }
+
   render() {
-    const { passwordSending, passwordError } = this.props.userPassword.page;
+    const { intl } = this.context;
+    const { passwordSending, passwordError } = this.props.userPassword.get('page').toJS();
     const reference = this.props.params.id;
 
     return (
       <div>
         <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
         <ContentNarrow>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
           />
-          {passwordError &&
-            <Messages type="error" messages={passwordError.messages} />
+          {passwordError
+            && <Messages type="error" messages={passwordError.messages} />
           }
-          {passwordSending &&
-            <Loading />
+          {passwordSending
+            && <Loading />
           }
-          { this.props.userPassword.form &&
-            <AuthForm
-              model="userPassword.form.data"
-              sending={passwordSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, reference)}
-              handleCancel={() => this.props.handleCancel(reference)}
-              labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
-              fields={[
-                getPasswordCurrentField(this.context.intl.formatMessage),
-                getPasswordNewField(this.context.intl.formatMessage),
-                getPasswordConfirmationField(this.context.intl.formatMessage),
-              ]}
-            />
+          { this.props.userPassword.get('form')
+            && (
+              <AuthForm
+                model="userPassword.form.data"
+                sending={passwordSending}
+                handleSubmit={(formData) => this.props.handleSubmit(formData, reference)}
+                handleCancel={() => this.props.handleCancel(reference)}
+                labels={{ submit: intl.formatMessage(messages.submit) }}
+                fields={[
+                  getPasswordCurrentField(intl.formatMessage),
+                  getPasswordNewField(intl.formatMessage),
+                  getPasswordConfirmationField(intl.formatMessage),
+                ]}
+              />
+            )
           }
         </ContentNarrow>
       </div>

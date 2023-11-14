@@ -41,6 +41,9 @@ const Remove = styled(ButtonFlatIconOnly)`
   &:hover {
     color: ${palette('linkHover', 2)};
   }
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 14px 0.75em;
+  }
 `;
 
 const Uploading = styled.div`
@@ -50,6 +53,9 @@ const Uploading = styled.div`
   margin-bottom: 0.25em;
   margin-top: -0.5em;
   overflow: hidden;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 const Styled = styled.div`
   padding-top: 1em;
@@ -69,10 +75,12 @@ const ReactS3UploaderLabelWrap = styled.label`
     color: ${palette('buttonDefaultHover', 0)};
     background-color: ${palette('buttonDefaultHover', 1)};
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
+  }
 `;
 
 class Upload extends React.Component { // eslint-disable-line react/prefer-stateless-function
-
   state = {
     progress: null,
     error: null,
@@ -116,59 +124,68 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
   }
 
   render() {
+    const { intl } = this.context;
     return (
       <Styled>
         {
-          this.props.value &&
-          <DocumentWrapEdit remove>
-            <DocumentView url={this.props.value} status />
-            <Remove onClick={this.handleRemove}>
-              <Icon name="removeLarge" />
-            </Remove>
-          </DocumentWrapEdit>
+          this.props.value
+          && (
+            <DocumentWrapEdit remove>
+              <DocumentView url={this.props.value} status />
+              <Remove onClick={this.handleRemove}>
+                <Icon name="removeLarge" />
+              </Remove>
+            </DocumentWrapEdit>
+          )
         }
         {
-          !this.state.error &&
-          !this.props.value &&
-          !this.state.progress &&
-          this.state.progress !== 0 &&
-          <ReactS3UploaderLabelWrap>
-            <FormattedMessage {...appMessages.attributes.document_upload} />
-            <Icon name="add" text textRight />
-            <ReactS3Uploader
-              style={{ display: 'none' }}
-              signingUrl={ENDPOINTS.SIGNING_URL}
-              signingUrlMethod="GET"
-              signingUrlWithCredentials
-              onProgress={this.onUploadProgress}
-              onError={this.onUploadError}
-              onFinish={this.onUploadFinish}
-              server={ENDPOINTS.API}
-              preprocess={this.modifyFileType}
-              scrubFilename={(filename) => filename.replace(/(\.[\w\d_-]+)$/i, `_${Date.now()}$1`)}
-            />
-          </ReactS3UploaderLabelWrap>
-        }
-        { !this.state.error && (this.state.progress || this.state.progress === 0) && !this.props.value &&
-          <DocumentWrapEdit>
-            <Uploading>
-              <FormattedMessage {...appMessages.attributes.document_uploading} />
-              {` ${this.state.progress}%`}
-              {this.props.value}
-              <Loading
-                progress={this.state.progress}
+          !this.state.error
+          && !this.props.value
+          && !this.state.progress
+          && this.state.progress !== 0
+          && (
+            <ReactS3UploaderLabelWrap>
+              <FormattedMessage {...appMessages.attributes.document_upload} />
+              <Icon name="add" text textRight />
+              <ReactS3Uploader
+                style={{ display: 'none' }}
+                signingUrl={ENDPOINTS.SIGNING_URL}
+                signingUrlMethod="GET"
+                signingUrlWithCredentials
+                onProgress={this.onUploadProgress}
+                onError={this.onUploadError}
+                onFinish={this.onUploadFinish}
+                server={`${ENDPOINTS.API}/`}
+                preprocess={this.modifyFileType}
+                scrubFilename={(filename) => filename.replace(/(\.[\w\d_-]+)$/i, `_${Date.now()}$1`)}
               />
-            </Uploading>
-          </DocumentWrapEdit>
+            </ReactS3UploaderLabelWrap>
+          )
+        }
+        { !this.state.error && (this.state.progress || this.state.progress === 0) && !this.props.value
+          && (
+            <DocumentWrapEdit>
+              <Uploading>
+                <FormattedMessage {...appMessages.attributes.document_uploading} />
+                {` ${this.state.progress}%`}
+                {this.props.value}
+                <Loading
+                  progress={this.state.progress}
+                />
+              </Uploading>
+            </DocumentWrapEdit>
+          )
         }
         {
-          this.state.error &&
-          <Messages
-            type="error"
-            onDismiss={this.reset}
-            message={this.context.intl.formatMessage(messages.uploadError)}
-            preMessage={false}
-          />
+          this.state.error
+          && (
+            <Messages
+              type="error"
+              onDismiss={this.reset}
+              message={intl.formatMessage(messages.uploadError)}
+              preMessage={false}
+            />
+          )
         }
       </Styled>
     );

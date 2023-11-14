@@ -1,4 +1,6 @@
-import { takeLatest, put, take, cancel, select, call } from 'redux-saga/effects';
+import {
+  takeLatest, put, take, cancel, select, call,
+} from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { selectLocation } from 'containers/App/selectors';

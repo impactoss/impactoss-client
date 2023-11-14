@@ -15,21 +15,21 @@ import { USER_ROLES } from 'themes/config';
 import {
   prepareCategory,
   usersByRole,
-  entitiesSetAssociated,
+  entitiesSetAssociatedCategory,
   prepareTaxonomiesMultiple,
-  attributesEqual,
 } from 'utils/entities';
-
+import { qe } from 'utils/quasi-equals';
 export const selectDomain = createSelector(
   (state) => state.get('categoryEdit'),
-  (substate) => substate.toJS()
+  (substate) => substate
 );
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
   (state) => selectEntities(state, 'users'),
   (state) => selectFWTaxonomiesSorted(state),
-  (entity, users, taxonomies) => prepareCategory(entity, users, taxonomies));
+  (entity, users, taxonomies) => prepareCategory(entity, users, taxonomies)
+);
 
 export const selectParentOptions = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
@@ -37,21 +37,28 @@ export const selectParentOptions = createSelector(
   selectTaxonomies,
   (entity, categories, taxonomies) => {
     if (entity && taxonomies && categories) {
-      const taxonomy = taxonomies.find((tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')));
-      const taxonomyParentId = taxonomy && taxonomy.getIn(['attributes', 'parent_id']);
+      const taxonomy = taxonomies.find(
+        (tax) => qe(
+          entity.getIn(['attributes', 'taxonomy_id']),
+          tax.get('id')
+        )
+      );
+      const taxonomyParentId = taxonomy
+        && taxonomy.getIn(['attributes', 'parent_id']);
       return taxonomyParentId
         ? categories.filter(
           (otherCategory) => {
             const otherTaxonomy = taxonomies.find(
-              (tax) => attributesEqual(
+              (tax) => qe(
                 otherCategory.getIn(['attributes', 'taxonomy_id']),
                 tax.get('id'),
               ),
             );
             return otherTaxonomy
-              ? attributesEqual(taxonomyParentId, otherTaxonomy.get('id'))
+              ? qe(taxonomyParentId, otherTaxonomy.get('id'))
               : null;
-          })
+          }
+        )
         : null;
     }
     return null;
@@ -65,19 +72,22 @@ export const selectParentTaxonomy = createSelector(
     if (entity && taxonomies) {
       // the category taxonomy
       const taxonomy = taxonomies.find(
-        (tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')),
+        (tax) => qe(
+          entity.getIn(['attributes', 'taxonomy_id']),
+          tax.get('id'),
+        ),
       );
       // any parent taxonomies
       return taxonomies.find(
-        (tax) =>
-          attributesEqual(
-            taxonomy.getIn(['attributes', 'parent_id']),
-            tax.get('id'),
-          ),
+        (tax) => qe(
+          taxonomy.getIn(['attributes', 'parent_id']),
+          tax.get('id'),
+        ),
       );
     }
     return null;
-  });
+  }
+);
 const selectIsParentTaxonomy = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
   selectTaxonomies,
@@ -85,75 +95,87 @@ const selectIsParentTaxonomy = createSelector(
     if (entity && taxonomies) {
       // the category taxonomy
       const taxonomy = taxonomies.find(
-        (tax) => attributesEqual(entity.getIn(['attributes', 'taxonomy_id']), tax.get('id')),
+        (tax) => qe(
+          entity.getIn(['attributes', 'taxonomy_id']),
+          tax.get('id'),
+        ),
       );
       // has any child taxonomies?
       return taxonomies.some(
-        (tax) =>
-          attributesEqual(
-            tax.getIn(['attributes', 'parent_id']),
-            taxonomy.get('id'),
-          ),
+        (tax) => qe(
+          tax.getIn(['attributes', 'parent_id']),
+          taxonomy.get('id'),
+        ),
       );
     }
     return false;
-  });
+  }
+);
 
 
 export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
-  (entities, associations) =>
-    usersByRole(entities, associations, USER_ROLES.MANAGER.value)
+  (entities, associations) => usersByRole(
+    entities,
+    associations,
+    USER_ROLES.MANAGER.value,
+  )
 );
 
 export const selectMeasures = createSelector(
   (state, id) => id,
-  (state) => selectMeasuresCategorised(state),
-  (state) => selectEntities(state, 'measure_categories'),
+  selectMeasuresCategorised,
   selectIsParentTaxonomy,
-  (id, entities, associations, isParent) =>
-    isParent
-      ? null
-      : entitiesSetAssociated(entities, 'measure_id', associations, 'category_id', id)
+  (id, entities, isParent) => {
+    if (isParent) return null;
+    return entitiesSetAssociatedCategory(
+      entities,
+      id,
+    );
+  }
 );
 
 export const selectRecommendationsByFw = createSelector(
   (state, id) => id,
   (state, id) => selectEntity(state, { path: 'categories', id }),
   (state) => selectEntities(state, 'framework_taxonomies'),
-  (state) => selectRecommendationsCategorised(state),
-  (state) => selectEntities(state, 'recommendation_categories'),
+  selectRecommendationsCategorised,
   selectIsParentTaxonomy,
-  (id, category, fwTaxonomies, entities, associations, isParent) => {
-    if (isParent || !category || !fwTaxonomies || !entities || !associations) {
+  (id, category, fwTaxonomies, entities, isParent) => {
+    if (isParent || !category || !fwTaxonomies || !entities) {
       return null;
     }
     // framework id for category
     const frameworkIds = fwTaxonomies.reduce(
-      (memo, fwt) =>
-        attributesEqual(
-          fwt.getIn(['attributes', 'taxonomy_id']),
-          category.getIn(['attributes', 'taxonomy_id']),
-        )
-          ? memo.push(fwt.getIn(['attributes', 'framework_id']))
-          : memo,
+      (memo, fwt) => qe(
+        fwt.getIn(['attributes', 'taxonomy_id']),
+        category.getIn(['attributes', 'taxonomy_id']),
+      )
+        ? memo.push(fwt.getIn(['attributes', 'framework_id']))
+        : memo,
       List(),
     );
-    return entitiesSetAssociated(entities, 'recommendation_id', associations, 'category_id', id)
-      .filter((r) =>
-        frameworkIds.find(
-          (fwid) => attributesEqual(fwid, r.getIn(['attributes', 'framework_id']))
-        ))
-      .groupBy(
-        (r) => r.getIn(['attributes', 'framework_id']).toString()
-      );
+    const filtered = entities.filter(
+      (r) => frameworkIds.find(
+        (fwid) => qe(fwid, r.getIn(['attributes', 'framework_id']))
+      )
+    );
+    return entitiesSetAssociatedCategory(
+      filtered,
+      id,
+    ).groupBy(
+      (r) => r.getIn(['attributes', 'framework_id']).toString()
+    );
   }
 );
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures', 'tags_recommendations'])
+  (taxonomies, categories) => prepareTaxonomiesMultiple(
+    taxonomies,
+    categories,
+    ['tags_measures', 'tags_recommendations']
+  )
 );

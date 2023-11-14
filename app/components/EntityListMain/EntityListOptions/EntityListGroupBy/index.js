@@ -18,11 +18,14 @@ const Styled = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 0.85em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 export class EntityListGroupBy extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
+    const { intl } = this.context;
     const { onChange, isSubgroup } = this.props;
     const value = this.props.value || PARAMS.GROUP_RESET;
     const options = value !== PARAMS.GROUP_RESET
@@ -30,22 +33,25 @@ export class EntityListGroupBy extends React.PureComponent { // eslint-disable-l
       // add placeholder select option if no value set
       : [{
         value: PARAMS.GROUP_RESET,
-        label: this.context.intl.formatMessage(messages.placeholder),
+        label: intl.formatMessage(messages.placeholder),
         default: true,
       }].concat(this.props.options);
 
     return (
       <Styled>
-        { this.props.options.length > 0 && options && options.length > 0 &&
-          <SelectReset
-            value={value || PARAMS.GROUP_RESET}
-            emptyValue={PARAMS.GROUP_RESET}
-            label={this.context.intl.formatMessage(isSubgroup ? messages.subgroupBy : messages.groupBy)}
-            index={`group-select-${isSubgroup ? '2' : '1'}`}
-            options={options}
-            isReset
-            onChange={onChange}
-          />
+        { this.props.options.length > 0 && options && options.length > 0
+          && (
+            <SelectReset
+              value={value || PARAMS.GROUP_RESET}
+              emptyValue={PARAMS.GROUP_RESET}
+              label={intl.formatMessage(isSubgroup ? messages.subgroupBy : messages.groupBy)}
+              index={`group-select-${isSubgroup ? '2' : '1'}`}
+              options={options}
+              isReset
+              onChange={onChange}
+              hidePrint={!value || value === PARAMS.GROUP_RESET}
+            />
+          )
         }
       </Styled>
     );

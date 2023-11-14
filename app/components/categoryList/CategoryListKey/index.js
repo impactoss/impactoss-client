@@ -4,30 +4,37 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 const Styled = styled.div`
-  text-align: right;
   position: absolute;
-  right: 0;
-  bottom: 100%;
-  padding-bottom: 2px;
-  font-size: 0.7em;
-  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
-    font-size: 0.8em;
-  }
+  left: 0;
+  top: 100%;
+  padding-top: 2px;
+  padding-left: 8px;
 `;
 
-const ColumnKey = styled.span`
-  padding-left: 1em;
+const ColumnKey = styled.div`
+  padding-bottom: 0.2em;
 `;
 
 const KeyItem = styled.span`
-  padding-left: 0.75em;
+  display: block;
+  @media (min-width: ${(props) => props.theme.breakpoints.smallest}) {
+    padding-right: 1em;
+    display: inline-block;
+  }
 `;
 
-const Title = styled.div`
+const ItemTitle = styled.div`
   padding-left: 0.25em;
   display: inline-block;
   vertical-align: middle;
   color: ${palette('text', 1)};
+  font-size: 0.7em;
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    font-size: 0.8em;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smallest};
+  }
 `;
 
 const Square = styled.div`
@@ -39,44 +46,56 @@ const Square = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     height: 0.8em;
   }
+  @media print {
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+    &:before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      z-index: -1;
+      border-bottom: 100px solid ${(props) => palette(props.palette, props.pIndex || 0)};
+    }
+  }
 `;
 
 
 class CategoryListKey extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
-    const { columns } = this.props;
-
+    const { keys } = this.props;
     return (
       <Styled>
         {
-          columns.map((col, i) => col.key
+          keys.map((key, i) => key
             ? (
               <ColumnKey key={i}>
-                {col.key.title && (
+                {key.title && (
                   <div>
-                    {col.key.title}
+                    {key.title}
                   </div>
                 )}
                 {
-                  col.key.map((item, j) => (
+                  key.items && key.items.map((item, j) => (
                     <KeyItem key={j}>
                       <Square palette={item.palette} pIndex={item.pIndex} />
-                      <Title>{item.label}</Title>
+                      <ItemTitle>{item.label}</ItemTitle>
                     </KeyItem>
                   ))
                 }
               </ColumnKey>
             )
-            : null
-          )
+            : null)
         }
       </Styled>
     );
   }
 }
 CategoryListKey.propTypes = {
-  columns: PropTypes.array,
+  keys: PropTypes.array,
 };
 
 export default CategoryListKey;

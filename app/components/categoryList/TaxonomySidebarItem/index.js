@@ -14,7 +14,7 @@ const Styled = styled(Button)`
   display: table;
   table-layout: fixed;
   width: 100%;
-  padding:  ${(props) => props.small ? '0.15em 8px 0.15em 32px' : '0.3em 8px 0.3em 12px'};
+  padding:  ${({ small }) => small ? '0.15em 8px 0.15em 32px' : '0.3em 8px 0.3em 12px'};
   text-align: left;
   color:  ${(props) => props.active ? palette('asideCatNavItem', 1) : palette('asideCatNavItem', 0)};
   background-color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : palette('asideCatNavItem', 2)};
@@ -24,8 +24,11 @@ const Styled = styled(Button)`
     background-color: ${(props) => props.active ? palette('taxonomiesHover', props.paletteId) : palette('taxonomies', props.paletteId)};
     border-bottom-color: ${palette('asideCatNavItemHover', 4)};
   }
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding:  ${({ small }) => small ? '0.15em 8px 0.15em 32px' : '0.3em 8px 0.3em 12px'};
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding:  ${(props) => props.small ? '0.25em 8px 0.25em 68px' : '0.5em 8px 0.5em 16px'};
+    padding:  ${({ small }) => small ? '0.25em 8px 0.25em 68px' : '0.5em 8px 0.5em 16px'};
   }
 `;
 
@@ -35,7 +38,6 @@ const TaxTitle = styled.div`
   display: table-cell;
 `;
 
-// font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 const TaxIcon = styled.div`
   padding-right: 8px;
   vertical-align: middle;
@@ -46,7 +48,6 @@ const TaxIcon = styled.div`
 `;
 
 class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const { taxonomy, nested, onTaxonomyClick } = this.props;
     return (
@@ -64,7 +65,10 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
         onBlur={() => taxonomy.onMouseOver && taxonomy.onMouseOver(false)}
       >
         <TaxIcon>
-          <Icon name={`taxonomy_${taxonomy.id}`} size={nested ? '28px' : null} />
+          <Icon
+            name={`taxonomy_${taxonomy.id}`}
+            size={nested ? '28px' : '40px'}
+          />
         </TaxIcon>
         <TaxTitle>
           <FormattedMessage {...appMessages.entities.taxonomies[taxonomy.id].plural} />
