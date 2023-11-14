@@ -21,7 +21,7 @@ import {
   selectActiveFrameworks,
   selectFrameworkQuery,
 } from 'containers/App/selectors';
-import { PATHS, CONTENT_LIST } from 'containers/App/constants';
+import { ROUTES, CONTENT_LIST } from 'containers/App/constants';
 
 // components
 import Button from 'components/buttons/Button';
@@ -118,8 +118,8 @@ const DiagramButtonWrap = styled.div`
 `;
 
 const DiagramButton = styled(Button)`
-  background-color: ${palette('primary', 4)};
-  color: ${palette('primary', 1)};
+  background-color: ${(props) => palette(props.paletteDefault, 0)};
+  color: white;
   padding: ${({ draft }) => draft ? '0.4em 0.5em 0.75em' : '0.6em 0.5em'};
   box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.2);
   font-size: 0.7em;
@@ -127,7 +127,7 @@ const DiagramButton = styled(Button)`
   max-width: ${({ multiple }) => multiple ? '70px' : 'none'};
   min-width: none;
   &:hover {
-    color: ${palette('primary', 0)};
+    background-color: ${(props) => palette(props.paletteHover, 0)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 1em;
@@ -552,7 +552,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                             return (
                               <DiagramButtonWrap key={fwId} multiple={frameworks.size > 1}>
                                 {this.renderButton({
-                                  path: PATHS.RECOMMENDATIONS,
+                                  path: ROUTES.RECOMMENDATIONS,
                                   query: frameworks.size > 1 && {
                                     arg: 'fwx',
                                     value: fwId,
@@ -580,7 +580,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                       <DiagramSectionVerticalCenter>
                         <DiagramButtonWrap>
                           {this.renderButton({
-                            path: PATHS.MEASURES,
+                            path: ROUTES.MEASURES,
                             paletteDefault: 'measures',
                             paletteHover: 'measuresHover',
                             stateButton: 'buttonMeasures',
@@ -599,7 +599,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                       <DiagramSectionVerticalCenter>
                         <DiagramButtonWrap>
                           {this.renderButton({
-                            path: PATHS.INDICATORS,
+                            path: ROUTES.INDICATORS,
                             paletteDefault: 'indicators',
                             paletteHover: 'indicatorsHover',
                             stateButton: 'buttonIndicators',

@@ -30,7 +30,7 @@ import {
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -356,7 +356,7 @@ function mapDispatchToProps(dispatch, props) {
       ));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}/${reference}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.PROGRESS_REPORTS}/${reference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));
@@ -365,7 +365,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(deleteEntity({
         path: 'progress_reports',
         id: props.params.id,
-        redirect: `${PATHS.INDICATORS}/${indicatorId}`,
+        redirect: `${ROUTES.INDICATORS}/${indicatorId}`,
       }));
     },
   };

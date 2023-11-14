@@ -4,7 +4,7 @@ import {
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { saveEntity } from 'containers/App/actions';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 import { SAVE } from './constants';
 
@@ -13,7 +13,7 @@ export function* save({ data }) {
   yield put(saveEntity({
     path: 'indicators',
     entity: data,
-    redirect: `${PATHS.INDICATORS}/${data.id}`,
+    redirect: `${ROUTES.INDICATORS}/${data.id}`,
     invalidateEntitiesOnSuccess: 'due_dates', // force due_date reload to get newly generated due_dates
   }));
 }

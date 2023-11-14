@@ -24,7 +24,7 @@ import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 import { updatePath } from 'containers/App/actions';
 
@@ -84,10 +84,10 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
           <BottomLinks>
             <p>
               <A
-                href={PATHS.LOGIN}
+                href={ROUTES.LOGIN}
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink(PATHS.LOGIN, { keepQuery: true });
+                  this.props.handleLink(ROUTES.LOGIN, { keepQuery: true });
                 }}
               >
                 <FormattedMessage {...messages.loginLink} />

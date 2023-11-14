@@ -377,6 +377,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
 
     const currentFrameworkOption = frameworkOptions
       && frameworkOptions.find((option) => option.active);
+
     return (
       <Styled
         isHome={isHome}
@@ -436,33 +437,35 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         )}
         {!isHome && (
           <NavMain hasBorder>
-            <SelectFrameworks
-              as="button"
-              ref={this.fwButtonRef}
-              onClick={(evt) => this.state.showFrameworks
-                ? this.onHideFrameworks(evt)
-                : this.onShowFrameworks(evt)
-              }
-            >
-              <LinkSuperTitle>
-                {intl.formatMessage(appMessages.frameworks.single)}
-              </LinkSuperTitle>
-              {currentFrameworkOption && (
-                <LinkTitle active>
-                  {truncateText(
-                    currentFrameworkOption.label,
-                    TEXT_TRUNCATE.FW_SELECT,
-                    false,
-                  )}
-                  {!this.state.showFrameworks && (
-                    <Icon name="dropdownOpen" text textRight size="1em" />
-                  )}
-                  {this.state.showFrameworks && (
-                    <Icon name="dropdownClose" text textRight size="1em" />
-                  )}
-                </LinkTitle>
-              )}
-            </SelectFrameworks>
+            {frameworkOptions && (
+              <SelectFrameworks
+                as="button"
+                ref={this.fwButtonRef}
+                onClick={(evt) => this.state.showFrameworks
+                  ? this.onHideFrameworks(evt)
+                  : this.onShowFrameworks(evt)
+                }
+              >
+                <LinkSuperTitle>
+                  {intl.formatMessage(appMessages.frameworks.single)}
+                </LinkSuperTitle>
+                {currentFrameworkOption && (
+                  <LinkTitle active>
+                    {truncateText(
+                      currentFrameworkOption.label,
+                      TEXT_TRUNCATE.FW_SELECT,
+                      false,
+                    )}
+                    {!this.state.showFrameworks && (
+                      <Icon name="dropdownOpen" text textRight size="1em" />
+                    )}
+                    {this.state.showFrameworks && (
+                      <Icon name="dropdownClose" text textRight size="1em" />
+                    )}
+                  </LinkTitle>
+                )}
+              </SelectFrameworks>
+            )}
             {navItems && navItems.map((item, i) => (
               <LinkMain
                 key={i}

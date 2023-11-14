@@ -119,7 +119,7 @@ export const VIEWPORTS = {
   LARGE: 4,
 };
 
-export const PATHS = {
+export const ROUTES = {
   ID: '/:id',
   NEW: '/new',
   EDIT: '/edit',

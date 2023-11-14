@@ -29,7 +29,7 @@ import { getEntityTitleTruncated, getEntityReference } from 'utils/entities';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 
 import Loading from 'components/Loading';
@@ -312,10 +312,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: (measureId) => {
-      dispatch(updatePath(`${PATHS.MEASURES}${PATHS.EDIT}/${measureId}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.MEASURES}${ROUTES.EDIT}/${measureId}`, { replace: true }));
     },
     handleClose: () => {
-      dispatch(closeEntity(PATHS.MEASURES));
+      dispatch(closeEntity(ROUTES.MEASURES));
     },
   };
 }

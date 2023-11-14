@@ -116,7 +116,12 @@ function appReducer(state = initialState, payload) {
         .setIn(['ready', payload.path], payload.time);
     case LOAD_ENTITIES_ERROR:
       // check unauthorised (401)
-      if (payload.error.response.status === 401) {
+      if (
+        payload
+        && payload.error
+        && payload.error.response
+        && payload.error.response.status === 401
+      ) {
         return state
           .setIn(['server', 'error'], payload.error)
           .setIn(['entities', payload.path], fromJS([]))

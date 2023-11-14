@@ -25,7 +25,7 @@ import {
   prepareTaxonomies,
 } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
-import { PARAMS, PATHS } from './constants';
+import { PARAMS, ROUTES } from './constants';
 
 // high level state selects
 const getRoute = (state) => state.get('route');
@@ -322,6 +322,17 @@ export const selectFrameworks = createSelector(
 );
 // use for testing single framework configuration
 // && entities.filter((fw) => fw.get('id') === '1')
+
+export const selectCurrentFrameworkId = createSelector(
+  selectFrameworkQuery,
+  selectFrameworks,
+  (queryId, frameworks) => {
+    if (frameworks && frameworks.size === 1) {
+      return frameworks.first().get('id');
+    }
+    return queryId;
+  }
+);
 
 export const selectActiveFrameworks = createSelector(
   selectFrameworks,
@@ -920,7 +931,7 @@ export const selectViewRecommendationFrameworkId = createSelector(
   selectCurrentPathname,
   (entity, pathname) => {
     if (
-      pathname.startsWith(PATHS.RECOMMENDATIONS)
+      pathname.startsWith(ROUTES.RECOMMENDATIONS)
       && entity
       && entity.getIn(['attributes', 'framework_id'])
     ) {

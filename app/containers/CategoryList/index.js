@@ -21,7 +21,7 @@ import {
   selectFrameworkQuery,
   selectActiveFrameworks,
 } from 'containers/App/selectors';
-import { PATHS, CONTENT_LIST } from 'containers/App/constants';
+import { ROUTES, CONTENT_LIST } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 // components
@@ -275,10 +275,10 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectToDefaultTaxonomy: (taxonomyId) => {
-      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyId}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.TAXONOMIES}/${taxonomyId}`, { replace: true }));
     },
     handleNew: (taxonomyId) => {
-      dispatch(updatePath(`${PATHS.TAXONOMIES}/${taxonomyId}${PATHS.NEW}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.TAXONOMIES}/${taxonomyId}${ROUTES.NEW}`, { replace: true }));
     },
     onPageLink: (path) => {
       dispatch(updatePath(path));

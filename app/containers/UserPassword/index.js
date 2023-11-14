@@ -24,7 +24,7 @@ import AuthForm from 'components/forms/AuthForm';
 
 import { updatePath } from 'containers/App/actions';
 
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 import messages from './messages';
 
 import { save } from './actions';
@@ -112,7 +112,7 @@ export function mapDispatchToProps(dispatch) {
       dispatch(save(saveData));
     },
     handleCancel: (userId) => {
-      dispatch(updatePath(`${PATHS.USERS}/${userId}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.USERS}/${userId}`, { replace: true }));
     },
   };
 }

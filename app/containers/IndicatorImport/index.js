@@ -12,7 +12,7 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import { fromJS } from 'immutable';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 import { getImportFields, getColumnAttribute } from 'utils/import';
 
@@ -190,7 +190,7 @@ function mapDispatchToProps(dispatch) {
       }
     },
     handleCancel: () => {
-      dispatch(updatePath(PATHS.INDICATORS));
+      dispatch(updatePath(ROUTES.INDICATORS));
     },
     handleReset: () => {
       dispatch(resetProgress());

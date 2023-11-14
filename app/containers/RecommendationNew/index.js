@@ -30,7 +30,7 @@ import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES, DEFAULT_FRAMEWORK } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -431,7 +431,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath(PATHS.RECOMMENDATIONS, { replace: true }));
+      dispatch(updatePath(ROUTES.RECOMMENDATIONS, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

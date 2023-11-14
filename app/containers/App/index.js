@@ -26,7 +26,7 @@ import {
   selectFrameworks,
   selectEntitiesWhere,
   selectNewEntityModal,
-  selectFrameworkQuery,
+  selectCurrentFrameworkId,
   selectViewRecommendationFrameworkId,
 } from './selectors';
 
@@ -38,7 +38,7 @@ import {
   openNewEntityModal,
 } from './actions';
 
-import { PATHS, DEPENDENCIES } from './constants';
+import { ROUTES, DEPENDENCIES } from './constants';
 
 import messages from './messages';
 
@@ -87,7 +87,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     'number'
   )
     .map((page) => ({
-      path: `${PATHS.PAGES}/${page.get('id')}`,
+      path: `${ROUTES.PAGES}/${page.get('id')}`,
       title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),
     }))
     .toArray();
@@ -116,62 +116,62 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     const { intl } = this.context;
     let navItems = [
       {
-        path: PATHS.OVERVIEW,
+        path: ROUTES.OVERVIEW,
         titleSuper: intl.formatMessage(messages.nav.overviewSuper),
         title: intl.formatMessage(messages.nav.overview),
         active:
-          currentPath.startsWith(PATHS.OVERVIEW)
-          || currentPath.startsWith(PATHS.TAXONOMIES)
-          || currentPath.startsWith(PATHS.CATEGORIES),
+          currentPath.startsWith(ROUTES.OVERVIEW)
+          || currentPath.startsWith(ROUTES.TAXONOMIES)
+          || currentPath.startsWith(ROUTES.CATEGORIES),
       },
       {
-        path: PATHS.RECOMMENDATIONS,
+        path: ROUTES.RECOMMENDATIONS,
         titleSuper: intl.formatMessage(messages.nav.recommendationsSuper),
         title: intl.formatMessage(messages.frameworkObjectivesShort[currentFrameworkId]),
-        active: currentPath.startsWith(PATHS.RECOMMENDATIONS) && (
+        active: currentPath.startsWith(ROUTES.RECOMMENDATIONS) && (
           !viewRecommendationFramework
           || currentFrameworkId === 'all'
           || currentFrameworkId === viewRecommendationFramework
         ),
       },
       {
-        path: PATHS.MEASURES,
+        path: ROUTES.MEASURES,
         titleSuper: intl.formatMessage(messages.nav.measuresSuper),
         title: intl.formatMessage(messages.nav.measures),
-        active: currentPath.startsWith(PATHS.MEASURES),
+        active: currentPath.startsWith(ROUTES.MEASURES),
       },
     ];
     navItems = navItems.concat([{
-      path: PATHS.INDICATORS,
+      path: ROUTES.INDICATORS,
       titleSuper: intl.formatMessage(messages.nav.indicatorsSuper),
       title: intl.formatMessage(messages.nav.indicators),
       active:
-        currentPath.startsWith(PATHS.INDICATORS)
-        || currentPath.startsWith(PATHS.PROGRESS_REPORTS),
+        currentPath.startsWith(ROUTES.INDICATORS)
+        || currentPath.startsWith(ROUTES.PROGRESS_REPORTS),
     }]);
     if (isManager) {
       navItems = navItems.concat([
         {
-          path: PATHS.PAGES,
+          path: ROUTES.PAGES,
           title: intl.formatMessage(messages.nav.pages),
           isAdmin: true,
-          active: currentPath === PATHS.PAGES,
+          active: currentPath === ROUTES.PAGES,
         },
         {
-          path: PATHS.USERS,
+          path: ROUTES.USERS,
           title: intl.formatMessage(messages.nav.users),
           isAdmin: true,
-          active: currentPath === PATHS.USERS,
+          active: currentPath === ROUTES.USERS,
         },
       ]);
     }
     if (isUserSignedIn) {
       navItems = navItems.concat([
         {
-          path: PATHS.BOOKMARKS,
+          path: ROUTES.BOOKMARKS,
           title: intl.formatMessage(messages.nav.bookmarks),
           isAdmin: true,
-          active: currentPath === PATHS.BOOKMARKS,
+          active: currentPath === ROUTES.BOOKMARKS,
         },
       ]);
     }
@@ -210,18 +210,20 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             viewRecommendationFramework,
           )}
           search={{
-            path: PATHS.SEARCH,
+            path: ROUTES.SEARCH,
             title: intl.formatMessage(messages.nav.search),
-            active: location.pathname.startsWith(PATHS.SEARCH),
+            active: location.pathname.startsWith(ROUTES.SEARCH),
             icon: 'search',
           }}
           onPageLink={onPageLink}
           isHome={location.pathname === '/'}
           onSelectFramework={onSelectFramework}
-          frameworkOptions={this.prepareFrameworkOptions(
-            frameworks,
-            currentFrameworkId,
-          )}
+          frameworkOptions={frameworks && frameworks.size > 1
+            ? this.prepareFrameworkOptions(
+              frameworks,
+              currentFrameworkId,
+            )
+            : null}
         />
         <Main isHome={location.pathname === '/'}>
           {React.Children.toArray(children)}
@@ -285,7 +287,7 @@ const mapStateToProps = (state, props) => ({
     where: { draft: false },
   }),
   newEntityModal: selectNewEntityModal(state),
-  currentFrameworkId: selectFrameworkQuery(state),
+  currentFrameworkId: selectCurrentFrameworkId(state),
   frameworks: selectFrameworks(state),
   viewRecommendationFramework: selectViewRecommendationFrameworkId(state, props.params.id),
 });

@@ -27,7 +27,7 @@ import LanguageProvider from 'containers/LanguageProvider';
 
 // Import ThemeProvider
 import { ThemeProvider } from 'styled-components';
-import theme from 'themes/theme-samoa';
+import theme from 'themes/theme-base';
 
 // Load the favicon, and the .htaccess file
 /* eslint-disable import/no-unresolved, import/extensions */

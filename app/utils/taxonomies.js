@@ -1,4 +1,4 @@
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 import { qe } from 'utils/quasi-equals';
 import { fromJS } from 'immutable';
 
@@ -27,13 +27,13 @@ const mapTaxonomy = (tax, childTaxonomies, activeId, onLink) => {
   return fromJS({
     id: tax.get('id'),
     count: tax.count,
-    onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${tax.get('id')}`),
+    onLink: (isActive = false) => onLink(isActive ? ROUTES.OVERVIEW : `${ROUTES.TAXONOMIES}/${tax.get('id')}`),
     active: parseInt(activeId, 10) === parseInt(tax.get('id'), 10),
     children: children && children.map((child) => ({
       id: child.id,
       child: true,
       count: child.count,
-      onLink: (isActive = false) => onLink(isActive ? PATHS.OVERVIEW : `${PATHS.TAXONOMIES}/${child.id}`),
+      onLink: (isActive = false) => onLink(isActive ? ROUTES.OVERVIEW : `${ROUTES.TAXONOMIES}/${child.id}`),
       active: parseInt(activeId, 10) === parseInt(child.id, 10),
     })),
   });

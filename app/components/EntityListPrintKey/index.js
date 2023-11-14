@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { Map, List } from 'immutable';
 import { sortEntities } from 'utils/sort';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 import ButtonTagCategory from 'components/buttons/ButtonTagCategory';
 
@@ -102,7 +102,7 @@ export class EntityListPrintKey extends React.Component { // eslint-disable-line
                           {cat.short}
                         </ButtonTagCategory>
                       </TagWrapper>
-                      <a href={`${PATHS.CATEGORIES}/${cat.id}`}>
+                      <a href={`${ROUTES.CATEGORIES}/${cat.id}`}>
                         <CatLabel>
                           {cat.label}
                         </CatLabel>

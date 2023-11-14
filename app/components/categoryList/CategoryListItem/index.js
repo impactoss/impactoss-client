@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import ItemStatus from 'components/ItemStatus';
 import Clear from 'components/styled/Clear';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 import { qe } from 'utils/quasi-equals';
 import appMessages from 'containers/App/messages';
@@ -338,7 +338,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
 
     return (
       <Styled
-        onClick={() => onPageLink(`${PATHS.CATEGORIES}/${catItem.id}`)}
+        onClick={() => onPageLink(`${ROUTES.CATEGORIES}/${catItem.id}`)}
       >
         <TableWrap>
           {

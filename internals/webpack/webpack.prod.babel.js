@@ -124,9 +124,9 @@ module.exports = require('./webpack.base.babel')({
     }),
 
     new WebpackPwaManifest({
-      name: 'Sadata',
-      short_name: 'Sadata',
-      description: 'Sadata',
+      name: 'IMPACT OSS - NZ',
+      short_name: 'IMPACT OSS - NZ',
+      description: 'IMPACT OSS - NZ',
       background_color: '#ffffff',
       theme_color: '#ffffff',
       inject: true,
@@ -152,7 +152,6 @@ module.exports = require('./webpack.base.babel')({
   ],
 
   performance: {
-    assetFilter: assetFilename =>
-      !/(\.map$)|(^(main\.|favicon\.))/.test(assetFilename),
+    assetFilter: (assetFilename) => !/(\.map$)|(^(main\.|favicon\.))/.test(assetFilename),
   },
 });

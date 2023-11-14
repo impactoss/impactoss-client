@@ -30,7 +30,7 @@ import A from 'components/styled/A';
 import { selectQueryMessages } from 'containers/App/selectors';
 import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 import messages from './messages';
 
@@ -106,10 +106,10 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
             <p>
               <FormattedMessage {...messages.loginLinkBefore} />
               <A
-                href={PATHS.LOGIN}
+                href={ROUTES.LOGIN}
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink(PATHS.LOGIN, { keepQuery: true });
+                  this.props.handleLink(ROUTES.LOGIN, { keepQuery: true });
                 }}
               >
                 <FormattedMessage {...messages.loginLink} />

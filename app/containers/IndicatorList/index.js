@@ -18,7 +18,7 @@ import {
   selectIsSignedIn,
 } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 import EntityList from 'containers/EntityList';
 import { CONFIG, DEPENDENCIES } from './constants';
@@ -141,10 +141,10 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
-      dispatch(updatePath(`${PATHS.INDICATORS}${PATHS.NEW}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.INDICATORS}${ROUTES.NEW}`, { replace: true }));
     },
     handleImport: () => {
-      dispatch(updatePath(`${PATHS.INDICATORS}${PATHS.IMPORT}`));
+      dispatch(updatePath(`${ROUTES.INDICATORS}${ROUTES.IMPORT}`));
     },
   };
 }

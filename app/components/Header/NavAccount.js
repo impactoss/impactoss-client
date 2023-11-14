@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import { PATHS, PARAMS } from 'containers/App/constants';
+import { ROUTES, PARAMS } from 'containers/App/constants';
 
 import LinkAccount from './LinkAccount';
 import LinkAccountLoading from './LinkAccountLoading';
@@ -24,7 +24,7 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
   onClick = (evt, path, currentPath) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     if (currentPath) {
-      if (currentPath === PATHS.LOGIN || currentPath === PATHS.REGISTER) {
+      if (currentPath === ROUTES.LOGIN || currentPath === ROUTES.REGISTER) {
         this.props.onPageLink(evt, path, { keepQuery: true });
       } else {
         this.props.onPageLink(evt, path, {
@@ -42,7 +42,7 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
   render() {
     const { isSignedIn, currentPath, user } = this.props;
 
-    const userPath = user ? `${PATHS.USERS}/${user.id}` : '';
+    const userPath = user ? `${ROUTES.USERS}/${user.id}` : '';
 
     return (
       <Styled>
@@ -67,9 +67,9 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
         {isSignedIn
           && (
             <LinkAccount
-              href={PATHS.LOGOUT}
-              active={currentPath === PATHS.LOGOUT}
-              onClick={(evt) => this.onClick(evt, PATHS.LOGOUT)}
+              href={ROUTES.LOGOUT}
+              active={currentPath === ROUTES.LOGOUT}
+              onClick={(evt) => this.onClick(evt, ROUTES.LOGOUT)}
             >
               <FormattedMessage {...messages.logout} />
             </LinkAccount>
@@ -78,9 +78,9 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
         {!isSignedIn
           && (
             <LinkAccount
-              href={PATHS.REGISTER}
-              active={currentPath === PATHS.REGISTER}
-              onClick={(evt) => this.onClick(evt, PATHS.REGISTER, currentPath)}
+              href={ROUTES.REGISTER}
+              active={currentPath === ROUTES.REGISTER}
+              onClick={(evt) => this.onClick(evt, ROUTES.REGISTER, currentPath)}
             >
               <FormattedMessage {...messages.register} />
             </LinkAccount>
@@ -89,9 +89,9 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
         {!isSignedIn
           && (
             <LinkAccount
-              href={PATHS.LOGIN}
-              active={currentPath === PATHS.LOGIN}
-              onClick={(evt) => this.onClick(evt, PATHS.LOGIN, currentPath)}
+              href={ROUTES.LOGIN}
+              active={currentPath === ROUTES.LOGIN}
+              onClick={(evt) => this.onClick(evt, ROUTES.LOGIN, currentPath)}
             >
               <FormattedMessage {...messages.login} />
             </LinkAccount>

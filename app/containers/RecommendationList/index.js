@@ -22,7 +22,7 @@ import {
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 import EntityList from 'containers/EntityList';
 
@@ -187,10 +187,10 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
-      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}${PATHS.NEW}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.RECOMMENDATIONS}${ROUTES.NEW}`, { replace: true }));
     },
     handleImport: () => {
-      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}${PATHS.IMPORT}`));
+      dispatch(updatePath(`${ROUTES.RECOMMENDATIONS}${ROUTES.IMPORT}`));
     },
   };
 }

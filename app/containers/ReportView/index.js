@@ -24,7 +24,7 @@ import { getEntityTitleTruncated } from 'utils/entities';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -214,10 +214,10 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleEdit: () => {
-      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}${PATHS.EDIT}/${props.params.id}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.PROGRESS_REPORTS}${ROUTES.EDIT}/${props.params.id}`, { replace: true }));
     },
     handleClose: (indicatorId) => {
-      dispatch(closeEntity(`${PATHS.INDICATORS}/${indicatorId}`));
+      dispatch(closeEntity(`${ROUTES.INDICATORS}/${indicatorId}`));
     },
   };
 }

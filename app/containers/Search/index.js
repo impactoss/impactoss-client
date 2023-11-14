@@ -42,7 +42,7 @@ import EntityListHeader from 'components/EntityListMain/EntityListGroups/EntityL
 import EntityListItemWrapper from 'components/EntityListMain/EntityListGroups/EntityListItems/EntityListItemWrapper';
 
 import appMessages from 'containers/App/messages';
-// import { PATHS } from 'containers/App/constants';
+// import { ROUTES } from 'containers/App/constants';
 
 import { DEPENDENCIES } from './constants';
 import { selectEntitiesByQuery } from './selectors';

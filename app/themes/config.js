@@ -11,6 +11,11 @@
 
 // Language and date settings ********************
 // Note: you may also set the locales in i18n.js
+import { version } from '../../package.json';
+
+export const SERVER = (process && process.env && process.env.SERVER) || 'development';
+export const IS_DEV = SERVER !== 'production';
+export const VERSION = `${version}${IS_DEV ? ' [DEV]' : ''}`;
 
 // default language locale
 export const DEFAULT_LOCALE = 'en-GB';
@@ -24,7 +29,7 @@ export const NODE_ENV = sessionStorage.NODE_ENV || 'production';
 // set in translations/[LOCALE].js
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
-export const SHOW_HEADER_TITLE = true;
+export const SHOW_HEADER_TITLE = false;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.header
@@ -100,11 +105,9 @@ export const CYCLE_TAXONOMY_ID = 2;
 // General ********************
 
 export const ENDPOINTS = {
-  API: (
-    NODE_ENV === 'production'
-      ? 'https://undp-sadata-staging.herokuapp.com'
-      : 'https://undp-sadata-staging.herokuapp.com'
-  ), // server API endpoint
+  API: IS_DEV
+    ? 'https://nz-development-303ae37ca294.herokuapp.com'
+    : 'https://nz-development-303ae37ca294.herokuapp.com', // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',

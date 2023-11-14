@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 import Clear from 'components/styled/Clear';
 import ItemStatus from 'components/ItemStatus';
 import Label from 'components/styled/Label';
@@ -58,7 +58,7 @@ class EntityListNestedReportItem extends React.PureComponent { // eslint-disable
           evt.preventDefault();
           onEntityClick(report.get('id'), 'reports');
         }}
-        href={`${PATHS.PROGRESS_REPORTS}/${report.get('id')}`}
+        href={`${ROUTES.PROGRESS_REPORTS}/${report.get('id')}`}
       >
         <Top>
           {report.get('date')

@@ -1,5 +1,5 @@
 import { USER_ROLES } from 'themes/config';
-import { PATHS, PARAMS } from 'containers/App/constants';
+import { ROUTES, PARAMS } from 'containers/App/constants';
 import {
   selectIsSignedIn,
   selectSessionUserRoles,
@@ -11,11 +11,11 @@ import checkStore from './checkStore';
 export function replaceIfNotSignedIn(redirectOnAuthSuccess, replace, info = PARAMS.NOT_SIGNED_IN, replacePath) {
   return replacePath
     ? replace(replacePath)
-    : replace({ pathname: PATHS.LOGIN, query: { redirectOnAuthSuccess, info } });
+    : replace({ pathname: ROUTES.LOGIN, query: { redirectOnAuthSuccess, info } });
 }
 
 export function replaceUnauthorised(replace, replacePath) {
-  return replace(replacePath || PATHS.UNAUTHORISED);
+  return replace(replacePath || ROUTES.UNAUTHORISED);
 }
 
 export function replaceAlreadySignedIn(replace, info = PARAMS.ALREADY_SIGNED_IN) {

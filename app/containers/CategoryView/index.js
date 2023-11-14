@@ -38,7 +38,7 @@ import { qe } from 'utils/quasi-equals';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -436,10 +436,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: (categoryId) => {
-      dispatch(updatePath(`${PATHS.CATEGORIES}${PATHS.EDIT}/${categoryId}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.CATEGORIES}${ROUTES.EDIT}/${categoryId}`, { replace: true }));
     },
     handleClose: (taxonomyId) => {
-      dispatch(closeEntity(taxonomyId ? `${PATHS.TAXONOMIES}/${taxonomyId}` : PATHS.OVERVIEW));
+      dispatch(closeEntity(taxonomyId ? `${ROUTES.TAXONOMIES}/${taxonomyId}` : ROUTES.OVERVIEW));
     },
   };
 }

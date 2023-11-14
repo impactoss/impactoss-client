@@ -4,7 +4,7 @@ import { filterTaxonomies, getAcceptanceStatus } from 'utils/entities';
 import { USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 export const getIdField = (entity, isManager) => ({
   controlType: 'info',
@@ -149,7 +149,7 @@ const mapCategoryOptions = (categories, taxId) => categories
       label: cat.getIn(['attributes', 'title']),
       reference: cat.getIn(['attributes', 'reference']) || null,
       draft: cat.getIn(['attributes', 'draft']) || null,
-      linkTo: `${PATHS.CATEGORIES}/${cat.get('id')}`,
+      linkTo: `${ROUTES.CATEGORIES}/${cat.get('id')}`,
     }))
     .valueSeq().toArray()
   : [];
@@ -165,7 +165,7 @@ const mapSmartCategoryOptions = (categories) => categories
       isSmart: cat.get('associated') && cat.get('associated').size > 0,
       reference: cat.getIn(['attributes', 'reference']) || null,
       draft: cat.getIn(['attributes', 'draft']) || null,
-      linkTo: `${PATHS.CATEGORIES}/${cat.get('id')}`,
+      linkTo: `${ROUTES.CATEGORIES}/${cat.get('id')}`,
     }))
     .valueSeq().toArray()
   : [];
@@ -177,7 +177,7 @@ const mapReports = (reports) => reports
     updatedAt: report.getIn(['attributes', 'updated_at']),
     createdAt: report.getIn(['attributes', 'created_at']),
     draft: report.getIn(['attributes', 'draft']),
-    linkTo: `${PATHS.PROGRESS_REPORTS}/${report.get('id')}`,
+    linkTo: `${ROUTES.PROGRESS_REPORTS}/${report.get('id')}`,
     updatedBy: report.get('user') && report.getIn(['user', 'attributes']).toJS(),
   })).valueSeq().toArray()
   : [];

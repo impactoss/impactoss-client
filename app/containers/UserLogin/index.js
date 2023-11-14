@@ -28,7 +28,7 @@ import A from 'components/styled/A';
 import { selectQueryMessages } from 'containers/App/selectors';
 import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 import messages from './messages';
 
 import { login } from './actions';
@@ -101,10 +101,10 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
             <p>
               <FormattedMessage {...messages.registerLinkBefore} />
               <A
-                href={PATHS.REGISTER}
+                href={ROUTES.REGISTER}
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink(PATHS.REGISTER, { keepQuery: true });
+                  this.props.handleLink(ROUTES.REGISTER, { keepQuery: true });
                 }}
               >
                 <FormattedMessage {...messages.registerLink} />
@@ -113,10 +113,10 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
             </p>
             <p>
               <A
-                href={PATHS.RECOVER_PASSWORD}
+                href={ROUTES.RECOVER_PASSWORD}
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink(PATHS.RECOVER_PASSWORD, { keepQuery: true });
+                  this.props.handleLink(ROUTES.RECOVER_PASSWORD, { keepQuery: true });
                 }}
               >
                 <FormattedMessage {...messages.recoverPasswordLink} />

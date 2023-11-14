@@ -4,14 +4,14 @@ import {
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { newEntity } from 'containers/App/actions';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 import { SAVE } from './constants';
 
 export function* save({ data }) {
   yield put(newEntity({
     path: 'categories',
     entity: data,
-    redirect: PATHS.CATEGORIES,
+    redirect: ROUTES.CATEGORIES,
   }));
 }
 

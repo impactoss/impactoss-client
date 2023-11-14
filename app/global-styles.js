@@ -12,7 +12,7 @@ const GlobalStyle = createGlobalStyle`
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 1.428571429;
-    color: #344547;
+    color: #1c2121;;
   }
   button, input, select, textarea {
     font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -26,7 +26,7 @@ const GlobalStyle = createGlobalStyle`
     outline: 5px auto rgb(77, 144, 254); /* TODO: improve focus styles and individualise for specific buttons and links */
   }
   #app {
-    background-color: #F1F3F3;
+    background-color: #ffffff;
     min-height: 100%;
     min-width: 100%;
   }
@@ -40,7 +40,7 @@ const GlobalStyle = createGlobalStyle`
     background: transparent;
     border: none;
     text-align: left;
-    color: #eb6e51;
+    color: #0077d8;
     text-decoration: none;
 
     &:hover {
@@ -49,7 +49,7 @@ const GlobalStyle = createGlobalStyle`
   }
   h1, h2, h3, h4, h5, h6 {
     line-height: 1.25;
-    font-weight: 700;
+    font-weight: 500;
     margin-top: 20px;
     margin-bottom: 10px;
   }

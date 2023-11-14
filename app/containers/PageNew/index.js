@@ -21,7 +21,7 @@ import {
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 
 import {
@@ -240,7 +240,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(formData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath(PATHS.PAGES, { replace: true }));
+      dispatch(updatePath(ROUTES.PAGES, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

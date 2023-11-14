@@ -29,7 +29,7 @@ import { qe } from 'utils/quasi-equals';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -345,12 +345,12 @@ function mapDispatchToProps(dispatch) {
 
       dispatch(save(
         saveData.toJS(),
-        canUserPublish ? PATHS.PROGRESS_REPORTS : `${PATHS.INDICATORS}/${indicatorReference}`,
+        canUserPublish ? ROUTES.PROGRESS_REPORTS : `${ROUTES.INDICATORS}/${indicatorReference}`,
         !canUserPublish // createAsGuest: do not append created id to redirect, do not create locally
       ));
     },
     handleCancel: (indicatorReference) => {
-      dispatch(updatePath(`${PATHS.INDICATORS}/${indicatorReference}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.INDICATORS}/${indicatorReference}`, { replace: true }));
     },
     handleUpdate: (formData) => {
       dispatch(updateEntityForm(formData));

@@ -38,7 +38,7 @@ import {
   RECOVER_PASSWORD,
   CLOSE_ENTITY,
   DISMISS_QUERY_MESSAGES,
-  PATHS,
+  ROUTES,
   PARAMS,
   SET_FRAMEWORK,
   OPEN_BOOKMARK,
@@ -176,12 +176,12 @@ export function* recoverSaga(payload) {
     yield put(recoverSending());
     yield call(apiRequest, 'post', ENDPOINTS.PASSWORD, {
       email,
-      redirect_url: `${window.location.origin}${PATHS.RESET_PASSWORD}`,
+      redirect_url: `${window.location.origin}${ROUTES.RESET_PASSWORD}`,
     });
     yield put(recoverSuccess());
     // forward to login
     yield put(updatePath(
-      PATHS.LOGIN,
+      ROUTES.LOGIN,
       {
         replace: true,
         query: { info: PARAMS.RECOVER_SUCCESS },
@@ -208,7 +208,7 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', ENDPOINTS.SIGN_OUT);
     yield call(clearAuthValues);
     yield put(logoutSuccess());
-    yield put(updatePath(PATHS.LOGIN, { replace: true }));
+    yield put(updatePath(ROUTES.LOGIN, { replace: true }));
   } catch (err) {
     yield call(clearAuthValues);
     yield put(authenticateError(err));

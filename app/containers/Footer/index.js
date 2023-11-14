@@ -8,10 +8,11 @@ import { palette } from 'styled-theme';
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 
 import NormalImg from 'components/Img';
+// import { VERSION } from 'themes/config';
 import Container from 'components/styled/Container';
 import A from 'components/styled/A';
 
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 import { FOOTER, DB_TABLES } from 'themes/config';
 
 import messages from './messages';
@@ -212,9 +213,9 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
                             <FooterLink
                               onClick={(evt) => {
                                 if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                                this.props.onPageLink(`${PATHS.PAGES}/${FOOTER.LINK_TARGET_INTERNAL_ID}`);
+                                this.props.onPageLink(`${ROUTES.PAGES}/${FOOTER.LINK_TARGET_INTERNAL_ID}`);
                               }}
-                              href={`${PATHS.PAGES}/${FOOTER.LINK_TARGET_INTERNAL_ID}`}
+                              href={`${ROUTES.PAGES}/${FOOTER.LINK_TARGET_INTERNAL_ID}`}
                               title={intl.formatMessage(messages.responsible.anchor)}
                             >
                               <FormattedMessage {...messages.responsible.anchor} />

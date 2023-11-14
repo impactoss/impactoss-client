@@ -25,7 +25,7 @@ import Loading from 'components/Loading';
 import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 import {
   SHOW_HOME_TITLE,
@@ -309,7 +309,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                     <Grid lg={2 / 3} sm={3 / 4} xs={1}>
                       <FrameworkButton
                         single
-                        onClick={() => onPageLink(PATHS.OVERVIEW)}
+                        onClick={() => onPageLink(ROUTES.OVERVIEW)}
                         count={1}
                       >
                         <FormattedMessage {...messages.explore} />
@@ -357,7 +357,7 @@ function mapDispatchToProps(dispatch) {
     },
     onSelectFramework: (framework) => {
       dispatch(updatePath(
-        PATHS.OVERVIEW,
+        ROUTES.OVERVIEW,
         {
           query: {
             arg: 'fw',
