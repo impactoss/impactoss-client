@@ -85,15 +85,18 @@ export const prepareTaxonomyGroups = (
       }
     });
     // common frameworks
-    groups.push({
-      id: 'common',
-      taxonomies: parentTaxonomies
-        .filter((tax) => tax.getIn(['attributes', 'tags_recommendations'])
-          && tax.get('frameworkIds').size > 1)
-        .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
-        .toList()
-        .toJS(),
-    });
+    const commonTaxonomies = parentTaxonomies
+      .filter((tax) => tax.getIn(['attributes', 'tags_recommendations'])
+        && tax.get('frameworkIds').size > 1)
+      .map((tax) => mapTaxonomy(tax, childTaxonomies, activeId, onLink))
+      .toList()
+      .toJS();
+    if (commonTaxonomies && commonTaxonomies.length > 0) {
+      groups.push({
+        id: 'common',
+        taxonomies: commonTaxonomies,
+      });
+    }
   }
 
   const measureOnlyTaxonomies = parentTaxonomies
