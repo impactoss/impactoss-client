@@ -192,6 +192,15 @@ export default defineMessages({
       defaultMessage: 'Show top menu',
     },
   },
+  htmlElementAttributes: {
+    autocomplete: {
+      fullName: 'name',
+      email: 'email',
+      username: 'username',
+      newPassword: 'new-password',
+      currentPassword: 'current-password',
+    },
+  },
   labels: {
     perPage: {
       id: 'app.containers.App.labels.perPage',
@@ -268,6 +277,7 @@ export default defineMessages({
       defaultMessage: '"Reference" is required. ',
     },
   },
+
   hints: {
     autoReference: {
       id: 'app.containers.App.hints.autoReference',

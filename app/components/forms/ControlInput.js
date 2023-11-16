@@ -2,7 +2,10 @@ import { Control } from 'react-redux-form/immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-const ControlInput = styled(Control.input)`
+const ControlInput = styled(Control.input)
+  .attrs(({ autocomplete }) => ({
+    autoComplete: autocomplete,
+  }))`
   background-color: ${palette('background', 0)};
   width: 100%;
   border: 1px solid ${palette('light', 1)};

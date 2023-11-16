@@ -68,7 +68,7 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
                 labels={{ submit: intl.formatMessage(messages.submit) }}
                 fields={[
                   getPasswordField(intl.formatMessage, '.password'),
-                  getPasswordConfirmationField(intl.formatMessage, '.passwordConfirmation'),
+                  getPasswordConfirmationField(intl.formatMessage, 'currentPassword', '.passwordConfirmation'),
                 ]}
               />
             )
