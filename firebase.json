@@ -7,47 +7,50 @@
         "destination": "/index.html"
       }
     ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "headers": [
       {
-        "source" : "**/*.@(eot|otf|ttf|ttc|woff|font.css)",
-        "headers" : [
+        "source": "**/*.@(eot|otf|ttf|ttc|woff|font.css)",
+        "headers": [
           {
-            "key" : "Access-Control-Allow-Origin",
-            "value" : "*"
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
           }
         ]
       },
       {
         "source": "/",
-        "headers": [{
-          "key": "Cache-Control",
-          "value": "private, max-age=0, no-cache"
-        }]
-      },
-      {
-        "source" : "**/*.html",
-        "headers" : [
+        "headers": [
           {
-            "key" : "Cache-Control",
-            "value" : "private, max-age=0, no-cache"
+            "key": "Cache-Control",
+            "value": "private, max-age=0, no-cache"
           }
         ]
       },
       {
-        "source" : "**/*.@(jpg|jpeg|gif|png)",
-        "headers" : [
+        "source": "**/*.html",
+        "headers": [
           {
-            "key" : "Cache-Control",
-            "value" : "max-age=3300"
+            "key": "Cache-Control",
+            "value": "private, max-age=0, no-cache"
           }
         ]
       },
       {
-        "source" : "**/*.@(css|js)",
-        "headers" : [
+        "source": "**/*.@(jpg|jpeg|gif|png)",
+        "headers": [
           {
-            "key" : "Cache-Control",
-            "value" : "max-age=3300"
+            "key": "Cache-Control",
+            "value": "max-age=3300"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(css|js)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=3300"
           }
         ]
       }
