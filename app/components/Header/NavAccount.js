@@ -14,9 +14,6 @@ import messages from './messages';
 
 const Styled = styled.div`
   background-color: ${palette('headerNavAccount', 0)};
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    float: right;
-  }
 `;
 
 
@@ -37,7 +34,7 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
     } else {
       this.props.onPageLink(evt, path);
     }
-  }
+  };
 
   render() {
     const { isSignedIn, currentPath, user } = this.props;

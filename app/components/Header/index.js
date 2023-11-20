@@ -95,7 +95,7 @@ const NavSecondary = styled(PrintHide)`
   bottom: 0;
   width: 100%;
   z-index: 99999;
-  background-color:  ${palette('header', 0)};
+  background-color: transparent;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     position: relative;
     top: auto;
@@ -204,6 +204,10 @@ const FrameworkOption = styled(Button)`
   }
   color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
 `;
+const NavWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
 
 const STATE_INITIAL = {
   showSecondary: false,
@@ -247,7 +251,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     if (!wrapperContains && !buttonContains) {
       this.setState({ showFrameworks: false });
     }
-  }
+  };
 
   onShowSecondary = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -280,7 +284,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     } else {
       this.props.onPageLink(path);
     }
-  }
+  };
 
   resize = () => {
     // reset
@@ -316,48 +320,50 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             <Icon name="close" size="30px" />
           </HideSecondary>
         </HideSecondaryWrap>
-        <NavAccount
-          isSignedIn={this.props.isSignedIn}
-          user={this.props.user}
-          onPageLink={(evt, path, query) => {
-            if (evt !== undefined && evt.stopPropagation) evt.stopPropagation();
-            this.onHideSecondary();
-            this.props.onPageLink(path, query);
-          }}
-          currentPath={this.props.currentPath}
-        />
-        { navItemsAdmin
-          && (
-            <NavAdmin>
-              { navItemsAdmin.map((item, i) => (
-                <LinkAdmin
-                  key={i}
-                  href={item.path}
-                  active={item.active}
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                    this.onHideSecondary();
-                    this.onClick(evt, item.path);
-                  }}
-                >
-                  {item.title}
-                </LinkAdmin>
-              ))}
-            </NavAdmin>
-          )
-        }
-        <NavPages>
-          { this.props.pages && this.props.pages.map((page, i) => (
-            <LinkPage
-              key={i}
-              href={page.path}
-              active={page.active || this.props.currentPath === page.path}
-              onClick={(evt) => this.onClick(evt, page.path)}
-            >
-              {page.title}
-            </LinkPage>
-          ))}
-        </NavPages>
+        <NavWrapper>
+          {navItemsAdmin
+            && (
+              <NavAdmin>
+                {navItemsAdmin.map((item, i) => (
+                  <LinkAdmin
+                    key={i}
+                    href={item.path}
+                    active={item.active}
+                    onClick={(evt) => {
+                      evt.stopPropagation();
+                      this.onHideSecondary();
+                      this.onClick(evt, item.path);
+                    }}
+                  >
+                    {item.title}
+                  </LinkAdmin>
+                ))}
+              </NavAdmin>
+            )
+          }
+          <NavPages>
+            {this.props.pages && this.props.pages.map((page, i) => (
+              <LinkPage
+                key={i}
+                href={page.path}
+                active={page.active || this.props.currentPath === page.path}
+                onClick={(evt) => this.onClick(evt, page.path)}
+              >
+                {page.title}
+              </LinkPage>
+            ))}
+          </NavPages>
+          <NavAccount
+            isSignedIn={this.props.isSignedIn}
+            user={this.props.user}
+            onPageLink={(evt, path, query) => {
+              if (evt !== undefined && evt.stopPropagation) evt.stopPropagation();
+              this.onHideSecondary();
+              this.props.onPageLink(path, query);
+            }}
+            currentPath={this.props.currentPath}
+          />
+        </NavWrapper>
       </NavSecondary>
     </PrintHide>
   );
