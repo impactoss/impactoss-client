@@ -114,7 +114,7 @@
   "app.components.ImportEntitiesForm.rowErrorHint": "Import of the following row(s) failed:",
   "app.components.ImportEntitiesForm.errorHintTitle": "Important",
   "app.components.ImportEntitiesForm.errorHintText": "When using the import feature again to add the failed rows, please make sure to remove the successfully imported rows from your CSV file. Failure to do so will lead to duplicate entries. Alternatively you can add each failed row individually by manually creating a new entry.",
-  "app.components.MarkdownControl.anchor": "Styling with Markdown is supported",
+  "app.components.MarkdownControl.anchor": "Formatting text with Markdown is supported",
   "app.components.MarkdownControl.url": "http://commonmark.org/help",
   "app.components.MarkdownControl.hint": " ## Subheader, **bold**, _italic_",
   "app.components.MultiSelectControl.new": "New",

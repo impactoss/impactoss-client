@@ -7,7 +7,7 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   anchor: {
     id: 'app.components.MarkdownControl.anchor',
-    defaultMessage: 'Styling with Markdown is supported',
+    defaultMessage: 'Learn more about markdown format options here',
   },
   url: {
     id: 'app.components.MarkdownControl.url',
