@@ -16,9 +16,10 @@ import { palette } from 'styled-theme';
 
 const ButtonWrapper = styled.div.attrs(({ as }) => ({
   as,
-}))`
+}))``;
 
-`;
+const IconWrapper = styled.span``;
+
 const ContentWrapper = styled.div`
 width: 50%;
 min-width: 320px;
@@ -98,7 +99,8 @@ function InfoOverlay({
         flex={inline ? false : { grow: 0, shrink: 0 }}
         style={inline ? { width: 'auto', display: 'inline-block' } : null}
       >
-        <Button
+        <IconWrapper
+          tabindex={0}
           onClick={() => !tooltip && showInfo(!info)}
         >
           <Icon
@@ -106,7 +108,7 @@ function InfoOverlay({
             name={(tooltip || icon === 'question') ? 'question' : 'info'}
             size="16px"
           />
-        </Button>
+        </IconWrapper>
       </ButtonWrapper>
       {info ? (
         <LayerWrap onClick={() => showInfo(false)}>

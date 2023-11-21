@@ -73,7 +73,7 @@ const ActionButtonsWrapper = styled.div`
 display: flex;
 flex-direction: row;
 gap: 5px; 
-  align-items: center;
+align-items: center;
 `;
 const EditorButtonsWrapper = styled.div`
 display: flex;
