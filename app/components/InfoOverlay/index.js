@@ -8,138 +8,117 @@ import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
 
-import Icon from 'components/Icon';
-import Button from 'components/buttons/Button';
-
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
+import {
+  Box,
+  Button,
+  Drop,
+} from 'grommet';
+import { CircleInformation, CircleQuestion } from 'grommet-icons';
 
-const ButtonWrapper = styled.div.attrs(({ as }) => ({
-  as,
-}))``;
+import Overlay from './Overlay';
 
-const IconWrapper = styled.span``;
-
-const ContentWrapper = styled.div`
-width: 50%;
-min-width: 320px;
-min-height: 200px;
-overflow-y: auto;
-background: white;
-`;
-const LayerWrap = styled((p) => (<div {...p} />))`
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-z-index: 102;
-background: rgba(0, 0, 0, 0.5);
-display: flex;
-justify-content: center;
-align-items: center;
-`;
-
-const LayerHeader = styled.div`
-display: flex;
-flex-direction: row;
-padding: 12px 12px 12px 24px;
-background: ${() => palette('background', 1)};
-gap: 5px;
-justify-content: between;
-align-content: center;
-flex: 0;
-`;
-
-const LayerContent = styled.div`
-padding: 24px;
-background: white;
-flex: 1;
+const DropContent = styled(({ dropBackground, ...p }) => (
+  <Box
+    pad="xxsmall"
+    background={dropBackground}
+    {...p}
+  />
+))`
+  max-width: 280px;
 `;
 
 const Markdown = styled(ReactMarkdown)`
-font-size: ${({ theme }) => theme.sizes.text.markdownMobile};
-@media (min-width: ${({ theme }) => theme.breakpoints.medium}) {
-  font-size: ${({ theme }) => theme.sizes.text.markdown};
-}
-@media print {
- font-size: ${({ theme }) => theme.sizes.print.markdown};
-}
-`;
-
-const CloseButtonWrapper = styled.div`
-display: flex;
-flex-grow: 1;
-justify-content: end;
-`;
-const HeaderTitle = styled.span`
-font-size: 16px;
-line-height: 21px;
-font-weight: 600;
+  font-size: ${(props) => props.theme.sizes.text.markdownMobile};
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    font-size: ${(props) => props.theme.sizes.text.markdown};
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.markdown};
+  }
 `;
 
 function InfoOverlay({
+  dark,
   content,
   tooltip,
   title,
   padButton = null,
+  colorButton,
   icon,
   markdown,
   inline,
+  dropBackground,
 }) {
   const infoRef = useRef(null);
   const [info, showInfo] = useState(false);
-
   return (
     <>
-      <ButtonWrapper
+      <Box
         as={inline ? 'span' : 'div'}
+        fill={false}
         pad={padButton || (inline ? null : { horizontal: 'small' })}
         ref={infoRef}
         flex={inline ? false : { grow: 0, shrink: 0 }}
-        style={inline ? { width: 'auto', display: 'inline-block' } : null}
+        style={inline ? { width: 'auto', display: 'inline' } : null}
+        align="center"
+        justify="center"
       >
-        <IconWrapper
-          tabindex={0}
+        <Button
+          plain
+          icon={
+            (tooltip || icon === 'question')
+              ? (
+                <CircleQuestion
+                  color={colorButton || (dark ? 'light-5' : 'dark-5')}
+                  size="21px"
+                />
+              )
+              : (
+                <CircleInformation
+                  color={colorButton || (dark ? 'light-5' : 'dark-5')}
+                  size="21px"
+                />
+              )
+          }
+          fill={false}
+          onMouseOver={() => tooltip && showInfo(true)}
+          onMouseLeave={() => tooltip && showInfo(false)}
+          onFocus={() => tooltip && showInfo(true)}
+          onBlur={() => null}
           onClick={() => !tooltip && showInfo(!info)}
+        />
+      </Box>
+      {info && infoRef && tooltip && (
+        <Drop
+          align={{ bottom: 'top' }}
+          target={infoRef.current}
+          plain
         >
-          <Icon
-            color={palette('text', 1)}
-            name={(tooltip || icon === 'question') ? 'question' : 'info'}
-            size="16px"
-          />
-        </IconWrapper>
-      </ButtonWrapper>
-      {info ? (
-        <LayerWrap onClick={() => showInfo(false)}>
-          <ContentWrapper onClick={(event) => event.stopPropagation()}>
-            <LayerHeader>
+          <DropContent dropBackground={dropBackground}>
+            {markdown && (
               <div>
-                {title && (<HeaderTitle>{title}</HeaderTitle>)}
+                <Markdown source={content} className="react-markdown" linkTarget="_blank" />
               </div>
-              <CloseButtonWrapper>
-                <Button onClick={() => showInfo(false)}>
-                  <Icon name="close" size="24px" />
-                </Button>
-              </CloseButtonWrapper>
-            </LayerHeader>
-            <LayerContent>
-              <div>
-                {markdown && (
-                  <Markdown source={content} className="react-markdown" linkTarget="_blank" />
-                )}
-                {!markdown && content}
-              </div>
-            </LayerContent>
-          </ContentWrapper>
-        </LayerWrap>
-      )
-        : null}
+            )}
+            {!markdown && content}
+          </DropContent>
+        </Drop>
+      )}
+      {info && !tooltip && (
+        <Overlay
+          onClose={() => showInfo(false)}
+          title={title}
+          markdown={markdown}
+          content={content}
+        />
+      )}
     </>
   );
 }
 
 InfoOverlay.propTypes = {
+  dark: PropTypes.bool,
   markdown: PropTypes.bool,
   inline: PropTypes.bool,
   tooltip: PropTypes.bool,
@@ -149,6 +128,8 @@ InfoOverlay.propTypes = {
   ]),
   title: PropTypes.string,
   icon: PropTypes.string,
+  dropBackground: PropTypes.string,
+  colorButton: PropTypes.string,
   padButton: PropTypes.oneOfType([
     PropTypes.object,
     PropTypes.string,

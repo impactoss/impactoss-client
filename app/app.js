@@ -26,8 +26,9 @@ import { makeSelectLocationState } from 'containers/App/selectors';
 import LanguageProvider from 'containers/LanguageProvider';
 
 // Import ThemeProvider
-import { ThemeProvider } from 'styled-components';
+// import { ThemeProvider } from 'styled-components';
 import theme from 'themes/theme-base';
+import { Grommet } from 'grommet';
 
 // Load the favicon, and the .htaccess file
 /* eslint-disable import/no-unresolved, import/extensions */
@@ -75,12 +76,12 @@ const render = (messages) => {
   ReactDOM.render(
     <Provider store={store}>
       <LanguageProvider messages={messages}>
-        <ThemeProvider theme={theme}>
+        <Grommet theme={theme}>
           <Router
             history={history}
             routes={rootRoute}
           />
-        </ThemeProvider>
+        </Grommet>
       </LanguageProvider>
     </Provider>,
     document.getElementById('app'),

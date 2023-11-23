@@ -5,115 +5,113 @@ import PropTypes from 'prop-types';
 import { injectIntl, intlShape } from 'react-intl';
 import { palette } from 'styled-theme';
 import styled, { withTheme } from 'styled-components';
+import { Box, Text, Button } from 'grommet';
 
-import Icon from 'components/Icon';
+import {
+  Bold,
+  Italic,
+  Link as LinkIcon,
+  List,
+} from 'grommet-icons';
+
 import TextareaMarkdown from 'textarea-markdown-editor';
 import MarkdownField from 'components/fields/MarkdownField';
 import InfoOverlay from 'components/InfoOverlay';
 import A from 'components/styled/A';
-import MarkdownButton from './MarkdownButton';
 import messages from './messages';
 
 const MIN_TEXTAREA_HEIGHT = 320;
 
 const MarkdownHint = styled.div`
-text-align: right;
-color: ${palette('text', 1)};
-font-size: 0.85em;
-@media print {
-font-size: ${({ theme }) => theme.sizes.print.smaller};
-}`;
+  text-align: right;
+  color: ${palette('text', 1)};
+  font-size: 0.85em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
+`;
 
 const StyledTextareaMarkdown = styled(
   React.forwardRef((p, ref) => <TextareaMarkdown ref={ref} {...p} />)
 )`
-background-color: ${palette('background', 0)};
-width: 100%;
-border: 1px solid ${palette('light', 1)};
-padding: 0.7em;
-border-radius: 0.5em;
-color: ${palette('text', 0)};
-min-height: ${MIN_TEXTAREA_HEIGHT}px;
-resize: none;
+  background-color: ${palette('background', 0)};
+  width: 100%;
+  border: 1px solid ${palette('light', 1)};
+  padding: 0.7em;
+  border-radius: 0.5em;
+  color: ${palette('text', 0)};
+  min-height: ${MIN_TEXTAREA_HEIGHT}px;
+  resize: "none";
+`;
+const Preview = styled((p) => <Box {...p} />)`
+  background-color: ${palette('background', 0)};
+  width: 100%;
+  border: 1px solid ${palette('light', 1)};
+  padding: 0.7em;
+  color: ${palette('text', 0)};
+  min-height: ${MIN_TEXTAREA_HEIGHT}px;
 `;
 
-const Preview = styled((p) => <div {...p} />)`
-background-color: ${palette('background', 0)};
-width: 100%;
-border: 1px solid ${palette('light', 1)};
-padding: 0.7em;
-color: ${palette('text', 0)};
-min-height: ${MIN_TEXTAREA_HEIGHT}px;
-`;
-
-const ViewButton = styled.button`
-background: none;
-opacity: ${({ active }) => active ? 1 : 0.6};
-border-bottom: 3px solid;
-border-bottom-color: ${({ active, theme }) => active ? theme.palette.linkHover[0] : 'transparent'};
-&:hover {
-opacity: 0.8;
-border-bottom-color: ${palette('light', 2)};
-}`;
-
-const MDButtonText = styled((p) => (
-  <TextLabel weight="bold" {...p} />
+const MDButton = styled((p) => (
+  <Button
+    plain
+    as="div"
+    {...p}
+  />
 ))`
-position: relative;
-top: -2px;
+  min-width: 30px;
+  min-height: 30px;
+  text-align: center;
+  padding: 4px 7px;
+  &:hover {
+    background-color: ${({ disabled }) => disabled ? 'transparent' : palette('light', 2)};
+  }
 `;
-const ComponentWrapper = styled.div`
-display: flex;
-flex-direction: row;
-justify-content: space-between;
-align-items: center;
-margin: 5px 0px;
+const ViewButton = styled((p) => (
+  <Button
+    plain
+    {...p}
+  />
+))`
+  background: none;
+  opacity: ${({ active }) => active ? 1 : 0.6};
+  border-bottom: 3px solid;
+  border-bottom-color: ${(
+    { active, theme }
+  ) => active ? theme.global.colors.aHover : 'transparent'
+};
+  &:hover {
+    opacity: 0.8;
+    border-bottom-color: ${palette('light', 2)};
+  }
 `;
-const ActionButtonsWrapper = styled.div`
-display: flex;
-flex-direction: row;
-gap: 5px; 
-align-items: center;
-`;
-const EditorButtonsWrapper = styled.div`
-display: flex;
-flex-direction: row; 
-align-items: center; 
-gap: 2px;
-`;
-const InnerWrapper = styled.div`
-margin-right: 2px;
-`;
-const FormatTextWrapper = styled.div`
-display: flex;
-flex-direction: row;
-align-items: center;
-gap: 8px;
-`;
-const TextLabel = styled.p`
-font-weight: ${({ weight }) => weight || '400'};
-color:${({ color }) => color ? palette('text', 1) : 'black'};
-font-size:${({ size }) => size === 'xsmall' ? ' 0.85em' : '1em'};
-margin: 0px;
+const MDButtonText = styled((p) => (
+  <Text weight="bold" size="medium" {...p} />
+))`
+  position: relative;
+  top: -1px;
 `;
 
 function TextareaMarkdownWrapper(props) {
   const { value, intl, theme } = props;
   const textareaRef = useRef(null);
   const [view, setView] = useState('write');
-
+  // const [hasFocus, setHasFocus] = useState(false);
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
-      textareaRef.current.style.height = `${Math.max(textareaRef.current.scrollHeight
-        + 20, MIN_TEXTAREA_HEIGHT)} px`;
+      textareaRef.current.style.height = `${
+        Math.max(textareaRef.current.scrollHeight + 20, MIN_TEXTAREA_HEIGHT)
+      }px`;
     }
+    // has textarea focus?
+    // setHasFocus(document.activeElement === textareaRef.current);
   });
   const mdDisabled = view !== 'write';
   return (
-    <div>
-      <ComponentWrapper>
-        <ActionButtonsWrapper>
+    <Box>
+      <Box direction="row" justify="between" align="center" margin={{ vertical: 'small' }} wrap>
+        <Box direction="row" gap="small" align="center">
           <ViewButton
             onClick={() => setView('write')}
             active={view === 'write'}
@@ -126,45 +124,47 @@ function TextareaMarkdownWrapper(props) {
           >
             Preview
           </ViewButton>
-        </ActionButtonsWrapper>
-        <EditorButtonsWrapper>
-          <InnerWrapper>
-            <FormatTextWrapper>
-              <TextLabel size="small" color="hint">Format text</TextLabel>
+        </Box>
+        <Box direction="row" align="center" gap="xsmall" wrap justify="end">
+          <Box direction="row" align="center" gap="xsmall" justify="end">
+            <Box fill="vertical">
+              <Text size="xsmall" color="hint">Format text</Text>
+            </Box>
+            <Box>
               <InfoOverlay
-                colorButton={theme.palette.link[0]}
-                inline
                 title="Format text using markdown"
+                colorButton={theme.global.colors.hint}
+                padButton="none"
                 content={(
                   <div>
                     <p>
-                      <TextLabel size="small">
+                      <Text size="small">
                         {'This text field supports basic formatting using markdown, incuding section headings, '}
                         <strong>**bold**</strong>
                         {', '}
                         <em>_italic_</em>
                         , links, and more.
-                      </TextLabel>
+                      </Text>
                     </p>
                     <p>
-                      <TextLabel size="small">
+                      <Text size="small">
                         You can either directly type markdown code or use one of the format buttons above the text area to insert it, by either
-                      </TextLabel>
+                      </Text>
                     </p>
                     <ul>
                       <li>
-                        <TextLabel size="small">
+                        <Text size="small">
                           first clicking one of the buttons and then replace the generated placeholder text, or
-                        </TextLabel>
+                        </Text>
                       </li>
                       <li>
-                        <TextLabel size="small">
+                        <Text size="small">
                           first select some existing text and then apply a format using one the buttons.
-                        </TextLabel>
+                        </Text>
                       </li>
                     </ul>
                     <p>
-                      <TextLabel size="small">
+                      <Text size="small">
                         {'You can learn more about '}
                         <A
                           href={intl.formatMessage(messages.url)}
@@ -174,101 +174,103 @@ function TextareaMarkdownWrapper(props) {
                           markdown and additional formatting options here
                         </A>
                         .
-                      </TextLabel>
+                      </Text>
                     </p>
                   </div>
                 )}
               />
-            </FormatTextWrapper>
-          </InnerWrapper>
-          <MarkdownButton
-            title="## Heading"
-            disabled={mdDisabled}
-            onClick={() => {
-              if (!mdDisabled && textareaRef.current) {
-                textareaRef.current.trigger('h2');
-              }
-            }}
-            label={<MDButtonText>H2</MDButtonText>}
-          >
-          </MarkdownButton>
-          <MarkdownButton
-            title="### Secondary heading"
-            disabled={mdDisabled}
-            onClick={() => {
-              if (!mdDisabled && textareaRef.current) {
-                textareaRef.current.trigger('h3');
-              }
-            }}
-            label={<MDButtonText>H3</MDButtonText>}
-          >
-          </MarkdownButton>
-          <MarkdownButton
-            title="Bold: **bold**"
-            disabled={mdDisabled}
-            onClick={() => {
-              if (!mdDisabled && textareaRef.current) {
-                textareaRef.current.trigger('bold');
-              }
-            }}
-            icon={<Icon name="calendar" text />}
-          />
-          <MarkdownButton
-            title="Italic: _italic_"
-            disabled={mdDisabled}
-            onClick={() => {
-              if (!mdDisabled && textareaRef.current) {
-                textareaRef.current.trigger('italic');
-              }
-            }}
-            icon={<Icon name="calendar" />}
-          />
-          <MarkdownButton
-            title="Link: (text)[url]"
-            disabled={mdDisabled}
-            onClick={() => {
-              if (!mdDisabled && textareaRef.current) {
-                textareaRef.current.trigger('link');
-              }
-            }}
-            icon={<Icon name="calendar" />}
-          />
-          <MarkdownButton
-            title="Unordered list: -"
-            disabled={mdDisabled}
-            onClick={() => {
-              if (!mdDisabled && textareaRef.current) {
-                textareaRef.current.trigger('unordered-list');
-              }
-            }}
-            icon={<Icon name="calendar" />}
-          />
-          <MarkdownButton
-            title="Ordered list: 1."
-            disabled={mdDisabled}
-            onClick={() => {
-              if (!mdDisabled && textareaRef.current) {
-                textareaRef.current.trigger('ordered-list');
-              }
-            }}
-            label={
-              <MDButtonText size="xxsmall">123</MDButtonText>
-            }
-          >
-          </MarkdownButton>
-        </EditorButtonsWrapper>
-      </ComponentWrapper>
+            </Box>
+          </Box>
+          <Box direction="row" align="center" gap="hair" justify="end">
+            <MDButton
+              title="## Heading"
+              disabled={mdDisabled}
+              onClick={() => {
+                if (!mdDisabled && textareaRef.current) {
+                  textareaRef.current.trigger('h2');
+                }
+              }}
+            >
+              <MDButtonText>H2</MDButtonText>
+            </MDButton>
+            <MDButton
+              title="### Secondary heading"
+              disabled={mdDisabled}
+              onClick={() => {
+                if (!mdDisabled && textareaRef.current) {
+                  textareaRef.current.trigger('h3');
+                }
+              }}
+            >
+              <MDButtonText>H3</MDButtonText>
+            </MDButton>
+            <MDButton
+              title="Bold: **bold**"
+              disabled={mdDisabled}
+              onClick={() => {
+                if (!mdDisabled && textareaRef.current) {
+                  textareaRef.current.trigger('bold');
+                }
+              }}
+              icon={<Bold size="xsmall" />}
+            />
+            <MDButton
+              title="Italic: _italic_"
+              disabled={mdDisabled}
+              onClick={() => {
+                if (!mdDisabled && textareaRef.current) {
+                  textareaRef.current.trigger('italic');
+                }
+              }}
+              icon={<Italic size="xsmall" />}
+            />
+            <MDButton
+              title="Link: (text)[url]"
+              disabled={mdDisabled}
+              onClick={() => {
+                if (!mdDisabled && textareaRef.current) {
+                  textareaRef.current.trigger('link');
+                }
+              }}
+              icon={<LinkIcon size="18px" />}
+            />
+            <MDButton
+              title="Unordered list: -"
+              disabled={mdDisabled}
+              onClick={() => {
+                if (!mdDisabled && textareaRef.current) {
+                  textareaRef.current.trigger('unordered-list');
+                }
+              }}
+              icon={<List size="xsmall" />}
+            />
+            <MDButton
+              title="Ordered list: 1."
+              disabled={mdDisabled}
+              onClick={() => {
+                if (!mdDisabled && textareaRef.current) {
+                  textareaRef.current.trigger('ordered-list');
+                }
+              }}
+            >
+              <MDButtonText size="xxsmall" style={{ top: '-4px' }}>123</MDButtonText>
+            </MDButton>
+          </Box>
+        </Box>
+      </Box>
       {view === 'preview' && (
         <Preview>
           <MarkdownField field={{ value }} />
         </Preview>
       )}
       {view === 'write' && (
-        <div>
+        <Box>
           <StyledTextareaMarkdown
             ref={textareaRef}
             options={{
               preferredItalicSyntax: '_',
+              linkTextPlaceholder: 'link-title',
+              linkUrlPlaceholder: 'https://link-url.ext',
             }}
             {...props}
           />
@@ -281,9 +283,9 @@ function TextareaMarkdownWrapper(props) {
               {intl.formatMessage(messages.anchor)}
             </A>
           </MarkdownHint>
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 }
 
