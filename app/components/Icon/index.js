@@ -31,7 +31,7 @@ class Icon extends React.PureComponent {
         <SVG
           viewBox={`0 0 ${iSize} ${iSize}`}
           preserveAspectRatio="xMidYMid meet"
-          role="img"
+          aria-hidden="true"
           palette={palette}
           paletteIndex={paletteIndex}
           size={size || `${iSize}px`}
