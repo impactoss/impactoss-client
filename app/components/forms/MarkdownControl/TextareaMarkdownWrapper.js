@@ -2,7 +2,7 @@ import React, {
   useRef, useState, useEffect,
 } from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, intlShape } from 'react-intl';
+import { injectIntl, intlShape, FormattedMessage } from 'react-intl';
 import { palette } from 'styled-theme';
 import styled, { withTheme } from 'styled-components';
 import { Box, Text, Button } from 'grommet';
@@ -56,6 +56,8 @@ const MDButton = styled((p) => (
   <Button
     plain
     as="div"
+    tabindex="0"
+    role="button"
     {...p}
   />
 ))`
@@ -100,8 +102,7 @@ function TextareaMarkdownWrapper(props) {
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
-      textareaRef.current.style.height = `${
-        Math.max(textareaRef.current.scrollHeight + 20, MIN_TEXTAREA_HEIGHT)
+      textareaRef.current.style.height = `${Math.max(textareaRef.current.scrollHeight + 20, MIN_TEXTAREA_HEIGHT)
       }px`;
     }
     // has textarea focus?
@@ -116,19 +117,19 @@ function TextareaMarkdownWrapper(props) {
             onClick={() => setView('write')}
             active={view === 'write'}
           >
-            Write
+            {intl.formatMessage(messages.buttons.labels.write)}
           </ViewButton>
           <ViewButton
             onClick={() => setView('preview')}
             active={view === 'preview'}
           >
-            Preview
+            {intl.formatMessage(messages.buttons.labels.preview)}
           </ViewButton>
         </Box>
         <Box direction="row" align="center" gap="xsmall" wrap justify="end">
           <Box direction="row" align="center" gap="xsmall" justify="end">
             <Box fill="vertical">
-              <Text size="xsmall" color="hint">Format text</Text>
+              <Text size="xsmall" color="hint">{intl.formatMessage(messages.buttons.labels.formatText)}</Text>
             </Box>
             <Box>
               <InfoOverlay
@@ -139,41 +140,49 @@ function TextareaMarkdownWrapper(props) {
                   <div>
                     <p>
                       <Text size="small">
-                        {'This text field supports basic formatting using markdown, incuding section headings, '}
-                        <strong>**bold**</strong>
-                        {', '}
-                        <em>_italic_</em>
-                        , links, and more.
+                        <FormattedMessage
+                          {...messages.infoOverlay.firstSection}
+                          values={
+                            {
+                              strong: <strong>bold</strong>,
+                              italic: <em>_italic_</em>,
+                            }
+                          }
+                        />
                       </Text>
                     </p>
                     <p>
                       <Text size="small">
-                        You can either directly type markdown code or use one of the format buttons above the text area to insert it, by either
+                        {intl.formatMessage(messages.infoOverlay.secondSection)}
                       </Text>
                     </p>
                     <ul>
                       <li>
                         <Text size="small">
-                          first clicking one of the buttons and then replace the generated placeholder text, or
+                          {intl.formatMessage(messages.infoOverlay.thirdSection)}
                         </Text>
                       </li>
                       <li>
                         <Text size="small">
-                          first select some existing text and then apply a format using one the buttons.
+                          {intl.formatMessage(messages.infoOverlay.fourthSection)}
                         </Text>
                       </li>
                     </ul>
                     <p>
                       <Text size="small">
-                        {'You can learn more about '}
-                        <A
-                          href={intl.formatMessage(messages.url)}
-                          target="_blank"
-                          isOnLightBackground
-                        >
-                          markdown and additional formatting options here
-                        </A>
-                        .
+                        <FormattedMessage
+                          {...messages.infoOverlay.fifthSection}
+                          values={{
+                            link:
+  <A
+    href={intl.formatMessage(messages.url)}
+    target="_blank"
+    isOnLightBackground
+  >
+    {intl.formatMessage(messages.infoOverlay.sixthSection)}
+  </A>,
+                          }}
+                        />
                       </Text>
                     </p>
                   </div>
@@ -183,7 +192,7 @@ function TextareaMarkdownWrapper(props) {
           </Box>
           <Box direction="row" align="center" gap="hair" justify="end">
             <MDButton
-              title="## Heading"
+              title={intl.formatMessage(messages.buttons.titles.heading2)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -191,10 +200,10 @@ function TextareaMarkdownWrapper(props) {
                 }
               }}
             >
-              <MDButtonText>H2</MDButtonText>
+              <MDButtonText>{intl.formatMessage(messages.buttons.labels.heading2)}</MDButtonText>
             </MDButton>
             <MDButton
-              title="### Secondary heading"
+              title={intl.formatMessage(messages.buttons.titles.heading3)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -202,10 +211,10 @@ function TextareaMarkdownWrapper(props) {
                 }
               }}
             >
-              <MDButtonText>H3</MDButtonText>
+              <MDButtonText>{intl.formatMessage(messages.buttons.labels.heading3)}</MDButtonText>
             </MDButton>
             <MDButton
-              title="Bold: **bold**"
+              title={intl.formatMessage(messages.buttons.titles.bold)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -215,7 +224,7 @@ function TextareaMarkdownWrapper(props) {
               icon={<Bold size="xsmall" />}
             />
             <MDButton
-              title="Italic: _italic_"
+              title={intl.formatMessage(messages.buttons.titles.italic)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -225,7 +234,7 @@ function TextareaMarkdownWrapper(props) {
               icon={<Italic size="xsmall" />}
             />
             <MDButton
-              title="Link: (text)[url]"
+              title={intl.formatMessage(messages.buttons.titles.link)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -235,7 +244,7 @@ function TextareaMarkdownWrapper(props) {
               icon={<LinkIcon size="18px" />}
             />
             <MDButton
-              title="Unordered list: -"
+              title={intl.formatMessage(messages.buttons.titles.unorderedList)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -245,7 +254,7 @@ function TextareaMarkdownWrapper(props) {
               icon={<List size="xsmall" />}
             />
             <MDButton
-              title="Ordered list: 1."
+              title={intl.formatMessage(messages.buttons.titles.orderedList)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -253,7 +262,7 @@ function TextareaMarkdownWrapper(props) {
                 }
               }}
             >
-              <MDButtonText size="xxsmall" style={{ top: '-4px' }}>123</MDButtonText>
+              <MDButtonText size="xxsmall" style={{ top: '-4px' }}>{intl.formatMessage(messages.buttons.labels.orderedList)}</MDButtonText>
             </MDButton>
           </Box>
         </Box>
