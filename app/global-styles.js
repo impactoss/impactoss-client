@@ -280,6 +280,9 @@ const GlobalStyle = createGlobalStyle`
   outline: 3px black dashed;
   box-shadow: 0 0 2px 2px black;
   }
+  *:focus {
+    outline: none;
+  }
 `;
 
 export default GlobalStyle;
