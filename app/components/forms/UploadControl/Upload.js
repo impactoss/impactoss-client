@@ -151,7 +151,7 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
                 style={{ display: 'none' }}
                 signingUrl={ENDPOINTS.SIGNING_URL}
                 signingUrlMethod="GET"
-                signingUrlWithCredentials
+                signingUrlWithCredentials={false}
                 onProgress={this.onUploadProgress}
                 onError={this.onUploadError}
                 onFinish={this.onUploadFinish}

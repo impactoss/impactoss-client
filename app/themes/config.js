@@ -108,7 +108,7 @@ export const ENDPOINTS = {
   API: IS_DEV
     ? 'https://nz-development-303ae37ca294.herokuapp.com'
     : 'https://nz-development-303ae37ca294.herokuapp.com', // server API endpoint
-  SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
+  SIGNING_URL: 's3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
   PASSWORD: 'auth/password',
