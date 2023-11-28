@@ -44,7 +44,7 @@ theme.media = {
 theme.gutter = 20;
 
 export const BREAKPOINTS = {
-  small: {
+  xsmall: {
     min: 0,
     max: 768, // inclusive
     name: 'mobile',
@@ -56,20 +56,20 @@ export const BREAKPOINTS = {
   //   name: 'mobile (landscape)',
   //   index: 1,
   // },
-  medium: {
+  small: {
     min: 768, // exclusive
     max: 992,
     name: 'tablet (portrait)',
     index: 2,
   },
-  large: {
+  medium: {
     min: 992, // exclusive
-    max: 1152,
+    max: 1199,
     name: 'laptop/tablet (landscape)',
     index: 3,
   },
-  xlarge: {
-    min: 1152, // exclusive
+  large: {
+    min: 1199, // exclusive
     max: 99999999,
     name: 'desktop',
     index: 4,
@@ -83,21 +83,21 @@ export const BREAKPOINTS = {
 };
 
 theme.breakpoints = {
-  small: `${BREAKPOINTS.small.min}px`, // max
-  // ms: `${BREAKPOINTS.ms.min}px`, // max
-  medium: `${BREAKPOINTS.medium.min}px`, // min
-  large: `${BREAKPOINTS.large.min}px`, // min
-  xlarge: `${BREAKPOINTS.xlarge.min}px`, // min
-  // xxlarge: `${BREAKPOINTS.xxlarge.min}px`, // min
-};
-theme.breakpointsMin = {
   small: `${BREAKPOINTS.small.min + 1}px`, // min
   medium: `${BREAKPOINTS.medium.min + 1}px`, // min
   large: `${BREAKPOINTS.large.min + 1}px`, // min
-  // ms: `${BREAKPOINTS.ms.min + 1}px`, // min
-  // xlarge: `${BREAKPOINTS.xlarge.min + 1}px`, // min
-  // xxlarge: `${BREAKPOINTS.xxlarge.min + 1}px`, // min
+  // small: `${BREAKPOINTS.small.min}px`, // max
+  // // ms: `${BREAKPOINTS.ms.min}px`, // max
+  // medium: `${BREAKPOINTS.medium.min}px`, // min
+  // large: `${BREAKPOINTS.large.min}px`, // min
+  // xlarge: `${BREAKPOINTS.xlarge.min}px`, // min
+  // xxlarge: `${BREAKPOINTS.xxlarge.min}px`, // min
 };
+// theme.breakpointsMin = {
+//   // ms: `${BREAKPOINTS.ms.min + 1}px`, // min
+//   // xlarge: `${BREAKPOINTS.xlarge.min + 1}px`, // min
+//   // xxlarge: `${BREAKPOINTS.xxlarge.min + 1}px`, // min
+// };
 
 // global color palettes
 // primary color palette: dark to light
@@ -435,6 +435,10 @@ theme.backgroundImages = {
 theme.global = {
   drop: {
     zIndex: 200,
+  },
+  font: {
+    size: '16px',
+    height: 1.42857,
   },
   breakpoints: {
     small: {

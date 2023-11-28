@@ -13,8 +13,8 @@ const Container = styled.div`
     padding-right: 12px;
     padding-left: 12px;
   }
-  @media (min-width: ${(props) => props.theme.breakpoints.xlarge}) {
-    max-width: ${(props) => props.isNarrow ? '960' : (parseInt(props.theme.breakpoints.xlarge, 10) - 30)}px;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    max-width: ${(props) => props.isNarrow ? '960' : (parseInt(props.theme.breakpoints.large, 10) - 30)}px;
   }
   @media print {
     max-width: 100%;
