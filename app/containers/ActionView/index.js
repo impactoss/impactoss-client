@@ -22,6 +22,7 @@ import {
   getDateField,
   getTextField,
   getIdField,
+  getSmartTaxonomyField,
 } from 'utils/fields';
 
 import { qe } from 'utils/quasi-equals';
@@ -91,6 +92,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 
   getBodyMainFields = (
     entity,
+    taxonomies,
     indicators,
     indicatorConnections,
     recommendationsByFw,
@@ -99,9 +101,17 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     frameworks,
     onEntityClick,
   ) => {
-    const fields = [];
+    const groups = [];
+    const smartTaxonomy = taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
+    if (smartTaxonomy) {
+      groups.push({ // fieldGroup
+        type: 'smartTaxonomy',
+        label: appMessages.entities.taxonomies[smartTaxonomy.get('id')].plural,
+        fields: [getSmartTaxonomyField(smartTaxonomy)],
+      });
+    }
     // own attributes
-    fields.push({
+    groups.push({
       fields: [
         getMarkdownField(entity, 'description', true),
         // getMarkdownField(entity, 'outcome', true),
@@ -110,7 +120,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     });
     // indicators
     if (indicators) {
-      fields.push({
+      groups.push({
         label: appMessages.nav.indicatorsSuper,
         icon: 'indicators',
         fields: [
@@ -135,13 +145,13 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           ),
         );
       });
-      fields.push({
+      groups.push({
         label: appMessages.nav.recommendationsSuper,
         icon: 'recommendations',
         fields: recConnections,
       });
     }
-    return fields;
+    return groups;
   };
 
   getBodyAsideFields = (viewEntity, taxonomies) => {
@@ -153,11 +163,18 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
         getTextField(viewEntity, 'target_date_comment'),
       ],
     });
-    if (hasTaxonomyCategories(taxonomies)) {
+    // exclude smart taxonomy
+    let taxonomiesFiltered = taxonomies.filter((tax) => !tax.getIn(['attributes', 'is_smart']));
+    taxonomiesFiltered = taxonomiesFiltered.map(
+      (tax) => tax.set('categories', tax.get('categories').filter(
+        (cat) => cat.get('associated')
+      ))
+    );
+    if (hasTaxonomyCategories(taxonomiesFiltered)) {
       fields.push({ // fieldGroup
         label: appMessages.entities.taxonomies.plural,
         icon: 'categories',
-        fields: getTaxonomyFields(taxonomies),
+        fields: getTaxonomyFields(taxonomiesFiltered),
       });
     }
     return fields;
@@ -244,6 +261,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
                   body: {
                     main: this.getBodyMainFields(
                       viewEntity,
+                      taxonomies,
                       indicators,
                       indicatorConnections,
                       recommendationsByFw,

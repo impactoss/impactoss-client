@@ -18,11 +18,12 @@ import {
   selectRecommendationIndicatorsByIndicator,
   selectMeasureIndicatorsByMeasure,
   selectMeasureIndicatorsByIndicator,
+  selectMeasureCategoriesByMeasure,
 } from 'containers/App/selectors';
 
 import {
   entitySetUser,
-  prepareTaxonomiesIsAssociated,
+  prepareTaxonomiesAssociated,
   getEntityCategories,
 } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
@@ -40,13 +41,12 @@ export const selectTaxonomies = createSelector(
   (state, id) => id,
   (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (state) => selectEntities(state, 'measure_categories'),
-  (id, taxonomies, categories, associations) => prepareTaxonomiesIsAssociated(
+  selectMeasureCategoriesByMeasure,
+  (id, taxonomies, categories, associations) => prepareTaxonomiesAssociated(
     taxonomies,
     categories,
     associations,
     'tags_measures',
-    'measure_id',
     id,
   )
 );
