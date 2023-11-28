@@ -106,8 +106,8 @@ export const CYCLE_TAXONOMY_ID = 2;
 
 export const ENDPOINTS = {
   API: IS_DEV
-    ? 'https://nz-development-303ae37ca294.herokuapp.com'
-    : 'https://nz-development-303ae37ca294.herokuapp.com', // server API endpoint
+    ? 'https://nz-dev-api.impactoss.org'
+    : 'https://nz-dev-api.impactoss.org', // server API endpoint
   SIGNING_URL: 's3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
