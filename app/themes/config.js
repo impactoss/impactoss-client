@@ -51,7 +51,7 @@ export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
 
 // show footer logo section
 export const FOOTER = {
-  PARTNERS: true,
+  PARTNERS: false,
   LINK_TARGET_INTERNAL: true,
   LINK_TARGET_INTERNAL_ID: 1,
 };

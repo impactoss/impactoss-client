@@ -159,7 +159,7 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
     const { theme } = this.props;
     return (
       <div>
-        { FOOTER.PARTNERS > 0
+        { FOOTER.PARTNERS
           && (
             <FooterLogos>
               <Container noPaddingBottom>
