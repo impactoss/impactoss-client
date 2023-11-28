@@ -88,7 +88,7 @@ export const TEXT_TRUNCATE = {
   META_TITLE: 20,
 };
 
-export const PROGRESS_TAXONOMY_ID = 8;
+export const PROGRESS_TAXONOMY_ID = 9;
 
 // WARNING: references as assigned by user
 export const PROGRESS_CATEGORY_REFERENCES = {
