@@ -49,7 +49,12 @@ const TaxIcon = styled.div`
 
 class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { taxonomy, nested, onTaxonomyClick } = this.props;
+    const {
+      taxonomy,
+      nested,
+      onTaxonomyClick,
+      onTaxonomyOver,
+    } = this.props;
     return (
       <Styled
         small={nested}
@@ -59,10 +64,10 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
         }}
         active={taxonomy.active}
         paletteId={parseInt(taxonomy.id, 10)}
-        onMouseOver={() => taxonomy.onMouseOver && taxonomy.onMouseOver()}
-        onFocus={() => taxonomy.onMouseOver && taxonomy.onMouseOver()}
-        onMouseOut={() => taxonomy.onMouseOver && taxonomy.onMouseOver(false)}
-        onBlur={() => taxonomy.onMouseOver && taxonomy.onMouseOver(false)}
+        onMouseOver={() => onTaxonomyOver && onTaxonomyOver(taxonomy.id)}
+        onFocus={() => onTaxonomyOver && onTaxonomyOver(taxonomy.id)}
+        onMouseOut={() => onTaxonomyOver && onTaxonomyOver(null)}
+        onBlur={() => onTaxonomyOver && onTaxonomyOver(null)}
       >
         <TaxIcon>
           <Icon
@@ -82,6 +87,7 @@ TaxonomySidebarItem.propTypes = {
   taxonomy: PropTypes.object,
   nested: PropTypes.bool,
   onTaxonomyClick: PropTypes.func,
+  onTaxonomyOver: PropTypes.func,
 };
 
 TaxonomySidebarItem.contextTypes = {

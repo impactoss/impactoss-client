@@ -175,6 +175,7 @@ export const REPORT_FREQUENCIES = [
 ];
 
 export const DEFAULT_FRAMEWORK = 1;
+export const ENABLE_SDGS = false;
 
 // Map server database tables **************************
 export const DB_TABLES = [
