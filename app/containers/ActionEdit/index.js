@@ -165,8 +165,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       {
         fields: [
           getMarkdownField(intl.formatMessage),
-          // getMarkdownField(intl.formatMessage, 'outcome'),
-          // getMarkdownField(intl.formatMessage, 'indicator_summary'),
+          getMarkdownField(intl.formatMessage, 'outcome'),
+          getMarkdownField(intl.formatMessage, 'indicator_summary'),
         ],
       },
     );

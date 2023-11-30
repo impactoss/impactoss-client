@@ -125,8 +125,8 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
       {
         fields: [
           getMarkdownField(intl.formatMessage),
-          // getMarkdownField(intl.formatMessage, 'outcome'),
-          // getMarkdownField(intl.formatMessage, 'indicator_summary'),
+          getMarkdownField(intl.formatMessage, 'outcome'),
+          getMarkdownField(intl.formatMessage, 'indicator_summary'),
         ],
       },
     );
