@@ -138,14 +138,15 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
         ],
       });
     }
-    if (recommendationsByFw) {
+    if (recommendationsByFw && recommendationsByFw.size > 0) {
       const recConnections = renderRecommendationsByFwControl(
         recommendationsByFw,
         connectedTaxonomies,
         onCreateOption,
         intl,
       );
-      if (recConnections) {
+
+      if (recConnections && recConnections.lenght > 0) {
         groups.push(
           {
             label: intl.formatMessage(appMessages.nav.recommendationsSuper),
@@ -170,12 +171,16 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             'start_date',
             repeat,
             repeat ? 'start_date' : 'start_date_only',
-            (model, value) => this.props.onStartDateChange(model, value, this.props.viewDomain.form.data, intl.formatMessage)
+            (model, value) => this.props.onStartDateChange(
+              model, value, this.props.viewDomain.getIn(['form', 'data']), intl.formatMessage
+            ),
           ),
           getCheckboxField(
             intl.formatMessage,
             'repeat',
-            (model, value) => this.props.onRepeatChange(model, value, this.props.viewDomain.form.data, intl.formatMessage)
+            (model, value) => this.props.onRepeatChange(
+              model, value, this.props.viewDomain.getIn(['form', 'data']), intl.formatMessage,
+            )
           ),
           repeat ? getFrequencyField(intl.formatMessage) : null,
           repeat ? getDateField(
@@ -183,7 +188,9 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             'end_date',
             repeat,
             'end_date',
-            (model, value) => this.props.onEndDateChange(model, value, this.props.viewDomain.form.data, intl.formatMessage)
+            (model, value) => this.props.onEndDateChange(
+              model, value, this.props.viewDomain.getIn(['form', 'data']), intl.formatMessage,
+            )
           )
             : null,
           renderUserControl(
