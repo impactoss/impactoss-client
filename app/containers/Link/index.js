@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { startsWith } from 'utils/string';
 import { updatePath } from 'containers/App/actions';
 import { getNextQueryString } from 'containers/App/sagas';
-import { selectFrameworkQuery } from 'containers/App/selectors';
+import { selectCurrentFrameworkId } from 'containers/App/selectors';
 
 // const A = styled.a``;
 
@@ -50,7 +50,7 @@ Link.propTypes = {
 
 
 const mapStateToProps = (state) => ({
-  frameworkId: selectFrameworkQuery(state),
+  frameworkId: selectCurrentFrameworkId(state),
 });
 
 function mapDispatchToProps(dispatch) {

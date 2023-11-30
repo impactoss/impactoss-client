@@ -19,7 +19,7 @@ import {
   selectFWTaxonomiesSorted,
   selectReady,
   selectActiveFrameworks,
-  selectFrameworkQuery,
+  selectCurrentFrameworkId,
 } from 'containers/App/selectors';
 import { ROUTES, CONTENT_LIST } from 'containers/App/constants';
 
@@ -653,7 +653,7 @@ const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectFWTaxonomiesSorted(state),
   frameworks: selectActiveFrameworks(state),
-  frameworkId: selectFrameworkQuery(state),
+  frameworkId: selectCurrentFrameworkId(state),
   recommendationCountByFw: selectRecommendationCount(state),
   measureCount: selectMeasureCount(state),
   indicatorCount: selectIndicatorCount(state),
