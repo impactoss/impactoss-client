@@ -117,23 +117,25 @@ function TextareaMarkdownWrapper(props) {
             onClick={() => setView('write')}
             active={view === 'write'}
           >
-            {intl.formatMessage(messages.buttons.labels.write)}
+            <FormattedMessage {...messages.writeLabel} />
           </ViewButton>
           <ViewButton
             onClick={() => setView('preview')}
             active={view === 'preview'}
           >
-            {intl.formatMessage(messages.buttons.labels.preview)}
+            <FormattedMessage {...messages.previewLabel} />
           </ViewButton>
         </Box>
         <Box direction="row" align="center" gap="xsmall" wrap justify="end">
           <Box direction="row" align="center" gap="xsmall" justify="end">
             <Box fill="vertical">
-              <Text size="xsmall" color="hint">{intl.formatMessage(messages.buttons.labels.formatText)}</Text>
+              <Text size="xsmall" color="hint">
+                <FormattedMessage {...messages.formatTextLabel} />
+              </Text>
             </Box>
             <Box>
               <InfoOverlay
-                title="Format text using markdown"
+                title={intl.formatMessage(messages.infoOverlayTitle)}
                 colorButton={theme.global.colors.hint}
                 padButton="none"
                 content={(
@@ -141,7 +143,7 @@ function TextareaMarkdownWrapper(props) {
                     <p>
                       <Text size="small">
                         <FormattedMessage
-                          {...messages.infoOverlay.firstSection}
+                          {...messages.infoOverlayFirstSection}
                           values={
                             {
                               strong: <strong>bold</strong>,
@@ -153,25 +155,25 @@ function TextareaMarkdownWrapper(props) {
                     </p>
                     <p>
                       <Text size="small">
-                        {intl.formatMessage(messages.infoOverlay.secondSection)}
+                        <FormattedMessage {...messages.infoOverlaySecondSection} />
                       </Text>
                     </p>
                     <ul>
                       <li>
                         <Text size="small">
-                          {intl.formatMessage(messages.infoOverlay.thirdSection)}
+                          <FormattedMessage {...messages.infoOverlayThirdSection} />
                         </Text>
                       </li>
                       <li>
                         <Text size="small">
-                          {intl.formatMessage(messages.infoOverlay.fourthSection)}
+                          <FormattedMessage {...messages.infoOverlayFourthSection} />
                         </Text>
                       </li>
                     </ul>
                     <p>
                       <Text size="small">
                         <FormattedMessage
-                          {...messages.infoOverlay.fifthSection}
+                          {...messages.infoOverlayFifthSection}
                           values={{
                             link:
   <A
@@ -179,7 +181,7 @@ function TextareaMarkdownWrapper(props) {
     target="_blank"
     isOnLightBackground
   >
-    {intl.formatMessage(messages.infoOverlay.sixthSection)}
+    <FormattedMessage {...messages.infoOverlaySixthSection} />
   </A>,
                           }}
                         />
@@ -192,7 +194,7 @@ function TextareaMarkdownWrapper(props) {
           </Box>
           <Box direction="row" align="center" gap="hair" justify="end">
             <MDButton
-              title={intl.formatMessage(messages.buttons.titles.heading2)}
+              title="## Heading"
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -200,10 +202,10 @@ function TextareaMarkdownWrapper(props) {
                 }
               }}
             >
-              <MDButtonText>{intl.formatMessage(messages.buttons.labels.heading2)}</MDButtonText>
+              <MDButtonText>H2</MDButtonText>
             </MDButton>
             <MDButton
-              title={intl.formatMessage(messages.buttons.titles.heading3)}
+              title="### Secondary heading"
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -211,10 +213,10 @@ function TextareaMarkdownWrapper(props) {
                 }
               }}
             >
-              <MDButtonText>{intl.formatMessage(messages.buttons.labels.heading3)}</MDButtonText>
+              <MDButtonText>H3</MDButtonText>
             </MDButton>
             <MDButton
-              title={intl.formatMessage(messages.buttons.titles.bold)}
+              title="Bold: **bold**"
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -224,7 +226,7 @@ function TextareaMarkdownWrapper(props) {
               icon={<Bold size="xsmall" />}
             />
             <MDButton
-              title={intl.formatMessage(messages.buttons.titles.italic)}
+              title="Italic: _italic_"
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -234,7 +236,7 @@ function TextareaMarkdownWrapper(props) {
               icon={<Italic size="xsmall" />}
             />
             <MDButton
-              title={intl.formatMessage(messages.buttons.titles.link)}
+              title="Link: (text)[url]"
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -244,7 +246,7 @@ function TextareaMarkdownWrapper(props) {
               icon={<LinkIcon size="18px" />}
             />
             <MDButton
-              title={intl.formatMessage(messages.buttons.titles.unorderedList)}
+              title="Unordered list: -"
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -254,7 +256,7 @@ function TextareaMarkdownWrapper(props) {
               icon={<List size="xsmall" />}
             />
             <MDButton
-              title={intl.formatMessage(messages.buttons.titles.orderedList)}
+              title="Ordered list: 1."
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -262,7 +264,7 @@ function TextareaMarkdownWrapper(props) {
                 }
               }}
             >
-              <MDButtonText size="xxsmall" style={{ top: '-4px' }}>{intl.formatMessage(messages.buttons.labels.orderedList)}</MDButtonText>
+              <MDButtonText size="xxsmall" style={{ top: '-4px' }}>123</MDButtonText>
             </MDButton>
           </Box>
         </Box>
@@ -289,7 +291,7 @@ function TextareaMarkdownWrapper(props) {
               target="_blank"
               isOnLightBackground
             >
-              {intl.formatMessage(messages.anchor)}
+              <FormattedMessage {...messages.anchor} />
             </A>
           </MarkdownHint>
         </Box>
