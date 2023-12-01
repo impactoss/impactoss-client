@@ -42,10 +42,95 @@ theme.media = {
 
 // grid-styles settings https://github.com/jxnblk/grid-styled
 theme.gutter = 20;
+
+export const BREAKPOINTS = {
+  small: {
+    min: 0,
+    max: 768, // inclusive
+    name: 'mobile',
+    index: 0,
+  },
+  // ms: {
+  //   min: 420, // exclusive
+  //   max: 720,
+  //   name: 'mobile (landscape)',
+  //   index: 1,
+  // },
+  medium: {
+    min: 768, // exclusive
+    max: 992,
+    name: 'tablet (portrait)',
+    index: 2,
+  },
+  large: {
+    min: 992, // exclusive
+    max: 1152,
+    name: 'laptop/tablet (landscape)',
+    index: 3,
+  },
+  xlarge: {
+    min: 1152, // exclusive
+    max: 99999999,
+    name: 'desktop',
+    index: 4,
+  },
+  // xxlarge: {
+  //   min: 1728, // exclusive
+  //   max: 99999999,
+  //   name: 'large desktop',
+  //   index: 5,
+  // },
+};
+
 theme.breakpoints = {
-  small: '769px',
-  medium: '993px',
-  large: '1200px',
+  small: `${BREAKPOINTS.small.min}px`, // max
+  // ms: `${BREAKPOINTS.ms.min}px`, // max
+  medium: `${BREAKPOINTS.medium.min}px`, // min
+  large: `${BREAKPOINTS.large.min}px`, // min
+  xlarge: `${BREAKPOINTS.xlarge.min}px`, // min
+  // xxlarge: `${BREAKPOINTS.xxlarge.min}px`, // min
+};
+theme.breakpointsMin = {
+  small: `${BREAKPOINTS.small.min + 1}px`, // min
+  medium: `${BREAKPOINTS.medium.min + 1}px`, // min
+  large: `${BREAKPOINTS.large.min + 1}px`, // min
+  // ms: `${BREAKPOINTS.ms.min + 1}px`, // min
+  // xlarge: `${BREAKPOINTS.xlarge.min + 1}px`, // min
+  // xxlarge: `${BREAKPOINTS.xxlarge.min + 1}px`, // min
+};
+// grommet
+theme.global = {
+  drop: {
+    zIndex: 200,
+  },
+  breakpoints: {
+    small: {
+      value: BREAKPOINTS.small.max,
+    },
+    medium: {
+      value: BREAKPOINTS.medium.max,
+    },
+    large: {
+      value: BREAKPOINTS.large.max,
+    },
+    xlarge: {},
+  },
+  colors: {
+    aHover: '#08586c',
+  },
+  edgeSize: {
+    hair: '1px',
+    xxsmall: '3px',
+    xsmall: '6px',
+    small: '12px',
+    ms: '16px',
+    medium: '24px',
+    ml: '36px',
+    large: '48px',
+    xlarge: '64px',
+    xxlarge: '100px',
+  },
+
 };
 
 // global color palettes
@@ -360,6 +445,21 @@ theme.sizes = {
       claim: '1em',
     },
   },
+};
+
+theme.text = {
+  xxxlarge: { size: '48px', height: '60px', maxWidth: '800px' },
+  xxlarge: { size: '30px', height: '36px', maxWidth: '800px' },
+  xlarge: { size: '20px', height: '28px', maxWidth: '800px' },
+  large: { size: '18px', height: '24px', maxWidth: '800px' },
+  largeTall: { size: '18px', height: '26px', maxWidth: '800px' },
+  medium: { size: '16px', height: '21px', maxWidth: '800px' },
+  mediumTall: { size: '16px', height: '23px', maxWidth: '800px' },
+  mediumTight: { size: '16px', height: '18px', maxWidth: '800px' },
+  small: { size: '14px', height: '18px', maxWidth: '700px' },
+  xsmall: { size: '13px', height: '16px', maxWidth: '600px' },
+  xxsmall: { size: '12px', height: '14px', maxWidth: '500px' },
+  xxxsmall: { size: '11px', height: '13px', maxWidth: '500px' },
 };
 
 // end styled-theme settings
