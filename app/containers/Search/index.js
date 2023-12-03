@@ -418,7 +418,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                     </Text>
                                   </Box>
                                   <Box>
-                                    {group.get('targets') && group.get('targets').map(
+                                    {group.get('targets') && group.get('targets').valueSeq().map(
                                       (target) => {
                                         const hasTargetResults = target.get('results') && target.get('results').size > 0;
                                         if (hasTargetResults) {
