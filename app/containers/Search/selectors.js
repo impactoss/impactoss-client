@@ -151,7 +151,7 @@ export const selectEntitiesByQuery = createSelector(
                 const sortOption = getSortOption(target.get('sorting') && target.get('sorting').toJS(), sort);
                 return memo.push(
                   target
-                    .set('active', searchQuery && true)
+                    .set('active', path === target.get('path'))
                     .set('results', sortEntities(
                       filteredEntities,
                       order || (sortOption ? sortOption.order : 'desc'),

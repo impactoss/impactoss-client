@@ -278,7 +278,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       onClear,
       entities,
       onEntityClick,
-      activeTargetPath,
+      // activeTargetPath,
     } = this.props;
     const hasQuery = !!location.query.search;
     const countResults = dataReady && hasQuery && entities && entities.reduce(
@@ -302,14 +302,17 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       ),
       0,
     );
+
     const activeTarget = entities.reduce((memo, group) => group.get('targets').find((target) => target.get('active')) || memo,
       Map());
-    const hasResults = location.query.search
-      && activeTarget.get('results')
-      && activeTarget.get('results').size > 0;
+    let activeTargetPath = activeTarget && activeTarget.get('path');
 
-    const noResults = location.query.search
-      && (!activeTarget.get('results') || activeTarget.get('results').size === 0);
+    const allResults = entities.filter((group) => group.get('targets') && group.get('targets').some((target) => target.get('results')));
+
+    const hasResults = location.query.search
+      && allResults.size > 0;
+
+    const noResults = !hasResults;
 
     const noResultsNoAlternative = noResults
       && !entities.reduce((memo, group) => group.get('targets').find((target) => target.get('results') && target.get('results').size > 0) || memo,
@@ -433,8 +436,10 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                                   onClick={(evt) => {
                                                     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
                                                     if (active) {
+                                                      activeTargetPath = null;
                                                       this.props.onTargetSelect('');
                                                     } else {
+                                                      activeTargetPath = target.get('path');
                                                       this.props.onTargetSelect(target.get('path'));
                                                     }
                                                   }}
@@ -528,7 +533,6 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     onSearch: (value) => {
-      // console.log('onSearch')
       dispatch(updateQuery(fromJS([
         {
           query: 'search',
@@ -542,7 +546,6 @@ function mapDispatchToProps(dispatch) {
       dispatch(resetSearchQuery(values));
     },
     onTargetSelect: (value) => {
-      // console.log('onTargetSelect')
       dispatch(updateQuery(fromJS([
         {
           query: 'path',
