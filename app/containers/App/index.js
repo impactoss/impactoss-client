@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import ReactModal from 'react-modal';
 import GlobalStyle from 'global-styles';
+import { FormattedMessage } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -66,6 +67,26 @@ const Main = styled.div`
   }
 `;
 // overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
+
+const SkipContent = styled.a`
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+  padding: 1em;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+
+  &:focus {
+    opacity: 1;
+    left: 0;
+    width: auto;
+    height: auto;
+    background-color: #fff;
+    z-index: 99999;
+    box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  }
+}`;
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   UNSAFE_componentWillMount() {
@@ -197,6 +218,12 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     const title = intl.formatMessage(messages.app.title);
     return (
       <div>
+        <SkipContent
+          href="#main-content"
+          title={this.context.intl.formatMessage(messages.screenreader.skipToContent)}
+        >
+          <FormattedMessage {...messages.screenreader.skipToContent} />
+        </SkipContent>
         <Helmet titleTemplate={`${title} - %s`} defaultTitle={title} />
         <Header
           isSignedIn={isUserSignedIn}
@@ -225,7 +252,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             )
             : null}
         />
-        <Main isHome={location.pathname === '/'}>
+        <Main isHome={location.pathname === '/'} role="main" id="main-content">
           {React.Children.toArray(children)}
         </Main>
         {newEntityModal
