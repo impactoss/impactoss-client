@@ -520,7 +520,7 @@ export const getEmailField = (formatMessage, model = '.attributes.email') => {
     required: true,
     model,
   });
-  field.autocomplete = appMessages.htmlElementAttributes.autocomplete.email;
+  field.autoComplete = appMessages.htmlElementAttributes.autocomplete.email;
   field.validators.email = validateEmailFormat;
   field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
   return field;
@@ -534,7 +534,7 @@ export const getNameField = (formatMessage, model = '.attributes.name') => {
     required: true,
     model,
   });
-  field.autocomplete = appMessages.htmlElementAttributes.autocomplete.fullName;
+  field.autoComplete = appMessages.htmlElementAttributes.autocomplete.fullName;
   return field;
 };
 
@@ -563,7 +563,7 @@ export const getPasswordCurrentField = (formatMessage, model = '.attributes.pass
     required: true,
     model,
   });
-  field.autocomplete = appMessages.htmlElementAttributes.autocomplete.currentPassword;
+  field.autoComplete = appMessages.htmlElementAttributes.autocomplete.currentPassword;
   // field.validators.email = validateEmailFormat;
   // field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
   return field;
@@ -578,7 +578,7 @@ export const getPasswordNewField = (formatMessage, model = '.attributes.password
     required: true,
     model,
   });
-  field.autocomplete = appMessages.htmlElementAttributes.autocomplete.newPassword;
+  field.autoComplete = appMessages.htmlElementAttributes.autocomplete.newPassword;
   // field.validators.email = validateEmailFormat;
   // field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
   return field;
@@ -593,7 +593,7 @@ export const getPasswordConfirmationField = (formatMessage, passwordType, model 
     required: true,
     model,
   });
-  field.autocomplete = appMessages.htmlElementAttributes.autocomplete[passwordType];
+  field.autoComplete = appMessages.htmlElementAttributes.autocomplete[passwordType];
   // field.validators.email = validateEmailFormat;
   // field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
   return field;
