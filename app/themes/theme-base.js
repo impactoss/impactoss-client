@@ -164,27 +164,25 @@ theme.palette = {
     '#8D95A0', // default, not used
     '#0059A3', // 1: Human Rights Body
     '#0077D8', // 2: UN session
-    '#007C70', // 3: Human right
-    '#05A763', // 4: Affected persons
-    '#B7177A', // 5: Thematic cluster
-    '#114060', // 6: Organisation
-    '#009ED8', // 7: SDGs
-    '#416680', // 8: State
-    '#E56700', // 9: SMART
-    '#007c3a', // 10: Progress status
+    '#416680', // 3: State
+    '#007C70', // 4: Human right
+    '#05A763', // 5: Affected persons
+    '#B7177A', // 6: Thematic cluster
+    '#114060', // 7: Organisation
+    '#E56700', // 8: SMART
+    '#007c3a', // 9: Progress status
   ],
   taxonomiesHover: [
     '#656F75', // default, not used
     '#005296', // 1: Human Rights Body
     '#0070CC', // 2: UN session
-    '#007267', // 3: Human right
-    '#008740', // 4: Affected persons
-    '#A5156E', // 5: Thematic cluster
-    '#0F364C', // 6: Organisation
-    '#007FAD', // 7: SDGs
-    '#395970', // 8: State
-    '#C75300', // 9: SMART
-    '#007034', // 10: Progress status
+    '#395970', // 3: State
+    '#007267', // 4: Human right
+    '#008740', // 5: Affected persons
+    '#A5156E', // 6: Thematic cluster
+    '#0F364C', // 7: Organisation
+    '#C75300', // 8: SMART
+    '#007034', // 9: Progress status
   ],
   // bg inactive, bg hover, icon
   smartInactive: [

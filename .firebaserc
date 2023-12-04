@@ -1,5 +1,5 @@
 {
   "projects": {
-    "dev": "nz-development",
+    "default": "impact-nz-dev"
   }
 }

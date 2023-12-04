@@ -4,7 +4,7 @@ import {
   selectEntity,
   selectEntities,
   selectMeasuresCategorised,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   selectFWIndicators,
   selectRecommendationMeasuresByRecommendation,
   selectRecommendationCategoriesByRecommendation,
@@ -31,7 +31,7 @@ export const selectViewEntity = createSelector(
 
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  selectTaxonomiesSorted,
+  selectFWTaxonomiesSorted,
   (state) => selectEntities(state, 'categories'),
   selectRecommendationCategoriesByRecommendation,
   (
@@ -50,7 +50,7 @@ export const selectTaxonomies = createSelector(
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectTaxonomiesSorted(state),
+  selectFWTaxonomiesSorted,
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) => prepareTaxonomiesMultiple(
     taxonomies,

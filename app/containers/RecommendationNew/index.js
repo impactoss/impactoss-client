@@ -50,7 +50,7 @@ import {
   selectMeasuresCategorised,
   selectRecommendationTaxonomies,
   selectEntities,
-  selectFrameworkQuery,
+  selectCurrentFrameworkId,
   selectActiveFrameworks,
 } from 'containers/App/selectors';
 
@@ -108,12 +108,13 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     ));
   }
 
-  getHeaderMainFields = (frameworks) => {
+  getHeaderMainFields = (frameworkId, frameworks) => {
     const { intl } = this.context;
+    const hasFWOptions = frameworks && frameworks.size > 1 && frameworkId === 'all';
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
-          frameworks && getFrameworkFormField(intl.formatMessage, frameworks), // required
+          hasFWOptions && getFrameworkFormField(intl.formatMessage, frameworks), // required
           getReferenceFormField(intl.formatMessage, true), // required
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
@@ -271,9 +272,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                 handleUpdate={this.props.handleUpdate}
                 fields={{ // isManager, taxonomies,
                   header: {
-                    main: this.getHeaderMainFields(
-                      frameworkId === 'all' ? frameworks : null
-                    ),
+                    main: this.getHeaderMainFields(frameworkId, frameworks),
                     aside: this.getHeaderAsideFields(),
                   },
                   body: {
@@ -335,7 +334,7 @@ const mapStateToProps = (state) => ({
   measures: selectMeasuresCategorised(state),
   indicators: selectEntities(state, 'indicators'),
   connectedTaxonomies: selectConnectedTaxonomies(state),
-  frameworkId: selectFrameworkQuery(state),
+  frameworkId: selectCurrentFrameworkId(state),
   frameworks: selectActiveFrameworks(state),
 });
 

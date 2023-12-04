@@ -13,8 +13,9 @@ import {
   selectFWTaxonomiesSorted,
   selectFWMeasures,
   selectFWIndicators,
-  selectFrameworkQuery,
+  selectCurrentFrameworkId,
   selectFrameworkListQuery,
+  selectFrameworks,
   selectReady,
   selectRecommendationCategoriesByRecommendation,
   selectMeasureCategoriesByMeasure,
@@ -94,17 +95,21 @@ const selectRecommendationsWithIndicators = createSelector(
 );
 const selectRecommendationsByFw = createSelector(
   selectRecommendationsWithIndicators,
-  selectFrameworkQuery,
+  selectFrameworks,
+  selectCurrentFrameworkId,
   selectFrameworkListQuery,
-  (entities, fwQuery, listQuery) => fwQuery === 'all'
-    && listQuery
-    ? entities.filter(
-      (entity) => qe(
-        entity.getIn(['attributes', 'framework_id']),
-        listQuery,
-      )
-    )
-    : entities
+  (entities, frameworks, fwQuery, listQuery) => {
+    // only filter recs if we have multiple fws and if all fws are loaded
+    if (frameworks && frameworks.size > 1 && fwQuery === 'all' && listQuery) {
+      return entities.filter(
+        (entity) => qe(
+          entity.getIn(['attributes', 'framework_id']),
+          listQuery,
+        )
+      );
+    }
+    return entities;
+  }
 );
 const selectRecommendationsWithout = createSelector(
   selectRecommendationsByFw,

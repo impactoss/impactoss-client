@@ -335,29 +335,29 @@ export const selectCurrentFrameworkId = createSelector(
 );
 
 export const selectActiveFrameworks = createSelector(
-  selectFrameworks,
   selectFrameworkQuery,
-  (entities, fwQuery) => {
+  selectFrameworks,
+  (queryId, frameworks) => {
     if (
-      entities
-      && entities.size > 1
-      && fwQuery
-      && fwQuery !== 'all'
+      frameworks
+      && frameworks.size > 1
+      && queryId
+      && queryId !== 'all'
     ) {
-      return entities.filter((fw) => qe(fwQuery, fw.get('id')));
+      return frameworks.filter((fw) => qe(queryId, fw.get('id')));
     }
-    return entities;
+    return frameworks;
   }
 );
 
 export const selectFWRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendations'),
-  selectFrameworkQuery,
-  (entities, framework) => {
-    if (entities && framework && framework !== 'all') {
+  selectCurrentFrameworkId,
+  (entities, frameworkId) => {
+    if (entities && frameworkId && frameworkId !== 'all') {
       return entities.filter(
         (rec) => qe(
-          framework,
+          frameworkId,
           rec.getIn(['attributes', 'framework_id']),
         )
       );
@@ -402,20 +402,20 @@ export const selectFWMeasures = createSelector(
 // get indicators for current framework
 export const selectFWIndicators = createSelector(
   (state) => selectEntities(state, 'indicators'),
-  selectFrameworkQuery,
+  selectCurrentFrameworkId,
   selectFWRecommendations,
   selectFWMeasures,
   (state) => selectEntities(state, 'recommendation_indicators'),
   (state) => selectEntities(state, 'measure_indicators'),
   selectIsUserManager,
-  (entities, framework, recs, measures, recIndicators, measureIndicators, isManager) => {
+  (entities, frameworkId, recs, measures, recIndicators, measureIndicators, isManager) => {
     if (
       recs
       && measures
       && recIndicators
       && measureIndicators
-      && framework
-      && framework !== 'all'
+      && frameworkId
+      && frameworkId !== 'all'
     ) {
       return entities.filter(
         (indicator) => {
@@ -515,28 +515,21 @@ export const selectTaxonomies = createSelector(
 export const selectFWTaxonomies = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
   (state) => selectEntities(state, 'framework_taxonomies'),
-  selectFrameworkQuery,
-  (taxonomies, fwTaxonomies, framework) => taxonomies
+  selectCurrentFrameworkId,
+  (taxonomies, fwTaxonomies, frameworkId) => taxonomies
     && fwTaxonomies
     && taxonomies.map(
       (tax) => {
-        const fwNotSet = !framework || framework === 'all';
         const hasFramework = !!tax.getIn(['attributes', 'framework_id'])
-          && (
-            fwNotSet
-            || qe(tax.getIn(['attributes', 'framework_id']), framework)
-          );
+          && qe(tax.getIn(['attributes', 'framework_id']), frameworkId);
         // connected to current framework
         const connectedToFramework = fwTaxonomies.some(
           (fwt) => qe(
             fwt.getIn(['attributes', 'taxonomy_id']),
             tax.get('id'),
-          ) && (
-            fwNotSet
-            || qe(
-              fwt.getIn(['attributes', 'framework_id']),
-              framework,
-            )
+          ) && qe(
+            fwt.getIn(['attributes', 'framework_id']),
+            frameworkId,
           )
         );
         // connectedFrameworks

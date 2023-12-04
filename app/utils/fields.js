@@ -162,7 +162,7 @@ const mapSmartCategoryOptions = (categories) => categories
   )
     .map((cat) => ({
       label: cat.getIn(['attributes', 'title']),
-      isSmart: cat.get('associated') && cat.get('associated').size > 0,
+      isSmart: !!cat.get('associated'),
       reference: cat.getIn(['attributes', 'reference']) || null,
       draft: cat.getIn(['attributes', 'draft']) || null,
       linkTo: `${ROUTES.CATEGORIES}/${cat.get('id')}`,

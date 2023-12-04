@@ -18,7 +18,7 @@ import {
   selectFWTaxonomiesSorted,
   selectReady,
   selectIsUserManager,
-  selectFrameworkQuery,
+  selectCurrentFrameworkId,
   selectActiveFrameworks,
 } from 'containers/App/selectors';
 import { ROUTES, CONTENT_LIST } from 'containers/App/constants';
@@ -248,7 +248,7 @@ CategoryList.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   frameworks: selectActiveFrameworks(state),
-  frameworkId: selectFrameworkQuery(state),
+  frameworkId: selectCurrentFrameworkId(state),
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectFWTaxonomiesSorted(state),

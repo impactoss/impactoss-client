@@ -111,6 +111,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
       taxonomies,
       active,
       onTaxonomyLink,
+      onTaxonomyOver,
       frameworkId,
       frameworks,
     } = this.props;
@@ -166,9 +167,25 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
                       <div>
                         {map(group.taxonomies, (taxonomy) => (
                           <div key={taxonomy.id}>
-                            <TaxonomySidebarItem taxonomy={taxonomy} onTaxonomyClick={this.onHideSidebar} />
+                            <TaxonomySidebarItem
+                              taxonomy={taxonomy}
+                              onTaxonomyClick={this.onHideSidebar}
+                              onTaxonomyOver={onTaxonomyOver}
+                            />
                             <div>
-                              { taxonomy.children && taxonomy.children.length > 0 && map(taxonomy.children, (child) => <TaxonomySidebarItem key={child.id} nested taxonomy={child} onTaxonomyClick={this.onHideSidebar} />)}
+                              {taxonomy.children
+                                && taxonomy.children.length > 0
+                                && taxonomy.children.map(
+                                  (child) => (
+                                    <TaxonomySidebarItem
+                                      key={child.id}
+                                      nested
+                                      taxonomy={child}
+                                      onTaxonomyClick={this.onHideSidebar}
+                                      onTaxonomyOver={onTaxonomyOver}
+                                    />
+                                  )
+                                )}
                             </div>
                           </div>
                         ))}
@@ -190,6 +207,7 @@ TaxonomySidebar.propTypes = {
   frameworks: PropTypes.object,
   frameworkId: PropTypes.string,
   onTaxonomyLink: PropTypes.func,
+  onTaxonomyOver: PropTypes.func,
   active: PropTypes.string,
   theme: PropTypes.object,
 };

@@ -31,6 +31,14 @@ export default defineMessages({
       id: 'app.containers.Overview.buttons.measures',
       defaultMessage: '{count} Government actions',
     },
+    measuresTitle: {
+      id: 'app.containers.Overview.buttons.measuresTitle',
+      defaultMessage: 'Implementation plan',
+    },
+    measuresAdditional: {
+      id: 'app.containers.Overview.buttons.measuresAdditional',
+      defaultMessage: '{count} Government actions',
+    },
     indicators: {
       id: 'app.containers.Overview.buttons.indicators',
       defaultMessage: '{count} Indicators',

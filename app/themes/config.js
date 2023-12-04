@@ -51,7 +51,7 @@ export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
 
 // show footer logo section
 export const FOOTER = {
-  PARTNERS: true,
+  PARTNERS: false,
   LINK_TARGET_INTERNAL: true,
   LINK_TARGET_INTERNAL_ID: 1,
 };
@@ -88,7 +88,7 @@ export const TEXT_TRUNCATE = {
   META_TITLE: 20,
 };
 
-export const PROGRESS_TAXONOMY_ID = 8;
+export const PROGRESS_TAXONOMY_ID = 9;
 
 // WARNING: references as assigned by user
 export const PROGRESS_CATEGORY_REFERENCES = {
@@ -106,9 +106,9 @@ export const CYCLE_TAXONOMY_ID = 2;
 
 export const ENDPOINTS = {
   API: IS_DEV
-    ? 'https://nz-development-303ae37ca294.herokuapp.com'
-    : 'https://nz-development-303ae37ca294.herokuapp.com', // server API endpoint
-  SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
+    ? 'https://nz-dev-api.impactoss.org'
+    : 'https://nz-dev-api.impactoss.org', // server API endpoint
+  SIGNING_URL: 's3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
   PASSWORD: 'auth/password',
@@ -175,6 +175,7 @@ export const REPORT_FREQUENCIES = [
 ];
 
 export const DEFAULT_FRAMEWORK = 1;
+export const ENABLE_SDGS = false;
 
 // Map server database tables **************************
 export const DB_TABLES = [
