@@ -57,4 +57,32 @@ export default defineMessages({
     id: 'app.components.MarkdownControl.infoOverlaySixthSection',
     defaultMessage: 'markdown and additional formatting options here',
   },
+  buttonTitleHeading2: {
+    id: 'app.components.MarkdownControl.buttonTitleHeading2',
+    defaultMessage: '## Heading',
+  },
+  buttonTitleHeading3: {
+    id: 'app.components.MarkdownControl.buttons.titles.heading3',
+    defaultMessage: '### Secondary heading',
+  },
+  buttonTitleBold: {
+    id: 'app.components.MarkdownControl.buttonTitleBold',
+    defaultMessage: 'Bold: **bold**',
+  },
+  buttonTitleItalic: {
+    id: 'app.components.MarkdownControl.buttonTitleItalic',
+    defaultMessage: 'Italic: _italic_',
+  },
+  buttonTitleLink: {
+    id: 'app.components.MarkdownControl.buttonTitleLink',
+    defaultMessage: 'Link: (text)[url]',
+  },
+  buttonTitleUnorderedList: {
+    id: 'app.components.MarkdownControl.buttonTitleUnorderedList',
+    defaultMessage: 'Unordered list: -',
+  },
+  buttonTitleOrderedList: {
+    id: 'app.components.MarkdownControl.buttonTitleOrderedList',
+    defaultMessage: 'Ordered list: 1.',
+  },
 });

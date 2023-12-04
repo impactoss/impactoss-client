@@ -194,7 +194,7 @@ function TextareaMarkdownWrapper(props) {
           </Box>
           <Box direction="row" align="center" gap="hair" justify="end">
             <MDButton
-              title="## Heading"
+              title={intl.formatMessage(messages.buttonTitleHeading2)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -205,7 +205,7 @@ function TextareaMarkdownWrapper(props) {
               <MDButtonText>H2</MDButtonText>
             </MDButton>
             <MDButton
-              title="### Secondary heading"
+              title={intl.formatMessage(messages.buttonTitleHeading3)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -216,7 +216,7 @@ function TextareaMarkdownWrapper(props) {
               <MDButtonText>H3</MDButtonText>
             </MDButton>
             <MDButton
-              title="Bold: **bold**"
+              title={intl.formatMessage(messages.buttonTitleBold)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -226,7 +226,7 @@ function TextareaMarkdownWrapper(props) {
               icon={<Bold size="xsmall" />}
             />
             <MDButton
-              title="Italic: _italic_"
+              title={intl.formatMessage(messages.buttonTitleItalic)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -236,7 +236,7 @@ function TextareaMarkdownWrapper(props) {
               icon={<Italic size="xsmall" />}
             />
             <MDButton
-              title="Link: (text)[url]"
+              title={intl.formatMessage(messages.buttonTitleLink)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -246,7 +246,7 @@ function TextareaMarkdownWrapper(props) {
               icon={<LinkIcon size="18px" />}
             />
             <MDButton
-              title="Unordered list: -"
+              title={intl.formatMessage(messages.buttonTitleUnorderedList)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -256,7 +256,7 @@ function TextareaMarkdownWrapper(props) {
               icon={<List size="xsmall" />}
             />
             <MDButton
-              title="Ordered list: 1."
+              title={intl.formatMessage(messages.buttonTitleOrderedList)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
