@@ -282,6 +282,7 @@ function TextareaMarkdownWrapper(props) {
               preferredItalicSyntax: '_',
               linkTextPlaceholder: 'link-title',
               linkUrlPlaceholder: 'https://link-url.ext',
+              enableIndentExtension: false,
             }}
             {...props}
           />
