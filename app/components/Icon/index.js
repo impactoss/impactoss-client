@@ -21,6 +21,7 @@ class Icon extends React.PureComponent {
       textLeft,
       hasStroke,
       hidePrint,
+      hideScreenreader,
     } = this.props;
     const icon = icons[name];
 
@@ -31,7 +32,7 @@ class Icon extends React.PureComponent {
         <SVG
           viewBox={`0 0 ${iSize} ${iSize}`}
           preserveAspectRatio="xMidYMid meet"
-          aria-hidden="true"
+          aria-hidden={hideScreenreader}
           palette={palette}
           paletteIndex={paletteIndex}
           size={size || `${iSize}px`}
@@ -66,12 +67,14 @@ Icon.propTypes = {
   hasStroke: PropTypes.bool,
   sizes: PropTypes.object,
   hidePrint: PropTypes.bool,
+  hideScreenreader: PropTypes.bool,
 };
 Icon.defaultProps = {
   name: 'placeholder',
   iconSize: 24,
   textLeft: false,
   textRight: false,
+  hideScreenreader: true,
 };
 
 
