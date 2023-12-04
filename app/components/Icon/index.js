@@ -35,6 +35,7 @@ class Icon extends React.PureComponent {
           preserveAspectRatio="xMidYMid meet"
           role={role}
           aria-hidden={hideScreenreader}
+          focusable="false"
           palette={palette}
           paletteIndex={paletteIndex}
           size={size || `${iSize}px`}
@@ -46,7 +47,7 @@ class Icon extends React.PureComponent {
           sizes={sizes}
           hidePrint={hidePrint}
         >
-          <title>{title || `Icon: ${name}`}</title>
+          {title && <title>{title}</title>}
           <path d={asArray(iconPaths).reduce((memo, path) => `${memo}${path}`, '')}></path>
         </SVG>
       );
