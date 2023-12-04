@@ -76,6 +76,8 @@
     "express": "4.14.0",
     "fontfaceobserver": "2.0.7",
     "grid-styled": "^1.0.1",
+    "grommet": "2.10",
+    "grommet-icons": "4.4.0",
     "history": "4.9.0",
     "hoist-non-react-statics": "3.3.0",
     "immer": "9.0.6",
@@ -112,6 +114,7 @@
     "sanitize.css": "8.0.0",
     "styled-components": "4.2.0",
     "styled-theme": "^0.3.3",
+    "textarea-markdown-editor": "^1.0.4",
     "url": "^0.11.0",
     "warning": "3.0.0",
     "whatwg-fetch": "3.0.0"
