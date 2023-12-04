@@ -97,7 +97,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
                   getNameField(intl.formatMessage),
                   getEmailField(intl.formatMessage),
                   getPasswordField(intl.formatMessage),
-                  getPasswordConfirmationField(intl.formatMessage, 'currentPassword'),
+                  getPasswordConfirmationField(intl.formatMessage),
                 ]}
               />
             )

@@ -72,7 +72,7 @@ export class UserPassword extends React.PureComponent { // eslint-disable-line r
                 fields={[
                   getPasswordCurrentField(intl.formatMessage),
                   getPasswordNewField(intl.formatMessage),
-                  getPasswordConfirmationField(intl.formatMessage, 'new-password'),
+                  getPasswordConfirmationField(intl.formatMessage),
                 ]}
               />
             )

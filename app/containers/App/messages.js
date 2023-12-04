@@ -197,7 +197,6 @@ export default defineMessages({
       fullName: 'name',
       email: 'email',
       username: 'username',
-      newPassword: 'new-password',
       currentPassword: 'current-password',
     },
   },
