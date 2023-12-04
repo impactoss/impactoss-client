@@ -321,6 +321,18 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
           </HideSecondary>
         </HideSecondaryWrap>
         <NavWrapper>
+          <NavPages>
+            {this.props.pages && this.props.pages.map((page, i) => (
+              <LinkPage
+                key={i}
+                href={page.path}
+                active={page.active || this.props.currentPath === page.path}
+                onClick={(evt) => this.onClick(evt, page.path)}
+              >
+                {page.title}
+              </LinkPage>
+            ))}
+          </NavPages>
           {navItemsAdmin
             && (
               <NavAdmin>
@@ -341,18 +353,6 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
               </NavAdmin>
             )
           }
-          <NavPages>
-            {this.props.pages && this.props.pages.map((page, i) => (
-              <LinkPage
-                key={i}
-                href={page.path}
-                active={page.active || this.props.currentPath === page.path}
-                onClick={(evt) => this.onClick(evt, page.path)}
-              >
-                {page.title}
-              </LinkPage>
-            ))}
-          </NavPages>
           <NavAccount
             isSignedIn={this.props.isSignedIn}
             user={this.props.user}
