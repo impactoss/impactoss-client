@@ -320,7 +320,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             <Icon name="close" size="30px" />
           </HideSecondary>
         </HideSecondaryWrap>
-        <NavWrapper>
+        <NavWrapper role="navigation" aria-label="secondary">
           <NavPages>
             {this.props.pages && this.props.pages.map((page, i) => (
               <LinkPage
@@ -442,7 +442,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
           </Banner>
         )}
         {!isHome && (
-          <NavMain hasBorder>
+          <NavMain hasBorder role="navigation" aria-label="primary">
             {frameworkOptions && (
               <SelectFrameworks
                 as="button"
