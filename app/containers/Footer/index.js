@@ -158,7 +158,7 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
     const { intl } = this.context;
     const { theme } = this.props;
     return (
-      <div>
+      <footer>
         { FOOTER.PARTNERS
           && (
             <FooterLogos>
@@ -261,7 +261,7 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
             </TableWrapper>
           </Container>
         </FooterMain>
-      </div>
+      </footer>
     );
   }
 }
