@@ -42,11 +42,62 @@ theme.media = {
 
 // grid-styles settings https://github.com/jxnblk/grid-styled
 theme.gutter = 20;
-theme.breakpoints = {
-  small: '769px',
-  medium: '993px',
-  large: '1200px',
+
+export const BREAKPOINTS = {
+  xsmall: {
+    min: 0,
+    max: 768, // inclusive
+    name: 'mobile',
+    index: 0,
+  },
+  // ms: {
+  //   min: 420, // exclusive
+  //   max: 720,
+  //   name: 'mobile (landscape)',
+  //   index: 1,
+  // },
+  small: {
+    min: 768, // exclusive
+    max: 992,
+    name: 'tablet (portrait)',
+    index: 2,
+  },
+  medium: {
+    min: 992, // exclusive
+    max: 1199,
+    name: 'laptop/tablet (landscape)',
+    index: 3,
+  },
+  large: {
+    min: 1199, // exclusive
+    max: 99999999,
+    name: 'desktop',
+    index: 4,
+  },
+  // xxlarge: {
+  //   min: 1728, // exclusive
+  //   max: 99999999,
+  //   name: 'large desktop',
+  //   index: 5,
+  // },
 };
+
+theme.breakpoints = {
+  small: `${BREAKPOINTS.small.min + 1}px`, // min
+  medium: `${BREAKPOINTS.medium.min + 1}px`, // min
+  large: `${BREAKPOINTS.large.min + 1}px`, // min
+  // small: `${BREAKPOINTS.small.min}px`, // max
+  // // ms: `${BREAKPOINTS.ms.min}px`, // max
+  // medium: `${BREAKPOINTS.medium.min}px`, // min
+  // large: `${BREAKPOINTS.large.min}px`, // min
+  // xlarge: `${BREAKPOINTS.xlarge.min}px`, // min
+  // xxlarge: `${BREAKPOINTS.xxlarge.min}px`, // min
+};
+// theme.breakpointsMin = {
+//   // ms: `${BREAKPOINTS.ms.min + 1}px`, // min
+//   // xlarge: `${BREAKPOINTS.xlarge.min + 1}px`, // min
+//   // xxlarge: `${BREAKPOINTS.xxlarge.min + 1}px`, // min
+// };
 
 // global color palettes
 // primary color palette: dark to light
@@ -376,6 +427,77 @@ theme.transitions = {
 theme.backgroundImages = {
   header: 'url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20260%2088%22%3E%3Ctitle%3Epattern3%3C%2Ftitle%3E%3Cg%20id%3D%22Layer_5%22%20data-name%3D%22Layer%205%22%3E%3Cpath%20d%3D%22M35.42%2C30.74h-18V26.52h18Zm0%2C3.46v4.23H11.73V34.2h23.7Zm-.5.5h-5.2v3.23h5.2ZM59.17%2C68.93h-18v4.23h18Zm0%2C7.69v4.22H35.48V76.62h23.7Zm-.5.5h-5.2v3.22h5.2ZM100.17%2C4.93h-18V9.16h18Zm0%2C7.69v4.22H76.48V12.62h23.7Zm-.5.5h-5.2v3.22h5.2Zm26.49%2C41.81h-18v4.23h18Zm0%2C7.69v4.22h-23.7V62.62h23.7Zm-.5.5h-5.2v3.22h5.2Zm58.74-32.19h-18v4.23h18Zm0%2C7.69v4.22h-23.7V38.62h23.7Zm-.5.5h-5.2v3.22h5.2Zm40.62%2C30.69h-18V74h18Zm0%2C7.68v4.23h-23.7V77.49h23.7Zm-.5.5h-5.2v3.23h5.2Zm14.5-72.68h-18V9.54h18Zm0%2C7.68v4.23h-23.7V13h23.7Zm-.5.5h-5.2v3.23h5.2ZM80.25%2C23.17%22%20style%3D%22fill%3A%23f1f4f4%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E")',
   asideHeader: 'url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20226.82%2082.78%22%3E%3Ctitle%3Epattern3%3C%2Ftitle%3E%3Cg%20id%3D%22Layer_5%22%20data-name%3D%22Layer%205%22%3E%3Cpath%20d%3D%22M35.42%2C30.74h-18V26.52h18Zm0%2C3.46v4.23H11.73V34.2h23.7Zm-.5.5h-5.2v3.23h5.2ZM59.17%2C74.93h-18v4.23h18Zm0%2C7.69v4.22H35.48V82.62h23.7Zm-.5.5h-5.2v3.22h5.2ZM100.17%2C4.93h-18V9.16h18Zm0%2C7.69v4.22H76.48V12.62h23.7Zm-.5.5h-5.2v3.22h5.2Zm26.49%2C41.81h-18v4.23h18Zm0%2C7.69v4.22h-23.7V62.62h23.7Zm-.5.5h-5.2v3.22h5.2Zm58.74-32.19h-18v4.23h18Zm0%2C7.69v4.22h-23.7V38.62h23.7Zm-.5.5h-5.2v3.22h5.2Zm40.62%2C36.69h-18V80h18Zm0%2C7.68v4.23h-23.7V83.49h23.7Zm-.5.5h-5.2v3.23h5.2Zm14.5-78.68h-18V9.54h18Zm0%2C7.68v4.23h-23.7V13h23.7Zm-.5.5h-5.2v3.23h5.2ZM80.25%2C23.17%22%20transform%3D%22translate%28-11.73%20-4.93%29%22%20style%3D%22fill%3A%23f1f4f4%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E")',
+};
+
+// grommet
+theme.global = {
+  drop: {
+    zIndex: 200,
+  },
+  font: {
+    size: '16px',
+    height: 1.42857,
+  },
+  breakpoints: {
+    small: {
+      value: BREAKPOINTS.small.max,
+    },
+    medium: {
+      value: BREAKPOINTS.medium.max,
+    },
+    large: {
+      value: BREAKPOINTS.large.max,
+    },
+    xlarge: {},
+  },
+  colors: {
+    aHover: '#08586c',
+  },
+  edgeSize: {
+    hair: '1px',
+    xxsmall: '3px',
+    xsmall: '6px',
+    small: '12px',
+    ms: '16px',
+    medium: '24px',
+    ml: '36px',
+    large: '48px',
+    xlarge: '64px',
+    xxlarge: '100px',
+  },
+};
+
+theme.layer = {
+  zIndex: 201,
+  overlay: {
+    background: 'rgba(0, 0, 0, 0.80)',
+  },
+};
+
+theme.text = {
+  xxxlarge: { size: '48px', height: '60px', maxWidth: '800px' },
+  xxlarge: { size: '30px', height: '36px', maxWidth: '800px' },
+  xlarge: { size: '20px', height: '28px', maxWidth: '800px' },
+  large: { size: '18px', height: '24px', maxWidth: '800px' },
+  largeTall: { size: '18px', height: '26px', maxWidth: '800px' },
+  medium: { size: '16px', height: '21px', maxWidth: '800px' },
+  mediumTall: { size: '16px', height: '23px', maxWidth: '800px' },
+  mediumTight: { size: '16px', height: '18px', maxWidth: '800px' },
+  small: { size: '14px', height: '18px', maxWidth: '700px' },
+  xsmall: { size: '13px', height: '16px', maxWidth: '600px' },
+  xxsmall: { size: '12px', height: '14px', maxWidth: '500px' },
+  xxxsmall: { size: '11px', height: '13px', maxWidth: '500px' },
+};
+
+theme.icon = {
+  size: {
+    xxsmall: '14px',
+    xsmall: '20px',
+    small: '24px',
+    medium: '36px',
+    large: '48px',
+    xlarge: '96px',
+  },
 };
 
 export default theme;

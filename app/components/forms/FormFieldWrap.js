@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 const FormFieldWrap = styled.div`
-  display: ${(props) => props.nested ? 'inline-block' : 'block'};
+  display: ${({ nested, inline }) => (nested || inline) ? 'inline-block' : 'block'};
   vertical-align: top;
 `;
 

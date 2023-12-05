@@ -277,7 +277,7 @@ export const selectChildRecommendations = createSelector(
         (cat) => cat.set(
           'recommendations',
           cat.get('recommendations').map(
-            (rec) => rec.set(
+            (rec) => rec && rec.set(
               'categories',
               getEntityCategories(
                 rec.get('id'),

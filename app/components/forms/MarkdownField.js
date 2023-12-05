@@ -37,11 +37,11 @@ function MarkdownField({ field }) {
   return (
     <FieldWrap>
       {field.label
-        && (
-          <Label>
-            <FormattedMessage {...field.label} />
-          </Label>
-        )
+                && (
+                  <Label>
+                    <FormattedMessage {...field.label} />
+                  </Label>
+                )
       }
       <Markdown
         source={field.value}
