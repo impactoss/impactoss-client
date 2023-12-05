@@ -26,27 +26,18 @@ import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
 import Container from 'components/styled/Container';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
-// import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 import TagSearch from 'components/TagSearch';
-// import Scrollable from 'components/styled/Scrollable';
 import SidebarGroupLabel from 'components/styled/SidebarGroupLabel';
-// import SupTitle from 'components/SupTitle';
-// mport Component from 'components/styled/Component';
 import Content from 'components/styled/Content';
-// import PrintHide from 'components/styled/PrintHide';
 import { Box, Text } from 'grommet';
 
 import { FormUp, FormDown } from 'grommet-icons';
 
 import qe from 'utils/quasi-equals';
 
-// import EntityListItem from 'components/EntityListItem';
-// import EntityListHeader from 'components/EntityListMain/EntityListGroups/EntityListHeader';
-// import EntityListItemWrapper from 'components/EntityListMain/EntityListGroups/EntityListItems/EntityListItemWrapper';
 import EntityListItem from 'components/EntityListItem';
 
 import appMessages from 'containers/App/messages';
-// import { ROUTES } from 'containers/App/constants';
 
 import { DEPENDENCIES } from './constants';
 import { selectEntitiesByQuery, selectPathQuery } from './selectors';
@@ -56,7 +47,6 @@ import {
   updateSortBy,
   updateSortOrder,
 } from './actions';
-// import { selectConnections, selectMeasures, selectConnectedTaxonomies } from './selectors';
 
 import messages from './messages';
 
@@ -72,11 +62,6 @@ const Group = styled.div`
   }
 `;
 
-/* const ScrollableWrapper = styled(Scrollable)`
-  background-color: ${palette('aside', 0)};
-`; */
-
-// TODO compare EntityListSidebarOption
 const Target = styled(Button)`
   display: table;
   width: 100%;
@@ -158,9 +143,7 @@ const ListHint = styled.div`
   padding-bottom: 10px;
 `;
 const ListWrapper = styled.div``;
-/* const ListEntitiesMain = styled.div`
-  padding-top: 0.5em;
-`; */
+
 const TargetsMobile = styled.div`
   padding-bottom: 20px;
 `;
