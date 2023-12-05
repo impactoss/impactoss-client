@@ -302,23 +302,14 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       ),
       0,
     );
-
+    const noEntry = !location.query.search;
     const activeTarget = entities.reduce((memo, group) => group.get('targets').find((target) => target.get('active')) || memo,
       Map());
-    let activeTargetPath = activeTarget && activeTarget.get('path');
-
-    const allResults = entities.filter((group) => group.get('targets') && group.get('targets').some((target) => target.get('results')));
-
-    const hasResults = location.query.search
-      && allResults.size > 0;
-
+    const hasResults = !noEntry && entities.reduce((memo, group) => group.get('targets').find((target) => target.get('results') && target.get('results').size > 0) || memo,
+      false);
     const noResults = !hasResults;
 
-    const noResultsNoAlternative = noResults
-      && !entities.reduce((memo, group) => group.get('targets').find((target) => target.get('results') && target.get('results').size > 0) || memo,
-        false);
-
-    const noEntry = !location.query.search;
+    let activeTargetPath = activeTarget && activeTarget.get('path');
 
     const headerButtons = [{
       type: 'icon',
@@ -366,14 +357,8 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       )
                     }
                     {
-                      noResultsNoAlternative && (
-                        <ListHint>
-                          <FormattedMessage {...messages.hints.noResultsNoAlternative} />
-                        </ListHint>
-                      )
-                    }
-                    {
-                      noResults && !noResultsNoAlternative && (
+                      noResults && !noEntry
+                      && (
                         <ListHint>
                           <FormattedMessage {...messages.hints.noResults} />
                         </ListHint>
@@ -383,11 +368,11 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       && (
                         <TargetsMobile>
                           {!noResults
-                          && (
-                            <ListHint>
-                              <FormattedMessage {...messages.hints.targetMobile} />
-                            </ListHint>
-                          )
+                            && (
+                              <ListHint>
+                                <FormattedMessage {...messages.hints.targetMobile} />
+                              </ListHint>
+                            )
                           }
                           {
                             this.renderSearchTargets(false)
@@ -403,7 +388,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                           </Text>
                           {countTargets > 1 && (
                             <Text>
-                              Please select a content type below to see individual results
+                              <FormattedMessage {...messages.hints.hasCountTargets} />
                             </Text>
                           )}
                         </ListHint>
