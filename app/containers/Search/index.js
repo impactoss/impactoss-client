@@ -55,8 +55,8 @@ const EntityListSearch = styled.div`
 `;
 
 const Group = styled.div`
-  border-bottom: ${(props) => props.hasBorder ? '1px solid' : 0};
-  border-color: ${(props) => props.expanded ? palette('aside', 0) : palette('light', 2)};
+  border-bottom: ${({ hasBorder }) => hasBorder ? '1px solid' : 0};
+  border-color: ${({ expanded }) => expanded ? palette('aside', 0) : palette('light', 2)};
   &:last-child {
     border-bottom: 0;
   }
@@ -66,44 +66,44 @@ const Target = styled(Button)`
   display: table;
   width: 100%;
   font-size: 0.85em;
-  font-weight: ${(props) => props.active ? 'bold' : 'normal'};
+  font-weight: ${({ active }) => active ? 'bold' : 'normal'};
   padding: 0.3em 8px 0.3em 12px;
   text-align: left;
-  color:  ${(props) => {
-    if (props.disabled) {
-      return props.active ? palette('asideListItem', 1) : palette('dark', 4);
+  color:  ${({ disabled, active }) => {
+    if (disabled) {
+      return active ? palette('asideListItem', 1) : palette('dark', 4);
     }
-    return props.active ? palette('asideListItem', 1) : palette('asideListItem', 0);
+    return active ? palette('asideListItem', 1) : palette('asideListItem', 0);
   }};
-  background-color: ${(props) => props.active ? palette('asideListItem', 3) : palette('asideListItem', 2)};
+  background-color: ${({ active }) => active ? palette('asideListItem', 3) : palette('asideListItem', 2)};
   border-bottom: 1px solid ${palette('asideListItem', 4)};
   &:hover {
-    color: ${(props) => {
-    if (props.disabled) {
-      return props.active ? palette('asideListItem', 1) : palette('dark', 4);
+    color: ${({ disabled, active }) => {
+    if (disabled) {
+      return active ? palette('asideListItem', 1) : palette('dark', 4);
     }
-    return props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0);
+    return active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0);
   }};
-    background-color: ${(props) => {
-    if (props.disabled) {
-      return props.active ? palette('asideListItem', 3) : palette('asideListItem', 2);
+    background-color: ${({ disabled, active }) => {
+    if (disabled) {
+      return active ? palette('asideListItem', 3) : palette('asideListItem', 2);
     }
-    return props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2);
+    return active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2);
   }};
     border-bottom-color: ${palette('asideListItemHover', 4)}
   }
   &:last-child {
     border-bottom: 0;
   }
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+  @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
     font-size: 0.85em;
     padding: 0.3em 8px 0.3em 12px;
   }
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+  @media (min-width: ${({ theme }) => theme.breakpoints.large}) {
     padding: 0.4em 20px 0.4em 24px
   }
   @media print {
-    font-size: ${(props) => props.theme.sizes.print.smaller};
+    font-size: ${({ theme }) => theme.sizes.print.smaller};
   }
 `;
 
@@ -117,16 +117,16 @@ const TargetCount = styled.div`
   width: 32px;
   display: table-cell;
   vertical-align: middle;
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+  @media (min-width: ${({ theme }) => theme.breakpoints.large}) {
     padding-right: 5px;
   }
 `;
 
 const Count = styled.div`
-  color:  ${(props) => (props.active || props.disabled) ? 'inherit' : palette('dark', 3)};
-  background-color: ${(props) => {
-    if (props.active) return 'inherit';
-    return props.disabled ? 'transparent' : palette('light', 0);
+  color:  ${({ active, disabled }) => (active || disabled) ? 'inherit' : palette('dark', 3)};
+  background-color: ${({ active, disabled }) => {
+    if (active) return 'inherit';
+    return disabled ? 'transparent' : palette('light', 0);
   }};
   border-radius: 999px;
   padding: 3px;
@@ -134,7 +134,7 @@ const Count = styled.div`
   text-align: center;
   min-width: 32px;
   @media print {
-    font-size: ${(props) => props.theme.sizes.print.smaller};
+    font-size: ${({ theme }) => theme.sizes.print.smaller};
   }
 `;
 
