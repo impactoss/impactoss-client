@@ -19,7 +19,7 @@ import { sortEntities, getSortOption } from 'utils/sort';
 import { CONFIG } from './constants';
 
 
-const selectPathQuery = createSelector(
+export const selectPathQuery = createSelector(
   (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('path')
 );

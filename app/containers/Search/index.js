@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
-import { fromJS } from 'immutable';
+import { Map, fromJS } from 'immutable';
 import { FormattedMessage } from 'react-intl';
 
 import { startsWith } from 'utils/string';
@@ -18,7 +18,6 @@ import { startsWith } from 'utils/string';
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
   selectReady,
-  selectSearchQuery,
 } from 'containers/App/selectors';
 import { CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
 
@@ -41,10 +40,7 @@ import EntityListItem from 'components/EntityListItem';
 import appMessages from 'containers/App/messages';
 
 import { DEPENDENCIES } from './constants';
-
-import { selectEntitiesByQuery } from './selectors';
-
-
+import { selectEntitiesByQuery, selectPathQuery } from './selectors';
 import {
   updateQuery,
   resetSearchQuery,
@@ -265,7 +261,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       onClear,
       entities,
       onEntityClick,
-      activeTargetPath,
+      // activeTargetPath,
     } = this.props;
     const hasQuery = !!location.query.search;
     const countResults = dataReady && hasQuery && entities && entities.reduce(
@@ -290,9 +286,13 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       0,
     );
     const noEntry = !location.query.search;
+    const activeTarget = entities.reduce((memo, group) => group.get('targets').find((target) => target.get('active')) || memo,
+      Map());
     const hasResults = !noEntry && entities.reduce((memo, group) => group.get('targets').find((target) => target.get('results') && target.get('results').size > 0) || memo,
       false);
     const noResults = !hasResults;
+
+    let activeTargetPath = activeTarget && activeTarget.get('path');
 
     const headerButtons = [{
       type: 'icon',
@@ -404,8 +404,10 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                                   onClick={(evt) => {
                                                     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
                                                     if (active) {
+                                                      activeTargetPath = null;
                                                       this.props.onTargetSelect('');
                                                     } else {
+                                                      activeTargetPath = target.get('path');
                                                       this.props.onTargetSelect(target.get('path'));
                                                     }
                                                   }}
@@ -491,7 +493,7 @@ Search.contextTypes = {
 const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   entities: selectEntitiesByQuery(state, fromJS(props.location.query)),
-  activeTargetPath: selectSearchQuery(state, fromJS(props.location.query)),
+  activeTargetPath: selectPathQuery(state),
 });
 function mapDispatchToProps(dispatch) {
   return {
