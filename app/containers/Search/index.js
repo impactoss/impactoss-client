@@ -241,16 +241,19 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       ),
       0,
     );
-    const noEntry = !location.query.search;
-    const isQueryMinLength = !noEntry
-      && location.query.search.length > SEARCH.MIN_LENGTH;
-    const hasResults = isQueryMinLength
+    const hasEntry = location.query && location.query.search;
+    const noEntry = !hasEntry;
+
+    const hasResults = hasEntry
       && entities.reduce(
         (memo, group) => group.get('targets').find(
           (target) => target.get('results') && target.get('results').size > 0
         ) || memo,
         false,
       );
+    const isQueryMinLength = hasEntry
+      && location.query.search.length > SEARCH.MIN_LENGTH;
+
     const noResults = isQueryMinLength && !hasResults;
 
     const headerButtons = [{
@@ -296,7 +299,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                         <FormattedMessage {...messages.hints.noEntry} />
                       </ListHint>
                     )}
-                    {!isQueryMinLength && !noEntry && (
+                    {!isQueryMinLength && hasEntry && !hasResults && (
                       <ListHint>
                         <FormattedMessage {...messages.hints.minLength} />
                       </ListHint>
