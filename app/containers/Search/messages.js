@@ -45,6 +45,10 @@ export default defineMessages({
       id: 'app.containers.Search.hints.noEntry',
       defaultMessage: 'Please enter a search text to start your search.',
     },
+    minLength: {
+      id: 'app.containers.Search.hints.minLength',
+      defaultMessage: 'Please continue entering your search text',
+    },
     noResults: {
       id: 'app.containers.Search.hints.noResults',
       defaultMessage: 'We are sorry, no content matched your search! Please try a different search text.',
@@ -52,14 +56,6 @@ export default defineMessages({
     hasCountTargets: {
       id: 'app.containers.Search.hints.hasCountTargets',
       defaultMessage: 'Please select a content type below to see individual results',
-    },
-    targetMobile: {
-      id: 'app.containers.Search.hints.targetMobile',
-      defaultMessage: 'Select search target - see results below',
-    },
-    resultsMobile: {
-      id: 'app.containers.Search.hints.resultsMobile',
-      defaultMessage: 'Search results',
     },
   },
 });

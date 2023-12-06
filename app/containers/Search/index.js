@@ -19,7 +19,8 @@ import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
   selectReady,
 } from 'containers/App/selectors';
-import { CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
+import { CONTENT_LIST } from 'containers/App/constants';
+import { SEARCH } from 'themes/config';
 
 import Button from 'components/buttons/Button';
 import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
@@ -144,27 +145,9 @@ const ListHint = styled.div`
 `;
 const ListWrapper = styled.div``;
 
-const TargetsMobile = styled.div`
-  padding-bottom: 20px;
-`;
-
-const STATE_INITIAL = {
-  viewport: null,
-};
-
 export class Search extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor(props) {
-    super(props);
-    this.state = STATE_INITIAL;
-  }
-
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-  }
-
-  componentDidMount() {
-    this.updateViewport();
-    window.addEventListener('resize', this.resize);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -174,41 +157,11 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     }
   }
 
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.resize);
-  }
-
   getTargetTitle = (target) => {
     if (startsWith(target.get('path'), 'taxonomies')) {
       return appMessages.entities.taxonomies[target.get('taxId')];
     }
     return appMessages.entities[target.get('path')];
-  };
-
-  resize = () => {
-    // reset
-    this.setState(STATE_INITIAL);
-    this.updateViewport();
-    this.forceUpdate();
-  };
-
-  updateViewport() {
-    let viewport = VIEWPORTS.MOBILE;
-    if (window.innerWidth >= parseInt(this.props.theme.breakpoints.large, 10)) {
-      viewport = VIEWPORTS.LARGE;
-    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.medium, 10)) {
-      viewport = VIEWPORTS.MEDIUM;
-    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.small, 10)) {
-      viewport = VIEWPORTS.SMALL;
-    }
-    this.setState({ viewport });
-  }
-
-  resize = () => {
-    // reset
-    this.setState(STATE_INITIAL);
-    this.updateViewport();
-    this.forceUpdate();
   };
 
   renderSearchTargets = (includeEmpty = true) => (
@@ -223,27 +176,30 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
             )
           }
           <div>
-            {
-              group.get('targets') && group.get('targets').entrySeq().map(([i, target]) => (includeEmpty || target.get('results').size > 0 || target.get('active')) && (
-                <Target
-                  key={i}
-                  onClick={(evt) => {
-                    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                    this.props.onTargetSelect(target.get('path'));
-                  }}
-                  active={target.get('active')}
-                  disabled={target.get('results').size === 0}
-                >
-                  <TargetTitle>
-                    {this.getTargetTitle(target) && this.context.intl.formatMessage(this.getTargetTitle(target).pluralLong || this.getTargetTitle(target).plural)}
-                  </TargetTitle>
-                  <TargetCount>
-                    <Count active={target.get('active')} disabled={target.get('results').size === 0}>
-                      {target.get('results').size}
-                    </Count>
-                  </TargetCount>
-                </Target>
-              ))
+            {group.get('targets')
+              && group.get('targets').entrySeq().map(
+                ([i, target]) => (includeEmpty || target.get('results').size > 0 || target.get('active')
+                ) && (
+                  <Target
+                    key={i}
+                    onClick={(evt) => {
+                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                      this.props.onTargetSelect(target.get('path'));
+                    }}
+                    active={target.get('active')}
+                    disabled={target.get('results').size === 0}
+                  >
+                    <TargetTitle>
+                      {this.getTargetTitle(target) && this.context.intl.formatMessage(this.getTargetTitle(target).pluralLong || this.getTargetTitle(target).plural)}
+                    </TargetTitle>
+                    <TargetCount>
+                      <Count active={target.get('active')} disabled={target.get('results').size === 0}>
+                        {target.get('results').size}
+                      </Count>
+                    </TargetCount>
+                  </Target>
+                )
+              )
             }
           </div>
         </Group>
@@ -286,10 +242,16 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       0,
     );
     const noEntry = !location.query.search;
-    const hasResults = !noEntry && entities.reduce((memo, group) => group.get('targets').find((target) => target.get('results') && target.get('results').size > 0) || memo,
-      false);
-    const noResults = !hasResults;
-
+    const isQueryMinLength = !noEntry
+      && location.query.search.length > SEARCH.MIN_LENGTH;
+    const hasResults = isQueryMinLength
+      && entities.reduce(
+        (memo, group) => group.get('targets').find(
+          (target) => target.get('results') && target.get('results').size > 0
+        ) || memo,
+        false,
+      );
+    const noResults = isQueryMinLength && !hasResults;
 
     const headerButtons = [{
       type: 'icon',
@@ -329,37 +291,21 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                     />
                   </EntityListSearch>
                   <ListWrapper>
-                    {
-                      noEntry && (
-                        <ListHint>
-                          <FormattedMessage {...messages.hints.noEntry} />
-                        </ListHint>
-                      )
-                    }
-                    {
-                      noResults && !noEntry
-                      && (
-                        <ListHint>
-                          <FormattedMessage {...messages.hints.noResults} />
-                        </ListHint>
-                      )
-                    }
-                    {!noEntry && this.state.viewport && this.state.viewport === VIEWPORTS.MOBILE
-                      && (
-                        <TargetsMobile>
-                          {!noResults
-                            && (
-                              <ListHint>
-                                <FormattedMessage {...messages.hints.targetMobile} />
-                              </ListHint>
-                            )
-                          }
-                          {
-                            this.renderSearchTargets(false)
-                          }
-                        </TargetsMobile>
-                      )
-                    }
+                    {noEntry && (
+                      <ListHint>
+                        <FormattedMessage {...messages.hints.noEntry} />
+                      </ListHint>
+                    )}
+                    {!isQueryMinLength && !noEntry && (
+                      <ListHint>
+                        <FormattedMessage {...messages.hints.minLength} />
+                      </ListHint>
+                    )}
+                    {noResults && !noEntry && (
+                      <ListHint>
+                        <FormattedMessage {...messages.hints.noResults} />
+                      </ListHint>
+                    )}
                     {hasResults && (
                       <Box>
                         <ListHint>
