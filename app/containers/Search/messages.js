@@ -45,21 +45,17 @@ export default defineMessages({
       id: 'app.containers.Search.hints.noEntry',
       defaultMessage: 'Please enter a search text to start your search.',
     },
+    minLength: {
+      id: 'app.containers.Search.hints.minLength',
+      defaultMessage: 'Please continue entering your search text',
+    },
     noResults: {
       id: 'app.containers.Search.hints.noResults',
-      defaultMessage: 'We are sorry, there are no results for the selected search target. Please select a different target or try a different search text.',
-    },
-    noResultsNoAlternative: {
-      id: 'app.containers.Search.hints.noResultsNoAlternative',
       defaultMessage: 'We are sorry, no content matched your search! Please try a different search text.',
     },
-    targetMobile: {
-      id: 'app.containers.Search.hints.targetMobile',
-      defaultMessage: 'Select search target - see results below',
-    },
-    resultsMobile: {
-      id: 'app.containers.Search.hints.resultsMobile',
-      defaultMessage: 'Search results',
+    hasCountTargets: {
+      id: 'app.containers.Search.hints.hasCountTargets',
+      defaultMessage: 'Please select a content type below to see individual results',
     },
   },
 });
