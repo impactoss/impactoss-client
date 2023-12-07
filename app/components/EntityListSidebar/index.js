@@ -27,6 +27,7 @@ import appMessages from 'containers/App/messages';
 import Sidebar from 'components/styled/Sidebar';
 import SidebarHeader from 'components/styled/SidebarHeader';
 import PrintHide from 'components/styled/PrintHide';
+import SkipContent from 'components/styled/SkipContent';
 
 import EntityListSidebarGroups from './EntityListSidebarGroups';
 
@@ -358,7 +359,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       }
     }
     return (
-      <Styled>
+      <Styled id="filter-options">
         { (!this.state.visible && this.state.viewport < VIEWPORTS.LARGE)
           && (
             <ToggleShow onClick={this.onShowSidebar}>
@@ -430,6 +431,12 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             </SidebarWrapper>
           )
         }
+        <SkipContent
+          href="#main-content"
+          title={this.context.intl.formatMessage(appMessages.screenreader.skipBackToContent)}
+        >
+          <FormattedMessage {...appMessages.screenreader.skipBackToContent} />
+        </SkipContent>
         { formOptions
           && (
             <EntityListForm

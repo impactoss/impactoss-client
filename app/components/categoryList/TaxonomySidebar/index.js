@@ -20,6 +20,7 @@ import SidebarGroupLabel from 'components/styled/SidebarGroupLabel';
 import Sidebar from 'components/styled/Sidebar';
 import Scrollable from 'components/styled/Scrollable';
 import PrintHide from 'components/styled/PrintHide';
+import SkipContent from 'components/styled/SkipContent';
 
 import { prepareTaxonomyGroups } from 'utils/taxonomies';
 
@@ -194,6 +195,12 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
                   ))}
                 </Component>
               </Scrollable>
+              <SkipContent
+                href="#main-content"
+                title={this.context.intl.formatMessage(appMessages.screenreader.skipBackToContent)}
+              >
+                <FormattedMessage {...appMessages.screenreader.skipBackToContent} />
+              </SkipContent>
             </Sidebar>
           )
         }

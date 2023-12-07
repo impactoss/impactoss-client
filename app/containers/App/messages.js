@@ -1544,5 +1544,13 @@ export default defineMessages({
       id: 'app.containers.App.screenreader.skipToContent',
       defaultMessage: 'Skip to content',
     },
+    skipBackToContent: {
+      id: 'app.containers.App.screenreader.skipBackToContent',
+      defaultMessage: 'Skip back to content',
+    },
+    skipToListFilter: {
+      id: 'app.containers.App.screenreader.skipToListFilter',
+      defaultMessage: 'Skip to list filter options',
+    },
   },
 });
