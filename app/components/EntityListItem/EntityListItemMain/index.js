@@ -55,6 +55,10 @@ const EntityListItemMainTitleWrap = styled.a`
 `;
 
 class EntityListItemMain extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  componentDidMount() {
+    if (this.props.isFocus) this.title.focus();
+  }
+
   getConnections = (entity, connectionOptions, connections) => {
     const { intl } = this.context;
     return reduce(connectionOptions, (memo, option) => {
@@ -205,6 +209,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
         <EntityListItemMainTop entity={entity} />
         <Clear />
         <EntityListItemMainTitleWrap
+          ref={(el) => { this.title = el; }}
           onClick={(evt) => {
             evt.preventDefault();
             onEntityClick(entity.id, entity.path);
@@ -243,6 +248,7 @@ EntityListItemMain.propTypes = {
   nestLevel: PropTypes.number,
   onEntityClick: PropTypes.func,
   isConnection: PropTypes.bool,
+  isFocus: PropTypes.bool,
 };
 EntityListItemMain.contextTypes = {
   intl: PropTypes.object,

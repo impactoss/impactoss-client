@@ -96,6 +96,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
       connections,
       error,
       isConnection,
+      isFocus,
     } = this.props;
 
     return (
@@ -133,6 +134,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
                 wrapper={this.props.wrapper}
                 isManager={isManager}
                 isConnection={isConnection}
+                isFocus={isFocus}
               />
             </MainInnerWrapper>
           </MainWrapper>
@@ -163,6 +165,7 @@ EntityListItem.propTypes = {
   isManager: PropTypes.bool,
   isSelected: PropTypes.bool,
   isConnection: PropTypes.bool,
+  isFocus: PropTypes.bool,
   onSelect: PropTypes.func,
   expandNo: PropTypes.number,
   onExpand: PropTypes.func,
