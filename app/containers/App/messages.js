@@ -183,14 +183,6 @@ export default defineMessages({
       id: 'app.containers.App.buttons.import',
       defaultMessage: 'Import',
     },
-    hideSecondaryNavigation: {
-      id: 'app.containers.App.buttons.hideSecondaryNavigation',
-      defaultMessage: 'Hide top menu',
-    },
-    showSecondaryNavigation: {
-      id: 'app.containers.App.buttons.showSecondaryNavigation',
-      defaultMessage: 'Show top menu',
-    },
   },
   htmlElementAttributes: {
     autocomplete: {
@@ -1540,6 +1532,14 @@ export default defineMessages({
     },
   },
   screenreader: {
+    hideSecondaryNavigation: {
+      id: 'app.containers.App.buttons.hideSecondaryNavigation',
+      defaultMessage: 'Hide top menu',
+    },
+    showSecondaryNavigation: {
+      id: 'app.containers.App.buttons.showSecondaryNavigation',
+      defaultMessage: 'Show top menu',
+    },
     skipToContent: {
       id: 'app.containers.App.screenreader.skipToContent',
       defaultMessage: 'Skip to content',

@@ -299,7 +299,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         onClick={this.onShowSecondary}
       >
         <ScreenReaderOnly>
-          <FormattedMessage {...appMessages.buttons.showSecondaryNavigation} />
+          <FormattedMessage {...appMessages.screenreader.showSecondaryNavigation} />
         </ScreenReaderOnly>
         <Icon name="menu" hasStroke />
       </ShowSecondary>
@@ -315,7 +315,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             onClick={this.onHideSecondary}
           >
             <ScreenReaderOnly>
-              <FormattedMessage {...appMessages.buttons.hideSecondaryNavigation} />
+              <FormattedMessage {...appMessages.screenreader.hideSecondaryNavigation} />
             </ScreenReaderOnly>
             <Icon name="close" size="30px" />
           </HideSecondary>

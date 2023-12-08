@@ -291,7 +291,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       searchQuery={location.query.search || ''}
                       onSearch={onSearch}
                       onClear={() => onClear(['search'])}
-                      autofocus
+                      focusOnMount
                     />
                   </EntityListSearch>
                   <ListWrapper>

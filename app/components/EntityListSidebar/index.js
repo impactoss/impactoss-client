@@ -173,13 +173,13 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
 
   onHideSidebar = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    this.onHideForm(evt);
-    this.setState({ visible: false });
+    this.hideForm();
+    this.hideSidebar();
   };
 
   onHideForm = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    this.setState({ activeOption: null });
+    this.hideForm();
   };
 
   onToggleGroup = (groupId, expanded) => {
@@ -192,6 +192,14 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       });
     });
   }
+
+  hideForm = () => {
+    this.setState({ activeOption: null });
+  };
+
+  hideSidebar = () => {
+    this.setState({ visible: false });
+  };
 
   getSidebarButtons = () => {
     const { intl } = this.context;
@@ -408,6 +416,33 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
                         onShowForm={this.onShowForm}
                         onToggleGroup={this.onToggleGroup}
                         expanded={this.state.expandedGroups}
+                        formOptions={formOptions && (
+                          <EntityListForm
+                            model={formModel}
+                            activeOptionId={activeOption.optionId}
+                            formOptions={formOptions}
+                            buttons={activePanel === EDIT_PANEL
+                              ? this.getFormButtons(activeOption)
+                              : null
+                            }
+                            onCancel={this.onHideForm}
+                            showCancelButton={(activePanel === FILTERS_PANEL)}
+                            onSelect={() => {
+                              if (activePanel === FILTERS_PANEL) {
+                                this.hideForm(false);
+                                this.hideSidebar();
+                              }
+                            }}
+                            onSubmit={activePanel === EDIT_PANEL
+                              ? (associations) => {
+                              // close and reset option panel
+                                this.setState({ activeOption: null });
+                                onUpdate(associations, activeOption);
+                              }
+                              : null
+                            }
+                          />
+                        )}
                       />
                     )
                     }
@@ -434,38 +469,18 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         <SkipContent
           href="#main-content"
           title={this.context.intl.formatMessage(appMessages.screenreader.skipBackToContent)}
+          onClick={() => {
+            if (activePanel === EDIT_PANEL) {
+              this.setState({ activeOption: null });
+            }
+            if (activePanel === FILTERS_PANEL) {
+              this.hideForm(false);
+              this.hideSidebar();
+            }
+          }}
         >
           <FormattedMessage {...appMessages.screenreader.skipBackToContent} />
         </SkipContent>
-        { formOptions
-          && (
-            <EntityListForm
-              model={formModel}
-              activeOptionId={activeOption.optionId}
-              formOptions={formOptions}
-              buttons={activePanel === EDIT_PANEL
-                ? this.getFormButtons(activeOption)
-                : null
-              }
-              onCancel={this.onHideForm}
-              showCancelButton={(activePanel === FILTERS_PANEL)}
-              onSelect={() => {
-                if (activePanel === FILTERS_PANEL) {
-                  this.onHideForm();
-                  this.onHideSidebar();
-                }
-              }}
-              onSubmit={activePanel === EDIT_PANEL
-                ? (associations) => {
-                // close and reset option panel
-                  this.setState({ activeOption: null });
-                  onUpdate(associations, activeOption);
-                }
-                : null
-              }
-            />
-          )
-        }
       </Styled>
     );
   }

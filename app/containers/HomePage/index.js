@@ -270,7 +270,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                   </Row>
                 )}
                 {dataReady && !signingIn && frameworks.size > 1 && (
-                  <span>
+                  <span role="navigation" aria-label="Primary">
                     <Row>
                       <GridSpace lg={1 / 6} sm={1 / 8} />
                       <Grid lg={2 / 3} sm={3 / 4} xs={1}>
@@ -306,7 +306,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                 {dataReady && !signingIn && frameworks.size === 1 && (
                   <Row>
                     <GridSpace lg={1 / 6} sm={1 / 8} />
-                    <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                    <Grid lg={2 / 3} sm={3 / 4} xs={1} role="navigation" aria-label="Primary">
                       <FrameworkButton
                         single
                         onClick={() => onPageLink(ROUTES.OVERVIEW)}

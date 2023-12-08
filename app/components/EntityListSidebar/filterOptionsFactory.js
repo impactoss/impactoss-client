@@ -92,6 +92,7 @@ export const makeActiveFilterOptions = (
 export const makeAttributeFilterOptions = (entities, config, activeOptionId, locationQueryValue, messages) => {
   const filterOptions = {
     groupId: 'attributes',
+    optionId: activeOptionId,
     options: {},
     multiple: true,
     required: false,
@@ -193,11 +194,12 @@ export const makeFrameworkFilterOptions = (
   entities,
   config,
   frameworks,
-  activeTaxId,
+  activeOptionId,
   locationQuery,
 ) => {
   const filterOptions = {
     groupId: 'frameworks',
+    optionId: activeOptionId,
     search: false,
     options: {},
     multiple: false,
@@ -267,6 +269,7 @@ export const makeTaxonomyFilterOptions = (
 ) => {
   const filterOptions = {
     groupId: 'taxonomies',
+    optionId: activeTaxId,
     search: config.search,
     options: {},
     multiple: true,
@@ -388,6 +391,7 @@ export const makeConnectionFilterOptions = (
 ) => {
   const filterOptions = {
     groupId: 'connections',
+    optionId: activeOptionId,
     options: {},
     multiple: true,
     required: false,
@@ -540,6 +544,7 @@ export const makeConnectedTaxonomyFilterOptions = (
 ) => {
   const filterOptions = {
     groupId: 'connectedTaxonomies',
+    optionId: activeOptionId,
     search: config.connectedTaxonomies.search,
     options: {},
     multiple: true,
