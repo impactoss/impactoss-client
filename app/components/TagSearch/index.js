@@ -90,6 +90,10 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     };
   }
 
+  componentDidMount() {
+    if (this.input && this.props.autofocus) this.input.focus();
+  }
+
   getFilterLabel = (filter) => {
     const { intl } = this.context;
     // not used I think?
@@ -177,6 +181,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
         }
         <SearchInput
           id="search"
+          inputRef={(el) => { this.input = el; }}
           minLength={1}
           debounceTimeout={500}
           value={searchQuery || ''}
@@ -219,6 +224,7 @@ TagSearch.propTypes = {
   onSearch: PropTypes.func,
   onClear: PropTypes.func,
   multiselect: PropTypes.bool,
+  autofocus: PropTypes.bool,
 };
 
 TagSearch.contextTypes = {
