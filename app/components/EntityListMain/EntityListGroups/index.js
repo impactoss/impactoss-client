@@ -238,8 +238,8 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
             );
           }}
         />
-        <ListEntitiesMain>
-          { entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0)
+        <ListEntitiesMain id="entity-list-main">
+          {entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0)
             && (
               <ListEntitiesEmpty>
                 <FormattedMessage {...messages.listEmptyAfterQuery} />

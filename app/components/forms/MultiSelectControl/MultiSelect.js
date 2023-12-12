@@ -348,6 +348,7 @@ class MultiSelect extends React.Component {
             && (
               <Search>
                 <TagSearch
+                  resultsId="option-list"
                   onSearch={this.onSearch}
                   onClear={this.onResetFilters}
                   filters={this.currentFilters(this.state.queryTags, this.props.tagFilterGroups)}

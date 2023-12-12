@@ -64,7 +64,7 @@ const Clear = styled(Button)`
   padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
   position: absolute;
   top: 0;
-  right: 0;
+  right: 20px;
   background-color: ${palette('background', 4)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
@@ -82,7 +82,7 @@ const SearchValuePrint = styled(PrintOnly)`
   font-size: ${(props) => props.theme.sizes.print.default};
   font-weight: bold;
 `;
-
+const SkipToResults = styled.a``;
 const StyledLabel = styled.label``;
 
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -149,6 +149,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       onSearch,
       placeholder,
       onClear,
+      resultsId,
     } = this.props;
     const { intl } = this.context;
     // TODO set focus to input when clicking wrapper
@@ -265,15 +266,25 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             {searchQuery}
           </SearchValuePrint>
         )}
+        <SkipToResults
+          href={`#${resultsId}`}
+        >
+          <Icon title="Search" name="search" size="1em" />
+        </SkipToResults>
       </Search>
     );
   }
 }
 
+TagSearch.defaultProps = {
+  resultsId: 'entity-list-main',
+};
+
 TagSearch.propTypes = {
   filters: PropTypes.array,
   searchQuery: PropTypes.string,
   placeholder: PropTypes.string,
+  resultsId: PropTypes.string,
   onSearch: PropTypes.func,
   onClear: PropTypes.func,
   multiselect: PropTypes.bool,
