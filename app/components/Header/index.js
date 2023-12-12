@@ -207,6 +207,15 @@ const FrameworkOption = styled(Button)`
 const NavWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.small}) {
+  width:100%;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
 `;
 
 const STATE_INITIAL = {

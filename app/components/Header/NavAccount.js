@@ -14,6 +14,10 @@ import messages from './messages';
 
 const Styled = styled.div`
   background-color: ${palette('headerNavAccount', 0)};
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.small}) {
+    width: 100%;
+  }
 `;
 
 
