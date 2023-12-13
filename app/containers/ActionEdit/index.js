@@ -25,6 +25,7 @@ import {
   getDateField,
   getTextareaField,
   renderTaxonomyControl,
+  getReferenceFormField,
 } from 'utils/forms';
 
 import {
@@ -111,7 +112,10 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     const {
       viewEntity, taxonomies, recommendationsByFw, indicators,
     } = props;
-
+    let attributes = viewEntity.get('attributes');
+    if (!attributes.get('reference')) {
+      attributes = attributes.set('reference', viewEntity.get('id'));
+    }
     return viewEntity
       ? Map({
         id: viewEntity.get('id'),
@@ -134,6 +138,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       [ // fieldGroups
         { // fieldGroup
           fields: [
+            getReferenceFormField(intl.formatMessage, false, true),
             getTitleFormField(intl.formatMessage),
           ],
         },
@@ -455,7 +460,11 @@ function mapDispatchToProps(dispatch, props) {
             }),
           )
       );
-
+      // default to database id
+      const formRef = formData.getIn(['attributes', 'reference']) || '';
+      if (formRef.trim() === '') {
+        saveData = saveData.setIn(['attributes', 'reference'], formData.get('id'));
+      }
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {

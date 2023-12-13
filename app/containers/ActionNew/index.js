@@ -15,6 +15,7 @@ import { Map, List, fromJS } from 'immutable';
 import {
   getConnectionUpdatesFromFormData,
   getTitleFormField,
+  getReferenceFormField,
   getStatusField,
   getMarkdownField,
   renderIndicatorControl,
@@ -96,6 +97,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
+          getReferenceFormField(intl.formatMessage, false, true),
           getTitleFormField(intl.formatMessage),
         ],
       },

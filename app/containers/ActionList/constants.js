@@ -20,13 +20,18 @@ export const DEPENDENCIES = [
 export const CONFIG = {
   serverPath: 'measures',
   clientPath: 'actions',
-  search: ['title'],
+  search: ['title', 'reference'],
   sorting: [
     {
       attribute: 'id', // proxy for created at
       type: 'number',
       order: 'desc',
       default: true,
+    },
+    {
+      attribute: 'reference',
+      type: 'string',
+      order: 'asc',
     },
     {
       attribute: 'title',
