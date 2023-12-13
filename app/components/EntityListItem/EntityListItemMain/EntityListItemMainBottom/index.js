@@ -32,8 +32,7 @@ class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-l
       (tax) => tax.getIn(['attributes', 'is_smart'])
     );
     const hasUpper = connections && connections.length > 0;
-    const hasLower = categories
-      && (categories.size > 0 || smartTaxonomy);
+    const hasLower = (categories && categories.size > 0) || smartTaxonomy;
     return (
       <Styled>
         {hasLower && (
