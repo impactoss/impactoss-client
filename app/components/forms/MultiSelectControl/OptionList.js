@@ -171,8 +171,8 @@ class OptionList extends React.PureComponent {
 
     return (
       <Styled>
-        <ListWrapper>
-          { groups && groups.toList().map((group, gid) => (
+        <ListWrapper id="option-list">
+          {groups && groups.toList().map((group, gid) => (
             <GroupWrapper key={gid}>
               { group.get('title') && (
                 <GroupTitle>
