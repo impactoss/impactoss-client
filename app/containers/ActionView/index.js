@@ -11,6 +11,7 @@ import Helmet from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 
 import {
+  getReferenceField,
   getTitleField,
   getStatusField,
   getMetaField,
@@ -21,7 +22,6 @@ import {
   hasTaxonomyCategories,
   getDateField,
   getTextField,
-  getIdField,
   getSmartTaxonomyField,
 } from 'utils/fields';
 
@@ -74,7 +74,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getIdField(entity, isManager),
+        getReferenceField(entity, isManager, true),
         getTitleField(entity, isManager),
       ],
     },
