@@ -70,26 +70,26 @@ const Target = styled(Button)`
   font-weight: ${({ active }) => active ? 'bold' : 'normal'};
   padding: 0.3em 8px 0.3em 12px;
   text-align: left;
-  color:  ${({ disabled, active }) => {
+  color:  ${({ disabled }) => {
     if (disabled) {
-      return active ? palette('asideListItem', 1) : palette('dark', 4);
+      return palette('dark', 4);
     }
-    return active ? palette('asideListItem', 1) : palette('asideListItem', 0);
+    return palette('asideListItem', 0);
   }};
-  background-color: ${({ active }) => active ? palette('asideListItem', 3) : palette('asideListItem', 2)};
+  background-color: ${palette('asideListItem', 2)};
   border-bottom: 1px solid ${palette('asideListItem', 4)};
   &:hover {
-    color: ${({ disabled, active }) => {
+    color: ${({ disabled }) => {
     if (disabled) {
-      return active ? palette('asideListItem', 1) : palette('dark', 4);
+      return palette('dark', 4);
     }
-    return active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0);
+    return palette('asideListItemHover', 0);
   }};
-    background-color: ${({ disabled, active }) => {
+    background-color: ${({ disabled }) => {
     if (disabled) {
-      return active ? palette('asideListItem', 3) : palette('asideListItem', 2);
+      return palette('asideListItem', 2);
     }
-    return active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2);
+    return palette('asideListItemHover', 2);
   }};
     border-bottom-color: ${palette('asideListItemHover', 4)}
   }
