@@ -102,6 +102,11 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
               data: getImportFields({
                 fields: [
                   {
+                    attribute: 'reference',
+                    type: 'text',
+                    import: true,
+                  },
+                  {
                     attribute: 'title',
                     type: 'text',
                     required: true,
