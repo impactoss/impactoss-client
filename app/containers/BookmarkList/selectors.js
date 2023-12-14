@@ -4,16 +4,15 @@ import {
   selectEntitiesSearchQuery,
   selectSortByQuery,
   selectSortOrderQuery,
-  selectLocationQuery,
 } from 'containers/App/selectors';
 
 import { sortEntities, getSortOption } from 'utils/sort';
 
 import { CONFIG } from './constants';
 
-export const selectTypeQuery = createSelector(
-  selectLocationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('type')
+export const selectPathQuery = createSelector(
+  (state, locationQuery) => locationQuery,
+  (locationQuery) => locationQuery && locationQuery.get('path')
 );
 
 // kicks off series of cascading selectors
