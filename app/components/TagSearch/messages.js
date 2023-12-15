@@ -29,4 +29,8 @@ export default defineMessages({
     id: 'app.components.TagSearch.removeAll',
     defaultMessage: 'Click to remove all filters',
   },
+  skipToResults: {
+    id: 'app.components.TagSearch.skipToResults',
+    defaultMessage: 'Skip to list of results',
+  },
 });

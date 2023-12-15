@@ -60,11 +60,8 @@ const Tags = styled.div`
   margin-bottom: -2px;
 `;
 
-const Clear = styled(Button)`
+const ButtonTagSearch = styled(Button)`
   padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
-  position: absolute;
-  top: 0;
-  right: 20px;
   background-color: ${palette('background', 4)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
@@ -82,7 +79,7 @@ const SearchValuePrint = styled(PrintOnly)`
   font-size: ${(props) => props.theme.sizes.print.default};
   font-weight: bold;
 `;
-const SkipToResults = styled.a``;
+// const ButtonTagSearch = styled.div``;
 const StyledLabel = styled.label``;
 
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -126,7 +123,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       return this.getLabels(filter.labels);
     }
     return filter.label;
-  }
+  };
 
   getFilterTitle = (filter) => {
     let title = '';
@@ -136,11 +133,11 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       title = filter.title || this.getFilterLabel(filter);
     }
     return this.context.intl.formatMessage(messages.removeTag, { title });
-  }
+  };
 
   focusLastFilter = () => {
     if (this.lastFilter) this.lastFilter.focus();
-  }
+  };
 
   render() {
     const {
@@ -180,7 +177,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             <FormattedMessage {...messages.labelPrintFilters} />
           </LabelPrint>
         )}
-        { filters.length > 0
+        {filters.length > 0
           && (
             <Tags>
               {
@@ -197,8 +194,8 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                       title={this.getFilterTitle(filter)}
                     >
                       {this.getFilterLabel(filter)}
-                      { filter.onClick
-                      && <Icon name="removeSmall" text textRight hidePrint />
+                      {filter.onClick
+                        && <Icon name="removeSmall" text textRight hidePrint />
                       }
                     </ButtonTagFilterInverse>
                   )
@@ -214,8 +211,8 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                       title={this.getFilterTitle(filter)}
                     >
                       {this.getFilterLabel(filter)}
-                      { filter.onClick
-                      && <Icon name="removeSmall" text textRight hidePrint />
+                      {filter.onClick
+                        && <Icon name="removeSmall" text textRight hidePrint />
                       }
                     </ButtonTagFilter>
                   ))
@@ -247,14 +244,14 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             }
           }}
         />
-        { hasFilters && (
-          <Clear
+        {hasFilters && (
+          <ButtonTagSearch
             onClick={onClear}
             small={this.props.multiselect}
             title={this.context.intl.formatMessage(messages.removeAll)}
           >
             <Icon name="removeSmall" />
-          </Clear>
+          </ButtonTagSearch>
         )}
         {searchQuery && (
           <LabelPrint>
@@ -266,11 +263,13 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             {searchQuery}
           </SearchValuePrint>
         )}
-        <SkipToResults
+        <ButtonTagSearch
+          as="a"
           href={`#${resultsId}`}
+          title={this.context.intl.formatMessage(messages.skipToResults)}
         >
-          <Icon title="Search" name="search" size="1em" />
-        </SkipToResults>
+          <Icon name="search" size="1em" />
+        </ButtonTagSearch>
       </Search>
     );
   }
