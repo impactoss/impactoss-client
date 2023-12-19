@@ -210,7 +210,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     }
 
     const errorsWithoutEntities = errors && errors.filter((error, id) => !entities.find((entity) => entity.get('id') === id));
-
     return (
       <div>
         <EntityListHeader
@@ -284,24 +283,54 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
             && (
               <div>
                 {
-                  entityGroupsPaged.map((entityGroup, i) => (
-                    <ListEntitiesGroup key={i}>
-                      { groupSelectValue && entityGroup.get('label')
-                      && <EntityListGroupHeader group={entityGroup} level={1} />
-                      }
-                      {
-                        entityGroup.get('entityGroups')
-                      && entityGroup.get('entityGroups').toList().map((entitySubGroup, j) => (
-                        <ListEntitiesSubGroup key={j}>
-                          { subgroupSelectValue && entitySubGroup.get('label')
-                            && <EntityListGroupHeader group={entitySubGroup} level={2} />
-                          }
+                  entityGroupsPaged.map((entityGroup, index, list) => {
+                    let skipGroupTargetId = null;
+                    if (list.size > index + 1) {
+                      const nextGroup = list.get(index + 1);
+                      skipGroupTargetId = nextGroup
+                        ? `#list-group-${nextGroup.get('id')}`
+                        : null;
+                    }
+                    return (
+                      <ListEntitiesGroup key={index}>
+                        { groupSelectValue && entityGroup.get('label')
+                        && <EntityListGroupHeader group={entityGroup} level={1} />
+                        }
+                        {
+                          entityGroup.get('entityGroups')
+                        && entityGroup.get('entityGroups').toList().map((entitySubGroup, j) => (
+                          <ListEntitiesSubGroup key={j}>
+                            { subgroupSelectValue && entitySubGroup.get('label')
+                              && <EntityListGroupHeader group={entitySubGroup} level={2} />
+                            }
+                            <EntityListItems
+                              taxonomies={this.props.taxonomies}
+                              connections={this.props.connections}
+                              config={config}
+                              entities={entitySubGroup.get('entities')}
+                              errors={errors}
+                              entityIdsSelected={entityIdsSelected}
+                              entityIcon={entityIcon}
+                              onEntityClick={onEntityClick}
+                              isManager={isManager}
+                              isContributor={isContributor}
+                              onEntitySelect={onEntitySelect}
+                              expandNo={expandNo}
+                              onExpand={onExpand}
+                              onDismissError={this.props.onDismissError}
+                              skipGroupTargetId={skipGroupTargetId}
+                            />
+                          </ListEntitiesSubGroup>
+                        ))
+                        }
+                        { entityGroup.get('entities') && !entityGroup.get('entityGroups')
+                        && (
                           <EntityListItems
                             taxonomies={this.props.taxonomies}
                             connections={this.props.connections}
-                            config={config}
-                            entities={entitySubGroup.get('entities')}
                             errors={errors}
+                            config={config}
+                            entities={entityGroup.get('entities')}
                             entityIdsSelected={entityIdsSelected}
                             entityIcon={entityIcon}
                             onEntityClick={onEntityClick}
@@ -311,32 +340,13 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             expandNo={expandNo}
                             onExpand={onExpand}
                             onDismissError={this.props.onDismissError}
+                            skipGroupTargetId={skipGroupTargetId}
                           />
-                        </ListEntitiesSubGroup>
-                      ))
-                      }
-                      { entityGroup.get('entities') && !entityGroup.get('entityGroups')
-                      && (
-                        <EntityListItems
-                          taxonomies={this.props.taxonomies}
-                          connections={this.props.connections}
-                          errors={errors}
-                          config={config}
-                          entities={entityGroup.get('entities')}
-                          entityIdsSelected={entityIdsSelected}
-                          entityIcon={entityIcon}
-                          onEntityClick={onEntityClick}
-                          isManager={isManager}
-                          isContributor={isContributor}
-                          onEntitySelect={onEntitySelect}
-                          expandNo={expandNo}
-                          onExpand={onExpand}
-                          onDismissError={this.props.onDismissError}
-                        />
-                      )
-                      }
-                    </ListEntitiesGroup>
-                  ))
+                        )
+                        }
+                      </ListEntitiesGroup>
+                    );
+                  })
                 }
               </div>
             )

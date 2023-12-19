@@ -8,6 +8,7 @@ import { Map } from 'immutable';
 import { qe } from 'utils/quasi-equals';
 import Component from 'components/styled/Component';
 import Clear from 'components/styled/Clear';
+import SkipContent from 'components/styled/SkipContent';
 import { USER_ROLES, PROGRESS_TAXONOMY_ID } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -199,16 +200,22 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
   }
 
   render() {
-    const { nestLevel, onEntityClick, taxonomies } = this.props;
+    const {
+      nestLevel,
+      onEntityClick,
+      taxonomies,
+      skipTargetId,
+    } = this.props;
+
     const entity = this.mapToEntityListItem(this.props);
 
     const bottomTaxonomies = taxonomies && taxonomies.filter((tax) => !qe(tax.get('id'), PROGRESS_TAXONOMY_ID));
-
     return (
       <Styled isManager={this.props.isManager} isConnection={this.props.isConnection}>
         <EntityListItemMainTop entity={entity} />
         <Clear />
         <EntityListItemMainTitleWrap
+          id={`list-item-${entity.id}`}
           ref={(el) => { this.title = el; }}
           onClick={(evt) => {
             evt.preventDefault();
@@ -220,6 +227,14 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             {entity.title}
           </EntityListItemMainTitle>
         </EntityListItemMainTitleWrap>
+        {skipTargetId && (
+          <SkipContent
+            href={skipTargetId}
+            title="Skip to next list item or group, use tab to continue to list item details"
+          >
+            Skip to next list item or group, use tab to continue to list item details
+          </SkipContent>
+        )}
         { (entity.categories || (entity.connectedCounts && this.props.wrapper))
           && (
             <EntityListItemMainBottom
@@ -249,6 +264,7 @@ EntityListItemMain.propTypes = {
   onEntityClick: PropTypes.func,
   isConnection: PropTypes.bool,
   isFocus: PropTypes.bool,
+  skipTargetId: PropTypes.string,
 };
 EntityListItemMain.contextTypes = {
   intl: PropTypes.object,

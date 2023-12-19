@@ -51,6 +51,7 @@ export class EntityListItemWrapper extends React.Component { // eslint-disable-l
       entityPath,
       isConnection,
       focusEntityId,
+      skipTargetId,
     } = this.props;
     return (
       <ItemWrapper
@@ -81,6 +82,7 @@ export class EntityListItemWrapper extends React.Component { // eslint-disable-l
               entityPath={entityPath}
               wrapper={this.state.wrapper}
               isFocus={entity.get('id') === focusEntityId}
+              skipTargetId={skipTargetId}
             />
             {config && config.expandableColumns
             && expandNo > 0
@@ -145,6 +147,7 @@ EntityListItemWrapper.propTypes = {
   onDismissError: PropTypes.func,
   expandNo: PropTypes.number,
   entityPath: PropTypes.string,
+  skipTargetId: PropTypes.string,
   entityIcon: PropTypes.func,
   isConnection: PropTypes.bool,
   focusEntityId: PropTypes.string,
