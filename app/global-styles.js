@@ -1,7 +1,62 @@
 import { createGlobalStyle } from 'styled-components';
+import Roboto400TTF from './fonts/roboto-400.ttf';
+import Roboto400iTTF from './fonts/roboto-400i.ttf';
+import Roboto500iTTF from './fonts/roboto-500i.ttf';
+import Roboto500TTF from './fonts/roboto-500.ttf';
+import Roboto700TTF from './fonts/roboto-700.ttf';
+import Roboto700iTTF from './fonts/roboto-700i.ttf';
 
 /* eslint no-unused-expressions: 0 */
 const GlobalStyle = createGlobalStyle`
+
+/* roboto - 400 - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url(${Roboto400TTF}) format('truetype');
+}
+/* roboto - 400 - italic - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 400;
+  src: url(${Roboto400iTTF}) format('truetype');
+}
+/* roboto - 500 - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  src: url(${Roboto500TTF}) format('truetype');
+}
+/* roboto - 500 - italic - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 500;
+  src: url(${Roboto500iTTF}) format('truetype');
+}
+/* roboto - 700 - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  src: url(${Roboto700TTF}) format('truetype');
+}
+/* roboto - 700 - italic - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 700;
+  src: url(${Roboto700iTTF}) format('truetype');
+}
 
   html,
   body {
