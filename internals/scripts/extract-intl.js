@@ -89,12 +89,78 @@ for (const locale of appLocales) {
     }
   }
 }
+//convert the js-like object string to valid JSON
+function convertToJSON(str) {
+  const removeNewLineRegex = /\n/g;
+  const trailingCommaRegex = /,(\s*})/g;
+  const wordKeysRegex = /(?<=[,{])\s*(\w+)\s*(?=:)/g;
+  const escapedCharsRegex = /\\/g;
+  const numberKeysRegex = /(\b\d+\b):/g;
+  const valuesSurroundedInQuotes = /'((?:\\'|[^'])*)'/g;
 
+  return str
+    .replace(removeNewLineRegex, '')
+    .replace(trailingCommaRegex, '$1')
+    .replace(valuesSurroundedInQuotes, (_, value) => {
+      //  Wrap the value with double quotes and replace double quotes inside with single quotes 
+      return `"${value.replace(/"/g, "'")}"`;
+    })
+    .replace(wordKeysRegex, '"$1"')
+    .replace(numberKeysRegex, '"$1":')
+    .replace(escapedCharsRegex, '');
+}
+
+function flattenContents(data, filename) {
+  //check to see if file contains defineMessage 
+  const defineMessageMatch = data.match(/export\s+default\s+defineMessages\(({[\s\S]*?})\);/);
+
+  if (defineMessageMatch && defineMessageMatch.length > 1) {
+    const defineMessageContents = defineMessageMatch[1];
+    const jsonString = convertToJSON(defineMessageContents, filename);
+    const parsedJSON = JSON.parse(jsonString);
+
+    const flattenedDefineMessage = {};
+
+    //check if last level of object
+    const isLastLevel = (obj) => {
+      for (const key in obj) {
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
+          return false;
+        }
+      }
+      return true;
+    };
+
+    //flatten the defineMessage object so there are no nested objects
+    const flatten = (obj, prefix = '') => {
+      for (const key in obj) {
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
+          if (isLastLevel(obj[key])) {
+            flattenedDefineMessage[`${prefix}${key}`] = obj[key];
+          } else {
+            flatten(obj[key], `${prefix}${key}.`);
+          }
+        } else {
+          flattenedDefineMessage[`${prefix}${key}`] = obj[key];
+        }
+      }
+    };
+    //flatten object to 1 level
+    flatten(parsedJSON);
+    //convert the flattened object back to a string
+    const flattenedDefineMessageString = JSON.stringify(flattenedDefineMessage, null, 2);
+    //add contents it back into the file data 
+    return data.replace(/defineMessages\(\s*\{[^]*?}\s*\);/, `defineMessages(${flattenedDefineMessageString})`);
+  }
+
+  return data;
+}
 const extractFromFile = async filename => {
   try {
     const code = await readFile(filename);
+    const parsedCode = flattenContents(code, filename);
 
-    const output = await transform(code, { filename, presets, plugins });
+    const output = await transform(parsedCode, { filename, presets, plugins });
     const messages = get(output, 'metadata.react-intl.messages', []);
 
     for (const message of messages) {
