@@ -84,7 +84,7 @@ export const RECOMENDATION_FIELDS = {
 export const CONFIG = {
   serverPath: 'recommendations',
   clientPath: 'recommendations',
-  type: 'recommendations',
+  types: 'recommendations',
   search: ['reference', 'title', 'description', 'response'],
   downloadCSV: true,
   sorting: [

@@ -41,6 +41,8 @@ import {
   // getTaxonomies,
 } from './utils';
 
+// import { actionTypes } from 'react-redux-form';
+
 
 const Footer = styled.div`
   width: 100%;
@@ -96,13 +98,18 @@ export function EntityListDownload({
   entities,
   // taxonomies,
   connections,
+  // frameworks,
   onClose,
-  // typeNames,
   intl,
   isAdmin,
   searchQuery,
   entityIdsSelected,
 }) {
+  // console.log(taxonomies.toJS());
+  // console.log(fields);
+  // console.log(entities.toJS());
+  // console.log(connections.toJS());
+  // console.log(frameworks);
   const [typeTitle, setTypeTitle] = useState('entities');
   const [csvFilename, setCSVFilename] = useState('csv');
   const [csvSuffix, setCSVSuffix] = useState(true);
@@ -111,17 +118,19 @@ export function EntityListDownload({
   const [attributes, setAttributes] = useState({});
 
   // for recommendations
-  // const [actiontypes, setActiontypes] = useState({});
-  // const [actionsAsRows, setActionsAsRows] = useState(false);
-  let hasMeasures;
+  const [actiontypes, setActiontypes] = useState({});
+  const [actionsAsRows, setActionsAsRows] = useState(false);
+
+  // for recommendations
+  let hasActions;
 
   // figure out export options
   const hasAttributes = !!config.attributes;
   // const hasTaxonomies = !!config.taxonomies;
 
-  if (config.type === 'reccomendations') {
-    hasMeasures = config.connections
-      && config.connections.measures;
+  if (config.types === 'recommendations') {
+    hasActions = connections.has('measures')
+      && connections.get('measures').size > 0;
   }
   // figure out options for each relationship type
   useEffect(() => {
@@ -136,12 +145,29 @@ export function EntityListDownload({
         })
       );
     }
+    if (config.types === 'recommendations') {
+      // actions
+      if (hasActions) {
+        setActiontypes(connections.get('measures').reduce((memo, action) => {
+          const actiontypeId = action.get('id');
+          const label = action.getIn(['attributes', 'title']);
+          return {
+            ...memo,
+            [actiontypeId]: {
+              id: actiontypeId,
+              label,
+              active: false,
+              column: `actions_${snakeCase(label)}`,
+            },
+          };
+        }, {}));
+      }
+    }
   }, [
     // taxonomies,
     hasAttributes,
-    // hasTaxonomies,
+    hasActions,
   ]);
-
   const totalCount = entities ? entities.size : 0;
   // check if should keep prefiltered search options
   const hasSearchQuery = !!searchQuery;
@@ -162,6 +188,7 @@ export function EntityListDownload({
       searchAttributes,
     );
   }
+
   if (hasSelectedEntities && !ignoreSelection) {
     searchedEntities = searchedEntities.filter((entity) => entityIdsSelected.includes(entity.get('id')));
   }
@@ -171,8 +198,8 @@ export function EntityListDownload({
   useEffect(() => {
     let title = 'unspecified';
     let tTitle = 'unspecified';
-    if (config.types === 'indicators') {
-      title = intl.formatMessage(appMessages.entities.indicators.plural);
+    if (config.types === 'recommendations') {
+      title = intl.formatMessage(appMessages.entities.recommendations.plural);
       tTitle = count !== 1 ? title : intl.formatMessage(appMessages.entities.indicators.single);
     }
     setTypeTitle(tTitle);
@@ -180,7 +207,6 @@ export function EntityListDownload({
   }, [count]);
 
   const relationships = connections;
-
   // figure out columns
   let csvColumns = [{ id: 'id' }];
   if (hasAttributes && count > 0) {
@@ -200,11 +226,49 @@ export function EntityListDownload({
   }
   let csvData;
   if (entities && count > 0) {
-    if (config.type === 'recommendations') {
+    if (config.types === 'recommendations') {
+      if (hasActions) {
+        if (!actionsAsRows) {
+          csvColumns = Object.keys(actiontypes).reduce((memo, actiontypeId) => {
+            if (actiontypes[actiontypeId].active) {
+              let displayName = actiontypes[actiontypeId].column;
+              if (!displayName || actiontypes[actiontypeId].column === '') {
+                displayName = actiontypeId;
+              }
+              return [
+                ...memo,
+                { id: `actions_${actiontypeId}`, displayName },
+              ];
+            }
+            return memo;
+          }, csvColumns);
+        } else {
+          csvColumns = [
+            ...csvColumns,
+            { id: 'action_id', displayName: 'action_id' },
+            { id: 'actiontype_id', displayName: 'action_type' },
+            { id: 'action_code', displayName: 'action_code' },
+            { id: 'action_title', displayName: 'action_title' },
+          ];
+          if (isAdmin) {
+            csvColumns = [
+              ...csvColumns,
+              { id: 'action_draft', displayName: 'action_draft' },
+              { id: 'action_private', displayName: 'action_private' },
+            ];
+          }
+        }
+      }
+
       csvData = prepareDataForRecommendations({
         entities: searchedEntities,
         relationships,
         attributes,
+
+        hasActions,
+        actionsAsRows,
+        actiontypes,
+
       });
     }
   }
@@ -276,14 +340,18 @@ export function EntityListDownload({
                 <FormattedMessage {...messages.exportDescription} />
               </Text>
             </Box>
-            {config.type === 'recommendations' && (
+            {config.types === 'recommendations' && (
               <OptionsForRecommendations
                 hasAttributes={hasAttributes}
                 attributes={attributes}
                 setAttributes={setAttributes}
-                // actions={[]}
-                // setActions={setActiontypes}
-                hasMeasures={hasMeasures}
+                actiontypes={actiontypes}
+                setActiontypes={setActiontypes}
+                actionsAsRows={actionsAsRows}
+                setActionsAsRows={setActionsAsRows}
+                hasActions={hasActions}
+                actions={[]}
+                typeTitle={typeTitle}
               />
             )}
             <Box

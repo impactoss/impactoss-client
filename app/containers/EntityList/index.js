@@ -212,17 +212,14 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           >
             <EntityListDownload
               config={config}
-              fields={this.getFields(config.type)}
-              typeId={null}
+              fields={this.getFields(config.types)}
               entities={entities}
               taxonomies={this.props.taxonomies}
               connections={this.props.connections}
               onClose={() => this.onDownloadDismiss()}
-              typeNames={{
-                recommendations: this.props.frameworks && this.props.frameworks.map(
-                  (type) => intl.formatMessage(appMessages.frameworks[`${type.get('id')}`])
-                ).toJS(),
-              }}
+              frameworks={this.props.frameworks && this.props.frameworks.map(
+                (type) => intl.formatMessage(appMessages.frameworks[`${type.get('id')}`])
+              ).toJS()}
               isAdmin
             />
           </ReactModal>
