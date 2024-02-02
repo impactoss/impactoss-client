@@ -1,7 +1,7 @@
 // import qe from 'utils/quasi-equals';
 import appMessages from 'containers/App/messages';
 
-// const IN_CELL_SEPARATOR = ', \n';
+const IN_CELL_SEPARATOR = ', \n';
 // const IN_CELL_SEPARATOR = ', ';
 
 export const getDateSuffix = (datetime) => {
@@ -26,6 +26,25 @@ const sanitiseText = (text) => {
     .replaceAll(/‘/g, "'")
     .replaceAll(/’/g, "'")
     .replaceAll(/"/g, '""')}"`;
+};
+
+const addWarnings = ({
+  value,
+  entity,
+}) => {
+  const draft = entity.getIn(['attributes', 'draft']);
+  const isPrivate = entity.getIn(['attributes', 'private']);
+  let warnings = [];
+  if (draft || isPrivate) {
+    if (draft) {
+      warnings = [...warnings, 'draft'];
+    }
+    if (isPrivate) {
+      warnings = [...warnings, 'private'];
+    }
+    return `${value} [${warnings.join('/')}]`;
+  }
+  return value;
 };
 
 const getValue = ({
@@ -79,6 +98,89 @@ const getValue = ({
   return val;
 };
 
+const prepActionDataAsRows = ({
+  entity, // Map
+  actiontypes,
+  actions, // Map
+  data,
+}) => {
+  if (entity.get('measures') && actiontypes) {
+    const dataRows = Object.keys(actiontypes).reduce((memo, actiontypeId) => {
+      if (!actiontypes[actiontypeId].active) {
+        return memo;
+      }
+      const entityActionIds = entity
+        .getIn(['measures'])
+        .filter((measure) => measure === parseInt(actiontypeId, 10));
+
+      if (entityActionIds) {
+        const dataTypeRows = entityActionIds.reduce((memo2, actionId) => {
+          const action = actions.get(actionId.toString());
+          const dataRow = {
+            ...data,
+            action_id: actionId,
+            action_title: sanitiseText(action.getIn(['attributes', 'title'])),
+            action_draft: !!action.getIn(['attributes', 'draft']),
+            action_private: !!action.getIn(['attributes', 'private']),
+          };
+          return [
+            ...memo2,
+            dataRow,
+          ];
+        }, []);
+        return [
+          ...memo,
+          ...dataTypeRows,
+        ];
+      }
+      return [
+        ...memo,
+      ];
+    }, []);
+    return dataRows.length > 0 ? dataRows : [data];
+  }
+  return [data];
+};
+
+const prepActionData = ({
+  entity, // Map
+  actiontypes,
+  actions, // Map
+  data,
+}) => Object.keys(actiontypes).reduce((memo, actiontypeId) => {
+  if (!actiontypes[actiontypeId].active) {
+    return memo;
+  }
+  const entityActionIds = entity
+    .getIn(['measures'])
+    .filter((measure) => measure === parseInt(actiontypeId, 10));
+
+  let actionsValue = '';
+  if (entityActionIds) {
+    actionsValue = entityActionIds.reduce((memo2, actionId) => {
+      const action = actions.get(actionId.toString());
+
+      if (action) {
+        const title = action.getIn(['attributes', 'title']);
+        const code = action.getIn(['attributes', 'code']);
+        let actionValue = (code && code !== '') ? `${code}|${title}` : title;
+        actionValue = addWarnings({
+          value: actionValue,
+          entity: action,
+        });
+        return memo2 === ''
+          ? actionValue
+          : `${memo2}${IN_CELL_SEPARATOR}${actionValue}`;
+      }
+      return memo2;
+    }, '');
+  }
+  return ({
+    ...memo,
+    [`actions_${actiontypeId}`]: sanitiseText(actionsValue),
+  });
+}, data);
+
 const prepAttributeData = ({
   entity,
   attributes,
@@ -108,6 +210,10 @@ export const prepareDataForRecommendations = ({
   entities,
   relationships,
   attributes,
+  // actions
+  hasActions,
+  actiontypes,
+  actionsAsRows,
 }) => entities.reduce((memo, entity) => {
   let data = { id: entity.get('id') };
   // add attribute columns
@@ -119,7 +225,24 @@ export const prepareDataForRecommendations = ({
       relationships,
     });
   }
-  return [...memo, data];
+  if (hasActions && !actionsAsRows) {
+    data = prepActionData({
+      entity,
+      actiontypes,
+      actions: relationships && relationships.get('measures'),
+      data,
+    });
+  }
+  let dataRows = [data];
+  if (hasActions && actionsAsRows) {
+    dataRows = prepActionDataAsRows({
+      entity,
+      actiontypes,
+      actions: relationships && relationships.get('measures'),
+      data,
+    });
+  }
+  return [...memo, ...dataRows];
 }, []);
 
 
