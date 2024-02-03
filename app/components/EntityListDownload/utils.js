@@ -1,4 +1,4 @@
-// import qe from 'utils/quasi-equals';
+import qe from 'utils/quasi-equals';
 import appMessages from 'containers/App/messages';
 
 const IN_CELL_SEPARATOR = ', \n';
@@ -109,9 +109,10 @@ const prepActionDataAsRows = ({
       if (!actiontypes[actiontypeId].active) {
         return memo;
       }
-      const entityActionIds = entity
-        .getIn(['measures'])
-        .filter((measure) => measure === parseInt(actiontypeId, 10));
+      const entityActionIds = entity.get('measures').size > 0
+        && entity
+          .get('measures')
+          .filter((actionId) => actionId === parseInt(actiontypeId, 10));
 
       if (entityActionIds) {
         const dataTypeRows = entityActionIds.reduce((memo2, actionId) => {
@@ -122,6 +123,7 @@ const prepActionDataAsRows = ({
             action_title: sanitiseText(action.getIn(['attributes', 'title'])),
             action_draft: !!action.getIn(['attributes', 'draft']),
             action_private: !!action.getIn(['attributes', 'private']),
+            // action_target_date: sanitiseText(action.getIn(['attributes', 'target_date'])),
           };
           return [
             ...memo2,
@@ -151,15 +153,15 @@ const prepActionData = ({
   if (!actiontypes[actiontypeId].active) {
     return memo;
   }
-  const entityActionIds = entity
-    .getIn(['measures'])
-    .filter((measure) => measure === parseInt(actiontypeId, 10));
+  const entityActionIds = entity.get('measures').size > 0
+    && entity
+      .get('measures')
+      .filter((actionId) => actionId === parseInt(actiontypeId, 10));
 
   let actionsValue = '';
   if (entityActionIds) {
     actionsValue = entityActionIds.reduce((memo2, actionId) => {
       const action = actions.get(actionId.toString());
-
       if (action) {
         const title = action.getIn(['attributes', 'title']);
         const code = action.getIn(['attributes', 'code']);
@@ -204,6 +206,69 @@ const prepAttributeData = ({
   });
 }, data);
 
+const getIndicatorValue = ({ entity, indicatorId }) => {
+  const indicatorConnection = entity.get('indicators').size > 0
+    && entity.get('indicators').find((connection) => qe(connection.get('id'), indicatorId));
+
+  if (indicatorConnection) {
+    return indicatorConnection.get('supportlevel_id') || '';
+  }
+  return '';
+};
+
+const prepIndicatorDataColumns = ({
+  entity, // Map
+  indicators, // Map
+  data,
+}) => indicators.reduce((memo, indicator) => {
+  const value = getIndicatorValue({
+    entity,
+    indicatorId: indicator.get('id'),
+  });
+
+  return ({
+    ...memo,
+    [`indicator_${indicator.get('id')}`]: value,
+  });
+}, data);
+
+const prepIndicatorDataAsRows = ({
+  entity, // Map
+  indicators, // Map
+  dataRows, // array of entity rows (i.e. for each actor and action)
+}) => {
+  const entityIndicatorConnections = entity.get('indicators');
+  if (entityIndicatorConnections) {
+    // for each indicator
+    const dataIndicatorRows = entityIndicatorConnections.reduce((memo, indicatorConnection) => {
+      const indicator = indicators.get(indicatorConnection.get('indicator_id').toString());
+      // and for each row: add indicator columns
+      if (indicator) {
+        const dataRowsIndicator = dataRows.reduce((memo2, data) => {
+          const dataRow = {
+            ...data,
+            indicator_id: indicatorConnection.get('id'),
+            indicator_title: sanitiseText(indicator.getIn(['attributes', 'title'])),
+            indicator_draft: !!indicator.getIn(['attributes', 'draft']),
+            indicator_private: !!indicator.getIn(['attributes', 'private']),
+          };
+          return [
+            ...memo2,
+            dataRow,
+          ];
+        }, []);
+        return [
+          ...memo,
+          ...dataRowsIndicator,
+        ];
+      }
+      return memo;
+    }, []);
+    return dataIndicatorRows.length > 0 ? dataIndicatorRows : dataRows;
+  }
+  return dataRows;
+};
+
 export const prepareDataForRecommendations = ({
   // typeId,
   // config,
@@ -214,6 +279,9 @@ export const prepareDataForRecommendations = ({
   hasActions,
   actiontypes,
   actionsAsRows,
+  // indicators
+  hasIndicators,
+  indicatorsAsRows,
 }) => entities.reduce((memo, entity) => {
   let data = { id: entity.get('id') };
   // add attribute columns
@@ -233,6 +301,13 @@ export const prepareDataForRecommendations = ({
       data,
     });
   }
+  if (hasIndicators && !indicatorsAsRows) {
+    data = prepIndicatorDataColumns({
+      entity,
+      indicators: relationships && relationships.get('indicators'),
+      data,
+    });
+  }
   let dataRows = [data];
   if (hasActions && actionsAsRows) {
     dataRows = prepActionDataAsRows({
@@ -240,6 +315,13 @@ export const prepareDataForRecommendations = ({
       actiontypes,
       actions: relationships && relationships.get('measures'),
       data,
+    });
+  }
+  if (hasIndicators && indicatorsAsRows) {
+    dataRows = prepIndicatorDataAsRows({
+      entity,
+      indicators: relationships && relationships.get('indicators'),
+      dataRows,
     });
   }
   return [...memo, ...dataRows];

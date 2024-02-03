@@ -96,7 +96,7 @@ export function EntityListDownload({
   config,
   fields,
   entities,
-  // taxonomies,
+  taxonomies,
   connections,
   // frameworks,
   onClose,
@@ -116,21 +116,28 @@ export function EntityListDownload({
   const [ignoreSearch, setIgnoreSearch] = useState(false);
   const [ignoreSelection, setIgnoreSelection] = useState(false);
   const [attributes, setAttributes] = useState({});
+  const [taxonomyColumns, setTaxonomies] = useState({});
 
   // for recommendations
   const [actiontypes, setActiontypes] = useState({});
   const [actionsAsRows, setActionsAsRows] = useState(false);
+  const [indicatorsAsRows, setIndicatorsAsRows] = useState(false);
+  const [indicatorsActive, setIndicatorsActive] = useState(false);
 
   // for recommendations
   let hasActions;
+  let hasIndicators;
 
   // figure out export options
   const hasAttributes = !!config.attributes;
-  // const hasTaxonomies = !!config.taxonomies;
+  const hasTaxonomies = !!config.taxonomies;
 
   if (config.types === 'recommendations') {
     hasActions = connections.has('measures')
       && connections.get('measures').size > 0;
+
+    hasIndicators = connections.has('indicators')
+      && connections.get('indicators').size > 0;
   }
   // figure out options for each relationship type
   useEffect(() => {
@@ -143,6 +150,19 @@ export function EntityListDownload({
           isAdmin,
           intl,
         })
+      );
+    }
+    if (hasTaxonomies && taxonomies) {
+      setTaxonomies(
+        taxonomies.map((tax) => {
+          const label = intl.formatMessage(appMessages.entities.taxonomies[tax.get('id')].plural);
+          return ({
+            id: tax.get('id'),
+            label,
+            active: false,
+            column: snakeCase(label),
+          });
+        }).toJS()
       );
     }
     if (config.types === 'recommendations') {
@@ -164,8 +184,9 @@ export function EntityListDownload({
       }
     }
   }, [
-    // taxonomies,
+    taxonomies,
     hasAttributes,
+    hasIndicators,
     hasActions,
   ]);
   const totalCount = entities ? entities.size : 0;
@@ -224,6 +245,21 @@ export function EntityListDownload({
       return memo;
     }, csvColumns);
   }
+  if (hasTaxonomies && count > 0) {
+    csvColumns = Object.keys(taxonomyColumns).reduce((memo, taxId) => {
+      if (taxonomyColumns[taxId].active) {
+        let displayName = taxonomyColumns[taxId].column;
+        if (!displayName || taxonomyColumns[taxId].column === '') {
+          displayName = taxId;
+        }
+        return [
+          ...memo,
+          { id: `taxonomy_${taxId}`, displayName },
+        ];
+      }
+      return memo;
+    }, csvColumns);
+  }
   let csvData;
   if (entities && count > 0) {
     if (config.types === 'recommendations') {
@@ -246,8 +282,7 @@ export function EntityListDownload({
           csvColumns = [
             ...csvColumns,
             { id: 'action_id', displayName: 'action_id' },
-            { id: 'actiontype_id', displayName: 'action_type' },
-            { id: 'action_code', displayName: 'action_code' },
+            // { id: 'action_target_date', displayName: 'action_target_date' },
             { id: 'action_title', displayName: 'action_title' },
           ];
           if (isAdmin) {
@@ -255,6 +290,43 @@ export function EntityListDownload({
               ...csvColumns,
               { id: 'action_draft', displayName: 'action_draft' },
               { id: 'action_private', displayName: 'action_private' },
+            ];
+          }
+        }
+      }
+      if (hasIndicators && indicatorsActive) {
+        if (!indicatorsAsRows) {
+          const indicatorColumns = connections.get('indicators').reduce((memo, indicator) => {
+            let displayName = `indicator_${indicator.get('id')}`;
+            if (indicator.getIn(['attributes', 'draft'])) {
+              displayName += '_DRAFT';
+            }
+            if (indicator.getIn(['attributes', 'private'])) {
+              displayName += '_PRIVATE';
+            }
+            return [
+              ...memo,
+              {
+                id: `indicator_${indicator.get('id')}`,
+                displayName,
+              },
+            ];
+          }, []);
+          csvColumns = [
+            ...csvColumns,
+            ...indicatorColumns,
+          ];
+        } else {
+          csvColumns = [
+            ...csvColumns,
+            { id: 'indicator_id', displayName: 'indicator_id' },
+            { id: 'indicator_title', displayName: 'topic_title' },
+          ];
+          if (isAdmin) {
+            csvColumns = [
+              ...csvColumns,
+              { id: 'indicator_draft', displayName: 'topic_draft' },
+              { id: 'indicator_private', displayName: 'topic_private' },
             ];
           }
         }
@@ -269,6 +341,12 @@ export function EntityListDownload({
         actionsAsRows,
         actiontypes,
 
+        hasTaxonomies,
+        taxonomyColumns,
+        taxonomies,
+
+        hasIndicators: hasIndicators && indicatorsActive,
+        indicatorsAsRows,
       });
     }
   }
@@ -350,7 +428,13 @@ export function EntityListDownload({
                 actionsAsRows={actionsAsRows}
                 setActionsAsRows={setActionsAsRows}
                 hasActions={hasActions}
-                actions={[]}
+                hasIndicators={hasIndicators}
+                hasTaxonomies={hasTaxonomies}
+                setTaxonomies={setTaxonomies}
+                indicatorsActive={indicatorsActive}
+                setIndicatorsActive={setIndicatorsActive}
+                setIndicatorsAsRows={setIndicatorsAsRows}
+                taxonomyColumns={taxonomyColumns}
                 typeTitle={typeTitle}
               />
             )}

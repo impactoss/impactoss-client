@@ -96,7 +96,7 @@ const ProgressText = styled.div`
   }
 `;
 const STATE_INITIAL = {
-  downloadActive: true,
+  downloadActive: false,
 };
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor() {
@@ -118,10 +118,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
   getFields = (type) => {
     switch (type) {
-      // case 'actiontypes':
-      //  return ACTION_FIELDS;
-      // case 'actortypes':
-      //   return ACTOR_FIELDS;
       case 'recommendations':
         return RECOMENDATION_FIELDS;
       default:
