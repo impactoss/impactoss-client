@@ -208,7 +208,8 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', ENDPOINTS.SIGN_OUT);
     yield call(clearAuthValues);
     yield put(logoutSuccess());
-    yield put(updatePath(ROUTES.LOGIN, { replace: true }));
+    // forward to home to prevent second login
+    yield put(updatePath('/', { replace: true }));
   } catch (err) {
     yield call(clearAuthValues);
     yield put(authenticateError(err));
@@ -239,6 +240,9 @@ export function* validateTokenSaga() {
         yield put(invalidateEntities());
       }
       yield put(authenticateSuccess(response.data)); // need to store currentUserData
+      if (window.location.search.includes('auth_token')) {
+        yield put(forwardOnAuthenticationChange());
+      }
     }
   } catch (err) {
     yield call(clearAuthValues);
@@ -704,7 +708,7 @@ export function* closeEntitySaga({ path }) {
  * Root saga manages watcher lifecycle
  */
 export default function* rootSaga() {
-  // console.log('calling rootSaga');
+  // console.log('calling rootSaga');)
   yield takeLatest(VALIDATE_TOKEN, validateTokenSaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
