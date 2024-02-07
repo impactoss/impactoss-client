@@ -161,6 +161,7 @@ const GlobalStyle = createGlobalStyle`
   }
   .download-csv-modal {
     z-index:105;
+    max-width: none !important;
   }
 
   .download-csv-modal,

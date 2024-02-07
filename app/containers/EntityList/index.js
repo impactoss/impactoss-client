@@ -40,6 +40,7 @@ import appMessages from 'containers/App/messages';
 import { PARAMS } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 import { RECOMENDATION_FIELDS } from '../RecommendationList/constants';
+import { ACTION_FIELDS } from '../ActionList/constants';
 
 import {
   selectDomain,
@@ -118,6 +119,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
   getFields = (type) => {
     switch (type) {
+      case 'measures':
+        return ACTION_FIELDS;
       case 'recommendations':
         return RECOMENDATION_FIELDS;
       default:

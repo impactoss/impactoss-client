@@ -51,7 +51,7 @@ export function OptionGroupToggle({
           <Box direction="row" align="center" gap="xsmall">
             {typeof activeCount !== 'undefined' && activeCount > 0 && (
               <Count alignContent="center" align="center" justify="center">
-                <Text color="white" size="small">{`${activeCount}/${optionCount}`}</Text>
+                <Text color="black" size="small">{`${activeCount}/${optionCount}`}</Text>
               </Count>
             )}
             {expanded && (

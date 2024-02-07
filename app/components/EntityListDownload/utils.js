@@ -1,8 +1,10 @@
 import qe from 'utils/quasi-equals';
 import appMessages from 'containers/App/messages';
 
-const IN_CELL_SEPARATOR = ', \n';
-// const IN_CELL_SEPARATOR = ', ';
+import { snakeCase } from 'lodash/string';
+
+// const IN_CELL_SEPARATOR = ', \n';
+const IN_CELL_SEPARATOR = ', ';
 
 export const getDateSuffix = (datetime) => {
   const date = datetime ? new Date(datetime) : new Date();
@@ -46,6 +48,10 @@ const addWarnings = ({
   }
   return value;
 };
+export const getActiveCount = (types) => Object.keys(types).reduce((counter, attKey) => {
+  if (types[attKey].active) return counter + 1;
+  return counter;
+}, 0);
 
 const getValue = ({
   key, attribute, entity, typeNames, relationships,
@@ -97,91 +103,90 @@ const getValue = ({
   }
   return val;
 };
-
-const prepActionDataAsRows = ({
-  entity, // Map
-  actiontypes,
-  actions, // Map
-  data,
-}) => {
-  if (entity.get('measures') && actiontypes) {
-    const dataRows = Object.keys(actiontypes).reduce((memo, actiontypeId) => {
-      if (!actiontypes[actiontypeId].active) {
-        return memo;
+export const getDefaultEntityTypes = (list, columnType) => list.reduce((memo, type) => {
+  const typeId = type.get('id');
+  const label = type.getIn(['attributes', 'title']);
+  return {
+    ...memo,
+    [typeId]: {
+      id: typeId,
+      label,
+      active: false,
+      column: `${columnType}_${snakeCase(label)}`,
+    },
+  };
+}, {});
+export const getIndicatorColumns = (indicatorsAsRows, connections, isAdmin) => {
+  let csvColumns = [];
+  if (!indicatorsAsRows) {
+    const indicatorColumns = connections.get('indicators').reduce((memo, indicator) => {
+      let displayName = `indicator_${indicator.get('id')}`;
+      if (indicator.getIn(['attributes', 'draft'])) {
+        displayName += '_DRAFT';
       }
-      const entityActionIds = entity.get('measures').size > 0
-        && entity
-          .get('measures')
-          .filter((actionId) => actionId === parseInt(actiontypeId, 10));
-
-      if (entityActionIds) {
-        const dataTypeRows = entityActionIds.reduce((memo2, actionId) => {
-          const action = actions.get(actionId.toString());
-          const dataRow = {
-            ...data,
-            action_id: actionId,
-            action_title: sanitiseText(action.getIn(['attributes', 'title'])),
-            action_draft: !!action.getIn(['attributes', 'draft']),
-            action_private: !!action.getIn(['attributes', 'private']),
-            // action_target_date: sanitiseText(action.getIn(['attributes', 'target_date'])),
-          };
-          return [
-            ...memo2,
-            dataRow,
-          ];
-        }, []);
-        return [
-          ...memo,
-          ...dataTypeRows,
-        ];
+      if (indicator.getIn(['attributes', 'private'])) {
+        displayName += '_PRIVATE';
       }
       return [
         ...memo,
+        {
+          id: `indicator_${indicator.get('id')}`,
+          displayName,
+        },
       ];
-    }, []);
-    return dataRows.length > 0 ? dataRows : [data];
+    }, csvColumns);
+    csvColumns = [
+      ...csvColumns,
+      ...indicatorColumns,
+    ];
+  } else {
+    csvColumns = [
+      ...csvColumns,
+      { id: 'indicator_id', displayName: 'indicator_id' },
+      { id: 'indicator_title', displayName: 'indicator_title' },
+    ];
+    if (isAdmin) {
+      csvColumns = [
+        ...csvColumns,
+        { id: 'indicator_draft', displayName: 'indicator_draft' },
+        { id: 'indicator_private', displayName: 'indicator_private' },
+      ];
+    }
   }
-  return [data];
+  return csvColumns;
 };
 
 const prepActionData = ({
   entity, // Map
-  actiontypes,
   actions, // Map
   data,
-}) => Object.keys(actiontypes).reduce((memo, actiontypeId) => {
-  if (!actiontypes[actiontypeId].active) {
-    return memo;
-  }
+}) => {
   const entityActionIds = entity.get('measures').size > 0
     && entity
       .get('measures')
-      .filter((actionId) => actionId === parseInt(actiontypeId, 10));
-
+      .map((actionId) => actionId);
   let actionsValue = '';
   if (entityActionIds) {
-    actionsValue = entityActionIds.reduce((memo2, actionId) => {
+    actionsValue = entityActionIds.reduce((memo, actionId) => {
       const action = actions.get(actionId.toString());
       if (action) {
         const title = action.getIn(['attributes', 'title']);
-        const code = action.getIn(['attributes', 'code']);
-        let actionValue = (code && code !== '') ? `${code}|${title}` : title;
-        actionValue = addWarnings({
-          value: actionValue,
+        actionsValue = addWarnings({
+          value: title,
           entity: action,
         });
-        return memo2 === ''
-          ? actionValue
-          : `${memo2}${IN_CELL_SEPARATOR}${actionValue}`;
+        return memo === ''
+          ? actionsValue
+          : `${memo}${IN_CELL_SEPARATOR}${actionsValue}`;
       }
-      return memo2;
+      return memo;
     }, '');
   }
   return ({
-    ...memo,
-    [`actions_${actiontypeId}`]: sanitiseText(actionsValue),
+    ...data,
+    connected_actions: sanitiseText(actionsValue),
   });
-}, data);
+};
 
 const prepAttributeData = ({
   entity,
@@ -206,26 +211,79 @@ const prepAttributeData = ({
   });
 }, data);
 
-const getIndicatorValue = ({ entity, indicatorId }) => {
-  const indicatorConnection = entity.get('indicators').size > 0
-    && entity.get('indicators').find((connection) => qe(connection.get('id'), indicatorId));
-
-  if (indicatorConnection) {
-    return indicatorConnection.get('supportlevel_id') || '';
+const prepRecommendationDataColumns = ({
+  entity, // Map
+  recommendations, // Map
+  data,
+  framework,
+}) => {
+  const entityRecommendationIds = entity.getIn(['recommendationsByFw', parseInt(framework, 10)]);
+  let recommendationValue = '';
+  if (entityRecommendationIds) {
+    recommendationValue = entityRecommendationIds.reduce((memo2, recommendationId) => {
+      const recommendation = recommendations.get(recommendationId.toString());
+      if (recommendation) {
+        const title = recommendation.getIn(['attributes', 'title']);
+        recommendationValue = addWarnings({
+          value: title,
+          entity: recommendation,
+        });
+        return memo2 === ''
+          ? recommendationValue
+          : `${memo2}${IN_CELL_SEPARATOR}${recommendationValue}`;
+      }
+      return memo2;
+    }, '');
   }
-  return '';
+  return ({
+    ...data,
+    connected_recommendations: sanitiseText(recommendationValue),
+  });
 };
+const prepTaxonomyDataColumns = ({
+  taxonomyColumns,
+  taxonomies,
+  entity,
+  data,
+}) => Object.keys(taxonomyColumns).reduce((memo, attKey) => {
+  if (!taxonomyColumns[attKey].active) {
+    return memo;
+  }
+  let categoryValue = '';
+  const entityTaxonomy = entity.getIn(['categories', attKey]);
+  if (entityTaxonomy) {
+    categoryValue = taxonomies
+      .reduce((memo2, tax) => {
+        let entityCategory = '';
+        if (tax.get('categories').has(entityTaxonomy.toString())) {
+          entityCategory = tax.getIn(['categories', entityTaxonomy.toString(), 'attributes', 'title']);
+          return memo2 === ''
+            ? entityCategory
+            : `${memo2}${IN_CELL_SEPARATOR}${entityCategory}`;
+        }
+        return memo2;
+      }, '');
+  }
+  return ({
+    ...memo,
+    [attKey]: categoryValue,
+  });
+}, data);
+
 
 const prepIndicatorDataColumns = ({
   entity, // Map
   indicators, // Map
   data,
 }) => indicators.reduce((memo, indicator) => {
-  const value = getIndicatorValue({
-    entity,
-    indicatorId: indicator.get('id'),
-  });
-
+  const indicatorId = indicator.get('id');
+  const indicatorConnection = entity.get('indicators').size > 0
+    && entity.get('indicators').find((connection) => qe(connection, indicatorId));
+  let value = '';
+  if (indicatorConnection) {
+    // value = indicator.getIn(['attributes', 'title']);
+    value = 'true';
+  }
   return ({
     ...memo,
     [`indicator_${indicator.get('id')}`]: value,
@@ -241,13 +299,13 @@ const prepIndicatorDataAsRows = ({
   if (entityIndicatorConnections) {
     // for each indicator
     const dataIndicatorRows = entityIndicatorConnections.reduce((memo, indicatorConnection) => {
-      const indicator = indicators.get(indicatorConnection.get('indicator_id').toString());
+      const indicator = indicators.get(indicatorConnection.toString());
       // and for each row: add indicator columns
       if (indicator) {
         const dataRowsIndicator = dataRows.reduce((memo2, data) => {
           const dataRow = {
             ...data,
-            indicator_id: indicatorConnection.get('id'),
+            indicator_id: indicator.get('id'),
             indicator_title: sanitiseText(indicator.getIn(['attributes', 'title'])),
             indicator_draft: !!indicator.getIn(['attributes', 'draft']),
             indicator_private: !!indicator.getIn(['attributes', 'private']),
@@ -268,19 +326,71 @@ const prepIndicatorDataAsRows = ({
   }
   return dataRows;
 };
-
-export const prepareDataForRecommendations = ({
-  // typeId,
-  // config,
+export const prepareDataForMeasures = ({
   entities,
   relationships,
   attributes,
-  // actions
-  hasActions,
-  actiontypes,
-  actionsAsRows,
-  // indicators
+  hasRecommendations,
   hasIndicators,
+  indicatorsAsRows,
+  hasTaxonomies,
+  taxonomyColumns,
+  taxonomies,
+  framework,
+}) => entities.reduce((memo, entity) => {
+  let data = { id: entity.get('id') };
+  // add attribute columns
+  if (attributes) {
+    data = prepAttributeData({
+      data,
+      entity,
+      attributes,
+      relationships,
+    });
+  }
+  if (hasTaxonomies) {
+    data = prepTaxonomyDataColumns({
+      taxonomyColumns,
+      taxonomies,
+      entity,
+      data,
+    });
+  }
+  if (hasRecommendations) {
+    data = prepRecommendationDataColumns({
+      entity,
+      recommendations: relationships && relationships.get('recommendations'),
+      data,
+      framework,
+    });
+  }
+  if (hasIndicators && !indicatorsAsRows) {
+    data = prepIndicatorDataColumns({
+      entity,
+      indicators: relationships && relationships.get('indicators'),
+      data,
+    });
+  }
+  let dataRows = [data];
+  if (hasIndicators && indicatorsAsRows) {
+    dataRows = prepIndicatorDataAsRows({
+      entity,
+      indicators: relationships && relationships.get('indicators'),
+      dataRows,
+    });
+  }
+  return [...memo, ...dataRows];
+}, []);
+
+export const prepareDataForRecommendations = ({
+  entities,
+  relationships,
+  attributes,
+  hasActions,
+  hasIndicators,
+  hasTaxonomies,
+  taxonomyColumns,
+  taxonomies,
   indicatorsAsRows,
 }) => entities.reduce((memo, entity) => {
   let data = { id: entity.get('id') };
@@ -293,10 +403,9 @@ export const prepareDataForRecommendations = ({
       relationships,
     });
   }
-  if (hasActions && !actionsAsRows) {
+  if (hasActions) {
     data = prepActionData({
       entity,
-      actiontypes,
       actions: relationships && relationships.get('measures'),
       data,
     });
@@ -308,15 +417,16 @@ export const prepareDataForRecommendations = ({
       data,
     });
   }
-  let dataRows = [data];
-  if (hasActions && actionsAsRows) {
-    dataRows = prepActionDataAsRows({
+  if (hasTaxonomies) {
+    data = prepTaxonomyDataColumns({
+      taxonomyColumns,
+      taxonomies,
       entity,
-      actiontypes,
-      actions: relationships && relationships.get('measures'),
       data,
     });
   }
+  let dataRows = [data];
+
   if (hasIndicators && indicatorsAsRows) {
     dataRows = prepIndicatorDataAsRows({
       entity,

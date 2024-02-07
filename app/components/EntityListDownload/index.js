@@ -32,17 +32,17 @@ import { filterEntitiesByKeywords } from 'utils/entities';
 import { isMinSize } from 'utils/responsive';
 
 import OptionsForRecommendations from './OptionsForRecommendations';
+import OptionsForActions from './OptionsForActions';
 
 import messages from './messages';
 import {
+  prepareDataForMeasures,
   prepareDataForRecommendations,
   getAttributes,
   getDateSuffix,
-  // getTaxonomies,
+  getIndicatorColumns,
+  // getDefaultEntityTypes,
 } from './utils';
-
-// import { actionTypes } from 'react-redux-form';
-
 
 const Footer = styled.div`
   width: 100%;
@@ -91,6 +91,7 @@ const OptionLabel = styled((p) => <Text as="label" {...p} />)`
   opacity: ${({ disabled }) => disabled ? 0.5 : 1};
 `;
 
+
 export function EntityListDownload({
   typeId,
   config,
@@ -105,11 +106,16 @@ export function EntityListDownload({
   searchQuery,
   entityIdsSelected,
 }) {
+  // console.log(config);
   // console.log(taxonomies.toJS());
   // console.log(fields);
   // console.log(entities.toJS());
   // console.log(connections.toJS());
   // console.log(frameworks);
+
+  // TODO: fix framework selection
+  const framework = 1;
+
   const [typeTitle, setTypeTitle] = useState('entities');
   const [csvFilename, setCSVFilename] = useState('csv');
   const [csvSuffix, setCSVSuffix] = useState(true);
@@ -121,12 +127,21 @@ export function EntityListDownload({
   // for recommendations
   const [actiontypes, setActiontypes] = useState({});
   const [actionsAsRows, setActionsAsRows] = useState(false);
+  let hasActions;
+
+
   const [indicatorsAsRows, setIndicatorsAsRows] = useState(false);
   const [indicatorsActive, setIndicatorsActive] = useState(false);
-
-  // for recommendations
-  let hasActions;
+  // const [indicatorTypes, setIndicatorTypes] = useState({});
   let hasIndicators;
+
+  // for actions
+  const [recommendationTypes, setRecommendationTypes] = useState({});
+  // const [recommendationsAsRows, setRecommendationsAsRows] = useState(false);
+  const [includeRecommendations, setIncludeRecommendations] = useState(false);
+  const [includeActions, setIncludeActions] = useState(false);
+  const [includeTaxonomies, setIncludeTaxonomies] = useState(false);
+  let hasRecommendations;
 
   // figure out export options
   const hasAttributes = !!config.attributes;
@@ -135,6 +150,13 @@ export function EntityListDownload({
   if (config.types === 'recommendations') {
     hasActions = connections.has('measures')
       && connections.get('measures').size > 0;
+
+    hasIndicators = connections.has('indicators')
+      && connections.get('indicators').size > 0;
+  }
+  if (config.types === 'measures') {
+    hasRecommendations = connections.has('recommendations')
+      && connections.get('recommendations').toList().size > 0;
 
     hasIndicators = connections.has('indicators')
       && connections.get('indicators').size > 0;
@@ -165,30 +187,22 @@ export function EntityListDownload({
         }).toJS()
       );
     }
-    if (config.types === 'recommendations') {
-      // actions
-      if (hasActions) {
-        setActiontypes(connections.get('measures').reduce((memo, action) => {
-          const actiontypeId = action.get('id');
-          const label = action.getIn(['attributes', 'title']);
-          return {
-            ...memo,
-            [actiontypeId]: {
-              id: actiontypeId,
-              label,
-              active: false,
-              column: `actions_${snakeCase(label)}`,
-            },
-          };
-        }, {}));
-      }
+    if (config.types === 'measures') {
+      /* if (hasRecommendations) {
+         setRecommendationTypes(getDefaultEntityTypes(connections.get('recommendations').toList(), 'recommendation'));
+       }
+      if (hasIndicators) {
+        setIndicatorTypes(connections.get('indicators').toList(), 'indicator');
+      } */
     }
   }, [
     taxonomies,
     hasAttributes,
     hasIndicators,
+    hasRecommendations,
     hasActions,
   ]);
+
   const totalCount = entities ? entities.size : 0;
   // check if should keep prefiltered search options
   const hasSearchQuery = !!searchQuery;
@@ -221,7 +235,11 @@ export function EntityListDownload({
     let tTitle = 'unspecified';
     if (config.types === 'recommendations') {
       title = intl.formatMessage(appMessages.entities.recommendations.plural);
-      tTitle = count !== 1 ? title : intl.formatMessage(appMessages.entities.indicators.single);
+      tTitle = count !== 1 ? title : intl.formatMessage(appMessages.entities.recommendations.single);
+    }
+    if (config.types === 'measures') {
+      title = intl.formatMessage(appMessages.entities.measures.plural);
+      tTitle = count !== 1 ? title : intl.formatMessage(appMessages.entities.measures.single);
     }
     setTypeTitle(tTitle);
     setCSVFilename(snakeCase(title));
@@ -263,90 +281,58 @@ export function EntityListDownload({
   let csvData;
   if (entities && count > 0) {
     if (config.types === 'recommendations') {
-      if (hasActions) {
-        if (!actionsAsRows) {
-          csvColumns = Object.keys(actiontypes).reduce((memo, actiontypeId) => {
-            if (actiontypes[actiontypeId].active) {
-              let displayName = actiontypes[actiontypeId].column;
-              if (!displayName || actiontypes[actiontypeId].column === '') {
-                displayName = actiontypeId;
-              }
-              return [
-                ...memo,
-                { id: `actions_${actiontypeId}`, displayName },
-              ];
-            }
-            return memo;
-          }, csvColumns);
-        } else {
-          csvColumns = [
-            ...csvColumns,
-            { id: 'action_id', displayName: 'action_id' },
-            // { id: 'action_target_date', displayName: 'action_target_date' },
-            { id: 'action_title', displayName: 'action_title' },
-          ];
-          if (isAdmin) {
+      if (hasActions && includeActions) {
+        csvColumns = [
+          ...csvColumns,
+          { id: 'connected_actions', displayName: 'connected_actions' },
+          // { id: 'action_title', displayName: 'action_title' },
+        ];
+        /*  if (isAdmin) {
             csvColumns = [
               ...csvColumns,
               { id: 'action_draft', displayName: 'action_draft' },
               { id: 'action_private', displayName: 'action_private' },
             ];
-          }
-        }
+          } */
       }
       if (hasIndicators && indicatorsActive) {
-        if (!indicatorsAsRows) {
-          const indicatorColumns = connections.get('indicators').reduce((memo, indicator) => {
-            let displayName = `indicator_${indicator.get('id')}`;
-            if (indicator.getIn(['attributes', 'draft'])) {
-              displayName += '_DRAFT';
-            }
-            if (indicator.getIn(['attributes', 'private'])) {
-              displayName += '_PRIVATE';
-            }
-            return [
-              ...memo,
-              {
-                id: `indicator_${indicator.get('id')}`,
-                displayName,
-              },
-            ];
-          }, []);
-          csvColumns = [
-            ...csvColumns,
-            ...indicatorColumns,
-          ];
-        } else {
-          csvColumns = [
-            ...csvColumns,
-            { id: 'indicator_id', displayName: 'indicator_id' },
-            { id: 'indicator_title', displayName: 'topic_title' },
-          ];
-          if (isAdmin) {
-            csvColumns = [
-              ...csvColumns,
-              { id: 'indicator_draft', displayName: 'topic_draft' },
-              { id: 'indicator_private', displayName: 'topic_private' },
-            ];
-          }
-        }
+        csvColumns = [...csvColumns, ...getIndicatorColumns(indicatorsAsRows, connections, isAdmin)];
       }
-
       csvData = prepareDataForRecommendations({
         entities: searchedEntities,
         relationships,
         attributes,
-
-        hasActions,
-        actionsAsRows,
-        actiontypes,
-
+        hasActions: hasActions && includeActions,
         hasTaxonomies,
         taxonomyColumns,
         taxonomies,
-
         hasIndicators: hasIndicators && indicatorsActive,
         indicatorsAsRows,
+      });
+    }
+    if (config.types === 'measures') {
+      if (hasRecommendations && includeRecommendations) {
+        csvColumns = [
+          ...csvColumns,
+          { id: 'connected_recommendations', displayName: 'connected_recommendations' },
+        ];
+      }
+      if (hasIndicators && indicatorsActive) {
+        csvColumns = [...csvColumns, ...getIndicatorColumns(indicatorsAsRows, connections, isAdmin)];
+      }
+
+      csvData = prepareDataForMeasures({
+        entities: searchedEntities,
+        relationships,
+        attributes,
+        hasRecommendations: hasRecommendations && includeRecommendations,
+        recommendationTypes,
+        hasIndicators: hasIndicators && indicatorsActive,
+        indicatorsAsRows,
+        hasTaxonomies: hasTaxonomies && includeTaxonomies,
+        taxonomyColumns,
+        taxonomies,
+        framework,
       });
     }
   }
@@ -425,6 +411,8 @@ export function EntityListDownload({
                 setAttributes={setAttributes}
                 actiontypes={actiontypes}
                 setActiontypes={setActiontypes}
+                setIncludeActions={setIncludeActions}
+                includeActions={includeActions}
                 actionsAsRows={actionsAsRows}
                 setActionsAsRows={setActionsAsRows}
                 hasActions={hasActions}
@@ -436,6 +424,27 @@ export function EntityListDownload({
                 setIndicatorsAsRows={setIndicatorsAsRows}
                 taxonomyColumns={taxonomyColumns}
                 typeTitle={typeTitle}
+              />
+            )}
+            {config.types === 'measures' && (
+              <OptionsForActions
+                hasAttributes={hasAttributes}
+                attributes={attributes}
+                setAttributes={setAttributes}
+                typeTitle={typeTitle}
+                hasIndicators={hasIndicators}
+                indicatorsActive={indicatorsActive}
+                hasTaxonomies={hasTaxonomies}
+                setTaxonomies={setTaxonomies}
+                taxonomyColumns={taxonomyColumns}
+                setIncludeTaxonomies={setIncludeTaxonomies}
+                setIndicatorsActive={setIndicatorsActive}
+                setIndicatorsAsRows={setIndicatorsAsRows}
+                indicatorsAsRows={indicatorsAsRows}
+                hasRecommendations={hasRecommendations}
+                setRecommendationTypes={setRecommendationTypes}
+                setIncludeRecommendations={setIncludeRecommendations}
+                recommendationTypes={recommendationTypes}
               />
             )}
             <Box

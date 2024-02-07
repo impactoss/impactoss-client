@@ -1,6 +1,6 @@
 /*
  *
- * OptionsForIndicators
+ * OptionsForActions
  *
  */
 
@@ -13,20 +13,22 @@ import { Box, Text } from 'grommet';
 
 import OptionGroup from './OptionGroup';
 
-// import messages from './messages';
 import { getActiveCount } from './utils';
+// import messages from './messages';
 
-export function OptionsForRecommendations({
+export function OptionsForActions({
   attributes,
   setAttributes,
   hasAttributes,
-  hasActions,
-  setIncludeActions,
-  includeActions,
+  hasRecommendations,
+  // setRecommendationTypes,
+  // recommendationTypes,
+  setIncludeRecommendations,
+  includeRecommendations,
   hasTaxonomies,
   setTaxonomies,
-  setIncludeTaxonomies,
   taxonomyColumns,
+  setIncludeTaxonomies,
   hasIndicators,
   indicatorsAsRows,
   setIndicatorsAsRows,
@@ -35,9 +37,9 @@ export function OptionsForRecommendations({
 }) {
   const [expandGroup, setExpandGroup] = useState(null);
 
-  // count active export options
   const activeAttributeCount = hasAttributes && getActiveCount(attributes);
-  // const activeActionsCount = hasActions && getActiveCount(actiontypes);
+  // const activeRecommendationsCount = hasRecommendations && getActiveCount(recommendationTypes);
+  // const activeActiontypeCount = hasActions && getActiveCount(actiontypes);
   const activeTaxonomyCount = hasTaxonomies && getActiveCount(taxonomyColumns);
 
   return (
@@ -60,19 +62,6 @@ export function OptionsForRecommendations({
           editColumnNames
         />
       )}
-      {hasActions && (
-        <OptionGroup
-          groupId="actions"
-          label="Actions"
-          expandedId={expandGroup}
-          onExpandGroup={(val) => setExpandGroup(val)}
-          activeOptionCount={includeActions ? 1 : 0}
-          optionCount={1}
-          active={includeActions}
-          onActiveLabel="Include connected actions"
-          onSetActive={(val) => setIncludeActions(val)}
-        />
-      )}
       {hasTaxonomies && (
         <OptionGroup
           groupId="taxonomies"
@@ -92,6 +81,21 @@ export function OptionsForRecommendations({
           editColumnNames
         />
       )}
+      {hasRecommendations && (
+        <OptionGroup
+          groupId="recommendations"
+          label="Recommendations"
+          expandedId={expandGroup}
+          onExpandGroup={(val) => setExpandGroup(val)}
+          activeOptionCount={includeRecommendations ? 1 : 0}
+          optionCount={1}
+          onSetActive={(val) => setIncludeRecommendations(val)}
+          onActiveLabel="Include connected recommendations"
+          optionListLabels={{
+            attributes: 'Select recommendation type',
+          }}
+        />
+      )}
       {hasIndicators && (
         <OptionGroup
           groupId="indicators"
@@ -103,7 +107,9 @@ export function OptionsForRecommendations({
           introNode={(
             <Box gap="xsmall">
               <Text size="small">
-                By default, the resulting CSV file will have one column for each indicator.
+                                By default, the resulting CSV file will have one column for each indicator.
+                {!indicatorsAsRows && ' Alternatively you can chose to include indicators as rows, resulting in one row per measure and indicator'}
+                {indicatorsAsRows && ' Alternatively you can chose to include topics as rows, resulting in one row per activity, actor and indicator'}
               </Text>
             </Box>
           )}
@@ -114,30 +120,18 @@ export function OptionsForRecommendations({
           asRows={indicatorsAsRows}
           asRowsDisabled={!indicatorsActive}
           asRowsLabels={{
-            columns: 'Include topics as columns (one column for each indicator)',
-            rows: indicatorsAsRows
-              ? 'Include indicators as rows (one row for each activity, actor and indicators)'
-              : 'Include indicators as rows (one row for each activity and topic)',
+            columns: 'Include indicators as columns (one column for each indicator)',
+            rows: 'Include indicators as rows (one row for each activity and indicator)',
           }}
         />
       )}
     </Box>
   );
 }
-
-OptionsForRecommendations.propTypes = {
-  // attributes
+OptionsForActions.propTypes = {
   attributes: PropTypes.object,
   setAttributes: PropTypes.func,
   hasAttributes: PropTypes.bool,
-  // actions
-  // actiontypes: PropTypes.object,
-  hasActions: PropTypes.bool,
-  includeActions: PropTypes.bool,
-  // setActiontypes: PropTypes.func,
-  // actionsAsRows: PropTypes.bool,
-  // setActionsAsRows: PropTypes.func,
-  setIncludeActions: PropTypes.func,
   // taxonomies
   hasTaxonomies: PropTypes.bool,
   setTaxonomies: PropTypes.func,
@@ -149,6 +143,10 @@ OptionsForRecommendations.propTypes = {
   indicatorsActive: PropTypes.bool,
   setIndicatorsActive: PropTypes.func,
   hasIndicators: PropTypes.bool,
+  // recommendations
+  setIncludeRecommendations: PropTypes.func,
+  includeRecommendations: PropTypes.bool,
+  hasRecommendations: PropTypes.bool,
 };
 
-export default OptionsForRecommendations;
+export default OptionsForActions;
