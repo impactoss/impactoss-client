@@ -106,13 +106,12 @@ export function* checkEntitiesSaga(payload) {
     // If haven't requested yet, do so now.
     if (!requestedAt) {
       const signedIn = yield select(selectIsSignedIn);
-
       try {
         // First record that we are requesting
         yield put(entitiesRequested(payload.path, Date.now()));
         // check role to prevent requesting endpoints not authorised
         // TODO check could be refactored
-        if (!signedIn && (payload.path === 'user_roles' || payload.path === 'users')) {
+        if (!signedIn && payload.path === 'users') {
           // store empty response so the app wont wait for the results
           yield put(entitiesLoaded({}, payload.path, Date.now()));
         } else {
