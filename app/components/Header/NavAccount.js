@@ -78,17 +78,6 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
         {!isSignedIn
           && (
             <LinkAccount
-              href={ROUTES.REGISTER}
-              active={currentPath === ROUTES.REGISTER}
-              onClick={(evt) => this.onClick(evt, ROUTES.REGISTER, currentPath)}
-            >
-              <FormattedMessage {...messages.register} />
-            </LinkAccount>
-          )
-        }
-        {!isSignedIn
-          && (
-            <LinkAccount
               href={ROUTES.LOGIN}
               active={currentPath === ROUTES.LOGIN}
               onClick={(evt) => this.onClick(evt, ROUTES.LOGIN, currentPath)}
