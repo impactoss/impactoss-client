@@ -69,7 +69,6 @@
     "chalk": "^2.4.2",
     "compression": "1.7.4",
     "coolors-to-hex": "^1.0.3",
-    "cross-env": "^6.0.3",
     "date-fns": "^2.16.1",
     "express": "^4.18.2",
     "grid-styled": "^1.0.1",
@@ -107,8 +106,7 @@
     "styled-components": "4.2.0",
     "styled-theme": "^0.3.3",
     "textarea-markdown-editor": "^1.0.4",
-    "warning": "3.0.0",
-    "whatwg-fetch": "3.0.0"
+    "warning": "3.0.0"
   },
   "devDependencies": {
     "@babel/cli": "7.4.3",
@@ -134,6 +132,7 @@
     "compare-versions": "3.4.0",
     "compression-webpack-plugin": "2.0.0",
     "coveralls": "3.0.3",
+    "cross-env": "^7.0.3",
     "css-loader": "^3.6.0",
     "eslint": "5.16.0",
     "eslint-config-airbnb": "17.1.0",
@@ -150,11 +149,9 @@
     "html-loader": "0.5.5",
     "html-webpack-plugin": "3.2.0",
     "image-webpack-loader": "4.6.0",
-    "imports-loader": "0.8.0",
     "lint-staged": "11.2.3",
     "ngrok": "3.1.1",
     "node-plop": "0.18.0",
-    "null-loader": "0.1.1",
     "offline-plugin": "5.0.6",
     "plop": "2.3.0",
     "pre-commit": "1.2.2",
@@ -177,7 +174,6 @@
     "webpack-dev-middleware": "3.6.2",
     "webpack-git-hash": "^1.0.2",
     "webpack-hot-middleware": "2.24.3",
-    "webpack-pwa-manifest": "4.0.0",
-    "whatwg-fetch": "3.0.0"
+    "webpack-pwa-manifest": "4.0.0"
   }
 }
