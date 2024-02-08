@@ -33,9 +33,11 @@ import { isMinSize } from 'utils/responsive';
 
 import OptionsForRecommendations from './OptionsForRecommendations';
 import OptionsForActions from './OptionsForActions';
+import OptionsForIndicators from './OptionsForIndicators';
 
 import messages from './messages';
 import {
+  prepareDataForIndicators,
   prepareDataForMeasures,
   prepareDataForRecommendations,
   getAttributes,
@@ -147,20 +149,23 @@ export function EntityListDownload({
   const hasAttributes = !!config.attributes;
   const hasTaxonomies = !!config.taxonomies;
 
-  if (config.types === 'recommendations') {
+  if (config.serverPath === 'recommendations') {
     hasActions = connections.has('measures')
       && connections.get('measures').size > 0;
 
     hasIndicators = connections.has('indicators')
       && connections.get('indicators').size > 0;
   }
-  if (config.types === 'measures') {
+  if (config.serverPath === 'measures') {
     hasRecommendations = connections.has('recommendations')
       && connections.get('recommendations').toList().size > 0;
 
     hasIndicators = connections.has('indicators')
       && connections.get('indicators').size > 0;
   }
+  /* if (config.serverPath === 'indicators') {
+
+  } */
   // figure out options for each relationship type
   useEffect(() => {
     // set initial config values
@@ -187,7 +192,7 @@ export function EntityListDownload({
         }).toJS()
       );
     }
-    if (config.types === 'measures') {
+    if (config.serverPath === 'measures') {
       /* if (hasRecommendations) {
          setRecommendationTypes(getDefaultEntityTypes(connections.get('recommendations').toList(), 'recommendation'));
        }
@@ -233,13 +238,17 @@ export function EntityListDownload({
   useEffect(() => {
     let title = 'unspecified';
     let tTitle = 'unspecified';
-    if (config.types === 'recommendations') {
+    if (config.serverPath === 'recommendations') {
       title = intl.formatMessage(appMessages.entities.recommendations.plural);
       tTitle = count !== 1 ? title : intl.formatMessage(appMessages.entities.recommendations.single);
     }
-    if (config.types === 'measures') {
+    if (config.serverPath === 'measures') {
       title = intl.formatMessage(appMessages.entities.measures.plural);
       tTitle = count !== 1 ? title : intl.formatMessage(appMessages.entities.measures.single);
+    }
+    if (config.serverPath === 'indicators') {
+      title = intl.formatMessage(appMessages.entities.indicators.plural);
+      tTitle = count !== 1 ? title : intl.formatMessage(appMessages.entities.indicators.single);
     }
     setTypeTitle(tTitle);
     setCSVFilename(snakeCase(title));
@@ -280,7 +289,7 @@ export function EntityListDownload({
   }
   let csvData;
   if (entities && count > 0) {
-    if (config.types === 'recommendations') {
+    if (config.serverPath === 'recommendations') {
       if (hasActions && includeActions) {
         csvColumns = [
           ...csvColumns,
@@ -310,7 +319,7 @@ export function EntityListDownload({
         indicatorsAsRows,
       });
     }
-    if (config.types === 'measures') {
+    if (config.serverPath === 'measures') {
       if (hasRecommendations && includeRecommendations) {
         csvColumns = [
           ...csvColumns,
@@ -333,6 +342,13 @@ export function EntityListDownload({
         taxonomyColumns,
         taxonomies,
         framework,
+      });
+    }
+    if (config.serverPath === 'indicators') {
+      csvData = prepareDataForIndicators({
+        entities: searchedEntities,
+        relationships,
+        attributes,
       });
     }
   }
@@ -404,7 +420,7 @@ export function EntityListDownload({
                 <FormattedMessage {...messages.exportDescription} />
               </Text>
             </Box>
-            {config.types === 'recommendations' && (
+            {config.serverPath === 'recommendations' && (
               <OptionsForRecommendations
                 hasAttributes={hasAttributes}
                 attributes={attributes}
@@ -426,7 +442,7 @@ export function EntityListDownload({
                 typeTitle={typeTitle}
               />
             )}
-            {config.types === 'measures' && (
+            {config.serverPath === 'measures' && (
               <OptionsForActions
                 hasAttributes={hasAttributes}
                 attributes={attributes}
@@ -445,6 +461,13 @@ export function EntityListDownload({
                 setRecommendationTypes={setRecommendationTypes}
                 setIncludeRecommendations={setIncludeRecommendations}
                 recommendationTypes={recommendationTypes}
+              />
+            )}
+            {config.serverPath === 'indicators' && (
+              <OptionsForIndicators
+                hasAttributes={hasAttributes}
+                attributes={attributes}
+                setAttributes={setAttributes}
               />
             )}
             <Box

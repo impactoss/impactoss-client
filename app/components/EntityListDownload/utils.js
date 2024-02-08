@@ -382,6 +382,31 @@ export const prepareDataForMeasures = ({
   return [...memo, ...dataRows];
 }, []);
 
+export const prepareDataForIndicators = ({
+  entities,
+  relationships,
+  attributes,
+}) => entities.reduce((memo, entity) => {
+  let data = { id: entity.get('id') };
+  // add attribute columns
+  if (attributes) {
+    data = prepAttributeData({
+      data,
+      entity,
+      attributes,
+      relationships,
+    });
+  }
+  /* if (hasActions) {
+     data = prepActionData({
+       entity,
+       actions: relationships && relationships.get('measures'),
+       data,
+     });
+   } */
+  return [...memo, data];
+}, []);
+
 export const prepareDataForRecommendations = ({
   entities,
   relationships,
@@ -476,7 +501,6 @@ export const getAttributes = ({
         if (attValue.exportRequired) {
           active = true;
         }
-
         const label = appMessages.attributes[attKey]
           ? `${intl.formatMessage(appMessages.attributes[attKey])}${attValue.exportRequired ? ' (required)' : ''}`
           : `title not working - ${attKey}`;
