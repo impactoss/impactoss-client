@@ -41,6 +41,7 @@ import { PARAMS } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 import { RECOMENDATION_FIELDS } from '../RecommendationList/constants';
 import { ACTION_FIELDS } from '../ActionList/constants';
+import { INDICATOR_FIELDS } from '../IndicatorList/constants';
 
 import {
   selectDomain,
@@ -123,6 +124,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         return ACTION_FIELDS;
       case 'recommendations':
         return RECOMENDATION_FIELDS;
+      case 'indicators':
+        return INDICATOR_FIELDS;
       default:
         return null;
     }
@@ -211,7 +214,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           >
             <EntityListDownload
               config={config}
-              fields={this.getFields(config.types)}
+              fields={this.getFields(config.serverPath)}
               entities={entities}
               taxonomies={this.props.taxonomies}
               connections={this.props.connections}

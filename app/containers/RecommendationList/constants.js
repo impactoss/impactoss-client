@@ -19,63 +19,42 @@ export const RECOMENDATION_FIELDS = {
   ATTRIBUTES: {
     recommendation_id: {
       defaultValue: '1',
-      // required: Object.values(ACTIONTYPES), // all types
       type: 'int',
-      // skipImport: true,
-      // table: API.ACTIONTYPES,
       exportColumn: 'recommendation_type',
       export: true,
     },
     title: {
-      // required: Object.values(ACTIONTYPES), // all types
       type: 'text',
-      // exportRequired: true,
     },
     description: {
-      // optional: Object.values(ACTIONTYPES),
       type: 'text',
     },
     reference: {
-      // optional: Object.values(ACTIONTYPES),
       type: 'text',
     },
     response: {
-      // optional: Object.values(ACTIONTYPES),
       type: 'text',
     },
     draft: {
       defaultValue: true,
-      // required: Object.values(ACTIONTYPES), // all types
       type: 'bool',
-      // ui: 'dropdown',
-      skipImport: true,
-      // options: [
-      //   { value: true, message: 'ui.publishStatuses.draft' },
-      //   { value: false, message: 'ui.publishStatuses.public' },
-      // ],
     },
     accepted: {
-      // defaultValue: true,
       type: 'bool',
     },
     created_at: {
-      skipImport: true,
       type: 'datetime',
       adminOnly: true,
-      meta: true,
     },
     updated_at: {
-      skipImport: true,
       type: 'datetime',
       adminOnly: true,
       meta: true,
     },
     last_modified_user_id: {
-      skipImport: true,
       type: 'int',
       adminOnly: true,
       meta: true,
-      // table: API.USERS,
       exportColumn: 'updated_by',
     },
   },
@@ -84,7 +63,6 @@ export const RECOMENDATION_FIELDS = {
 export const CONFIG = {
   serverPath: 'recommendations',
   clientPath: 'recommendations',
-  types: 'recommendations',
   search: ['reference', 'title', 'description', 'response'],
   downloadCSV: true,
   sorting: [

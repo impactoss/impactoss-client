@@ -20,60 +20,42 @@ export const ACTION_FIELDS = {
   ATTRIBUTES: {
     measuretype_id: {
       defaultValue: '1',
-      // required: Object.values(ACTIONTYPES), // all types
       type: 'number',
       skipImport: true,
-      // table: API.ACTIONTYPES,
       exportColumn: 'activity_type',
       export: true,
     },
     title: {
-      // required: Object.values(ACTIONTYPES), // all types
       type: 'text',
-      // exportRequired: true,
     },
     description: {
-      // optional: Object.values(ACTIONTYPES),
       type: 'markdown',
     },
     outcome: {
-      // optional: Object.values(ACTIONTYPES),
       type: 'markdown',
     },
     reference: {
-      // optional: Object.values(ACTIONTYPES),
       type: 'markdown',
     },
     indicator_summary: {
-      // optional: Object.values(ACTIONTYPES),
       type: 'markdown',
     },
     created_at: {
-      // optional: Object.values(ACTIONTYPES),
       type: 'date',
     },
     target_date: {
-      // optional: [ACTIONTYPES.EVENT],
       type: 'date',
     },
     updated_at: {
-      // optional: [ACTIONTYPES.EVENT],
       type: 'date',
     },
     target_date_comment: {
-      // optional: Object.values(ACTIONTYPES),
       type: 'text',
     },
     draft: {
       defaultValue: true,
-      // required: Object.values(ACTIONTYPES), // all types
       type: 'bool',
-      // ui: 'dropdown',
       skipImport: true,
-      options: [
-        { value: true, message: 'ui.publishStatuses.draft' },
-        { value: false, message: 'ui.publishStatuses.public' },
-      ],
     },
   },
 };

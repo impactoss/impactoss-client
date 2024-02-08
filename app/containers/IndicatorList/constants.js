@@ -18,9 +18,65 @@ export const DEPENDENCIES = [
   'progress_reports',
 ];
 
+export const INDICATOR_FIELDS = {
+  ATTRIBUTES: {
+    indicator_id: {
+      defaultValue: '1',
+      type: 'number',
+      // exportColumn: 'activity_type',
+      export: true,
+    },
+    title: {
+      type: 'text',
+    },
+    description: {
+      type: 'markdown',
+    },
+    frequency_months: {
+      type: 'int',
+    },
+    date_start: {
+      type: 'date',
+    },
+    date_end: {
+      type: 'date',
+    },
+    reference: {
+      type: 'text',
+    },
+    draft: {
+      defaultValue: true,
+      type: 'bool',
+    },
+    created_at: {
+      type: 'datetime',
+      adminOnly: true,
+    },
+    repeat: {
+      defaultValue: false,
+      type: 'bool',
+    },
+    end_date: {
+      type: 'datetime',
+      adminOnly: true,
+    },
+    updated_at: {
+      type: 'datetime',
+      adminOnly: true,
+    },
+    last_modified_user_id: {
+      type: 'key',
+      adminOnly: true,
+      exportColumn: 'updated_by',
+    },
+  },
+
+};
+
 export const CONFIG = {
   serverPath: 'indicators',
   clientPath: 'indicators',
+  downloadCSV: true,
   search: ['title', 'reference'],
   sorting: [
     {
