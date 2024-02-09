@@ -31,26 +31,20 @@ import ButtonSubmit from 'components/buttons/ButtonSubmit';
 import { filterEntitiesByKeywords } from 'utils/entities';
 import { isMinSize } from 'utils/responsive';
 
-import OptionsForRecommendations from './OptionsForRecommendations';
-import OptionsForActions from './OptionsForActions';
-import OptionsForIndicators from './OptionsForIndicators';
+import OptionsForEntityList from './OptionsForEntityList';
 
 import messages from './messages';
 import {
-  prepareDataForIndicators,
-  prepareDataForMeasures,
-  prepareDataForRecommendations,
   getAttributes,
   getDateSuffix,
-  getIndicatorColumns,
-  // getDefaultEntityTypes,
+  getActiveCount,
+  prepareData,
 } from './utils';
 
 const Footer = styled.div`
   width: 100%;
 `;
 
-// color: white;
 const StyledButtonCancel = styled(ButtonForm)`
   opacity: 0.9;
   &:hover {
@@ -93,7 +87,6 @@ const OptionLabel = styled((p) => <Text as="label" {...p} />)`
   opacity: ${({ disabled }) => disabled ? 0.5 : 1};
 `;
 
-
 export function EntityListDownload({
   typeId,
   config,
@@ -101,23 +94,12 @@ export function EntityListDownload({
   entities,
   taxonomies,
   connections,
-  // frameworks,
   onClose,
   intl,
   isAdmin,
   searchQuery,
   entityIdsSelected,
 }) {
-  // console.log(config);
-  // console.log(taxonomies.toJS());
-  // console.log(fields);
-  // console.log(entities.toJS());
-  // console.log(connections.toJS());
-  // console.log(frameworks);
-
-  // TODO: fix framework selection
-  const framework = 1;
-
   const [typeTitle, setTypeTitle] = useState('entities');
   const [csvFilename, setCSVFilename] = useState('csv');
   const [csvSuffix, setCSVSuffix] = useState(true);
@@ -125,47 +107,17 @@ export function EntityListDownload({
   const [ignoreSelection, setIgnoreSelection] = useState(false);
   const [attributes, setAttributes] = useState({});
   const [taxonomyColumns, setTaxonomies] = useState({});
-
-  // for recommendations
-  const [actiontypes, setActiontypes] = useState({});
-  const [actionsAsRows, setActionsAsRows] = useState(false);
-  let hasActions;
-
-
-  const [indicatorsAsRows, setIndicatorsAsRows] = useState(false);
-  const [indicatorsActive, setIndicatorsActive] = useState(false);
-  // const [indicatorTypes, setIndicatorTypes] = useState({});
-  let hasIndicators;
-
-  // for actions
-  const [recommendationTypes, setRecommendationTypes] = useState({});
-  // const [recommendationsAsRows, setRecommendationsAsRows] = useState(false);
-  const [includeRecommendations, setIncludeRecommendations] = useState(false);
-  const [includeActions, setIncludeActions] = useState(false);
-  const [includeTaxonomies, setIncludeTaxonomies] = useState(false);
-  let hasRecommendations;
+  const [connectionTypes, setConnectionTypes] = useState({});
 
   // figure out export options
   const hasAttributes = !!config.attributes;
   const hasTaxonomies = !!config.taxonomies;
 
-  if (config.serverPath === 'recommendations') {
-    hasActions = connections.has('measures')
-      && connections.get('measures').size > 0;
+  const includeTaxonomies = !!getActiveCount(taxonomyColumns);
+  const includeConnections = !!getActiveCount(connectionTypes);
 
-    hasIndicators = connections.has('indicators')
-      && connections.get('indicators').size > 0;
-  }
-  if (config.serverPath === 'measures') {
-    hasRecommendations = connections.has('recommendations')
-      && connections.get('recommendations').toList().size > 0;
+  const hasConnections = connections && connections.size > 0;
 
-    hasIndicators = connections.has('indicators')
-      && connections.get('indicators').size > 0;
-  }
-  /* if (config.serverPath === 'indicators') {
-
-  } */
   // figure out options for each relationship type
   useEffect(() => {
     // set initial config values
@@ -192,20 +144,32 @@ export function EntityListDownload({
         }).toJS()
       );
     }
-    if (config.serverPath === 'measures') {
-      /* if (hasRecommendations) {
-         setRecommendationTypes(getDefaultEntityTypes(connections.get('recommendations').toList(), 'recommendation'));
-       }
-      if (hasIndicators) {
-        setIndicatorTypes(connections.get('indicators').toList(), 'indicator');
-      } */
+    if (hasConnections && connections) {
+      setConnectionTypes(
+        connections
+          .entrySeq()
+          .reduce((memo, [connectionType, value]) => {
+            // check is for empty indicator connection on recommendations
+            if (value.size > 0) {
+              const label = intl.formatMessage(appMessages.entities[connectionType].plural);
+              return {
+                ...memo,
+                [connectionType]: {
+                  id: connectionType,
+                  label,
+                  active: false,
+                  column: snakeCase(label),
+                },
+              };
+            }
+            return memo;
+          }, {})
+      );
     }
   }, [
-    taxonomies,
     hasAttributes,
-    hasIndicators,
-    hasRecommendations,
-    hasActions,
+    hasTaxonomies,
+    hasConnections,
   ]);
 
   const totalCount = entities ? entities.size : 0;
@@ -272,7 +236,7 @@ export function EntityListDownload({
       return memo;
     }, csvColumns);
   }
-  if (hasTaxonomies && count > 0) {
+  if (hasTaxonomies && includeTaxonomies && count > 0) {
     csvColumns = Object.keys(taxonomyColumns).reduce((memo, taxId) => {
       if (taxonomyColumns[taxId].active) {
         let displayName = taxonomyColumns[taxId].column;
@@ -287,70 +251,27 @@ export function EntityListDownload({
       return memo;
     }, csvColumns);
   }
+  if (hasConnections && includeConnections && count > 0) {
+    csvColumns = Object.keys(connectionTypes)
+      .filter((connection) => connectionTypes[connection].active)
+      .reduce((memo, connection) => ([
+        ...memo,
+        { id: `connected_${connection}`, displayName: `connected_${connection}` },
+      ]), csvColumns);
+  }
   let csvData;
   if (entities && count > 0) {
-    if (config.serverPath === 'recommendations') {
-      if (hasActions && includeActions) {
-        csvColumns = [
-          ...csvColumns,
-          { id: 'connected_actions', displayName: 'connected_actions' },
-          // { id: 'action_title', displayName: 'action_title' },
-        ];
-        /*  if (isAdmin) {
-            csvColumns = [
-              ...csvColumns,
-              { id: 'action_draft', displayName: 'action_draft' },
-              { id: 'action_private', displayName: 'action_private' },
-            ];
-          } */
-      }
-      if (hasIndicators && indicatorsActive) {
-        csvColumns = [...csvColumns, ...getIndicatorColumns(indicatorsAsRows, connections, isAdmin)];
-      }
-      csvData = prepareDataForRecommendations({
-        entities: searchedEntities,
-        relationships,
-        attributes,
-        hasActions: hasActions && includeActions,
-        hasTaxonomies,
-        taxonomyColumns,
-        taxonomies,
-        hasIndicators: hasIndicators && indicatorsActive,
-        indicatorsAsRows,
-      });
-    }
-    if (config.serverPath === 'measures') {
-      if (hasRecommendations && includeRecommendations) {
-        csvColumns = [
-          ...csvColumns,
-          { id: 'connected_recommendations', displayName: 'connected_recommendations' },
-        ];
-      }
-      if (hasIndicators && indicatorsActive) {
-        csvColumns = [...csvColumns, ...getIndicatorColumns(indicatorsAsRows, connections, isAdmin)];
-      }
-
-      csvData = prepareDataForMeasures({
-        entities: searchedEntities,
-        relationships,
-        attributes,
-        hasRecommendations: hasRecommendations && includeRecommendations,
-        recommendationTypes,
-        hasIndicators: hasIndicators && indicatorsActive,
-        indicatorsAsRows,
-        hasTaxonomies: hasTaxonomies && includeTaxonomies,
-        taxonomyColumns,
-        taxonomies,
-        framework,
-      });
-    }
-    if (config.serverPath === 'indicators') {
-      csvData = prepareDataForIndicators({
-        entities: searchedEntities,
-        relationships,
-        attributes,
-      });
-    }
+    csvData = prepareData({
+      entities: searchedEntities,
+      relationships,
+      attributes,
+      connections,
+      connectionTypes,
+      hasConnections: hasConnections && includeConnections,
+      hasTaxonomies: hasTaxonomies && includeTaxonomies,
+      taxonomyColumns,
+      taxonomies,
+    });
   }
   const csvDateSuffix = `_${getDateSuffix()}`;
   const size = React.useContext(ResponsiveContext);
@@ -420,54 +341,18 @@ export function EntityListDownload({
                 <FormattedMessage {...messages.exportDescription} />
               </Text>
             </Box>
-            {config.serverPath === 'recommendations' && (
-              <OptionsForRecommendations
+            {config.serverPath !== '' && (
+              <OptionsForEntityList
                 hasAttributes={hasAttributes}
                 attributes={attributes}
                 setAttributes={setAttributes}
-                actiontypes={actiontypes}
-                setActiontypes={setActiontypes}
-                setIncludeActions={setIncludeActions}
-                includeActions={includeActions}
-                actionsAsRows={actionsAsRows}
-                setActionsAsRows={setActionsAsRows}
-                hasActions={hasActions}
-                hasIndicators={hasIndicators}
-                hasTaxonomies={hasTaxonomies}
-                setTaxonomies={setTaxonomies}
-                indicatorsActive={indicatorsActive}
-                setIndicatorsActive={setIndicatorsActive}
-                setIndicatorsAsRows={setIndicatorsAsRows}
-                taxonomyColumns={taxonomyColumns}
-                typeTitle={typeTitle}
-              />
-            )}
-            {config.serverPath === 'measures' && (
-              <OptionsForActions
-                hasAttributes={hasAttributes}
-                attributes={attributes}
-                setAttributes={setAttributes}
-                typeTitle={typeTitle}
-                hasIndicators={hasIndicators}
-                indicatorsActive={indicatorsActive}
+                connectionTypes={connectionTypes}
+                setConnectionTypes={setConnectionTypes}
+                includeConnections={includeConnections}
                 hasTaxonomies={hasTaxonomies}
                 setTaxonomies={setTaxonomies}
                 taxonomyColumns={taxonomyColumns}
-                setIncludeTaxonomies={setIncludeTaxonomies}
-                setIndicatorsActive={setIndicatorsActive}
-                setIndicatorsAsRows={setIndicatorsAsRows}
-                indicatorsAsRows={indicatorsAsRows}
-                hasRecommendations={hasRecommendations}
-                setRecommendationTypes={setRecommendationTypes}
-                setIncludeRecommendations={setIncludeRecommendations}
-                recommendationTypes={recommendationTypes}
-              />
-            )}
-            {config.serverPath === 'indicators' && (
-              <OptionsForIndicators
-                hasAttributes={hasAttributes}
-                attributes={attributes}
-                setAttributes={setAttributes}
+                hasConnections={hasConnections}
               />
             )}
             <Box
