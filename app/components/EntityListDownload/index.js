@@ -245,7 +245,7 @@ export function EntityListDownload({
         }
         return [
           ...memo,
-          { id: `taxonomy_${taxId}`, displayName },
+          { id: displayName, displayName },
         ];
       }
       return memo;

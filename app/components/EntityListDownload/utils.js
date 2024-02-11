@@ -2,6 +2,7 @@
 import appMessages from 'containers/App/messages';
 
 import { snakeCase } from 'lodash/string';
+import { Set } from 'immutable';
 
 // const IN_CELL_SEPARATOR = ', \n';
 const IN_CELL_SEPARATOR = ', ';
@@ -161,8 +162,10 @@ const prepConnnectionData = ({
   connectionTypes,
   data,
 }) => Object.keys(connectionTypes)
-  .filter((connection) => connectionTypes[connection].active)
   .reduce((memo, connectionType) => {
+    if (!connectionTypes[connectionType].active) {
+      return memo;
+    }
     const entityConnectionIds = entity.get(connectionType).size > 0
       && entity
         .get(connectionType)
@@ -218,31 +221,28 @@ const prepTaxonomyDataColumns = ({
   taxonomies,
   entity,
   data,
-}) => Object.keys(taxonomyColumns).reduce((memo, attKey) => {
-  if (!taxonomyColumns[attKey].active) {
-    return memo;
-  }
-  let categoryValue = '';
-  const entityTaxonomy = entity.getIn(['categories', attKey]);
-  if (entityTaxonomy) {
-    categoryValue = taxonomies
-      .reduce((memo2, tax) => {
-        if (tax.get('categories').has(entityTaxonomy.toString())) {
-          let entityCategory = '';
-          entityCategory = tax.getIn(['categories', entityTaxonomy.toString(), 'attributes', 'title']);
-          // eslint-disable-next-line no-param-reassign
-          return memo2 === ''
-            ? entityCategory
-            : `${memo2}${IN_CELL_SEPARATOR}${entityCategory}`;
-        }
-        return memo2;
+}) => Object.keys(taxonomyColumns)
+  .reduce((memo, attKey) => {
+    if (!taxonomyColumns[attKey].active) {
+      return memo;
+    }
+    const entityCategories = Set(entity.get('categories').valueSeq().map((key) => String(key)));
+    const activeTaxonomyCategories = Set(taxonomies.getIn([attKey, 'categories']).keySeq());
+    const intersect = entityCategories.intersect(activeTaxonomyCategories);
+    let categoryValue = '';
+    if (intersect.size > 0) {
+      categoryValue = intersect.reduce((memo2, categoryId) => {
+        const entityCategory = taxonomies.getIn([attKey, 'categories', categoryId, 'attributes', 'title']);
+        return memo2 === ''
+          ? entityCategory
+          : `${memo2}${IN_CELL_SEPARATOR}${entityCategory}`;
       }, '');
-  }
-  return ({
-    ...memo,
-    [taxonomyColumns[attKey].column]: categoryValue,
-  });
-}, data);
+    }
+    return ({
+      ...memo,
+      [taxonomyColumns[attKey].column]: categoryValue,
+    });
+  }, data);
 
 export const prepareData = ({
   entities,
