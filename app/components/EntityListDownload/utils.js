@@ -166,7 +166,7 @@ const prepConnnectionData = ({
     if (!connectionTypes[connectionType].active) {
       return memo;
     }
-    const entityConnectionIds = entity.get(connectionType).size > 0
+    const entityConnectionIds = entity.get(connectionType)
       && entity
         .get(connectionType)
         .map((typeId) => typeId);
@@ -226,11 +226,15 @@ const prepTaxonomyDataColumns = ({
     if (!taxonomyColumns[attKey].active) {
       return memo;
     }
-    const entityCategories = Set(entity.get('categories').valueSeq().map((key) => String(key)));
-    const activeTaxonomyCategories = Set(taxonomies.getIn([attKey, 'categories']).keySeq());
-    const intersect = entityCategories.intersect(activeTaxonomyCategories);
+    const entityCategories = entity.get('categories')
+      && Set(entity.get('categories').valueSeq().map((key) => String(key)));
+    const activeTaxonomyCategories = taxonomies.getIn([attKey, 'categories'])
+      && Set(taxonomies.getIn([attKey, 'categories']).keySeq());
+
     let categoryValue = '';
-    if (intersect.size > 0) {
+    const intersect = entityCategories && activeTaxonomyCategories
+      && entityCategories.intersect(activeTaxonomyCategories);
+    if (intersect && intersect.size > 0) {
       categoryValue = intersect.reduce((memo2, categoryId) => {
         const entityCategory = taxonomies.getIn([attKey, 'categories', categoryId, 'attributes', 'title']);
         return memo2 === ''
