@@ -191,13 +191,14 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     const header = this.props.header ? this.props.header : [];
     if (config.downloadCSV) {
-      header.actions.push({
+      header.actions.splice(header.actions.length - 1, 0, {
         type: 'icon',
         onClick: () => this.onDownloadClick(),
         title: 'Download CSV',
         icon: 'download',
       });
     }
+
     return (
       <div>
         {config.downloadCSV && this.state.downloadActive && (
