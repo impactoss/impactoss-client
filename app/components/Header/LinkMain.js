@@ -6,7 +6,8 @@ import Link from './Link';
 export default styled(Link)`
   display: inline-block;
   vertical-align: top;
-  color: ${palette('headerNavMainItem', 0)};
+  color: ${({ active }) => active ? palette('text', 2) : palette('light', 4)};
+  background:  ${({ active }) => active ? palette('primary', 0) : 'transparent'};
   &:hover {
     color:${palette('headerNavMainItemHover', 0)};
   }
