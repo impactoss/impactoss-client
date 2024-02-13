@@ -14,8 +14,8 @@ const getColor = (props, isHover = false) => {
   if (props.isSmartTag) {
     if (props.isSmart) {
       return isHover
-        ? palette('smartActive', 1)
-        : palette('smartActive', 0);
+        ? palette('taxonomies', props.taxId || 0)
+        : palette('taxonomiesHover', props.taxId || 0);
     }
     return isHover
       ? palette('smartInactive', 1)

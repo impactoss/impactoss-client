@@ -144,31 +144,30 @@ theme.palette = {
   taxonomies: [
     '#8D95A0', // default, not used
     '#560950', // 1: Human Rights Body
-    '#73018E', // 2: Reporting Cycle
-    '#BA4692', // 3: Recommending State
-    '#9B2727', // 4: Human right
-    '#BA5D03', // 5: Affected persons
+    '#560950', // 2: Reporting Cycle
+    '#73018E', // 3: Recommending State
+    '#BA4692', // 4: Human right
+    '#9B2727', // 5: Affected persons
     '#FDB980', // 6: Thematic cluster
-    '#FFDDC1', // 7: Organisation
-    '#EAEAEA', // 8:
+    '#EAEAEA', // 7: Organisation
+    '#BA5D03', // 8: SMART
     '#73777B', // 9: Progress status
-    '#1E1F1F', // 10:
+    '#FFDDC1', // 10:
+    '#1E1F1F',
   ],
   taxonomiesHover: [
     '#656F75', // default, not used
     '#0B000B', // 1: Human Rights Body
-    '#73018E', // 2: Reporting Cycle
-    '#98226F', // 3: Recommending State
-    '#6F0B0B', // 4: Human right
-    '#964B00', // 5: Affected persons
+    '#0B000B', // 2: Reporting Cycle
+    '#510064', // 3: Recommending State
+    '#98226F', // 4: Human right
+    '#6F0B0B', // 5: Affected persons
     '#F09F5B', // 6: Thematic cluster
-    '#F7BF8E', // 7: Organisation
-    '#DBD8D8', // 8:
+    '#DBD8D8', // 7: Organisation
+    '#964B00', // 8: SMART
     '#5F6367', // 9: Progress status
-    '#000000', // 10
-  ],
-  smartActive: [
-    '#BA5D03', '#964B00', // [regular,hover]
+    '#F7BF8E',
+    '#000000',
   ],
   // bg inactive, bg hover, icon
   smartInactive: [
