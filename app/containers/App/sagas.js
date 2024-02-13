@@ -173,9 +173,18 @@ export function* authenticateSaga(payload) {
 
 export function* authenticateWithAzureSaga() {
   // let's get the path for successful redirects
-  // const redirectPathname = yield select(selectRedirectOnAuthSuccessPath);
+  const redirectPathname = yield select(selectRedirectOnAuthSuccessPath);
   try {
     yield put(authenticateSending());
+    // figure out success query and location
+    const querySuccess = {
+      [PARAMS.REDIRECT_ON_AUTH_SUCCESS]: redirectPathname,
+    };
+    const querySuccessString = getNextQueryString(querySuccess);
+    const successLocation = `${window.location.origin}${ROUTES.LOGIN_OAUTH_SUCCESS}?${querySuccessString}`;
+    let location = `${ENDPOINTS.API}/${ENDPOINTS.SIGN_IN_AZURE}?resource_class=User`;
+    location = `${location}&auth_origin_url=${encodeURIComponent(successLocation)}`;
+    window.location.href = location;
   } catch (err) {
     if (err.response) {
       err.response.json = yield err.response.json();
@@ -258,9 +267,6 @@ export function* validateTokenSaga() {
         yield put(invalidateEntities());
       }
       yield put(authenticateSuccess(response.data)); // need to store currentUserData
-      // if (window.location.search.includes('auth_token')) {
-      //   yield put(forwardOnAuthenticationChange());
-      // }
     }
   } catch (err) {
     yield call(clearAuthValues);

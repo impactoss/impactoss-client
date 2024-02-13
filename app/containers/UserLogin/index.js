@@ -41,7 +41,9 @@ const BottomLinks = styled.div`
   padding: 2em 0;
 `;
 
-const AzureButton = styled(ButtonHero)``;
+const AzureButton = styled(ButtonHero)`
+  width: 100%;
+`;
 
 
 export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -93,7 +95,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
               />
             )
           }
-          {authSending
+          {!ENABLE_AZURE && authSending
             && <Loading />
           }
           {!ENABLE_AZURE && (
@@ -148,9 +150,12 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                 <FormattedMessage {...messages.signInWithAzureDescription} />
               </p>
               <div>
-                <AzureButton onClick={() => handleSubmitWithAzure()}>
-                  <FormattedMessage {...messages.submitWithAzure} />
-                </AzureButton>
+                {!authSending && (
+                  <AzureButton onClick={() => handleSubmitWithAzure()}>
+                    <FormattedMessage {...messages.submitWithAzure} />
+                  </AzureButton>
+                )}
+                {authSending && <Loading />}
               </div>
             </>
           )}
@@ -191,7 +196,6 @@ export function mapDispatchToProps(dispatch) {
     },
     handleSubmitWithAzure: () => {
       dispatch(loginWithAzure());
-      dispatch(dismissQueryMessages());
     },
     handleCancel: () => {
       dispatch(updatePath('/'));

@@ -97,21 +97,17 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: ROUTES.LOGIN_SUCCESS_WITH_AZURE,
-      name: 'userLoginSuccessWithAzure',
+      path: ROUTES.LOGIN_OAUTH_SUCCESS,
+      name: 'userLoginOAuthSuccess',
       onEnter: redirectIfSignedIn(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/UserLogin/reducer'),
-          import('containers/UserLogin/sagas'),
-          import('containers/UserLogin'),
+          import('containers/UserLoginOAuthSuccess'),
         ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('userLogin', reducer.default);
-          injectSagas(sagas.default);
+        importModules.then(([component]) => {
           renderRoute(component);
         });
 

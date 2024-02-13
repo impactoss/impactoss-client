@@ -113,7 +113,7 @@ export const ENDPOINTS = {
   SIGN_OUT: 'auth/sign_out',
   PASSWORD: 'auth/password',
   VALIDATE_TOKEN: 'auth/validate_token',
-  SIGN_IN_AZURE: 'auth/azure_activedirectory_v2?resource_class=User',
+  SIGN_IN_AZURE: 'auth/azure_activedirectory_v2',
 };
 
 // API request Authentification keys

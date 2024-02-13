@@ -128,6 +128,8 @@ export const ROUTES = {
   PASSWORD: '/password',
   OVERVIEW: '/overview',
   LOGIN: '/login',
+  LOGIN_OAUTH_SUCCESS: '/loginOAuthSuccess',
+  LOGIN_OAUTH_ERROR: '/loginOAuthError',
   BOOKMARKS: '/bookmarks',
   LOGOUT: '/logout',
   REGISTER: '/register',
