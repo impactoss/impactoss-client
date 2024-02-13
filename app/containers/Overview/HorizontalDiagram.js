@@ -187,7 +187,7 @@ const DiagramButton = styled(Button)`
   &:hover {
     background-color: ${(props) => palette(props.paletteHover, 0)};
   }
-  color: ${palette('primary', 4)};
+  color: ${(props) => props.fontColor ? palette(props.fontColor, props.fontColorIndex) : palette('primary', 4)};
   padding: 0.4em 0.5em 0.75em;
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   font-size: 0.8em;
@@ -329,7 +329,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
         ? (boundingRect.bottom - boundingRectReference.top)
         : (boundingRect.top - boundingRectReference.top),
     });
-  }
+  };
 
   getConnectionPath = (vertical = false, start, end) => vertical
     ? [
@@ -371,7 +371,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
         { x: point.x - 5, y: point.y + 5 },
         point,
       ];
-  }
+  };
 
   updateViewport() {
     let viewport = VIEWPORTS.MOBILE;
@@ -456,7 +456,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
         </CategorisedIcon>
       ))}
     </CategorisedIcons>
-  )
+  );
 
   renderPath = (points = [], dashed = false, r = 10) => (
     <PathLineCustom
@@ -515,6 +515,8 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
     path,
     paletteDefault,
     paletteHover,
+    fontColorIndex,
+    fontColor,
     icon,
     type,
     count,
@@ -526,6 +528,8 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
       onClick={() => onPageLink(path)}
       paletteDefault={paletteDefault}
       paletteHover={paletteHover}
+      fontColorIndex={fontColorIndex}
+      fontColor={fontColor}
       ref={(node) => {
         if (!this.state[stateButton]) {
           this.setState({ [stateButton]: node });
@@ -547,7 +551,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
         </DraftEntities>
       )}
     </DiagramButton>
-  )
+  );
 
   renderCategoryIcons = (
     tags,
@@ -670,6 +674,8 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
         paletteHover: 'indicatorsHover',
         icon: 'indicators',
         type: 'indicators',
+        fontColorIndex: 0,
+        fontColor: 'dark',
         count: indicatorCount,
         draftCount: indicatorDraftCount,
         stateButton: 'buttonIndicators',
@@ -697,7 +703,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
         draftCount: sdgtargetDraftCount,
         stateButton: 'buttonSdgtargets',
         onPageLink,
-      }) }
+      })}
       {this.renderCategoryIcons(
         'tags_sdgtargets',
         onPageLink,
@@ -732,7 +738,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
           }
         }}
       >
-        {this.renderPathsSVG(this.state.viewport < VIEWPORTS.MEDIUM) }
+        {this.renderPathsSVG(this.state.viewport < VIEWPORTS.MEDIUM)}
         {this.state.viewport
           && this.state.viewport < VIEWPORTS.MEDIUM
           && (

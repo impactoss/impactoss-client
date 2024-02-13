@@ -86,18 +86,7 @@ theme.breakpoints = {
   small: `${BREAKPOINTS.small.min + 1}px`, // min
   medium: `${BREAKPOINTS.medium.min + 1}px`, // min
   large: `${BREAKPOINTS.large.min + 1}px`, // min
-  // small: `${BREAKPOINTS.small.min}px`, // max
-  // // ms: `${BREAKPOINTS.ms.min}px`, // max
-  // medium: `${BREAKPOINTS.medium.min}px`, // min
-  // large: `${BREAKPOINTS.large.min}px`, // min
-  // xlarge: `${BREAKPOINTS.xlarge.min}px`, // min
-  // xxlarge: `${BREAKPOINTS.xxlarge.min}px`, // min
 };
-// theme.breakpointsMin = {
-//   // ms: `${BREAKPOINTS.ms.min + 1}px`, // min
-//   // xlarge: `${BREAKPOINTS.xlarge.min + 1}px`, // min
-//   // xxlarge: `${BREAKPOINTS.xxlarge.min + 1}px`, // min
-// };
 
 // global color palettes
 // primary color palette: dark to light
@@ -134,8 +123,6 @@ const light = coolorsToHex('https://coolors.co/f1f4f4-e0e6e6-d5dddd-cdd6d6-c7d1d
 // 1: AA on white
 const error = coolorsToHex('https://coolors.co/b20e0e-c10f0f-d31717-f2e3e3-ffffff');
 const success = coolorsToHex('https://coolors.co/00632e-007034-007c3a-e1f2ed-ffffff');
-// const alert = coolorsToHex('https://coolors.co/c75300-e56700-ed7000-f97807-ffffff');
-// const info = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-118ef4-ffffff');
 
 // colour palettes, usage:
 //   import { palette } from 'styled-theme';
@@ -151,38 +138,37 @@ theme.palette = {
   // other palettes
   error,
   success,
-  // alert,
-  // info,
 
   // taxonomy/category colours
   // [0: default, 1: Human Rights Body, 2: UN session, 3: Human right, 4: Affected persons, 5: Thematic cluster, 6: Organisation, 7: SDGs, 8: State, 9: SMART]
-  // taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#40D7FF'],
-  // taxonomiesAAL: ['#8C969B', '#6B3285', '#5149AD', '#31A573', '#26938C', '#4DA53B', '#0069A4', '#199CD4', '#8C969B'],
-  // [#AA compliant]
-  // taxonomiesHoverAAL: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
   taxonomies: [
     '#8D95A0', // default, not used
-    '#0059A3', // 1: Human Rights Body
-    '#0077D8', // 2: UN session
-    '#416680', // 3: State
-    '#007C70', // 4: Human right
-    '#05A763', // 5: Affected persons
-    '#B7177A', // 6: Thematic cluster
-    '#114060', // 7: Organisation
-    '#E56700', // 8: SMART
-    '#007c3a', // 9: Progress status
+    '#560950', // 1: Human Rights Body
+    '#73018E', // 2: Reporting Cycle
+    '#BA4692', // 3: Recommending State
+    '#9B2727', // 4: Human right
+    '#BA5D03', // 5: Affected persons
+    '#FDB980', // 6: Thematic cluster
+    '#FFDDC1', // 7: Organisation
+    '#EAEAEA', // 8:
+    '#73777B', // 9: Progress status
+    '#1E1F1F', // 10:
   ],
   taxonomiesHover: [
     '#656F75', // default, not used
-    '#005296', // 1: Human Rights Body
-    '#0070CC', // 2: UN session
-    '#395970', // 3: State
-    '#007267', // 4: Human right
-    '#008740', // 5: Affected persons
-    '#A5156E', // 6: Thematic cluster
-    '#0F364C', // 7: Organisation
-    '#C75300', // 8: SMART
-    '#007034', // 9: Progress status
+    '#0B000B', // 1: Human Rights Body
+    '#73018E', // 2: Reporting Cycle
+    '#98226F', // 3: Recommending State
+    '#6F0B0B', // 4: Human right
+    '#964B00', // 5: Affected persons
+    '#F09F5B', // 6: Thematic cluster
+    '#F7BF8E', // 7: Organisation
+    '#DBD8D8', // 8:
+    '#5F6367', // 9: Progress status
+    '#000000', // 10
+  ],
+  smartActive: [
+    '#BA5D03', '#964B00', // [regular,hover]
   ],
   // bg inactive, bg hover, icon
   smartInactive: [
@@ -194,12 +180,12 @@ theme.palette = {
   // other entities
   // [aqll #AA compliant]
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
-  measuresHover: ['#C75300'], // FFC107  AA compliant
-  measures: ['#ED7000'],
-  recommendationsHover: ['#023066', '#426BA6'], // accepted, noted ['#FF9B69', '#FFB28B'],
-  recommendations: ['#033A89', '#6889B8'],
-  indicatorsHover: ['#15881A'],
-  indicators: ['#1BAC29'],
+  measuresHover: ['#964B00'], // FFC107  AA compliant
+  measures: ['#1E1F1F'],
+  recommendationsHover: ['#510064', 'transparent'], // accepted, noted ['#FF9B69', '#FFB28B'],
+  recommendations: ['#73018E', 'transparent'],
+  indicatorsHover: ['#F09F5B'],
+  indicators: ['#FFCEA5'],
   reportsHover: [error[1]],
   reports: [error[0]],
   attributesHover: [dark[2]],
