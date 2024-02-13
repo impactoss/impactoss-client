@@ -206,6 +206,10 @@ const DiagramButton = styled(Button)`
 // font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
 
 const DiagramButtonMain = styled(DiagramButton)`
+  background-color: ${(props) => palette(props.paletteDefault, 0)};
+  &:hover {
+    background-color: ${(props) => palette(props.paletteHover, 0)};
+  } 
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0.4em 0.75em 1em;
     &:before {

@@ -95,7 +95,7 @@ theme.breakpoints = {
 // 2: main colour, used for links and navigation elements (AA large on white)
 // 3: white/placeholder
 // 4: white/placeholder
-const primary = coolorsToHex('https://coolors.co/73018e-510064-0077d8-ffffff-ffffff');
+const primary = coolorsToHex('https://coolors.co/73018e-510064-360441-ffffff-ffffff');
 // secondary color palette: dark to light
 // 0: secondary colour, dark / white/placeholder
 // 1: secondary colour, medium / white/placeholder
@@ -181,7 +181,7 @@ theme.palette = {
   // [aqll #AA compliant]
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
   measuresHover: ['#964B00'], // FFC107  AA compliant
-  measures: ['#1E1F1F'],
+  measures: ['#BA5D03'],
   recommendationsHover: ['#510064', 'transparent'], // accepted, noted ['#FF9B69', '#FFB28B'],
   recommendations: ['#73018E', 'transparent'],
   indicatorsHover: ['#F09F5B'],
@@ -282,7 +282,7 @@ theme.palette = {
   buttonCancel: [dark[3]], // form footer cancel
   buttonCancelHover: [primary[1]],
   // buttonDefault: ['#text', '#bg'],
-  buttonDefault: [primary[4], primary[2]], // with background
+  buttonDefault: [primary[4], primary[0]], // with background
   buttonDefaultHover: [primary[4], primary[0]],
   buttonDefaultDisabled: [light[0], dark[3]], // with background disabled
   // buttonPrimary: ['#text', '#bg', '#border'],
