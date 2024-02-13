@@ -18,7 +18,7 @@ export const IS_DEV = SERVER !== 'production';
 export const VERSION = `${version}${IS_DEV ? ' [DEV]' : ''}`;
 
 // default language locale
-export const DEFAULT_LOCALE = 'en-GB';
+export const DEFAULT_LOCALE = 'en-NZ';
 // date format - change to format according to locale, only used for form error message
 export const DATE_FORMAT = 'dd/MM/yyyy';
 export const NODE_ENV = sessionStorage.NODE_ENV || 'production';
