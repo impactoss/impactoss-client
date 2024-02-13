@@ -128,6 +128,7 @@ const HideSecondaryWrap = styled.div`
 const HideSecondary = styled(Button)``;
 
 const LinkSuperTitle = styled.div`
+  color: ${(props) => props.active ? palette('text', 2) : 'inherit'};
   font-size: ${(props) => props.theme.sizes.text.smallMobile};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.theme.sizes.text.smaller};
@@ -446,7 +447,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                   : this.onShowFrameworks(evt)
                 }
               >
-                <LinkSuperTitle>
+                <LinkSuperTitle active>
                   {intl.formatMessage(appMessages.frameworks.single)}
                 </LinkSuperTitle>
                 {currentFrameworkOption && (
@@ -473,7 +474,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 active={item.active}
                 onClick={(evt) => this.onClick(evt, item.path)}
               >
-                <LinkSuperTitle>
+                <LinkSuperTitle active={item.active}>
                   {item.titleSuper}
                 </LinkSuperTitle>
                 <LinkTitle active={item.active}>
