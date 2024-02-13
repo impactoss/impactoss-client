@@ -139,7 +139,7 @@ const LinkSuperTitle = styled.div`
 const LinkTitle = styled.div`
   font-size: ${(props) => props.theme.sizes.text.small};
   font-weight: bold;
-  color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
+  color: ${(props) => props.active ? palette('text', 2) : 'inherit'};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.theme.sizes.text.default};
   }
@@ -247,7 +247,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     if (!wrapperContains && !buttonContains) {
       this.setState({ showFrameworks: false });
     }
-  }
+  };
 
   onShowSecondary = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -280,7 +280,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     } else {
       this.props.onPageLink(path);
     }
-  }
+  };
 
   resize = () => {
     // reset
@@ -326,10 +326,10 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
           }}
           currentPath={this.props.currentPath}
         />
-        { navItemsAdmin
+        {navItemsAdmin
           && (
             <NavAdmin>
-              { navItemsAdmin.map((item, i) => (
+              {navItemsAdmin.map((item, i) => (
                 <LinkAdmin
                   key={i}
                   href={item.path}
@@ -347,7 +347,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
           )
         }
         <NavPages>
-          { this.props.pages && this.props.pages.map((page, i) => (
+          {this.props.pages && this.props.pages.map((page, i) => (
             <LinkPage
               key={i}
               href={page.path}
@@ -404,10 +404,10 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             ))}
           </FrameworkOptions>
         )}
-        { !SHOW_BRAND_ON_HOME && isHome
+        {!SHOW_BRAND_ON_HOME && isHome
           && (
             <HomeNavWrap>
-              { this.renderSecondary(navItemsAdmin) }
+              {this.renderSecondary(navItemsAdmin)}
             </HomeNavWrap>
           )
         }
@@ -490,7 +490,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
               >
                 {search.title}
                 {search.icon
-                && <Icon title={search.title} name={search.icon} text textRight size="1em" />
+                  && <Icon title={search.title} name={search.icon} text textRight size="1em" />
                 }
               </Search>
             )}

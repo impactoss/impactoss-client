@@ -95,7 +95,7 @@ theme.breakpoints = {
 // 2: main colour, used for links and navigation elements (AA large on white)
 // 3: white/placeholder
 // 4: white/placeholder
-const primary = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-ffffff-ffffff');
+const primary = coolorsToHex('https://coolors.co/73018e-510064-0077d8-ffffff-ffffff');
 // secondary color palette: dark to light
 // 0: secondary colour, dark / white/placeholder
 // 1: secondary colour, medium / white/placeholder
@@ -116,7 +116,7 @@ const dark = coolorsToHex('https://coolors.co/1c2121-232b2b-323e3e-687271-8d9696
 // 2:  gray 1 (gray pattern)
 // 3:  gray 2 (icons light)
 // 4:  gray 3 (dark lines)
-const light = coolorsToHex('https://coolors.co/f1f4f4-e0e6e6-d5dddd-cdd6d6-c7d1d1');
+const light = coolorsToHex('https://coolors.co/f1f4f4-eaeaea-dfe1e3-cfd0d1-73777b');
 
 // other palettes
 // 0: AA on light[0] and on error[3]
