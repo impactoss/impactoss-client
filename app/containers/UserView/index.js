@@ -23,7 +23,7 @@ import { getEntityTitle } from 'utils/entities';
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -64,8 +64,10 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     sessionUserHighestRoleId,
     handleEdit,
     handleClose,
+    handleEditPassword,
     dataReady,
   }) => {
+    const { intl } = this.context;
     const userId = user.get('id') || user.getIn(['attributes', 'id']);
     const buttons = [];
     if (dataReady) {
@@ -74,6 +76,13 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
         onClick: () => window.print(),
         title: 'Print',
         icon: 'print',
+      });
+    }
+    if (userId === sessionUserId && !ENABLE_AZURE) {
+      buttons.push({
+        type: 'edit',
+        title: intl.formatMessage(messages.editPassword),
+        onClick: () => handleEditPassword(userId),
       });
     }
     if (sessionUserHighestRoleId === USER_ROLES.ADMIN.value // is admin
@@ -209,6 +218,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleEdit: (userId) => {
       dispatch(updatePath(`${ROUTES.USERS}${ROUTES.EDIT}/${userId}`, { replace: true }));
+    },
+    handleEditPassword: (userId) => {
+      dispatch(updatePath(`${ROUTES.USERS}${ROUTES.PASSWORD}/${userId}`, { replace: true }));
     },
     handleClose: () => {
       dispatch(closeEntity(ROUTES.USERS));

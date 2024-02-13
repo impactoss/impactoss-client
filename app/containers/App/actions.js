@@ -18,6 +18,7 @@
 import {
   AUTHENTICATE_SENDING,
   AUTHENTICATE,
+  AUTHENTICATE_AZURE,
   AUTHENTICATE_SUCCESS,
   AUTHENTICATE_ERROR,
   SET_AUTHENTICATION_STATE,
@@ -365,6 +366,11 @@ export function authenticate(data) {
   return {
     type: AUTHENTICATE,
     data,
+  };
+}
+export function authenticateWithAzure() {
+  return {
+    type: AUTHENTICATE_AZURE,
   };
 }
 

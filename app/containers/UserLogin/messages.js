@@ -34,4 +34,12 @@ export default defineMessages({
     id: 'app.containers.UserLogin.submit',
     defaultMessage: 'Sign in',
   },
+  signInWithAzureDescription: {
+    id: 'app.containers.UserLogin.signInWithAzureDescription',
+    defaultMessage: 'If you have a valid Azure AD account you can sign in below',
+  },
+  submitWithAzure: {
+    id: 'app.containers.UserLogin.submitWithAzure',
+    defaultMessage: 'Sign in with your Azure AD account',
+  },
 });

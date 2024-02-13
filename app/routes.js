@@ -21,6 +21,7 @@ export default function createRoutes(store) {
   const { injectReducer, injectSagas } = getAsyncInjectors(store); // eslint-disable-line no-unused-vars
   const {
     redirectIfSignedIn,
+    redirectIfAzureEnabled,
     redirectIfNotSignedIn,
     redirectIfNotPermitted,
   } = getRedirects(store);
@@ -95,69 +96,90 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
-    // }, {
-    //   path: ROUTES.RECOVER_PASSWORD,
-    //   name: 'userPasswordRecover',
-    //   onEnter: redirectIfSignedIn(),
-    //   getComponent(nextState, cb) {
-    //     const importModules = Promise.all([
-    //       import('containers/UserPasswordRecover/reducer'),
-    //       import('containers/UserPasswordRecover/sagas'),
-    //       import('containers/UserPasswordRecover'),
-    //     ]);
-    //
-    //     const renderRoute = loadModule(cb);
-    //
-    //     importModules.then(([reducer, sagas, component]) => {
-    //       injectReducer('userPasswordRecover', reducer.default);
-    //       injectSagas(sagas.default);
-    //       renderRoute(component);
-    //     });
-    //
-    //     importModules.catch(errorLoading);
-    //   },
-    // }, {
-    //   path: ROUTES.RESET_PASSWORD,
-    //   name: 'userPasswordReset',
-    //   onEnter: redirectIfSignedIn(),
-    //   getComponent(nextState, cb) {
-    //     const importModules = Promise.all([
-    //       import('containers/UserPasswordReset/reducer'),
-    //       import('containers/UserPasswordReset/sagas'),
-    //       import('containers/UserPasswordReset'),
-    //     ]);
-    //
-    //     const renderRoute = loadModule(cb);
-    //
-    //     importModules.then(([reducer, sagas, component]) => {
-    //       injectReducer('userPasswordReset', reducer.default);
-    //       injectSagas(sagas.default);
-    //       renderRoute(component);
-    //     });
-    //
-    //     importModules.catch(errorLoading);
-    //   },
-    // }, {
-    //   path: ROUTES.REGISTER,
-    //   name: 'userRegister',
-    //   onEnter: redirectIfSignedIn(),
-    //   getComponent(nextState, cb) {
-    //     const importModules = Promise.all([
-    //       import('containers/UserRegister/reducer'),
-    //       import('containers/UserRegister/sagas'),
-    //       import('containers/UserRegister'),
-    //     ]);
-    //
-    //     const renderRoute = loadModule(cb);
-    //
-    //     importModules.then(([reducer, sagas, component]) => {
-    //       injectReducer('userRegister', reducer.default);
-    //       injectSagas(sagas.default);
-    //       renderRoute(component);
-    //     });
-    //
-    //     importModules.catch(errorLoading);
-    //   },
+    }, {
+      path: ROUTES.LOGIN_SUCCESS_WITH_AZURE,
+      name: 'userLoginSuccessWithAzure',
+      onEnter: redirectIfSignedIn(),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserLogin/reducer'),
+          import('containers/UserLogin/sagas'),
+          import('containers/UserLogin'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('userLogin', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: ROUTES.RECOVER_PASSWORD,
+      name: 'userPasswordRecover',
+      onEnter: redirectIfAzureEnabled(),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserPasswordRecover/reducer'),
+          import('containers/UserPasswordRecover/sagas'),
+          import('containers/UserPasswordRecover'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('userPasswordRecover', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: ROUTES.RESET_PASSWORD,
+      name: 'userPasswordReset',
+      onEnter: redirectIfAzureEnabled(),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserPasswordReset/reducer'),
+          import('containers/UserPasswordReset/sagas'),
+          import('containers/UserPasswordReset'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('userPasswordReset', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: ROUTES.REGISTER,
+      name: 'userRegister',
+      onEnter: redirectIfAzureEnabled(),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserRegister/reducer'),
+          import('containers/UserRegister/sagas'),
+          import('containers/UserRegister'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('userRegister', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
     }, {
       path: ROUTES.USERS,
       name: 'userList',

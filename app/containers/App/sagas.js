@@ -27,6 +27,7 @@ import {
   DELETE_ENTITY,
   DELETE_MULTIPLE_ENTITIES,
   AUTHENTICATE,
+  AUTHENTICATE_AZURE,
   LOGOUT,
   VALIDATE_TOKEN,
   INVALIDATE_ENTITIES,
@@ -48,6 +49,7 @@ import {
   ENDPOINTS,
   KEYS,
   DB_TABLES,
+  ENABLE_AZURE,
 } from 'themes/config';
 
 import {
@@ -169,6 +171,19 @@ export function* authenticateSaga(payload) {
   }
 }
 
+export function* authenticateWithAzureSaga() {
+  // let's get the path for successful redirects
+  // const redirectPathname = yield select(selectRedirectOnAuthSuccessPath);
+  try {
+    yield put(authenticateSending());
+  } catch (err) {
+    if (err.response) {
+      err.response.json = yield err.response.json();
+      yield put(authenticateError(err));
+    }
+  }
+}
+
 export function* recoverSaga(payload) {
   const { email } = payload.data;
   try {
@@ -207,8 +222,12 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', ENDPOINTS.SIGN_OUT);
     yield call(clearAuthValues);
     yield put(logoutSuccess());
-    // forward to home to prevent second login
-    yield put(updatePath('/', { replace: true }));
+    if (ENABLE_AZURE) {
+      // forward to home to prevent second login
+      yield put(updatePath('/', { replace: true }));
+    } else {
+      yield put(updatePath(ROUTES.LOGIN, { replace: true }));
+    }
   } catch (err) {
     yield call(clearAuthValues);
     yield put(authenticateError(err));
@@ -239,9 +258,9 @@ export function* validateTokenSaga() {
         yield put(invalidateEntities());
       }
       yield put(authenticateSuccess(response.data)); // need to store currentUserData
-      if (window.location.search.includes('auth_token')) {
-        yield put(forwardOnAuthenticationChange());
-      }
+      // if (window.location.search.includes('auth_token')) {
+      //   yield put(forwardOnAuthenticationChange());
+      // }
     }
   } catch (err) {
     yield call(clearAuthValues);
@@ -711,6 +730,7 @@ export default function* rootSaga() {
   yield takeLatest(VALIDATE_TOKEN, validateTokenSaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
+  yield takeLatest(AUTHENTICATE_AZURE, authenticateWithAzureSaga);
   yield takeLatest(RECOVER_PASSWORD, recoverSaga);
   yield takeLatest(LOGOUT, logoutSaga);
   yield takeLatest(AUTHENTICATE_FORWARD, authChangeSaga);
