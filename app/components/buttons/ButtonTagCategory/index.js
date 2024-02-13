@@ -3,12 +3,19 @@ import { palette } from 'styled-theme';
 
 import Button from '../Button';
 
+const getFontColor = ({ taxId, isSmartTag }) => {
+  if (!isSmartTag && (taxId === 6 || taxId === 7 || taxId === 8)) {
+    return palette('dark', 0);
+  }
+  return palette('text', 2);
+};
+
 const getColor = (props, isHover = false) => {
   if (props.isSmartTag) {
     if (props.isSmart) {
       return isHover
-        ? palette('taxonomiesHover', props.taxId || 0)
-        : palette('taxonomies', props.taxId || 0);
+        ? palette('smartActive', 1)
+        : palette('smartActive', 0);
     }
     return isHover
       ? palette('smartInactive', 1)
@@ -22,7 +29,7 @@ const getColor = (props, isHover = false) => {
 
 // eslint-disable no-nested-ternary
 const ButtonTagCategory = styled(Button)`
-  color: ${palette('text', 2)};
+  color: ${(props) => getFontColor(props)}};
   background-color: ${(props) => getColor(props)};
   margin-right: 2px;
   border-radius: ${(props) => props.isSmartTag ? 9999 : 3}px;
