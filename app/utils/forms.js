@@ -511,7 +511,7 @@ export const getUploadField = (formatMessage) => getFormField({
   placeholder: 'url',
 });
 
-export const getEmailField = (formatMessage, model = '.attributes.email') => {
+export const getEmailFormField = (formatMessage, model = '.attributes.email') => {
   const field = getFormField({
     formatMessage,
     controlType: 'email',

@@ -14,7 +14,7 @@ import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
   getNameField,
-  getEmailField,
+  getEmailFormField,
   getPasswordField,
   getPasswordConfirmationField,
 } from 'utils/forms';
@@ -95,7 +95,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
                 labels={{ submit: intl.formatMessage(messages.submit) }}
                 fields={[
                   getNameField(intl.formatMessage),
-                  getEmailField(intl.formatMessage),
+                  getEmailFormField(intl.formatMessage),
                   getPasswordField(intl.formatMessage),
                   getPasswordConfirmationField(intl.formatMessage),
                 ]}

@@ -489,7 +489,7 @@
   "app.containers.App.entities.categories.plural": "Categories",
   "app.containers.App.entities.roles.single": "User role",
   "app.containers.App.entities.roles.plural": "User roles",
-  "app.containers.App.messages.notSignedIn": "Please sign in or register first to access this page",
+  "app.containers.App.messages.notSignedIn": "Please sign in (again) to access this page",
   "app.containers.App.messages.alreadySignedIn": "Welcome back!",
   "app.containers.App.messages.signInGuestReport": "Please sign in or register first to submit a progress update",
   "app.containers.App.messages.submitInvalid": "One or more fields have errors.",

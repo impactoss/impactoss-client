@@ -46,6 +46,7 @@ export const getEntityLinkField = (entity, path, label, labelFormatted) => ({
 });
 
 export const getTitleField = (entity, isManager, attribute = 'title', label) => ({
+  controlType: 'info',
   type: 'title',
   value: entity.getIn(['attributes', attribute]),
   isManager,
@@ -389,6 +390,7 @@ export const getDownloadField = (entity, isManager) => ({
 });
 
 export const getEmailField = (entity) => ({
+  controlType: 'info',
   type: 'email',
   value: entity.getIn(['attributes', 'email']),
 });
