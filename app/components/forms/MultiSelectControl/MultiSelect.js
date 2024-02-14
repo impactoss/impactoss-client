@@ -57,6 +57,7 @@ const ControlMain = styled.div`
   overflow-y: auto;
   padding:0;
   padding-bottom: ${(props) => props.hasChangeNote ? '50px' : '0px'};
+  border-top: 1px solid ${palette('primary', 4)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     top: 80px;
   }

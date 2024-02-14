@@ -11,7 +11,6 @@ const Styled = styled.div`
   color: ${palette('multiSelectHeader', 0)};
   background-color: ${palette('multiSelectHeader', 1)};
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
-  border-bottom: 1px solid ${palette('primary', 4)};
   z-index: 1;
   height: 80px;
   padding: 16px;
