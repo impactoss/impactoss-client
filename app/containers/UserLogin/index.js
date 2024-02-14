@@ -17,6 +17,8 @@ import {
   getPasswordField,
 } from 'utils/forms';
 
+
+import ButtonHero from 'components/buttons/ButtonHero';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Icon from 'components/Icon';
@@ -29,14 +31,20 @@ import { selectQueryMessages } from 'containers/App/selectors';
 import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
 import { ROUTES } from 'containers/App/constants';
+import { ENABLE_AZURE } from 'themes/config';
 import messages from './messages';
 
-import { login } from './actions';
+import { login, loginWithAzure } from './actions';
 import { selectDomain } from './selectors';
 
 const BottomLinks = styled.div`
   padding: 2em 0;
 `;
+
+const AzureButton = styled(ButtonHero)`
+  width: 100%;
+`;
+
 
 export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   UNSAFE_componentWillMount() {
@@ -46,6 +54,14 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
   render() {
     const { intl } = this.context;
     const { authError, authSending } = this.props.viewDomain.get('page').toJS();
+
+    const {
+      handleSubmit,
+      handleCancel,
+      onDismissQueryMessages,
+      queryMessages,
+      handleSubmitWithAzure,
+    } = this.props;
 
     return (
       <div>
@@ -62,12 +78,12 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
           <ContentHeader
             title={intl.formatMessage(messages.pageTitle)}
           />
-          {this.props.queryMessages.info
+          {queryMessages.info
             && (
               <Messages
                 type="info"
-                onDismiss={this.props.onDismissQueryMessages}
-                messageKey={this.props.queryMessages.info}
+                onDismiss={onDismissQueryMessages}
+                messageKey={queryMessages.info}
               />
             )
           }
@@ -79,51 +95,70 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
               />
             )
           }
-          {authSending
+          {!ENABLE_AZURE && authSending
             && <Loading />
           }
-          { this.props.viewDomain.get('form')
-            && (
-              <AuthForm
-                model="userLogin.form.data"
-                sending={authSending}
-                handleSubmit={(formData) => this.props.handleSubmit(formData)}
-                handleCancel={this.props.handleCancel}
-                labels={{ submit: intl.formatMessage(messages.submit) }}
-                fields={[
-                  getEmailField(intl.formatMessage, '.email'),
-                  getPasswordField(intl.formatMessage, '.password'),
-                ]}
-              />
-            )
-          }
-          <BottomLinks>
-            <p>
-              <FormattedMessage {...messages.registerLinkBefore} />
-              <A
-                href={ROUTES.REGISTER}
-                onClick={(evt) => {
-                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink(ROUTES.REGISTER, { keepQuery: true });
-                }}
-              >
-                <FormattedMessage {...messages.registerLink} />
-                <Icon name="arrowRight" text size="1.5em" sizes={{ mobile: '1em' }} />
-              </A>
-            </p>
-            <p>
-              <A
-                href={ROUTES.RECOVER_PASSWORD}
-                onClick={(evt) => {
-                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink(ROUTES.RECOVER_PASSWORD, { keepQuery: true });
-                }}
-              >
-                <FormattedMessage {...messages.recoverPasswordLink} />
-                <Icon name="arrowRight" text size="1.5em" sizes={{ mobile: '1em' }} />
-              </A>
-            </p>
-          </BottomLinks>
+          {!ENABLE_AZURE && (
+            <>
+              {this.props.viewDomain.get('form')
+                && (
+                  <AuthForm
+                    model="userLogin.form.data"
+                    sending={authSending}
+                    handleSubmit={(formData) => handleSubmit(formData)}
+                    handleCancel={handleCancel}
+                    labels={{ submit: intl.formatMessage(messages.submit) }}
+                    fields={[
+                      getEmailField(intl.formatMessage, '.email'),
+                      getPasswordField(intl.formatMessage, '.password'),
+                    ]}
+                  />
+                )
+              }
+              <BottomLinks>
+                <p>
+                  <FormattedMessage {...messages.registerLinkBefore} />
+                  <A
+                    href={ROUTES.REGISTER}
+                    onClick={(evt) => {
+                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                      this.props.handleLink(ROUTES.REGISTER, { keepQuery: true });
+                    }}
+                  >
+                    <FormattedMessage {...messages.registerLink} />
+                    <Icon name="arrowRight" text size="1.5em" sizes={{ mobile: '1em' }} />
+                  </A>
+                </p>
+                <p>
+                  <A
+                    href={ROUTES.RECOVER_PASSWORD}
+                    onClick={(evt) => {
+                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                      this.props.handleLink(ROUTES.RECOVER_PASSWORD, { keepQuery: true });
+                    }}
+                  >
+                    <FormattedMessage {...messages.recoverPasswordLink} />
+                    <Icon name="arrowRight" text size="1.5em" sizes={{ mobile: '1em' }} />
+                  </A>
+                </p>
+              </BottomLinks>
+            </>
+          )}
+          {ENABLE_AZURE && (
+            <>
+              <p>
+                <FormattedMessage {...messages.signInWithAzureDescription} />
+              </p>
+              <div>
+                {!authSending && (
+                  <AzureButton onClick={() => handleSubmitWithAzure()}>
+                    <FormattedMessage {...messages.submitWithAzure} />
+                  </AzureButton>
+                )}
+                {authSending && <Loading />}
+              </div>
+            </>
+          )}
         </ContentNarrow>
       </div>
     );
@@ -133,6 +168,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
 UserLogin.propTypes = {
   viewDomain: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
+  handleSubmitWithAzure: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
   initialiseForm: PropTypes.func,
@@ -157,6 +193,9 @@ export function mapDispatchToProps(dispatch) {
     handleSubmit: (formData) => {
       dispatch(login(formData.toJS()));
       dispatch(dismissQueryMessages());
+    },
+    handleSubmitWithAzure: () => {
+      dispatch(loginWithAzure());
     },
     handleCancel: () => {
       dispatch(updatePath('/'));

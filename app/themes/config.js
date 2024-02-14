@@ -113,6 +113,7 @@ export const ENDPOINTS = {
   SIGN_OUT: 'auth/sign_out',
   PASSWORD: 'auth/password',
   VALIDATE_TOKEN: 'auth/validate_token',
+  SIGN_IN_AZURE: 'auth/azure_activedirectory_v2',
 };
 
 // API request Authentification keys
@@ -176,6 +177,7 @@ export const REPORT_FREQUENCIES = [
 
 export const DEFAULT_FRAMEWORK = 1;
 export const ENABLE_SDGS = false;
+export const ENABLE_AZURE = true;
 
 // Map server database tables **************************
 export const DB_TABLES = [

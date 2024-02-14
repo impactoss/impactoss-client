@@ -23,7 +23,7 @@ import { getEntityTitle } from 'utils/entities';
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -78,7 +78,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
         icon: 'print',
       });
     }
-    if (userId === sessionUserId) {
+    if (userId === sessionUserId && !ENABLE_AZURE) {
       buttons.push({
         type: 'edit',
         title: intl.formatMessage(messages.editPassword),

@@ -21,6 +21,7 @@ export default function createRoutes(store) {
   const { injectReducer, injectSagas } = getAsyncInjectors(store); // eslint-disable-line no-unused-vars
   const {
     redirectIfSignedIn,
+    redirectIfAzureEnabled,
     redirectIfNotSignedIn,
     redirectIfNotPermitted,
   } = getRedirects(store);
@@ -96,9 +97,26 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: ROUTES.LOGIN_OAUTH_SUCCESS,
+      name: 'userLoginOAuthSuccess',
+      onEnter: redirectIfSignedIn(),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserLoginOAuthSuccess'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
       path: ROUTES.RECOVER_PASSWORD,
       name: 'userPasswordRecover',
-      onEnter: redirectIfSignedIn(),
+      onEnter: redirectIfAzureEnabled(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserPasswordRecover/reducer'),
@@ -119,7 +137,7 @@ export default function createRoutes(store) {
     }, {
       path: ROUTES.RESET_PASSWORD,
       name: 'userPasswordReset',
-      onEnter: redirectIfSignedIn(),
+      onEnter: redirectIfAzureEnabled(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserPasswordReset/reducer'),
@@ -140,7 +158,7 @@ export default function createRoutes(store) {
     }, {
       path: ROUTES.REGISTER,
       name: 'userRegister',
-      onEnter: redirectIfSignedIn(),
+      onEnter: redirectIfAzureEnabled(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserRegister/reducer'),

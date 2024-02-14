@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import { ROUTES, PARAMS } from 'containers/App/constants';
+import { ENABLE_AZURE } from 'themes/config';
 
 import LinkAccount from './LinkAccount';
 import LinkAccountLoading from './LinkAccountLoading';
@@ -75,7 +76,7 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
             </LinkAccount>
           )
         }
-        {!isSignedIn
+        {!isSignedIn && !ENABLE_AZURE
           && (
             <LinkAccount
               href={ROUTES.REGISTER}
