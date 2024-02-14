@@ -51,7 +51,7 @@ const Main = styled.div`
   left: 0;
   right: 0;
   bottom:0;
-  background-color: ${(props) => props.isHome ? 'transparent' : palette('light', 0)};
+  background-color: ${(props) => props.isHome ? 'transparent' : palette('mainBackground', 0)};
   overflow: hidden;
 
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
@@ -104,7 +104,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       label: intl.formatMessage(messages.frameworks.all),
       active: (activeId === 'all') || frameworks.size === 0,
     });
-  }
+  };
 
   prepareMainMenuItems = (
     isManager,
@@ -176,7 +176,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       ]);
     }
     return navItems;
-  }
+  };
 
   render() {
     const {

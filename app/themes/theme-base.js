@@ -196,6 +196,8 @@ theme.palette = {
   // UI PALETTES //////////////////////////////////////////////////////////////
   //
 
+  // main background
+  mainBackground: ['#f2f3f4'],
   // text
   // [#primaryFont, #secondaryFont, #inverse]
   text: [dark[0], dark[1], primary[4]],
