@@ -321,7 +321,7 @@
   "app.containers.App.attributes.manager_id.categories": "Category manager",
   "app.containers.App.attributes.manager_id.categoriesEmpty": "No category manager assigned",
   "app.containers.App.attributes.manager_id.indicatorsEmpty": "No indicator contributor assigned",
-  "app.containers.App.attributes.meta.title": "Meta",
+  "app.containers.App.attributes.meta.title": "History",
   "app.containers.App.attributes.meta.updated_by": "Updated by",
   "app.containers.App.attributes.meta.updated_at": "Last updated",
   "app.containers.App.attributes.meta.created_at": "Created",
