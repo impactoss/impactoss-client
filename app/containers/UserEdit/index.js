@@ -186,6 +186,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       onCreateOption,
     } = this.props;
     const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
+    const isAdmin = sessionUserHighestRoleId <= USER_ROLES.ADMIN.value;
 
     const reference = this.props.params.id;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
@@ -266,7 +267,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                   },
                   body: {
                     main: this.getBodyMainFields(viewEntity),
-                    aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER.value) && this.getBodyAsideFields(taxonomies, onCreateOption),
+                    aside: isAdmin && this.getBodyAsideFields(taxonomies, onCreateOption),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}

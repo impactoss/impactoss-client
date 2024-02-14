@@ -16,7 +16,7 @@ import {
 import {
   entitiesSetAssociated,
   entitySetUser,
-  usersByRole,
+  usersByMinimumRole,
   prepareTaxonomiesMultiple,
 } from 'utils/entities';
 
@@ -88,7 +88,7 @@ export const selectRecommendationsByFw = createSelector(
 export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
-  (entities, associations) => usersByRole(
+  (entities, associations) => usersByMinimumRole(
     entities,
     associations,
     USER_ROLES.CONTRIBUTOR.value,
