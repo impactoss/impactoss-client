@@ -102,14 +102,14 @@ const primary = coolorsToHex('https://coolors.co/73018e-510064-360441-ffffff-fff
 // 2: secondary colour, main / white/placeholder
 // 3: white/placeholder
 // 4: white/placeholder
-const secondary = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-ffffff');
+const secondary = coolorsToHex('https://coolors.co/ba5d03-ffffff-ffffff-ffffff-ffffff');
 // dark grayscale: dark to light
 // 0:  darkest (AA)
 // 1:  darker (AA)
 // 2:  dark (AA)
 // 3:  medium gray 1 (AA) --- !!! AA compatible with light[0]
 // 4:  medium gray 2 (AA large)
-const dark = coolorsToHex('https://coolors.co/1c2121-232b2b-323e3e-687271-8d9696');
+const dark = coolorsToHex('https://coolors.co/1e1f1f-6b6f73-73777b-cfd0d1-dfe1e3');
 // light grayscale: light to dark
 // 0:  lightest gray (background colour) - also used in global-styles.js !!! AA compatible with dark[3]
 // 1:  light gray (light lines, navigation filter panel)
@@ -198,7 +198,7 @@ theme.palette = {
 
   // text
   // [#primaryFont, #secondaryFont, #inverse]
-  text: [dark[0], dark[3], primary[4]],
+  text: [dark[0], dark[1], primary[4]],
   background: [primary[4], light[0], secondary[0]],
 
   // links
@@ -224,16 +224,16 @@ theme.palette = {
   headerBrandHover: [dark[1], dark[3]], // WARNING component sets opacity
 
   // headerNavPages: [ '#bg' ],
-  headerNavPages: [light[0]],
+  headerNavPages: [secondary[2]],
   // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
-  headerNavPagesItem: [dark[3], primary[4], 'transparent', primary[2]],
-  headerNavPagesItemHover: [dark[2], primary[4], 'transparent', primary[0]],
+  headerNavPagesItem: [dark[0], secondary[0], 'transparent', 'transparent'],
+  headerNavPagesItemHover: [dark[0], secondary[0], 'transparent', 'transparent'],
 
   // headerNavAccount: [ '#bg' ],
   headerNavAccount: ['transparent'],
   // headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border' ]
-  headerNavAccountItem: [primary[4], primary[4], dark[2], primary[2], dark[0]],
-  headerNavAccountItemHover: [primary[4], primary[4], dark[1], primary[2], dark[2]],
+  headerNavAccountItem: [dark[0], secondary[0], 'transparent', 'transparent', dark[0]],
+  headerNavAccountItemHover: [dark[0], secondary[0], 'transparent', 'transparent', dark[0]],
 
   // headerNavMain: [ '#bg', '#border'  ],
   headerNavMain: [secondary[4], secondary[4]],
@@ -256,12 +256,15 @@ theme.palette = {
 
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
-  asideListItem: [dark[2], primary[4], primary[4], dark[2], light[0]],
-  asideListItemHover: [dark[1], primary[4], primary[4], dark[2], light[0]],
+  asideListItem: [dark[0], dark[0], primary[4], light[0], light[0]],
+  asideListItemHover: [dark[0], dark[0], light[2], light[2], light[0]],
 
   // asideHeader: [#color, '#bg',]
-  asideListGroup: [dark[2], light[1]],
-  asideListGroupHover: [dark[3], light[0]],
+  asideListGroup: [dark[1], light[0]],
+  asideListGroupHover: [dark[1], light[0]],
+
+  // mainListHeader
+  mainListHeader: [dark[2], primary[4]],
 
   // mainListItem: [#color, '#bg',], eg category and entity list items
   mainListItem: [dark[0], primary[4]],
@@ -276,7 +279,7 @@ theme.palette = {
   // BUTTONS / LINKS
   //
   // button: ['#colorPrimary', '#colorSecondary', #disabled],
-  buttonFlat: [primary[1], dark[3], light[4]], // aka ghost button
+  buttonFlat: [primary[1], dark[1], light[4]], // aka ghost button
   buttonFlatHover: [primary[0], primary[1]],
   buttonCancel: [dark[3]], // form footer cancel
   buttonCancelHover: [primary[1]],
@@ -296,6 +299,9 @@ theme.palette = {
   // ButtonInverse: ['#color', '#bg'],
   buttonInverse: [primary[2], primary[4]], // used for taxonomy tags, background only
   buttonInverseHover: [primary[0], primary[4]],
+
+  // checkbox
+  checkbox: [dark[2]],
 };
 
 // fonts
