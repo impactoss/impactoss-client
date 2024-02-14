@@ -7,13 +7,24 @@ import { palette } from 'styled-theme';
 import Link from 'containers/Link';
 import { ROUTES } from 'containers/App/constants';
 
+const ListEntitiesGroupHeaderWrapper = styled.div`
+padding: ${({ separated }) => separated ? '5px 0 10px' : '0'};
+background:  ${palette('secondary', 1)};
+margin-top: 10px;
+@media print {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  page-break-inside: avoid;
+  border-top: 1px solid ${palette('light', 1)};
+}
+`;
+
 const ListEntitiesGroupHeaderLink = styled(Link)`
   color: ${palette('link', 2)};
   &:hover {
     color: ${palette('linkHover', 2)};
   }
 `;
-
 
 const ListEntitiesGroupHeader = styled.h3`
   margin-top: 15px;
@@ -40,6 +51,7 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
     if (group.get('id') === 'without') {
       return level === 1
         ? (
+
           <ListEntitiesGroupHeader>
             {group.get('label')}
           </ListEntitiesGroupHeader>
@@ -52,18 +64,22 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
     }
     return level === 1
       ? (
-        <ListEntitiesGroupHeaderLink to={`${ROUTES.CATEGORIES}/${group.get('id')}`}>
-          <ListEntitiesGroupHeader>
-            {group.get('label')}
-          </ListEntitiesGroupHeader>
-        </ListEntitiesGroupHeaderLink>
+        <ListEntitiesGroupHeaderWrapper>
+          <ListEntitiesGroupHeaderLink to={`${ROUTES.CATEGORIES}/${group.get('id')}`}>
+            <ListEntitiesGroupHeader>
+              {group.get('label')}
+            </ListEntitiesGroupHeader>
+          </ListEntitiesGroupHeaderLink>
+        </ListEntitiesGroupHeaderWrapper>
       )
       : (
-        <ListEntitiesGroupHeaderLink to={`${ROUTES.CATEGORIES}/${group.get('id')}`}>
-          <ListEntitiesSubgroupHeader>
-            {group.get('label')}
-          </ListEntitiesSubgroupHeader>
-        </ListEntitiesGroupHeaderLink>
+        <ListEntitiesGroupHeaderWrapper>
+          <ListEntitiesGroupHeaderLink to={`${ROUTES.CATEGORIES}/${group.get('id')}`}>
+            <ListEntitiesSubgroupHeader>
+              {group.get('label')}
+            </ListEntitiesSubgroupHeader>
+          </ListEntitiesGroupHeaderLink>
+        </ListEntitiesGroupHeaderWrapper>
       );
   }
 }
