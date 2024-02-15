@@ -234,8 +234,8 @@ theme.palette = {
   // headerNavAccount: [ '#bg' ],
   headerNavAccount: ['transparent'],
   // headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border' ]
-  headerNavAccountItem: [dark[0], secondary[0], 'transparent', 'transparent', dark[0]],
-  headerNavAccountItemHover: [dark[0], secondary[0], 'transparent', 'transparent', dark[0]],
+  headerNavAccountItem: [secondary[4], secondary[4], dark[0], secondary[0], dark[0]],
+  headerNavAccountItemHover: [secondary[4], secondary[4], 'black', 'black', dark[0]],
 
   // headerNavMain: [ '#bg', '#border'  ],
   headerNavMain: [secondary[4], secondary[4]],
