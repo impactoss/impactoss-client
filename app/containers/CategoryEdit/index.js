@@ -38,6 +38,7 @@ import {
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import { canUserDeleteEntities } from 'utils/permissions';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
@@ -60,6 +61,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectIsUserAdmin,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -273,6 +275,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       viewEntity,
       dataReady,
       isAdmin,
+      highestRole,
       viewDomain,
       users,
       connectedTaxonomies,
@@ -369,8 +372,8 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
                 handleUpdate={this.props.handleUpdate}
-                handleDelete={() => isAdmin
-                  ? this.props.handleDelete(viewEntity.getIn(['attributes', 'taxonomy_id']))
+                handleDelete={canUserDeleteEntities(highestRole)
+                  ? () => this.props.handleDelete(viewEntity.getIn(['attributes', 'taxonomy_id']))
                   : null
                 }
                 fields={{
@@ -422,6 +425,7 @@ CategoryEdit.propTypes = {
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
+  highestRole: PropTypes.number,
   params: PropTypes.object,
   parentOptions: PropTypes.object,
   parentTaxonomy: PropTypes.object,
@@ -440,6 +444,7 @@ CategoryEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isAdmin: selectIsUserAdmin(state),
+  highestRole: selectSessionUserHighestRoleId(state),
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
