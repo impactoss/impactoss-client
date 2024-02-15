@@ -15,7 +15,7 @@ import { version } from '../../package.json';
 
 export const SERVER = (process && process.env && process.env.SERVER) || 'development';
 const SERVER_ENDPOINTS = {
-  production: 'https://nz-dev-api.impactoss.org',
+  production: 'https://nz-api.impactoss.org',
   test: 'https://nz-dev-api.impactoss.org',
   development: 'https://nz-dev-6568bd13e406.herokuapp.com',
 };
