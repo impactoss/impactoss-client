@@ -626,7 +626,7 @@
   "app.containers.ReportNew.pageTitle": "New Report for indicator {indicatorReference}",
   "app.containers.ReportNew.metaDescription": "New Report page description",
   "app.containers.ReportNew.header": "New Report",
-  "app.containers.ReportNew.guestNote": "Please note: you are contributing as a guest user. Your report will only be publicly available once verified and published by an authorised user.",
+  "app.containers.ReportNew.draftNote": "Please note: you are limited to creating draft reports. It will only be publicly available once verified and published by an authorised user.",
   "app.containers.ReportView.pageTitle": "Progress report",
   "app.containers.ReportView.metaDescription": "Progress report page description",
   "app.containers.ReportView.notFound": "Sorry no progress report found",

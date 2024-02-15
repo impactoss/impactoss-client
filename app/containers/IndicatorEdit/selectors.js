@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import { USER_ROLES } from 'themes/config';
+import { CONTRIBUTOR_MIN_ROLE_ASSIGNED } from 'themes/config';
 
 import {
   selectEntity,
@@ -91,6 +91,6 @@ export const selectUsers = createSelector(
   (entities, associations) => usersByMinimumRole(
     entities,
     associations,
-    USER_ROLES.CONTRIBUTOR.value,
+    CONTRIBUTOR_MIN_ROLE_ASSIGNED,
   )
 );

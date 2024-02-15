@@ -24,6 +24,7 @@ import {
   SET_AUTHENTICATION_STATE,
   LOAD_ENTITIES_IF_NEEDED,
   REDIRECT_IF_NOT_PERMITTED,
+  REDIRECT_NOT_PERMITTED,
   LOADING_ENTITIES,
   LOAD_ENTITIES_SUCCESS,
   LOAD_ENTITIES_ERROR,
@@ -171,6 +172,12 @@ export function loadEntitiesIfNeeded(path) {
 export function redirectIfNotPermitted(role) {
   return {
     type: REDIRECT_IF_NOT_PERMITTED,
+    role,
+  };
+}
+export function redirectNotPermitted(role) {
+  return {
+    type: REDIRECT_NOT_PERMITTED,
     role,
   };
 }

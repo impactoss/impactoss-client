@@ -6,7 +6,7 @@ import {
   selectRecommendationsCategorised,
   selectFrameworks,
 } from 'containers/App/selectors';
-import { USER_ROLES } from 'themes/config';
+import { CONTRIBUTOR_MIN_ROLE_ASSIGNED } from 'themes/config';
 
 import {
   usersByMinimumRole,
@@ -25,7 +25,7 @@ export const selectUsers = createSelector(
   (entities, associations) => usersByMinimumRole(
     entities,
     associations,
-    USER_ROLES.CONTRIBUTOR.value,
+    CONTRIBUTOR_MIN_ROLE_ASSIGNED,
   )
 );
 

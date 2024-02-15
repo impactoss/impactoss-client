@@ -10,7 +10,7 @@ import {
   selectTaxonomies,
 } from 'containers/App/selectors';
 
-import { USER_ROLES } from 'themes/config';
+import { CATEGORY_MANAGER_MIN_ROLE } from 'themes/config';
 
 import {
   prepareCategory,
@@ -119,7 +119,7 @@ export const selectUsers = createSelector(
   (entities, associations) => usersByMinimumRole(
     entities,
     associations,
-    USER_ROLES.MANAGER.value,
+    CATEGORY_MANAGER_MIN_ROLE,
   )
 );
 
