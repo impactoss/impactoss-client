@@ -3,9 +3,9 @@ import { palette } from 'styled-theme';
 
 import Button from '../Button';
 
-const getFontColor = ({ taxId, isSmartTag }) => {
-  if (!isSmartTag && (taxId === 6 || taxId === 7 || taxId === 8)) {
-    return palette('dark', 0);
+const getFontColor = ({ isSmart, taxId, isHover = false }) => {
+  if (!isSmart && (taxId === 6 || taxId === 7 || taxId === 8)) {
+    return isHover ? palette('dark', 1) : palette('dark', 0);
   }
   return palette('text', 2);
 };
@@ -14,8 +14,8 @@ const getColor = (props, isHover = false) => {
   if (props.isSmartTag) {
     if (props.isSmart) {
       return isHover
-        ? palette('taxonomies', props.taxId || 0)
-        : palette('taxonomiesHover', props.taxId || 0);
+        ? palette('taxonomiesHover', props.taxId || 0)
+        : palette('taxonomies', props.taxId || 0);
     }
     return isHover
       ? palette('smartInactive', 1)
@@ -38,7 +38,7 @@ const ButtonTagCategory = styled(Button)`
   cursor:${(props) => props.disabled ? 'default' : 'pointer'};
   border: 1px solid ${(props) => getColor(props)};
   &:hover {
-    color: ${palette('text', 2)};
+    color: ${(props) => getFontColor(props)};
     background-color: ${(props) => getColor(props, true)};
     border-color: ${(props) => getColor(props, true)};
   }
