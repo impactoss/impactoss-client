@@ -14,8 +14,19 @@
 import { version } from '../../package.json';
 
 export const SERVER = (process && process.env && process.env.SERVER) || 'development';
-export const IS_DEV = SERVER !== 'production';
-export const VERSION = `${version}${IS_DEV ? ' [DEV]' : ''}`;
+const SERVER_ENDPOINTS = {
+  production: 'https://nz-api.impactoss.org',
+  test: 'https://nz-dev-api.impactoss.org',
+  development: 'https://nz-dev-6568bd13e406.herokuapp.com',
+};
+const IS_PROD = SERVER === 'production';
+const IS_TEST = SERVER === 'test';
+// const IS_DEV = SERVER === 'development';
+const version_text = IS_PROD ? '' : ` [${SERVER}]`;
+export const VERSION = `${version}${version_text}`;
+
+// enable azure for test and prod environments but not for dev
+export const ENABLE_AZURE = IS_PROD || IS_TEST;
 
 // default language locale
 export const DEFAULT_LOCALE = 'en-NZ';
@@ -105,9 +116,7 @@ export const CYCLE_TAXONOMY_ID = 2;
 // General ********************
 
 export const ENDPOINTS = {
-  API: IS_DEV
-    ? 'https://nz-dev-api.impactoss.org'
-    : 'https://nz-dev-api.impactoss.org', // server API endpoint
+  API: SERVER_ENDPOINTS[SERVER], // server API endpoint
   SIGNING_URL: 's3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
@@ -177,7 +186,6 @@ export const REPORT_FREQUENCIES = [
 
 export const DEFAULT_FRAMEWORK = 1;
 export const ENABLE_SDGS = false;
-export const ENABLE_AZURE = true;
 
 // Map server database tables **************************
 export const DB_TABLES = [
