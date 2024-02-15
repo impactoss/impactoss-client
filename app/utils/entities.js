@@ -485,9 +485,9 @@ export const hasUserMinimumRole = (user, userRoles, minRoleId) => {
     (association) => qe(
       association.getIn(['attributes', 'user_id']),
       user.get('id'),
-    ) && association.getIn(['attributes', 'role_id']) < minRoleId,
+    ) && association.getIn(['attributes', 'role_id']) <= minRoleId,
   );
-  return !!pass;
+  return pass;
 };
 
 export const usersByMinimumRole = (
