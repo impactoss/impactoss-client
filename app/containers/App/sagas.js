@@ -20,6 +20,7 @@ import {
 import {
   LOAD_ENTITIES_IF_NEEDED,
   REDIRECT_IF_NOT_PERMITTED,
+  REDIRECT_NOT_PERMITTED,
   SAVE_ENTITY,
   SAVE_MULTIPLE_ENTITIES,
   NEW_ENTITY,
@@ -155,6 +156,12 @@ export function* checkRoleSaga({ role }) {
       yield put(replaceUnauthorised(replace));
     }
   }
+}
+/**
+ * Check if user is authorized
+ */
+export function* redirectNotPermittedSaga() {
+  yield put(replaceUnauthorised(replace));
 }
 
 export function* authenticateSaga(payload) {
@@ -751,6 +758,7 @@ export default function* rootSaga() {
 
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);
+  yield takeLatest(REDIRECT_NOT_PERMITTED, redirectNotPermittedSaga);
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
   yield takeEvery(UPDATE_PATH, updatePathSaga);
   yield takeEvery(SET_FRAMEWORK, setFrameworkSaga);

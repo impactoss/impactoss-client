@@ -25,7 +25,10 @@ import {
 
 import { qe } from 'utils/quasi-equals';
 import { getEntityTitleTruncated, getEntityReference } from 'utils/entities';
-
+import {
+  canUserCreateOrEditReports,
+  canUserBeAssignedToReports,
+} from 'utils/permissions';
 import {
   loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages,
 } from 'containers/App/actions';
@@ -40,6 +43,8 @@ import EntityView from 'components/EntityView';
 
 import {
   selectReady,
+  selectSessionUserId,
+  selectSessionUserHighestRoleId,
   selectIsUserContributor,
   selectIsUserManager,
   selectMeasureTaxonomies,
@@ -92,19 +97,19 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       ],
     }]);
 
-  getBodyMainFields = (
+  getBodyMainFields = ({
     entity,
     measures,
     reports,
     measureTaxonomies,
-    isContributor,
     onEntityClick,
     measureConnections,
     recommendationsByFw,
     recommendationTaxonomies,
     recommendationConnections,
     frameworks,
-  ) => {
+    canCreateReports,
+  }) => {
     const { intl } = this.context;
     const fields = [];
     // own attributes
@@ -113,11 +118,13 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
         getMarkdownField(entity, 'description', true),
         getReportsField(
           reports,
-          {
-            type: 'add',
-            title: intl.formatMessage(messages.addReport),
-            onClick: this.props.handleNewReport,
-          }
+          canCreateReports
+            ? {
+              type: 'add',
+              title: intl.formatMessage(messages.addReport),
+              onClick: this.props.handleNewReport,
+            }
+            : null
         ),
       ],
     });
@@ -195,42 +202,53 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       recommendationTaxonomies,
       recommendationConnections,
       frameworks,
+      userId,
+      highestRole,
     } = this.props;
     let buttons = [];
+
+    const hasUserMinimumRole = dataReady && canUserCreateOrEditReports(highestRole);
+    const isUserAssigned = dataReady && viewEntity && canUserBeAssignedToReports(highestRole)
+      && qe(viewEntity.getIn(['attributes', 'manager_id']), userId);
+    const canCreateReports = hasUserMinimumRole || isUserAssigned;
+
     if (dataReady) {
-      buttons.push({
-        type: 'icon',
-        onClick: () => window.print(),
-        title: 'Print',
-        icon: 'print',
-      });
-      buttons = isManager
-        ? buttons.concat([
+      buttons = [
+        ...buttons,
+        {
+          type: 'icon',
+          onClick: () => window.print(),
+          title: 'Print',
+          icon: 'print',
+        },
+      ];
+
+      if (canCreateReports) {
+        buttons = [
+          ...buttons,
           {
             type: 'text',
             title: intl.formatMessage(messages.addReport),
             onClick: this.props.handleNewReport,
           },
+        ];
+      }
+      if (isManager) {
+        buttons = [
+          ...buttons,
           {
             type: 'edit',
             onClick: () => this.props.handleEdit(this.props.params.id),
           },
-          {
-            type: 'close',
-            onClick: this.props.handleClose,
-          },
-        ])
-        : buttons.concat([
-          {
-            type: 'text',
-            title: intl.formatMessage(messages.addReport),
-            onClick: this.props.handleNewReport,
-          },
-          {
-            type: 'close',
-            onClick: this.props.handleClose,
-          },
-        ]);
+        ];
+      }
+      buttons = [
+        ...buttons,
+        {
+          type: 'close',
+          onClick: this.props.handleClose,
+        },
+      ];
     }
 
     const pageTitle = intl.formatMessage(messages.pageTitle);
@@ -285,19 +303,19 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                     aside: this.getHeaderAsideFields(viewEntity, isContributor),
                   },
                   body: {
-                    main: this.getBodyMainFields(
-                      viewEntity,
+                    main: this.getBodyMainFields({
+                      entity: viewEntity,
                       measures,
                       reports,
                       measureTaxonomies,
-                      isContributor,
                       onEntityClick,
                       measureConnections,
                       recommendationsByFw,
                       recommendationTaxonomies,
                       recommendationConnections,
                       frameworks,
-                    ),
+                      canCreateReports,
+                    }),
                     aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
                   },
                 }}
@@ -332,6 +350,8 @@ IndicatorView.propTypes = {
   recommendationConnections: PropTypes.object,
   recommendationsByFw: PropTypes.object,
   frameworks: PropTypes.object,
+  highestRole: PropTypes.number,
+  userId: PropTypes.string,
 };
 
 IndicatorView.contextTypes = {
@@ -354,6 +374,8 @@ const mapStateToProps = (state, props) => ({
   recommendationConnections: selectRecommendationConnections(state),
   queryMessages: selectQueryMessages(state),
   frameworks: selectActiveFrameworks(state),
+  userId: selectSessionUserId(state),
+  highestRole: selectSessionUserHighestRoleId(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

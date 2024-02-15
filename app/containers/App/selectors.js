@@ -407,8 +407,7 @@ export const selectFWIndicators = createSelector(
   selectFWMeasures,
   (state) => selectEntities(state, 'recommendation_indicators'),
   (state) => selectEntities(state, 'measure_indicators'),
-  selectIsUserManager,
-  (entities, frameworkId, recs, measures, recIndicators, measureIndicators, isManager) => {
+  (entities, frameworkId, recs, measures, recIndicators, measureIndicators) => {
     if (
       recs
       && measures
@@ -437,8 +436,7 @@ export const selectFWIndicators = createSelector(
           );
           // consider includes instead of !!find
           return (
-            isManager
-            && recIds.size === 0
+            recIds.size === 0
             && measureIds.size === 0
           ) || recIds.some(
             (id) => !!recs.find(

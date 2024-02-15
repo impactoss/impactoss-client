@@ -17,11 +17,11 @@ import Header from 'components/Header';
 import EntityNew from 'containers/EntityNew';
 
 import { sortEntities } from 'utils/sort';
-
+import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
 import {
   selectIsSignedIn,
-  selectIsUserManager,
   selectSessionUserAttributes,
+  selectSessionUserHighestRoleId,
   selectReady,
   selectFrameworks,
   selectEntitiesWhere,
@@ -107,7 +107,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 
   prepareMainMenuItems = (
-    isManager,
+    highestRole,
     isUserSignedIn,
     currentPath,
     currentFrameworkId,
@@ -149,7 +149,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         currentPath.startsWith(ROUTES.INDICATORS)
         || currentPath.startsWith(ROUTES.PROGRESS_REPORTS),
     }]);
-    if (isManager) {
+    if (canUserManagePages(highestRole)) {
       navItems = navItems.concat([
         {
           path: ROUTES.PAGES,
@@ -157,6 +157,10 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           isAdmin: true,
           active: currentPath === ROUTES.PAGES,
         },
+      ]);
+    }
+    if (canUserManageUsers(highestRole)) {
+      navItems = navItems.concat([
         {
           path: ROUTES.USERS,
           title: intl.formatMessage(messages.nav.users),
@@ -183,7 +187,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       pages,
       onPageLink,
       isUserSignedIn,
-      isManager,
+      highestRole,
       location,
       newEntityModal,
       currentFrameworkId,
@@ -203,7 +207,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           user={user}
           pages={pages && this.preparePageMenuPages(pages)}
           navItems={this.prepareMainMenuItems(
-            isUserSignedIn && isManager,
+            highestRole,
             isUserSignedIn,
             location.pathname,
             currentFrameworkId,
@@ -260,7 +264,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
 App.propTypes = {
   children: PropTypes.node,
   isUserSignedIn: PropTypes.bool,
-  isManager: PropTypes.bool,
+  highestRole: PropTypes.number,
   user: PropTypes.object,
   pages: PropTypes.object,
   validateToken: PropTypes.func,
@@ -280,7 +284,7 @@ App.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  isManager: selectIsUserManager(state),
+  highestRole: selectSessionUserHighestRoleId(state),
   isUserSignedIn: selectIsSignedIn(state),
   user: selectSessionUserAttributes(state),
   pages: selectEntitiesWhere(state, {

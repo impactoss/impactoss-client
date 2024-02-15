@@ -6,7 +6,12 @@ import { getAsyncInjectors } from 'utils/asyncInjectors';
 import { getRedirects } from 'utils/redirects';
 
 import { ROUTES } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import {
+  USER_ROLES,
+  PAGE_ADMIN_MIN_ROLE,
+  USER_ADMIN_MIN_ROLE,
+  CONTRIBUTOR_MIN_ROLE_ASSIGNED,
+} from 'themes/config';
 
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
@@ -179,7 +184,7 @@ export default function createRoutes(store) {
     }, {
       path: ROUTES.USERS,
       name: 'userList',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
+      onEnter: redirectIfNotPermitted(USER_ADMIN_MIN_ROLE),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserList'),
@@ -558,7 +563,7 @@ export default function createRoutes(store) {
     }, {
       path: `${ROUTES.PROGRESS_REPORTS}${ROUTES.NEW}${ROUTES.ID}`, // the indicator id
       name: 'reportNew',
-      onEnter: redirectIfNotSignedIn('signInGuestReport'),
+      onEnter: redirectIfNotPermitted(CONTRIBUTOR_MIN_ROLE_ASSIGNED),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ReportNew/reducer'),
@@ -595,7 +600,7 @@ export default function createRoutes(store) {
     }, {
       path: `${ROUTES.PROGRESS_REPORTS}${ROUTES.EDIT}${ROUTES.ID}`,
       name: 'reportEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR.value),
+      onEnter: redirectIfNotPermitted(CONTRIBUTOR_MIN_ROLE_ASSIGNED),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ReportEdit/reducer'),
@@ -696,7 +701,7 @@ export default function createRoutes(store) {
     }, {
       path: ROUTES.PAGES,
       name: 'pageList',
-      onEnter: redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR.value),
+      onEnter: redirectIfNotPermitted(PAGE_ADMIN_MIN_ROLE),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/PageList'),
@@ -713,7 +718,7 @@ export default function createRoutes(store) {
     }, {
       path: `${ROUTES.PAGES}${ROUTES.NEW}`,
       name: 'pageNew',
-      onEnter: redirectIfNotPermitted(USER_ROLES.ADMIN.value),
+      onEnter: redirectIfNotPermitted(PAGE_ADMIN_MIN_ROLE),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/PageNew/reducer'),
@@ -750,7 +755,7 @@ export default function createRoutes(store) {
     }, {
       path: `${ROUTES.PAGES}${ROUTES.EDIT}${ROUTES.ID}`,
       name: 'pageEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.ADMIN.value),
+      onEnter: redirectIfNotPermitted(PAGE_ADMIN_MIN_ROLE),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/PageEdit/reducer'),

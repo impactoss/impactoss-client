@@ -25,10 +25,15 @@ import {
 
 import {
   getMetaField,
+  getStatusField as getStatusInfoField,
 } from 'utils/fields';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import {
+  canUserDeleteEntities,
+  canUserPublishReports,
+} from 'utils/permissions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
@@ -47,7 +52,7 @@ import {
 import {
   selectReady,
   selectReadyForAuthCheck,
-  selectIsUserAdmin,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -89,7 +94,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
       this.props.initialiseForm('reportEdit.form.data', this.getInitialFormData(nextProps));
     }
     if (nextProps.authReady && !this.props.authReady) {
-      this.props.redirectIfNotPermitted();
+      this.props.onRedirectIfNotPermitted();
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
       scrollToTop(this.scrollContainer.current);
@@ -125,12 +130,14 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     ]);
   };
 
-  getHeaderAsideFields = (entity) => {
+  getHeaderAsideFields = (entity, canUserPublish) => {
     const { intl } = this.context;
     return ([
       {
         fields: [
-          getStatusField(intl.formatMessage),
+          canUserPublish
+            ? getStatusField(intl.formatMessage)
+            : getStatusInfoField(entity),
           getMetaField(entity),
         ],
       },
@@ -252,14 +259,17 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
                 handleUpdate={this.props.handleUpdate}
-                handleDelete={() => this.props.isUserAdmin
-                  ? this.props.handleDelete(viewEntity.getIn(['attributes', 'indicator_id']))
+                handleDelete={canUserDeleteEntities(this.props.highestRole)
+                  ? () => this.props.handleDelete(viewEntity.getIn(['attributes', 'indicator_id']))
                   : null
                 }
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(),
-                    aside: this.getHeaderAsideFields(viewEntity),
+                    aside: this.getHeaderAsideFields(
+                      viewEntity,
+                      canUserPublishReports(this.props.highestRole),
+                    ),
                   },
                   body: {
                     main: this.getBodyMainFields(),
@@ -281,7 +291,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
 
 ReportEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  redirectIfNotPermitted: PropTypes.func,
+  onRedirectIfNotPermitted: PropTypes.func,
   initialiseForm: PropTypes.func,
   handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
@@ -293,7 +303,7 @@ ReportEdit.propTypes = {
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
-  isUserAdmin: PropTypes.bool,
+  highestRole: PropTypes.number,
   params: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
@@ -305,7 +315,7 @@ ReportEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
-  isUserAdmin: selectIsUserAdmin(state),
+  highestRole: selectSessionUserHighestRoleId(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
@@ -319,7 +329,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('due_dates'));
       dispatch(loadEntitiesIfNeeded('indicators'));
     },
-    redirectIfNotPermitted: () => {
+    onRedirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR.value));
     },
     initialiseForm: (model, formData) => {

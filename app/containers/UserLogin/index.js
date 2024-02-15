@@ -13,7 +13,7 @@ import styled from 'styled-components';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
-  getEmailField,
+  getEmailFormField,
   getPasswordField,
 } from 'utils/forms';
 
@@ -109,7 +109,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                     handleCancel={handleCancel}
                     labels={{ submit: intl.formatMessage(messages.submit) }}
                     fields={[
-                      getEmailField(intl.formatMessage, '.email'),
+                      getEmailFormField(intl.formatMessage, '.email'),
                       getPasswordField(intl.formatMessage, '.password'),
                     ]}
                   />

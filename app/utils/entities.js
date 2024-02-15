@@ -480,6 +480,24 @@ export const prepareCategory = (
   return null;
 };
 
+export const hasUserMinimumRole = (user, userRoles, minRoleId) => {
+  const pass = !!userRoles.find(
+    (association) => qe(
+      association.getIn(['attributes', 'user_id']),
+      user.get('id'),
+    ) && association.getIn(['attributes', 'role_id']) <= minRoleId,
+  );
+  return pass;
+};
+
+export const usersByMinimumRole = (
+  users,
+  userRoles,
+  roleId,
+) => users && users.filter(
+  (user) => hasUserMinimumRole(user, userRoles, roleId)
+);
+
 export const usersByRole = (
   users,
   userRoles,

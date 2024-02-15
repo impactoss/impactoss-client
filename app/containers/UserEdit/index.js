@@ -17,7 +17,7 @@ import {
   renderTaxonomyControl,
   getCategoryUpdatesFromFormData,
   getTitleFormField,
-  getEmailField,
+  getEmailFormField,
   getHighestUserRoleId,
   getRoleFormField,
 } from 'utils/forms';
@@ -25,6 +25,8 @@ import {
 import {
   getMetaField,
   getRoleField,
+  getTitleField,
+  getEmailField,
 } from 'utils/fields';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -45,13 +47,15 @@ import {
 } from 'containers/App/selectors';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
 
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+
+import appMessages from 'containers/App/messages';
 
 import {
   selectDomain,
@@ -62,6 +66,7 @@ import {
 
 import { save } from './actions';
 import messages from './messages';
+
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class UserEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -105,33 +110,44 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     });
   }
 
-  getHeaderMainFields = () => {
+  getHeaderMainFields = (entity, isManager) => {
     const { intl } = this.context;
+    if (!ENABLE_AZURE) {
+      return ([{ // fieldGroup
+        fields: [getTitleFormField(intl.formatMessage, 'title', 'name')],
+      }]);
+    }
     return ([{ // fieldGroup
-      fields: [getTitleFormField(intl.formatMessage, 'title', 'name')],
+      fields: [getTitleField(entity, isManager, 'name', appMessages.attributes.name)],
     }]);
   };
 
   getHeaderAsideFields = (entity, roles) => {
     const { intl } = this.context;
-    return ([
-      {
-        fields: (roles && roles.size > 0) ? [
-          getRoleFormField(intl.formatMessage, roles),
-          getMetaField(entity),
-        ]
-          : [
-            getRoleField(entity),
-            getMetaField(entity),
-          ],
-      },
-    ]);
+    let fields = [];
+    if (!ENABLE_AZURE && roles && roles.size > 0) {
+      fields = [
+        getRoleFormField(intl.formatMessage, roles),
+      ];
+    } else {
+      fields = [
+        getRoleField(entity),
+      ];
+    }
+    fields = [...fields, getMetaField(entity)];
+
+    return ([{ fields }]);
   };
 
-  getBodyMainFields = () => {
+  getBodyMainFields = (entity) => {
     const { intl } = this.context;
+    if (!ENABLE_AZURE) {
+      return ([{
+        fields: [getEmailFormField(intl.formatMessage)],
+      }]);
+    }
     return ([{
-      fields: [getEmailField(intl.formatMessage)],
+      fields: [getEmailField(entity)],
     }]);
   };
 
@@ -161,8 +177,17 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   render() {
     const { intl } = this.context;
     const {
-      viewEntity, dataReady, viewDomain, taxonomies, roles, sessionUserHighestRoleId, onCreateOption,
+      viewEntity,
+      dataReady,
+      viewDomain,
+      taxonomies,
+      roles,
+      sessionUserHighestRoleId,
+      onCreateOption,
     } = this.props;
+    const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
+    const isAdmin = sessionUserHighestRoleId <= USER_ROLES.ADMIN.value;
+
     const reference = this.props.params.id;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
@@ -237,12 +262,12 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 handleUpdate={this.props.handleUpdate}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
+                    main: this.getHeaderMainFields(viewEntity, isManager),
                     aside: this.getHeaderAsideFields(viewEntity, editableRoles),
                   },
                   body: {
-                    main: this.getBodyMainFields(),
-                    aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER.value) && this.getBodyAsideFields(taxonomies, onCreateOption),
+                    main: this.getBodyMainFields(viewEntity),
+                    aside: isAdmin && this.getBodyAsideFields(taxonomies, onCreateOption),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
