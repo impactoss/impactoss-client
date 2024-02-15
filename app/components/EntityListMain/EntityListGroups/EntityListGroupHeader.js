@@ -9,7 +9,6 @@ import { ROUTES } from 'containers/App/constants';
 
 const ListEntitiesGroupHeaderWrapper = styled.div`
 padding: ${({ separated }) => separated ? '5px 0 10px' : '0'};
-background:  ${palette('secondary', 1)};
 margin-top: 10px;
 @media print {
   margin-top: 20px;
