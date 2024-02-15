@@ -172,7 +172,7 @@ theme.palette = {
   // bg inactive, bg hover, icon
   smartInactive: [
     '#DBE1E1', // SMART inactive - NOT ACCESSIBLE
-    '#656F75', // SMART inactive hover
+    '#CFD0D1', // SMART inactive hover
     '#9BABAB', // SMART icon
   ],
 
@@ -249,7 +249,7 @@ theme.palette = {
   // aside: ['#bg']
   aside: [primary[4]],
   // asideHeader: ['#bg']
-  asideHeader: [light[0]],
+  asideHeader: [primary[4]],
 
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
@@ -270,7 +270,7 @@ theme.palette = {
 
   // mainListItem: [#color, '#bg',], eg category and entity list items
   mainListItem: [dark[0], primary[4]],
-  mainListItemHover: [dark[3], primary[4]],
+  mainListItemHover: [dark[1], primary[4]],
 
   // multiselect header [#color, #bg]
   // compare asideListItem
@@ -290,7 +290,7 @@ theme.palette = {
   buttonDefaultHover: [primary[4], primary[0]],
   buttonDefaultDisabled: [light[0], dark[3]], // with background disabled
   // buttonPrimary: ['#text', '#bg', '#border'],
-  buttonDefaultIconOnly: [primary[4], primary[2], primary[1]], // with background, without text
+  buttonDefaultIconOnly: [primary[4], primary[0], primary[2]], // with background, without text
   buttonDefaultIconOnlyHover: [primary[4], primary[0], primary[0]],
   // buttonSecondary: ['#text', '#bg'],
   // buttonSecondary: [secondary[4], secondary[1]],
