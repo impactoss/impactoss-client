@@ -224,6 +224,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
               currentFrameworkId,
             )
             : null}
+          currentPath={location.pathname}
         />
         <Main isHome={location.pathname === '/'}>
           {React.Children.toArray(children)}
