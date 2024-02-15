@@ -41,10 +41,7 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
 
   render() {
     const { isSignedIn, currentPath, user } = this.props;
-
     const userPath = user ? `${ROUTES.USERS}/${user.id}` : '';
-    // console.log(userPath);
-    // console.log(currentPath);
     return (
       <Styled>
         {isSignedIn && user
