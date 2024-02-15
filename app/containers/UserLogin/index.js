@@ -146,9 +146,6 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
           )}
           {ENABLE_AZURE && (
             <>
-              <p>
-                <FormattedMessage {...messages.signInWithAzureDescription} />
-              </p>
               <div>
                 {!authSending && (
                   <AzureButton onClick={() => handleSubmitWithAzure()}>
