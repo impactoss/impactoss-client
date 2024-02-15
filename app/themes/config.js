@@ -186,6 +186,15 @@ export const REPORT_FREQUENCIES = [
 
 export const DEFAULT_FRAMEWORK = 1;
 export const ENABLE_SDGS = false;
+// set to min role required or null to disable
+export const DELETE_MIN_ROLE = null;
+export const PAGE_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value;
+export const USER_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value;
+export const CATEGORY_MANAGER_MIN_ROLE = USER_ROLES.MANAGER.value;
+export const CONTRIBUTOR_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create
+export const CONTRIBUTOR_MIN_ROLE_PUBLISH = USER_ROLES.MANAGER.value; // publish
+export const CONTRIBUTOR_MIN_ROLE_ASSIGNED = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
+export const SEE_DRAFT_MIN_ROLE = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
 
 // Map server database tables **************************
 export const DB_TABLES = [
