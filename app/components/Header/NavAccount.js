@@ -19,7 +19,6 @@ const Styled = styled.div`
   }
 `;
 
-
 class NavAccount extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   onClick = (evt, path, currentPath) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -37,13 +36,14 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
     } else {
       this.props.onPageLink(evt, path);
     }
-  }
+  };
 
   render() {
     const { isSignedIn, currentPath, user } = this.props;
 
     const userPath = user ? `${ROUTES.USERS}/${user.id}` : '';
-
+    // console.log(userPath);
+    // console.log(currentPath);
     return (
       <Styled>
         {isSignedIn && user
