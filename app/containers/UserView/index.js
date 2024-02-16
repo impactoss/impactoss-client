@@ -19,6 +19,7 @@ import {
 } from 'utils/fields';
 
 import { getEntityTitle } from 'utils/entities';
+import { canUserManageUsers } from 'utils/permissions';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
@@ -69,35 +70,47 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
   }) => {
     const { intl } = this.context;
     const userId = user.get('id') || user.getIn(['attributes', 'id']);
-    const buttons = [];
+    let buttons = [];
     if (dataReady) {
-      buttons.push({
-        type: 'icon',
-        onClick: () => window.print(),
-        title: 'Print',
-        icon: 'print',
-      });
+      buttons = [
+        ...buttons,
+        {
+          type: 'icon',
+          onClick: () => window.print(),
+          title: 'Print',
+          icon: 'print',
+        },
+      ];
     }
     if (userId === sessionUserId && !ENABLE_AZURE) {
-      buttons.push({
-        type: 'edit',
-        title: intl.formatMessage(messages.editPassword),
-        onClick: () => handleEditPassword(userId),
-      });
+      buttons = [
+        ...buttons,
+        {
+          type: 'edit',
+          title: intl.formatMessage(messages.editPassword),
+          onClick: () => handleEditPassword(userId),
+        },
+      ];
     }
-    if (sessionUserHighestRoleId === USER_ROLES.ADMIN.value // is admin
-      || userId === sessionUserId // own profile
-      || sessionUserHighestRoleId < this.getHighestUserRoleId(user.get('roles'))
+    if (
+      canUserManageUsers(sessionUserHighestRoleId)
+      || (userId === sessionUserId && !ENABLE_AZURE)
     ) {
-      buttons.push({
-        type: 'edit',
-        onClick: () => handleEdit(userId),
-      });
+      buttons = [
+        ...buttons,
+        {
+          type: 'edit',
+          onClick: () => handleEdit(userId),
+        },
+      ];
     }
-    buttons.push({
-      type: 'close',
-      onClick: handleClose,
-    });
+    buttons = [
+      ...buttons,
+      {
+        type: 'close',
+        onClick: handleClose,
+      },
+    ];
     return buttons;
   };
 
