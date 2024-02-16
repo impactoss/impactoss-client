@@ -22,7 +22,12 @@ import { getEntityTitle } from 'utils/entities';
 import { canUserManageUsers } from 'utils/permissions';
 import qe from 'utils/quasi-equals';
 
-import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  updatePath,
+  closeEntity,
+  redirectNotPermitted,
+} from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
@@ -36,6 +41,7 @@ import {
   selectReady,
   selectSessionUserId,
   selectSessionUserHighestRoleId,
+  selectReadyForAuthCheck,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -57,6 +63,17 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     // reload entities if not ready or no longer ready (eg invalidated)
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    // redirect if user not found, assuming no permissions
+    if (nextProps.dataReady && nextProps.authReady && !nextProps.user) {
+      this.props.onRedirectNotPermitted();
+    }
+    if (nextProps.dataReady && nextProps.authReady && nextProps.user) {
+      const canView = canUserManageUsers(nextProps.sessionUserHighestRoleId)
+        || (nextProps.user.get('id') === nextProps.sessionUserId);
+      if (!canView) {
+        this.props.onRedirectNotPermitted();
+      }
     }
   }
 
@@ -204,6 +221,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
 UserView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  onRedirectNotPermitted: PropTypes.func,
   // handleEdit: PropTypes.func,
   // handleEditPassword: PropTypes.func,
   // handleClose: PropTypes.func,
@@ -222,6 +240,7 @@ UserView.contextTypes = {
 const mapStateToProps = (state, props) => ({
   sessionUserHighestRoleId: selectSessionUserHighestRoleId(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   sessionUserId: selectSessionUserId(state),
   user: selectViewEntity(state, props.params.id),
   // all connected categories for all user-taggable taxonomies
@@ -232,6 +251,9 @@ function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
+    },
+    onRedirectNotPermitted: () => {
+      dispatch(redirectNotPermitted());
     },
     handleEdit: (userId) => {
       dispatch(updatePath(`${ROUTES.USERS}${ROUTES.EDIT}/${userId}`, { replace: true }));
