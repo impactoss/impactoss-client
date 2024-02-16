@@ -20,6 +20,7 @@ import {
 
 import { getEntityTitle } from 'utils/entities';
 import { canUserManageUsers } from 'utils/permissions';
+import qe from 'utils/quasi-equals';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
@@ -142,7 +143,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
   render() {
     const { intl } = this.context;
     const {
-      user, dataReady, sessionUserHighestRoleId, taxonomies,
+      user, dataReady, sessionUserHighestRoleId, taxonomies, sessionUserId,
     } = this.props;
     const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
 
@@ -150,7 +151,10 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     const metaTitle = user
       ? `${pageTitle}: ${getEntityTitle(user)}`
       : `${pageTitle} ${this.props.params.id}`;
-
+    const canSeeAside = dataReady && (
+      canUserManageUsers(sessionUserHighestRoleId)
+      || qe(user.get('id'), sessionUserId)
+    );
     return (
       <div>
         <Helmet
@@ -182,11 +186,11 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(user, isManager),
-                    aside: isManager && this.getHeaderAsideFields(user),
+                    aside: canSeeAside && this.getHeaderAsideFields(user),
                   },
                   body: {
                     main: this.getBodyMainFields(user),
-                    aside: isManager && this.getBodyAsideFields(taxonomies),
+                    aside: canSeeAside && this.getBodyAsideFields(taxonomies),
                   },
                 }}
               />
@@ -208,7 +212,7 @@ UserView.propTypes = {
   dataReady: PropTypes.bool,
   sessionUserHighestRoleId: PropTypes.number,
   params: PropTypes.object,
-  // sessionUserId: PropTypes.string,
+  sessionUserId: PropTypes.string,
 };
 
 UserView.contextTypes = {
