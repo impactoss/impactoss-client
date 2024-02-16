@@ -19,7 +19,7 @@ import {
 } from 'utils/fields';
 
 import { getEntityTitle } from 'utils/entities';
-import { canUserManageUsers } from 'utils/permissions';
+import { canUserManageUsers, canUserSeeMeta } from 'utils/permissions';
 import qe from 'utils/quasi-equals';
 
 import {
@@ -136,12 +136,24 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     fields: [getTitleField(entity, isManager, 'name', appMessages.attributes.name)],
   }]);
 
-  getHeaderAsideFields = (entity) => ([{
-    fields: [
-      getRoleField(entity),
-      getMetaField(entity),
-    ],
-  }]);
+  getHeaderAsideFields = (entity, userId, highestRole) => {
+    let fields = [];
+    const canSeeRole = canUserManageUsers(highestRole)
+      || qe(entity.get('id'), userId);
+    if (canSeeRole) {
+      fields = [
+        ...fields,
+        getRoleField(entity),
+      ];
+    }
+    if (canUserSeeMeta(highestRole)) {
+      fields = [
+        ...fields,
+        getMetaField(entity),
+      ];
+    }
+    return [{ fields }];
+  };
 
   getBodyMainFields = (entity) => ([{
     fields: [getEmailField(entity)],
@@ -168,10 +180,12 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     const metaTitle = user
       ? `${pageTitle}: ${getEntityTitle(user)}`
       : `${pageTitle} ${this.props.params.id}`;
-    const canSeeAside = dataReady && (
+
+    const canSeeOrg = dataReady && (
       canUserManageUsers(sessionUserHighestRoleId)
       || qe(user.get('id'), sessionUserId)
     );
+
     return (
       <div>
         <Helmet
@@ -203,11 +217,11 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(user, isManager),
-                    aside: canSeeAside && this.getHeaderAsideFields(user),
+                    aside: this.getHeaderAsideFields(user, sessionUserId, sessionUserHighestRoleId),
                   },
                   body: {
                     main: this.getBodyMainFields(user),
-                    aside: canSeeAside && this.getBodyAsideFields(taxonomies),
+                    aside: canSeeOrg && this.getBodyAsideFields(taxonomies),
                   },
                 }}
               />

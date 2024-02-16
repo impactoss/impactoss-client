@@ -89,13 +89,12 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     },
   ]);
 
-  getHeaderAsideFields = (entity, isContributor) => isContributor
-    && ([{
-      fields: [
-        getStatusField(entity),
-        getMetaField(entity),
-      ],
-    }]);
+  getHeaderAsideFields = (entity) => ([{
+    fields: [
+      getStatusField(entity),
+      getMetaField(entity),
+    ],
+  }]);
 
   getBodyMainFields = ({
     entity,
@@ -300,7 +299,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(viewEntity, isContributor),
-                    aside: this.getHeaderAsideFields(viewEntity, isContributor),
+                    aside: isManager && this.getHeaderAsideFields(viewEntity),
                   },
                   body: {
                     main: this.getBodyMainFields({
