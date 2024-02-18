@@ -498,7 +498,7 @@
   "app.containers.App.ui.userRoles.admin": "Administrator",
   "app.containers.App.ui.userRoles.manager": "Manager",
   "app.containers.App.ui.userRoles.contributor": "Contributor",
-  "app.containers.App.ui.userRoles.default": "Archived user (without permissions)",
+  "app.containers.App.ui.userRoles.default": "No role assigned",
   "app.containers.App.ui.publishStatuses.draft": "Draft",
   "app.containers.App.ui.publishStatuses.public": "Public",
   "app.containers.App.ui.docPublishStatuses.public": "Public",

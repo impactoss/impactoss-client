@@ -28,6 +28,7 @@ import {
   getTitleField,
   getEmailField,
 } from 'utils/fields';
+import { canUserManageUsers } from 'utils/permissions';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
@@ -39,11 +40,14 @@ import {
   submitInvalid,
   saveErrorDismiss,
   openNewEntityModal,
+  redirectNotPermitted,
 } from 'containers/App/actions';
 
 import {
   selectReady,
   selectSessionUserHighestRoleId,
+  selectReadyForAuthCheck,
+  selectSessionUserId,
 } from 'containers/App/selectors';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
@@ -89,6 +93,13 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     }
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.initialiseForm('userEdit.form.data', this.getInitialFormData(nextProps));
+    }
+    if (nextProps.dataReady && nextProps.authReady && nextProps.viewEntity) {
+      const canEdit = canUserManageUsers(nextProps.sessionUserHighestRoleId)
+        || (nextProps.viewEntity.get('id') === nextProps.sessionUserId && !ENABLE_AZURE);
+      if (!canEdit) {
+        this.props.onRedirectNotPermitted();
+      }
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
       scrollToTop(this.scrollContainer.current);
@@ -301,6 +312,9 @@ UserEdit.propTypes = {
   onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
+  onRedirectNotPermitted: PropTypes.func,
+  // authReady: PropTypes.bool,
+  // sessionUserId: PropTypes.string, // used in nextProps
 };
 
 UserEdit.contextTypes = {
@@ -311,9 +325,11 @@ const mapStateToProps = (state, props) => ({
   sessionUserHighestRoleId: selectSessionUserHighestRoleId(state),
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   roles: selectRoles(state, props.params.id),
+  sessionUserId: selectSessionUserId(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -324,6 +340,9 @@ function mapDispatchToProps(dispatch) {
     initialiseForm: (model, formData) => {
       dispatch(formActions.reset(model));
       dispatch(formActions.change(model, formData, { silent: true }));
+    },
+    onRedirectNotPermitted: () => {
+      dispatch(redirectNotPermitted());
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));

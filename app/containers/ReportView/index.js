@@ -110,7 +110,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
       && canUserBeAssignedToReports(highestRole)
       && viewEntity.get('indicator')
       && qe(viewEntity.get('indicator').getIn(['attributes', 'manager_id']), sessionUserId);
-    const canEdit = hasUserMinimumRole || isUserAssigned;
+    const canEdit = hasUserMinimumRole || (isUserAssigned && viewEntity.getIn(['attributes', 'draft']));
 
     let buttons = [];
     if (dataReady) {

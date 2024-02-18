@@ -31,16 +31,22 @@ import {
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 import {
+  canUserCreateOrEditReports,
+  canUserBeAssignedToReports,
   canUserDeleteEntities,
   canUserPublishReports,
 } from 'utils/permissions';
 
+import qe from 'utils/quasi-equals';
+
+
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { CONTRIBUTOR_MIN_ROLE_ASSIGNED } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
   loadEntitiesIfNeeded,
+  redirectNotPermitted,
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
@@ -53,6 +59,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectSessionUserHighestRoleId,
+  selectSessionUserId,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -93,8 +100,25 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.initialiseForm('reportEdit.form.data', this.getInitialFormData(nextProps));
     }
-    if (nextProps.authReady && !this.props.authReady) {
+    if (nextProps.authReady) {
       this.props.onRedirectIfNotPermitted();
+    }
+    if (nextProps.dataReady && nextProps.authReady && nextProps.viewEntity) {
+      // to allow creating it requires
+      // user to have CONTRIBUTOR_MIN_ROLE
+      // OR
+      //    user to have CONTRIBUTOR_MIN_ROLE_ASSIGNED
+      //    AND
+      //    user to be assigned
+      //
+      // otherwise redirect to unauthorised
+      const hasUserMinimumRole = canUserCreateOrEditReports(nextProps.highestRole);
+      const isUserAssigned = canUserBeAssignedToReports(nextProps.highestRole)
+        && qe(nextProps.viewEntity.get('indicator').getIn(['attributes', 'manager_id']), nextProps.userId);
+      const canEdit = hasUserMinimumRole || (isUserAssigned && nextProps.viewEntity.getIn(['attributes', 'draft']));
+      if (!canEdit) {
+        this.props.onRedirectNotPermitted();
+      }
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
       scrollToTop(this.scrollContainer.current);
@@ -292,6 +316,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
 ReportEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onRedirectIfNotPermitted: PropTypes.func,
+  onRedirectNotPermitted: PropTypes.func,
   initialiseForm: PropTypes.func,
   handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
@@ -307,6 +332,7 @@ ReportEdit.propTypes = {
   params: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
+  // userId: PropTypes.string, // used in nextProps
 };
 
 ReportEdit.contextTypes = {
@@ -319,6 +345,7 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
+  userId: selectSessionUserId(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -330,7 +357,10 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('indicators'));
     },
     onRedirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR.value));
+      dispatch(redirectIfNotPermitted(CONTRIBUTOR_MIN_ROLE_ASSIGNED));
+    },
+    onRedirectNotPermitted: () => {
+      dispatch(redirectNotPermitted());
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
