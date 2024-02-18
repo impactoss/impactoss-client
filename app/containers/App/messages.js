@@ -1447,7 +1447,11 @@ export default defineMessages({
     },
     signingInServer: {
       id: 'app.containers.App.messages.signingInServer',
-      defaultMessage: 'Note: signing in to database: {server}',
+      defaultMessage: 'Note: signing in to {server} database',
+    },
+    registeringServer: {
+      id: 'app.containers.App.messages.registeringServer',
+      defaultMessage: 'Note: registering for {server} database',
     },
   },
   ui: {
