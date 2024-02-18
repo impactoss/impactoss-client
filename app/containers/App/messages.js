@@ -1445,6 +1445,10 @@ export default defineMessages({
       id: 'app.containers.App.messages.createdAsGuest',
       defaultMessage: '{entityType} created successfully. It will become publicly available once verified and published by an authorised user.',
     },
+    signingInServer: {
+      id: 'app.containers.App.messages.signingInServer',
+      defaultMessage: 'Note: signing in to database: {server}',
+    },
   },
   ui: {
     userRoles: {
