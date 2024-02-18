@@ -1,16 +1,25 @@
+import { version } from '../../package.json';
 /*
- * Global config
- *
- * Theme and icons:
- * - theme file is set in app.js "import theme from 'themes/[theme-file]';"
- * - icon file is set in components/Icon/index.js "import icons from 'themes/[icons-file]';"
- *
- * Images: images are stored in 'themes/media' folder
- *
- */
+* Global config
+*
+* Theme and icons:
+* - theme file is set in app.js "import theme from 'themes/[theme-file]';"
+* - icon file is set in components/Icon/index.js "import icons from 'themes/[icons-file]';"
+*
+* Images: images are stored in 'themes/media' folder
+*
+*/
 
 // Language and date settings ********************
 // Note: you may also set the locales in i18n.js
+export const SERVER = (process && process.env && process.env.SERVER) || 'development';
+const SERVER_ENDPOINTS = {
+  production: 'https://sadata-production.herokuapp.com',
+  staging: 'https://undp-sadata-staging.herokuapp.com',
+};
+export const IS_PROD = SERVER === 'production';
+const version_text = IS_PROD ? '' : ` [${SERVER}]`;
+export const VERSION = `${version}${version_text}`;
 
 // default language locale
 export const DEFAULT_LOCALE = 'en-GB';
@@ -100,11 +109,7 @@ export const CYCLE_TAXONOMY_ID = 2;
 // General ********************
 
 export const ENDPOINTS = {
-  API: (
-    NODE_ENV === 'production'
-      ? 'https://undp-sadata-staging.herokuapp.com'
-      : 'https://undp-sadata-staging.herokuapp.com'
-  ), // server API endpoint
+  API: SERVER_ENDPOINTS[SERVER], // server API endpoint
   SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
