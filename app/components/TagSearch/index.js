@@ -26,7 +26,7 @@ const Search = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
-  background-color: ${palette('light', 2)};
+  background-color: ${palette('primary', 3)};
   border: 1px solid ${palette('light', 3)};
   color: ${palette('dark', 1)};
   border-radius: 100px;
@@ -133,7 +133,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             <FormattedMessage {...messages.labelPrintFilters} />
           </LabelPrint>
         )}
-        { filters.length > 0
+        {filters.length > 0
           && (
             <Tags>
               {
@@ -148,8 +148,8 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                       disabled={!filter.onClick}
                     >
                       {this.getFilterLabel(filter)}
-                      { filter.onClick
-                      && <Icon name="removeSmall" text textRight hidePrint />
+                      {filter.onClick
+                        && <Icon name="removeSmall" text textRight hidePrint />
                       }
                     </ButtonTagFilterInverse>
                   )
@@ -163,8 +163,8 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                       disabled={!filter.onClick}
                     >
                       {this.getFilterLabel(filter)}
-                      { filter.onClick
-                      && <Icon name="removeSmall" text textRight hidePrint />
+                      {filter.onClick
+                        && <Icon name="removeSmall" text textRight hidePrint />
                       }
                     </ButtonTagFilter>
                   ))
