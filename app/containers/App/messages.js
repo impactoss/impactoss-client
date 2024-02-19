@@ -633,23 +633,25 @@ export default defineMessages({
         defaultMessage: 'No indicator reporter assigned',
       },
     },
-    meta: {
-      title: {
-        id: 'app.containers.App.attributes.meta.title',
-        defaultMessage: 'Meta',
-      },
-      updated_by: {
-        id: 'app.containers.App.attributes.meta.updated_by',
-        defaultMessage: 'Updated by',
-      },
-      updated_at: {
-        id: 'app.containers.App.attributes.meta.updated_at',
-        defaultMessage: 'Last updated',
-      },
-      created_at: {
-        id: 'app.containers.App.attributes.meta.created_at',
-        defaultMessage: 'Created',
-      },
+    metaTitle: {
+      id: 'app.containers.App.attributes.metaTitle',
+      defaultMessage: 'Meta',
+    },
+    updated_by_id: {
+      id: 'app.containers.App.attributes.updated_by_id',
+      defaultMessage: 'Updated by',
+    },
+    updated_at: {
+      id: 'app.containers.App.attributes.updated_at',
+      defaultMessage: 'Last updated',
+    },
+    created_by_id: {
+      id: 'app.containers.App.attributes.created_by_id',
+      defaultMessage: 'Created by',
+    },
+    created_at: {
+      id: 'app.containers.App.attributes.created_at',
+      defaultMessage: 'Created',
     },
     framework_id: {
       id: 'app.containers.App.attributes.framework_id',
