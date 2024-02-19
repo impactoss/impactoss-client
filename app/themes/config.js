@@ -227,3 +227,7 @@ export const COLUMN_WIDTHS = {
   MAIN: 0.72,
   OTHER: 0.28,
 };
+
+export const SEARCH = {
+  MIN_LENGTH: 1,
+};

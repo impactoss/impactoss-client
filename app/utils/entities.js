@@ -1,6 +1,6 @@
 import { Map } from 'immutable';
 
-import { TEXT_TRUNCATE, ACCEPTED_STATUSES } from 'themes/config';
+import { TEXT_TRUNCATE, ACCEPTED_STATUSES, SEARCH } from 'themes/config';
 import { find, reduce, every } from 'lodash/collection';
 
 import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/string';
@@ -66,7 +66,7 @@ export const testEntityAssociation = (entity, associatedPath) => {
 // prep searchtarget, incl id
 export const prepareEntitySearchTarget = (entity, fields, queryLength) => reduce(
   fields,
-  (target, field) => queryLength > 1 || field === 'reference '
+  (target, field) => queryLength > SEARCH.MIN_LENGTH || field === 'reference '
     ? `${target} ${cleanupSearchTarget(entity.getIn(['attributes', field]))}`
     : target,
   entity.get('id')

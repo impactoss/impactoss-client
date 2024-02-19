@@ -413,6 +413,21 @@ theme.sizes = {
   },
 };
 
+theme.text = {
+  xxxlarge: { size: '48px', height: '60px', maxWidth: '800px' },
+  xxlarge: { size: '30px', height: '36px', maxWidth: '800px' },
+  xlarge: { size: '20px', height: '28px', maxWidth: '800px' },
+  large: { size: '18px', height: '24px', maxWidth: '800px' },
+  largeTall: { size: '18px', height: '26px', maxWidth: '800px' },
+  medium: { size: '16px', height: '21px', maxWidth: '800px' },
+  mediumTall: { size: '16px', height: '23px', maxWidth: '800px' },
+  mediumTight: { size: '16px', height: '18px', maxWidth: '800px' },
+  small: { size: '14px', height: '18px', maxWidth: '700px' },
+  xsmall: { size: '13px', height: '16px', maxWidth: '600px' },
+  xxsmall: { size: '12px', height: '14px', maxWidth: '500px' },
+  xxxsmall: { size: '11px', height: '13px', maxWidth: '500px' },
+};
+
 // end styled-theme settings
 
 // other global theme variables
