@@ -30,6 +30,8 @@ import ContentHeader from 'components/ContentHeader';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 
+import ContainerFooter from '../Footer/ContainerFooter';
+
 // relative
 import VerticalDiagram from './VerticalDiagram';
 import HorizontalDiagram from './HorizontalDiagram';
@@ -108,13 +110,13 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     this.setState({
       mouseOverTaxonomyDiagram: isOver ? taxonomyId : null,
     });
-  }
+  };
 
   onTaxonomyMouseOver = (taxonomyId, isOver = true) => {
     this.setState({
       mouseOverTaxonomy: isOver ? taxonomyId : null,
     });
-  }
+  };
 
   resize = () => {
     // reset
@@ -198,6 +200,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
               )}
             </Content>
           </Container>
+          <ContainerFooter />
         </ContainerWithSidebar>
       </div>
     );

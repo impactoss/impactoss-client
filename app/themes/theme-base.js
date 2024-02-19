@@ -3,6 +3,9 @@ import coolorsToHex from 'coolors-to-hex';
 import headerLogo from 'themes/media/headerLogo.png';
 import headerLogo2x from 'themes/media/headerLogo@2x.png';
 
+import footerLogo1 from 'themes/media/footer-logo-nzgov.png';
+import footerLogo2 from 'themes/media/footer-logo-nzjustice.png';
+
 import graphicHome from 'themes/media/homeGraphic.png';
 import graphicHome2x from 'themes/media/homeGraphic@2x.png';
 import titleHome from 'themes/media/homeTitle.png';
@@ -38,6 +41,8 @@ theme.media = {
     [partner3, partner3x2x],
     [partner4, partner4x2x],
   ],
+  nzGovLogo: [footerLogo1, footerLogo1],
+  nzJusticeLogo: [footerLogo2, footerLogo2],
 };
 
 // grid-styles settings https://github.com/jxnblk/grid-styled

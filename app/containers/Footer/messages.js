@@ -10,6 +10,10 @@ export default defineMessages({
     id: 'app.containers.Footer.disclaimer',
     defaultMessage: 'Every care has been taken to ensure the accuracy of this data and information. Please send any feedback to ',
   },
+  disclaimer2: {
+    id: 'app.containers.Footer.disclaimer2',
+    defaultMessage: 'Every care has been taken to ensure the accuracy of this data and information.',
+  },
   contact: {
     email: {
       id: 'app.containers.Footer.contact.email',
@@ -18,6 +22,28 @@ export default defineMessages({
     anchor: {
       id: 'app.containers.Footer.contact.anchor',
       defaultMessage: 'contact@project.url',
+    },
+  },
+  govLink: {
+    id: 'app.containers.Footer.govlink',
+    defaultMessage: 'www.govt.nz',
+  },
+  contactUs: {
+    id: 'app.containers.Footer.contactUs',
+    defaultMessage: 'Contact Us',
+  },
+  containerLinks: {
+    privacy: {
+      id: 'app.containers.Footer.containerLinks.privacy',
+      defaultMessage: 'Privacy',
+    },
+    copyright: {
+      id: 'app.containers.Footer.containerLinks.copyright',
+      defaultMessage: 'Copyright',
+    },
+    disclaimer: {
+      id: 'app.containers.Footer.containerLinks.disclaimer',
+      defaultMessage: 'Disclaimer',
     },
   },
   responsible: {
@@ -105,5 +131,6 @@ export default defineMessages({
       id: 'app.containers.Footer.partners.url6',
       defaultMessage: 'http://www.partner6.org',
     },
+
   },
 });
