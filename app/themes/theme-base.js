@@ -271,7 +271,7 @@ theme.palette = {
   asideListGroupHover: [dark[1], light[0]],
 
   // mainListHeader
-  mainListHeader: [dark[2], primary[4]],
+  mainListHeader: [dark[0], '#E5E7E8'],
 
   // mainListItem: [#color, '#bg',], eg category and entity list items
   mainListItem: [dark[0], primary[4]],
