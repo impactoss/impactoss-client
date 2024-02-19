@@ -57,5 +57,9 @@ export default defineMessages({
       id: 'app.containers.Search.hints.hasCountTargets',
       defaultMessage: 'Please select a content type below to see individual results',
     },
+    resultsFound: {
+      id: 'app.containers.Search.hints.resultsFound',
+      defaultMessage: '{count} {count, select, 1 {result} other {results}} found in database.',
+    },
   },
 });

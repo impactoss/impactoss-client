@@ -28,7 +28,6 @@ import Container from 'components/styled/Container';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
-import SidebarGroupLabel from 'components/styled/SidebarGroupLabel';
 import Content from 'components/styled/Content';
 import { Box, Text } from 'grommet';
 
@@ -55,88 +54,30 @@ const EntityListSearch = styled.div`
   padding: 0 0 2em;
 `;
 
-const Group = styled.div`
-  border-bottom: ${({ hasBorder }) => hasBorder ? '1px solid' : 0};
-  border-color: ${({ expanded }) => expanded ? palette('aside', 0) : palette('light', 2)};
-  &:last-child {
-    border-bottom: 0;
-  }
-`;
-
 const Target = styled(Button)`
   display: table;
   width: 100%;
   font-size: 0.85em;
-  font-weight: ${({ active }) => active ? 'bold' : 'normal'};
-  padding: 0.3em 8px 0.3em 12px;
+  font-weight: 600;
+  padding: 0 12px;
   text-align: left;
-  color:  ${({ disabled }) => {
-    if (disabled) {
-      return palette('dark', 4);
-    }
-    return palette('asideListItem', 0);
-  }};
-  background-color: ${palette('asideListItem', 2)};
-  border-bottom: 1px solid ${palette('asideListItem', 4)};
+  color: ${palette('asideListGroup', 0)};
+  background-color: ${({ active }) => active ? palette('light', 1) : 'transparent'};
   &:hover {
-    color: ${({ disabled }) => {
-    if (disabled) {
-      return palette('dark', 4);
-    }
-    return palette('asideListItemHover', 0);
+    background-color: ${({ disabled, active }) => {
+    if (active) return palette('light', 1);
+    return disabled ? 'transparent' : palette('light', 1);
   }};
-    background-color: ${({ disabled }) => {
-    if (disabled) {
-      return palette('asideListItem', 2);
-    }
-    return palette('asideListItemHover', 2);
-  }};
-    border-bottom-color: ${palette('asideListItemHover', 4)}
   }
-  &:last-child {
-    border-bottom: 0;
-  }
+  border-bottom: 1px solid ${palette('asideListGroup', 1)};
+  margin-bottom: 8px;
   @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
     font-size: 0.85em;
-    padding: 0.3em 8px 0.3em 12px;
-  }
-  @media (min-width: ${({ theme }) => theme.breakpoints.large}) {
-    padding: 0.4em 20px 0.4em 24px
   }
   @media print {
     font-size: ${({ theme }) => theme.sizes.print.smaller};
   }
-`;
-
-const TargetTitle = styled.div`
-  vertical-align: middle;
-  display: table-cell;
-  width: 99%;
-`;
-const TargetCount = styled.div`
-  padding-left: 5px;
-  width: 32px;
-  display: table-cell;
-  vertical-align: middle;
-  @media (min-width: ${({ theme }) => theme.breakpoints.large}) {
-    padding-right: 5px;
-  }
-`;
-
-const Count = styled.div`
-  color:  ${({ active, disabled }) => (active || disabled) ? 'inherit' : palette('dark', 3)};
-  background-color: ${({ active, disabled }) => {
-    if (active) return 'inherit';
-    return disabled ? 'transparent' : palette('light', 0);
-  }};
-  border-radius: 999px;
-  padding: 3px;
-  font-size: 0.85em;
-  text-align: center;
-  min-width: 32px;
-  @media print {
-    font-size: ${({ theme }) => theme.sizes.print.smaller};
-  }
+  cursor: ${({ disabled }) => disabled ? 'default' : 'pointer'};
 `;
 
 const ListHint = styled.div`
@@ -157,56 +98,16 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     }
   }
 
-  getTargetTitle = (target) => {
+  getTargetTitle = (target, isSingle, intl) => {
     if (startsWith(target.get('path'), 'taxonomies')) {
-      return appMessages.entities.taxonomies[target.get('taxId')];
+      return intl.formatMessage(
+        appMessages.entities.taxonomies[target.get('taxId')][isSingle ? 'single' : 'plural']
+      );
     }
-    return appMessages.entities[target.get('path')];
+    return intl.formatMessage(
+      appMessages.entities[target.get('path')][isSingle ? 'single' : 'plural']
+    );
   };
-
-  renderSearchTargets = (includeEmpty = true) => (
-    <div>
-      {this.props.entities && this.props.entities.map((group) => (
-        <Group key={group.get('group')} hasBorder={includeEmpty}>
-          {includeEmpty
-            && (
-              <SidebarGroupLabel>
-                <FormattedMessage {...messages.groups[group.get('group')]} />
-              </SidebarGroupLabel>
-            )
-          }
-          <div>
-            {group.get('targets')
-              && group.get('targets').entrySeq().map(
-                ([i, target]) => (includeEmpty || target.get('results').size > 0 || target.get('active')
-                ) && (
-                  <Target
-                    key={i}
-                    onClick={(evt) => {
-                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                      this.props.onTargetSelect(target.get('path'));
-                    }}
-                    active={target.get('active')}
-                    disabled={target.get('results').size === 0}
-                  >
-                    <TargetTitle>
-                      {this.getTargetTitle(target) && this.context.intl.formatMessage(this.getTargetTitle(target).pluralLong || this.getTargetTitle(target).plural)}
-                    </TargetTitle>
-                    <TargetCount>
-                      <Count active={target.get('active')} disabled={target.get('results').size === 0}>
-                        {target.get('results').size}
-                      </Count>
-                    </TargetCount>
-                  </Target>
-                )
-              )
-            }
-          </div>
-        </Group>
-      ))}
-    </div>
-  );
-
 
   render() {
     const { intl } = this.context;
@@ -262,7 +163,6 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       title: 'Print',
       icon: 'print',
     }];
-
     return (
       <div>
         <Helmet
@@ -313,7 +213,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       <Box>
                         <ListHint>
                           <Text>
-                            {`${countResults} ${countResults === 1 ? 'result' : 'results'} found in database. `}
+                            <FormattedMessage {...messages.hints.resultsFound} values={{ count: countResults }} />
                           </Text>
                           {countTargets > 1 && (
                             <Text>
@@ -328,24 +228,26 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                             );
                             if (hasGroupResults) {
                               return (
-                                <Box key={id} margin={{ bottom: 'large' }}>
-                                  <Box margin={{ bottom: 'xsmall' }}>
-                                    <Text size="small">
-                                      <FormattedMessage {...messages.groups[group.get('group')]} />
-                                    </Text>
-                                  </Box>
+                                <Box key={id} margin={{ vertical: 'medium' }}>
+                                  {group.get('group') !== 'entities' && (
+                                    <Box margin={{ bottom: 'xsmall' }}>
+                                      <Text size="small">
+                                        <FormattedMessage {...messages.groups[group.get('group')]} />
+                                      </Text>
+                                    </Box>
+                                  )}
                                   <Box>
                                     {group.get('targets') && group.get('targets').valueSeq().map(
                                       (target) => {
                                         const hasTargetResults = target.get('results') && target.get('results').size > 0;
                                         if (hasTargetResults) {
                                           const count = target.get('results').size;
-                                          const title = this.getTargetTitle(target, count, intl);
-                                          const active = qe(target.get('path'), activeTargetPath);
+                                          const title = this.getTargetTitle(target, count === 1, this.context.intl);
                                           const otherTargets = countTargets > 1;
+                                          const active = qe(target.get('path'), activeTargetPath) || !otherTargets;
                                           return (
                                             <Box key={target.get('path')}>
-                                              <Box border="bottom" gap="xsmall">
+                                              <Box gap="xsmall">
                                                 <Target
                                                   onClick={(evt) => {
                                                     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -356,28 +258,25 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                                     }
                                                   }}
                                                   active={active}
+                                                  disabled={!otherTargets}
                                                 >
                                                   <Box direction="row" gap="small" align="center" justify="between">
-                                                    <Box direction="row" gap="xsmall" pad={{ vertical: 'small' }}>
-                                                      <Text size="large">
-                                                        {count}
-                                                      </Text>
-                                                      <Text size="large">
-                                                        <FormattedMessage {...title.plural} />
-                                                      </Text>
+                                                    <Box direction="row" gap="xsmall" pad={{ vertical: 'xsmall' }}>
+                                                      <Text size="large">{count}</Text>
+                                                      <Text size="large">{title}</Text>
                                                     </Box>
                                                     {otherTargets && active && (
-                                                      <FormUp size="large" />
+                                                      <FormUp size="medium" />
                                                     )}
                                                     {otherTargets && !active && (
-                                                      <FormDown size="large" />
+                                                      <FormDown size="medium" />
                                                     )}
                                                   </Box>
                                                 </Target>
                                               </Box>
                                               {
                                                 (active || !otherTargets) && (
-                                                  <Box margin={{ bottom: 'large' }}>
+                                                  <Box margin={{ bottom: 'large' }} gap="xsmall">
                                                     {target.get('results').toList().map((entity, key) => (
                                                       <EntityListItem
                                                         key={key}
