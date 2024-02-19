@@ -390,7 +390,7 @@ export const prepareTaxonomiesIsAssociated = (
   ); // map/return
 };
 
-const getTaxCategories = (categories, taxonomy, tagsKey) => categories.filter(
+export const getTaxCategories = (categories, taxonomy, tagsKey) => categories.filter(
   (cat) => qe(
     cat.getIn(['attributes', 'taxonomy_id']),
     taxonomy.get('id')
