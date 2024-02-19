@@ -201,6 +201,7 @@ const mapDates = (dates) => dates
 export const getScheduleField = (dates) => ({
   type: 'schedule',
   values: mapDates(dates),
+  showEmpty: true,
 });
 
 export const getTaxonomyFields = (taxonomies) => taxonomies
