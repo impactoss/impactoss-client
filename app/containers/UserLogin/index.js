@@ -31,7 +31,7 @@ import { selectQueryMessages } from 'containers/App/selectors';
 import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
 import { ROUTES } from 'containers/App/constants';
-import { ENABLE_AZURE } from 'themes/config';
+import { ENABLE_AZURE, IS_PROD, SERVER } from 'themes/config';
 import messages from './messages';
 
 import { login, loginWithAzure } from './actions';
@@ -78,6 +78,13 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
           <ContentHeader
             title={intl.formatMessage(messages.pageTitle)}
           />
+          {!IS_PROD && (
+            <Messages
+              type="info"
+              messageKey="signingInServer"
+              messageArgs={{ server: SERVER }}
+            />
+          )}
           {queryMessages.info
             && (
               <Messages

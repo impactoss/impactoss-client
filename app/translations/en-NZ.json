@@ -495,6 +495,8 @@
   "app.containers.App.messages.submitInvalid": "One or more fields have errors.",
   "app.containers.App.messages.recoverSuccess": "Please check your email and follow the instructions to reset your password.",
   "app.containers.App.messages.createdAsGuest": "{entityType} created successfully. It will become publicly available once verified and published by an authorised user.",
+  "app.containers.App.messages.registeringServer": "Note: registering for {server} database",
+  "app.containers.App.messages.signingInServer": "Note: signing in to {server} database",
   "app.containers.App.ui.userRoles.admin": "Administrator",
   "app.containers.App.ui.userRoles.manager": "Manager",
   "app.containers.App.ui.userRoles.contributor": "Contributor",

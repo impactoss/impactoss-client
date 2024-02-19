@@ -19,8 +19,8 @@ const SERVER_ENDPOINTS = {
   test: 'https://nz-dev-api.impactoss.org',
   development: 'https://nz-dev-6568bd13e406.herokuapp.com',
 };
-const IS_PROD = SERVER === 'production';
-const IS_TEST = SERVER === 'test';
+export const IS_PROD = SERVER === 'production';
+export const IS_TEST = SERVER === 'test';
 // const IS_DEV = SERVER === 'development';
 const version_text = IS_PROD ? '' : ` [${SERVER}]`;
 export const VERSION = `${version}${version_text}`;
