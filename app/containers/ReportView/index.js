@@ -39,7 +39,6 @@ import EntityView from 'components/EntityView';
 
 import {
   selectReady,
-  selectIsUserContributor,
   selectIsUserManager,
   selectSessionUserId,
   selectSessionUserHighestRoleId,
@@ -80,11 +79,11 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
     },
   ]);
 
-  getBodyMainFields = (entity, isContributor) => ([
+  getBodyMainFields = (entity, isManager) => ([
     {
       fields: [
         getMarkdownField(entity, 'description', true),
-        getDownloadField(entity, entity.getIn(['attributes', 'document_public']) || isContributor),
+        getDownloadField(entity, entity.getIn(['attributes', 'document_public']) || isManager),
       ],
     },
   ]);
@@ -102,7 +101,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
   render() {
     const { intl } = this.context;
     const {
-      viewEntity, dataReady, isContributor, sessionUserId, highestRole,
+      viewEntity, dataReady, isManager, sessionUserId, highestRole,
     } = this.props;
     const hasUserMinimumRole = dataReady
       && canUserCreateOrEditReports(highestRole);
@@ -173,12 +172,12 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
               <EntityView
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(viewEntity, isContributor, viewEntity.get('indicator')),
-                    aside: isContributor && this.getHeaderAsideFields(viewEntity),
+                    main: this.getHeaderMainFields(viewEntity, isManager, viewEntity.get('indicator')),
+                    aside: isManager && this.getHeaderAsideFields(viewEntity),
                   },
                   body: {
-                    main: this.getBodyMainFields(viewEntity, isContributor),
-                    aside: isContributor ? this.getBodyAsideFields(viewEntity) : null,
+                    main: this.getBodyMainFields(viewEntity, isManager),
+                    aside: isManager ? this.getBodyAsideFields(viewEntity) : null,
                   },
                 }}
               />
@@ -197,7 +196,6 @@ ReportView.propTypes = {
   viewEntity: PropTypes.object,
   sessionUserId: PropTypes.string,
   dataReady: PropTypes.bool,
-  isContributor: PropTypes.bool,
   isManager: PropTypes.bool,
   params: PropTypes.object,
   highestRole: PropTypes.number,
@@ -209,7 +207,6 @@ ReportView.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   sessionUserId: selectSessionUserId(state),
-  isContributor: selectIsUserContributor(state),
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),

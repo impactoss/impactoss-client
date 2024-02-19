@@ -30,7 +30,7 @@ import EntityView from 'components/EntityView';
 import {
   selectReady,
   selectIsUserAdmin,
-  selectIsUserContributor,
+  selectIsUserManager,
 } from 'containers/App/selectors';
 
 import {
@@ -77,10 +77,10 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
     fields: [getMarkdownField(entity, 'content', false)],
   }]);
 
-  getFields = (entity, isContributor) => ({
+  getFields = (entity, isManager) => ({
     body: {
       main: this.getBodyMainFields(entity),
-      aside: isContributor
+      aside: isManager
         ? this.getBodyAsideFields(entity)
         : null,
     },
@@ -90,7 +90,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
   render() {
     const { intl } = this.context;
     const {
-      page, dataReady, isAdmin, isContributor,
+      page, dataReady, isAdmin, isManager,
     } = this.props;
     const buttons = [];
     if (dataReady) {
@@ -117,7 +117,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <Styled className={`content-${CONTENT_PAGE}`}>
-          <ViewContainer isNarrow={!isContributor}>
+          <ViewContainer isNarrow={!isManager}>
             <ContentHeader
               title={page ? page.getIn(['attributes', 'title']) : ''}
               supTitle={page ? page.getIn(['attributes', 'menu_title']) : ''}
@@ -137,7 +137,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
             { page && dataReady
               && (
                 <EntityView
-                  fields={this.getFields(page, isContributor)}
+                  fields={this.getFields(page, isManager)}
                   seamless
                 />
               )
@@ -157,7 +157,7 @@ PageView.propTypes = {
   page: PropTypes.object,
   dataReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
-  isContributor: PropTypes.bool,
+  isManager: PropTypes.bool,
   params: PropTypes.object,
 };
 
@@ -168,7 +168,7 @@ PageView.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isAdmin: selectIsUserAdmin(state),
-  isContributor: selectIsUserContributor(state),
+  isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   page: selectViewEntity(state, props.params.id),
 });

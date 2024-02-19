@@ -42,6 +42,7 @@ const BottomLinks = styled.div`
 `;
 
 const AzureButton = styled(ButtonHero)`
+  margin-top: 10px;
   width: 100%;
 `;
 
