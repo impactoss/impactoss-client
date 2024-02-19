@@ -28,10 +28,11 @@ import {
   getTitleField,
   getEmailField,
 } from 'utils/fields';
-import { canUserManageUsers } from 'utils/permissions';
+import { canUserManageUsers, canUserSeeMeta } from 'utils/permissions';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import qe from 'utils/quasi-equals';
 
 import {
   loadEntitiesIfNeeded,
@@ -133,19 +134,23 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     }]);
   };
 
-  getHeaderAsideFields = (entity, roles) => {
+  getHeaderAsideFields = (entity, roles, userId, highestRole) => {
     const { intl } = this.context;
     let fields = [];
-    if (!ENABLE_AZURE && roles && roles.size > 0) {
+    const canSeeRole = canUserManageUsers(highestRole)
+      || qe(entity.get('id'), userId);
+    if (!ENABLE_AZURE && canUserManageUsers(highestRole)) {
       fields = [
         getRoleFormField(intl.formatMessage, roles),
       ];
-    } else {
+    } else if (canSeeRole) {
       fields = [
         getRoleField(entity),
       ];
     }
-    fields = [...fields, getMetaField(entity)];
+    if (canUserSeeMeta(highestRole)) {
+      fields = [...fields, getMetaField(entity)];
+    }
 
     return ([{ fields }]);
   };
@@ -188,6 +193,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   render() {
     const { intl } = this.context;
     const {
+      sessionUserId,
       viewEntity,
       dataReady,
       viewDomain,
@@ -274,7 +280,12 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(viewEntity, isManager),
-                    aside: this.getHeaderAsideFields(viewEntity, editableRoles),
+                    aside: this.getHeaderAsideFields(
+                      viewEntity,
+                      editableRoles,
+                      sessionUserId,
+                      sessionUserHighestRoleId,
+                    ),
                   },
                   body: {
                     main: this.getBodyMainFields(viewEntity),
@@ -314,7 +325,7 @@ UserEdit.propTypes = {
   onServerErrorDismiss: PropTypes.func.isRequired,
   onRedirectNotPermitted: PropTypes.func,
   // authReady: PropTypes.bool,
-  // sessionUserId: PropTypes.string, // used in nextProps
+  sessionUserId: PropTypes.string, // used in nextProps
 };
 
 UserEdit.contextTypes = {
