@@ -32,6 +32,7 @@ import {
 import {
   getMetaField,
 } from 'utils/fields';
+import { canUserDeleteEntities } from 'utils/permissions';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
@@ -60,6 +61,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectIsUserAdmin,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -250,8 +252,16 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   render() {
     const { intl } = this.context;
     const {
-      viewEntity, dataReady, viewDomain, connectedTaxonomies, measures, recommendationsByFw, users, onCreateOption,
+      viewEntity,
+      dataReady,
+      viewDomain,
+      connectedTaxonomies,
+      measures,
+      recommendationsByFw,
+      users,
+      onCreateOption,
     } = this.props;
+
     const {
       saveSending, saveError, deleteSending, deleteError, submitValid,
     } = viewDomain.get('page').toJS();
@@ -325,7 +335,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                 handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, intl.formatMessage)}
                 handleCancel={this.props.handleCancel}
                 handleUpdate={this.props.handleUpdate}
-                handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+                handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 validators={{
                   '': {
                   // Form-level validator
@@ -379,6 +389,7 @@ IndicatorEdit.propTypes = {
   recommendationsByFw: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   users: PropTypes.object,
+  highestRole: PropTypes.number,
   onCreateOption: PropTypes.func,
   onRepeatChange: PropTypes.func,
   onStartDateChange: PropTypes.func,
@@ -399,6 +410,7 @@ const mapStateToProps = (state, props) => ({
   recommendationsByFw: selectRecommendationsByFw(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
   users: selectUsers(state),
+  highestRole: selectSessionUserHighestRoleId(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

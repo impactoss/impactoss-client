@@ -25,6 +25,7 @@ import {
   getDateField,
   getTextareaField,
   renderTaxonomyControl,
+  getReferenceFormField,
 } from 'utils/forms';
 
 import {
@@ -33,6 +34,7 @@ import {
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import { canUserDeleteEntities } from 'utils/permissions';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
@@ -52,6 +54,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectIsUserAdmin,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -111,7 +114,10 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     const {
       viewEntity, taxonomies, recommendationsByFw, indicators,
     } = props;
-
+    let attributes = viewEntity.get('attributes');
+    if (!attributes.get('reference')) {
+      attributes = attributes.set('reference', viewEntity.get('id'));
+    }
     return viewEntity
       ? Map({
         id: viewEntity.get('id'),
@@ -134,6 +140,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       [ // fieldGroups
         { // fieldGroup
           fields: [
+            getReferenceFormField(intl.formatMessage, false, true),
             getTitleFormField(intl.formatMessage),
           ],
         },
@@ -314,7 +321,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 handleUpdate={this.props.handleUpdate}
-                handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+                handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(),
@@ -363,6 +370,7 @@ ActionEdit.propTypes = {
   isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
+  highestRole: PropTypes.number,
   connectedTaxonomies: PropTypes.object,
   recommendationsByFw: PropTypes.object,
   indicators: PropTypes.object,
@@ -378,6 +386,7 @@ ActionEdit.contextTypes = {
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   isUserAdmin: selectIsUserAdmin(state),
+  highestRole: selectSessionUserHighestRoleId(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
@@ -455,7 +464,11 @@ function mapDispatchToProps(dispatch, props) {
             }),
           )
       );
-
+      // default to database id
+      const formRef = formData.getIn(['attributes', 'reference']) || '';
+      if (formRef.trim() === '') {
+        saveData = saveData.setIn(['attributes', 'reference'], formData.get('id'));
+      }
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {

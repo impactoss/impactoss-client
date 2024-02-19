@@ -21,6 +21,12 @@ import {
 } from 'utils/fields';
 
 import { getEntityTitleTruncated } from 'utils/entities';
+import {
+  canUserCreateOrEditReports,
+  canUserBeAssignedToReports,
+} from 'utils/permissions';
+
+import qe from 'utils/quasi-equals';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
@@ -36,6 +42,7 @@ import {
   selectIsUserContributor,
   selectIsUserManager,
   selectSessionUserId,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -95,17 +102,16 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
   render() {
     const { intl } = this.context;
     const {
-      viewEntity, dataReady, isContributor, isManager, sessionUserId,
+      viewEntity, dataReady, isContributor, sessionUserId, highestRole,
     } = this.props;
+    const hasUserMinimumRole = dataReady
+      && canUserCreateOrEditReports(highestRole);
+    const isUserAssigned = dataReady
+      && canUserBeAssignedToReports(highestRole)
+      && viewEntity.get('indicator')
+      && qe(viewEntity.get('indicator').getIn(['attributes', 'manager_id']), sessionUserId);
+    const canEdit = hasUserMinimumRole || (isUserAssigned && viewEntity.getIn(['attributes', 'draft']));
 
-    const canEdit = isManager
-      || (
-        isContributor
-        && viewEntity
-        && viewEntity.get('indicator')
-        && viewEntity.get('indicator').getIn(['attributes', 'manager_id'])
-        && viewEntity.get('indicator').getIn(['attributes', 'manager_id']).toString() === sessionUserId
-      );
     let buttons = [];
     if (dataReady) {
       buttons.push({
@@ -194,6 +200,7 @@ ReportView.propTypes = {
   isContributor: PropTypes.bool,
   isManager: PropTypes.bool,
   params: PropTypes.object,
+  highestRole: PropTypes.number,
 };
 
 ReportView.contextTypes = {
@@ -206,6 +213,7 @@ const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
+  highestRole: selectSessionUserHighestRoleId(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
