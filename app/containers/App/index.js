@@ -18,6 +18,9 @@ import EntityNew from 'containers/EntityNew';
 
 import { sortEntities } from 'utils/sort';
 import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
+
+import { FOOTER } from 'themes/config';
+
 import {
   selectIsSignedIn,
   selectSessionUserAttributes,
@@ -86,6 +89,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     'order',
     'number'
   )
+    .filter((page) => FOOTER.INTERNAL_LINKS.indexOf(parseInt(page.get('id'), 10)) < 0)
     .map((page) => ({
       path: `${ROUTES.PAGES}/${page.get('id')}`,
       title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),

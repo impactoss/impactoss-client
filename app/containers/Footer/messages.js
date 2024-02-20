@@ -24,27 +24,17 @@ export default defineMessages({
       defaultMessage: 'contact@project.url',
     },
   },
-  govLink: {
-    id: 'app.containers.Footer.govlink',
+  govLinkHref: {
+    id: 'app.containers.Footer.govLinkHref',
+    defaultMessage: 'https://www.govt.nz',
+  },
+  govLinkAnchor: {
+    id: 'app.containers.Footer.govLinkAnchor',
     defaultMessage: 'www.govt.nz',
   },
   contactUs: {
     id: 'app.containers.Footer.contactUs',
     defaultMessage: 'Contact Us',
-  },
-  containerLinks: {
-    privacy: {
-      id: 'app.containers.Footer.containerLinks.privacy',
-      defaultMessage: 'Privacy',
-    },
-    copyright: {
-      id: 'app.containers.Footer.containerLinks.copyright',
-      defaultMessage: 'Copyright',
-    },
-    disclaimer: {
-      id: 'app.containers.Footer.containerLinks.disclaimer',
-      defaultMessage: 'Disclaimer',
-    },
   },
   responsible: {
     text: {

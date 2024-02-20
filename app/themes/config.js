@@ -62,28 +62,13 @@ export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
 
 // show footer logo section
 export const FOOTER = {
-  PARTNERS: false,
-  LINK_TARGET_INTERNAL: true,
-  LINK_TARGET_INTERNAL_ID: 1,
-};
-
-export const CONTAINER_FOOTER = {
-  LINK_TARGET_INTERNAL: true,
-  LINKS: [
-    {
-      TYPE: 'copyright',
-      LINK_TARGET_INTERNAL_ID: 1,
-    },
-    {
-      TYPE: 'disclaimer',
-      LINK_TARGET_INTERNAL_ID: 1,
-    },
-    {
-      TYPE: 'privacy',
-      LINK_TARGET_INTERNAL_ID: 1,
-    },
+  INTERNAL_LINKS: [
+    1, // copyright (page db id as generated in seed file)
+    2, // disclaimer
+    3, // privacy
   ],
 };
+
 // entitylists items-per-page options
 // export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100, 'all'];
 export const PAGE_ITEM_OPTIONS = [
