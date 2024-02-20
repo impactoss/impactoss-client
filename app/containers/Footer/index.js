@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl, intlShape } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
-import { Box, Text } from 'grommet';
+import { Box, Text, ResponsiveContext } from 'grommet';
 import { updatePath } from 'containers/App/actions';
 
 import qe from 'utils/quasi-equals';
+import { isMinSize } from 'utils/responsive';
+
 import { selectEntitiesWhere } from 'containers/App/selectors';
 
 import NormalImg from 'components/Img';
@@ -39,11 +41,8 @@ const FooterLink = styled.a`
 `;
 
 const Logo = styled(NormalImg)`
-  height: 55px;
+  height: 40px;
   padding-right: ${({ hasRightPadding }) => hasRightPadding ? '2em' : 0};
-  @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
-    height: 45px;
-  }
   @media (min-width: ${({ theme }) => theme.breakpoints.large}) {
     height: 65px;
   }
@@ -73,18 +72,21 @@ const Footer = ({
   onPageLink,
   pages,
 }) => {
+  const size = useContext(ResponsiveContext);
+  const isMobile = !isMinSize(size, 'medium');
   const appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
   return (
     <FooterMain>
       <Container noPaddingBottom>
         <Wrapper>
           <BoxRow
+            direction={isMobile ? 'column' : 'row'}
             justify="between"
             border="top"
             align="start"
             pad={{ top: 'medium' }}
           >
-            <BoxColumn gap="medium">
+            <BoxColumn gap="medium" pad={{ bottom: isMobile ? 'medium' : 'small' }}>
               <BoxColumn>
                 <FormattedMessage {...messages.disclaimer2} />
               </BoxColumn>
@@ -104,22 +106,36 @@ const Footer = ({
           </BoxRow>
           <BoxColumn gap="xsmall">
             <BoxRow
+              direction={isMobile ? 'column' : 'row'}
               justify="between"
               border="top"
-              margin={{ top: 'large' }}
+              margin={{ top: 'medium' }}
               pad={{ top: 'small' }}
             >
-              <BoxColumn>
-                <FooterLink
-                  target="_blank"
-                  href={`mailto:${intl.formatMessage(messages.contact.email)}`}
-                  title={intl.formatMessage(messages.contactUs)}
-                >
-                  <FormattedMessage {...messages.contactUs} />
-                </FooterLink>
-              </BoxColumn>
+              {!isMobile
+                && (
+                  <BoxColumn>
+                    <FooterLink
+                      target="_blank"
+                      href={`mailto:${intl.formatMessage(messages.contact.email)}`}
+                      title={intl.formatMessage(messages.contactUs)}
+                    >
+                      <FormattedMessage {...messages.contactUs} />
+                    </FooterLink>
+                  </BoxColumn>
+                )}
               <BoxColumn>
                 <BoxRow gap="small" align="end">
+                  {isMobile
+                    && (
+                      <FooterLink
+                        target="_blank"
+                        href={`mailto:${intl.formatMessage(messages.contact.email)}`}
+                        title={intl.formatMessage(messages.contactUs)}
+                      >
+                        <FormattedMessage {...messages.contactUs} />
+                      </FooterLink>
+                    )}
                   {pages && pages.size > 0 && FOOTER.INTERNAL_LINKS && FOOTER.INTERNAL_LINKS.map((pageId) => {
                     const page = pages.find((p) => qe(p.get('id'), pageId));
                     return (
