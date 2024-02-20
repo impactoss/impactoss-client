@@ -131,7 +131,7 @@ const ContainerFooter = ({ intl, theme, onPageLink }) => {
                 <PartnerLogo src={theme.media.nzJusticeLogo} alt={appTitle} />
               </TableCellSmall>
               <TableCellSmall>
-                <ImpactLogo src={theme.media.headerLogo} alt={intl.formatMessage(messages.project.anchor)} />
+                <ImpactLogo src={theme.media.impactossLogo} alt={intl.formatMessage(messages.project.anchor)} />
               </TableCellSmall>
             </TableRow>
             <Divider />

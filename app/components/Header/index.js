@@ -160,10 +160,6 @@ const SelectFrameworks = styled(LinkMain)`
 `;
 const Search = styled(LinkMain)`
   display: none;
-  color: ${(props) => props.active ? palette('headerNavMainItem', 1) : palette('headerNavMainItem', 0)};
-  &:hover {
-    color:${palette('headerNavMainItemHover', 0)};
-  }
   padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: inline-block;
@@ -176,6 +172,12 @@ const Search = styled(LinkMain)`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding-left: 24px;
     padding-right: 24px;
+  }
+`;
+const SearchSecondary = styled(LinkPage)`
+  display: block;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: none;
   }
 `;
 
@@ -289,7 +291,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     this.forceUpdate();
   };
 
-  renderSecondary = (navItemsAdmin) => (
+  renderSecondary = (navItemsAdmin, search) => (
     <PrintHide>
       <ShowSecondary
         visible={!this.state.showSecondary}
@@ -358,6 +360,18 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
               {page.title}
             </LinkPage>
           ))}
+          {search && (
+            <SearchSecondary
+              href={search.path}
+              active={search.active}
+              onClick={(evt) => this.onClick(evt, search.path)}
+            >
+              {search.title}
+              {search.icon
+                && <Icon title={search.title} name={search.icon} text textRight size="1em" />
+              }
+            </SearchSecondary>
+          )}
         </NavPages>
       </NavSecondary>
     </PrintHide>
@@ -369,6 +383,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       frameworkOptions,
       onSelectFramework,
       search,
+      brandPath,
     } = this.props;
     const { intl } = this.context;
     const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
@@ -408,7 +423,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         {!SHOW_BRAND_ON_HOME && isHome
           && (
             <HomeNavWrap>
-              {this.renderSecondary(navItemsAdmin)}
+              {this.renderSecondary(navItemsAdmin, search)}
             </HomeNavWrap>
           )
         }
@@ -417,8 +432,8 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             showPattern={(!isHome && SHOW_HEADER_PATTERN)}
           >
             <Brand
-              href="/"
-              onClick={(evt) => this.onClick(evt, '/')}
+              href={brandPath}
+              onClick={(evt) => this.onClick(evt, brandPath)}
               title={appTitle}
             >
               <Logo src={this.props.theme.media.headerLogo} alt={appTitle} />
@@ -433,7 +448,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 </BrandText>
               )}
             </Brand>
-            {this.renderSecondary(navItemsAdmin)}
+            {this.renderSecondary(navItemsAdmin, search)}
           </Banner>
         )}
         {!isHome && (
@@ -487,7 +502,6 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 href={search.path}
                 active={search.active}
                 onClick={(evt) => this.onClick(evt, search.path)}
-                icon={search.icon}
               >
                 {search.title}
                 {search.icon
@@ -518,10 +532,12 @@ Header.propTypes = {
   theme: PropTypes.object.isRequired,
   search: PropTypes.object,
   frameworkOptions: PropTypes.array,
+  brandPath: PropTypes.string,
 };
 
 Header.defaultProps = {
   isHome: true,
+  brandPath: '/',
 };
 
 export default withTheme(Header);

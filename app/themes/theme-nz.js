@@ -1,7 +1,7 @@
 import coolorsToHex from 'coolors-to-hex';
 
 import headerLogo from 'themes/media/headerLogo.png';
-import headerLogo2x from 'themes/media/headerLogo@2x.png';
+// import headerLogo2x from 'themes/media/headerLogo.png';
 
 import footerLogo1 from 'themes/media/footer-logo-nzgov.png';
 import footerLogo2 from 'themes/media/footer-logo-nzjustice.png';
@@ -11,8 +11,8 @@ import graphicHome2x from 'themes/media/homeGraphic@2x.png';
 import titleHome from 'themes/media/homeTitle.png';
 import titleHome2x from 'themes/media/homeTitle@2x.png';
 
-import impactossLogo from 'themes/media/impactoss.png';
-import impactossLogo2x from 'themes/media/impactoss@2x.png';
+import impactossLogo from 'themes/media/impactossLogo.png';
+// import impactossLogo2x from 'themes/media/impactoss@2x.png';
 
 import partner1 from 'themes/media/partner1.png';
 import partner2 from 'themes/media/partner2.png';
@@ -29,10 +29,10 @@ const theme = {};
 // pass array for retina images: [normalSrc, retinaSrc],
 // or single image: src
 theme.media = {
-  headerLogo: [headerLogo, headerLogo2x],
+  headerLogo: [headerLogo, headerLogo],
   graphicHome: [graphicHome, graphicHome2x],
   titleHome: [titleHome, titleHome2x],
-  impactossLogo: [impactossLogo, impactossLogo2x],
+  impactossLogo: [impactossLogo, impactossLogo],
   // up to 6 partner logos,
   // link text and title to be set in translations/[lang].js > app.components.Footer.partners.[]
   partnerLogos: [
