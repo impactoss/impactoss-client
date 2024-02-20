@@ -47,6 +47,7 @@ import {
 } from './selectors';
 
 const Content = styled.div`
+  min-height: 80vH; 
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0 1em;
   }

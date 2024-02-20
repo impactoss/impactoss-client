@@ -64,7 +64,7 @@ const GraphicHome = styled(NormalImg)`
 `;
 
 const SectionTop = styled.div`
-  min-height: ${(props) => props.hasBrand ? 0 : '100vH'};
+  min-height: ${(props) => props.hasBrand ? 0 : '80vH'};
   display: ${(props) => props.hasBrand ? 'block' : 'table'};
   width: ${(props) => props.hasBrand ? 'auto' : '100%'};
   background-color: ${palette('home', 0)};
