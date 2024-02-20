@@ -30,7 +30,7 @@ import ContentHeader from 'components/ContentHeader';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 
-import ContainerFooter from '../Footer/ContainerFooter';
+import Footer from '../Footer';
 
 // relative
 import VerticalDiagram from './VerticalDiagram';
@@ -47,6 +47,7 @@ import {
 } from './selectors';
 
 const Content = styled.div`
+  min-height: 80vH; 
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0 1em;
   }
@@ -199,8 +200,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 />
               )}
             </Content>
+            <Footer />
           </Container>
-          <ContainerFooter />
         </ContainerWithSidebar>
       </div>
     );

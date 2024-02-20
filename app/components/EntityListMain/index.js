@@ -20,6 +20,7 @@ import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
 import PrintOnly from 'components/styled/PrintOnly';
+import Footer from 'containers/Footer';
 
 import { CONTENT_LIST, PARAMS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -278,6 +279,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
               </ListEntities>
             )}
           </Content>
+          <Footer />
         </Container>
       </ContainerWithSidebar>
     );
