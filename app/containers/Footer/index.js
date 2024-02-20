@@ -119,7 +119,7 @@ const Footer = ({
                 </FooterLink>
               </BoxColumn>
               <BoxColumn>
-                <BoxRow gap="small" align="start">
+                <BoxRow gap="small" align="end">
                   {pages && pages.size > 0 && FOOTER.INTERNAL_LINKS && FOOTER.INTERNAL_LINKS.map((pageId) => {
                     const page = pages.find((p) => qe(p.get('id'), pageId));
                     return (
