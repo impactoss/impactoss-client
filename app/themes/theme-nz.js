@@ -3,6 +3,9 @@ import coolorsToHex from 'coolors-to-hex';
 import headerLogo from 'themes/media/headerLogo.png';
 import headerLogo2x from 'themes/media/headerLogo@2x.png';
 
+import footerLogo1 from 'themes/media/footer-logo-nzgov.png';
+import footerLogo2 from 'themes/media/footer-logo-nzjustice.png';
+
 import graphicHome from 'themes/media/homeGraphic.png';
 import graphicHome2x from 'themes/media/homeGraphic@2x.png';
 import titleHome from 'themes/media/homeTitle.png';
@@ -38,6 +41,8 @@ theme.media = {
     [partner3, partner3x2x],
     [partner4, partner4x2x],
   ],
+  nzGovLogo: [footerLogo1, footerLogo1],
+  nzJusticeLogo: [footerLogo2, footerLogo2],
 };
 
 // grid-styles settings https://github.com/jxnblk/grid-styled
@@ -86,18 +91,7 @@ theme.breakpoints = {
   small: `${BREAKPOINTS.small.min + 1}px`, // min
   medium: `${BREAKPOINTS.medium.min + 1}px`, // min
   large: `${BREAKPOINTS.large.min + 1}px`, // min
-  // small: `${BREAKPOINTS.small.min}px`, // max
-  // // ms: `${BREAKPOINTS.ms.min}px`, // max
-  // medium: `${BREAKPOINTS.medium.min}px`, // min
-  // large: `${BREAKPOINTS.large.min}px`, // min
-  // xlarge: `${BREAKPOINTS.xlarge.min}px`, // min
-  // xxlarge: `${BREAKPOINTS.xxlarge.min}px`, // min
 };
-// theme.breakpointsMin = {
-//   // ms: `${BREAKPOINTS.ms.min + 1}px`, // min
-//   // xlarge: `${BREAKPOINTS.xlarge.min + 1}px`, // min
-//   // xxlarge: `${BREAKPOINTS.xxlarge.min + 1}px`, // min
-// };
 
 // global color palettes
 // primary color palette: dark to light
@@ -106,36 +100,34 @@ theme.breakpoints = {
 // 2: main colour, used for links and navigation elements (AA large on white)
 // 3: white/placeholder
 // 4: white/placeholder
-const primary = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-ffffff-ffffff');
+const primary = coolorsToHex('https://coolors.co/73018e-510064-360441-ffffff-ffffff');
 // secondary color palette: dark to light
 // 0: secondary colour, dark / white/placeholder
 // 1: secondary colour, medium / white/placeholder
 // 2: secondary colour, main / white/placeholder
 // 3: white/placeholder
 // 4: white/placeholder
-const secondary = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-ffffff');
+const secondary = coolorsToHex('https://coolors.co/ba5d03-ffffff-ffffff-ffffff-ffffff');
 // dark grayscale: dark to light
 // 0:  darkest (AA)
 // 1:  darker (AA)
 // 2:  dark (AA)
 // 3:  medium gray 1 (AA) --- !!! AA compatible with light[0]
 // 4:  medium gray 2 (AA large)
-const dark = coolorsToHex('https://coolors.co/1c2121-232b2b-323e3e-687271-8d9696');
+const dark = coolorsToHex('https://coolors.co/1e1f1f-6b6f73-73777b-cfd0d1-dfe1e3');
 // light grayscale: light to dark
 // 0:  lightest gray (background colour) - also used in global-styles.js !!! AA compatible with dark[3]
 // 1:  light gray (light lines, navigation filter panel)
 // 2:  gray 1 (gray pattern)
 // 3:  gray 2 (icons light)
 // 4:  gray 3 (dark lines)
-const light = coolorsToHex('https://coolors.co/f1f4f4-e0e6e6-d5dddd-cdd6d6-c7d1d1');
+const light = coolorsToHex('https://coolors.co/f1f4f4-eaeaea-dfe1e3-cfd0d1-73777b');
 
 // other palettes
 // 0: AA on light[0] and on error[3]
 // 1: AA on white
 const error = coolorsToHex('https://coolors.co/b20e0e-c10f0f-d31717-f2e3e3-ffffff');
 const success = coolorsToHex('https://coolors.co/00632e-007034-007c3a-e1f2ed-ffffff');
-// const alert = coolorsToHex('https://coolors.co/c75300-e56700-ed7000-f97807-ffffff');
-// const info = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-118ef4-ffffff');
 
 // colour palettes, usage:
 //   import { palette } from 'styled-theme';
@@ -151,55 +143,53 @@ theme.palette = {
   // other palettes
   error,
   success,
-  // alert,
-  // info,
 
   // taxonomy/category colours
   // [0: default, 1: Human Rights Body, 2: UN session, 3: Human right, 4: Affected persons, 5: Thematic cluster, 6: Organisation, 7: SDGs, 8: State, 9: SMART]
-  // taxonomies: ['#E8EAEB', '#6B3285', '#5149AD', '#75D6AC', '#26938C', '#55B542', '#0069A4', '#199CD4', '#40D7FF'],
-  // taxonomiesAAL: ['#8C969B', '#6B3285', '#5149AD', '#31A573', '#26938C', '#4DA53B', '#0069A4', '#199CD4', '#8C969B'],
-  // [#AA compliant]
-  // taxonomiesHoverAAL: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
   taxonomies: [
     '#8D95A0', // default, not used
-    '#0059A3', // 1: Human Rights Body
-    '#0077D8', // 2: UN session
-    '#416680', // 3: State
-    '#007C70', // 4: Human right
-    '#05A763', // 5: Affected persons
-    '#B7177A', // 6: Thematic cluster
-    '#114060', // 7: Organisation
-    '#E56700', // 8: SMART
-    '#007c3a', // 9: Progress status
+    '#560950', // 1: Human Rights Body
+    '#560950', // 2: Reporting Cycle
+    '#73018E', // 3: Recommending State
+    '#BA4692', // 4: Human right
+    '#9B2727', // 5: Affected persons
+    '#FDB980', // 6: Thematic cluster
+    '#EAEAEA', // 7: Organisation
+    '#BA5D03', // 8: SMART
+    '#73777B', // 9: Progress status
+    '#FFDDC1', // 10:
+    '#1E1F1F',
   ],
   taxonomiesHover: [
     '#656F75', // default, not used
-    '#005296', // 1: Human Rights Body
-    '#0070CC', // 2: UN session
-    '#395970', // 3: State
-    '#007267', // 4: Human right
-    '#008740', // 5: Affected persons
-    '#A5156E', // 6: Thematic cluster
-    '#0F364C', // 7: Organisation
-    '#C75300', // 8: SMART
-    '#007034', // 9: Progress status
+    '#0B000B', // 1: Human Rights Body
+    '#0B000B', // 2: Reporting Cycle
+    '#510064', // 3: Recommending State
+    '#98226F', // 4: Human right
+    '#6F0B0B', // 5: Affected persons
+    '#F09F5B', // 6: Thematic cluster
+    '#DBD8D8', // 7: Organisation
+    '#964B00', // 8: SMART
+    '#5F6367', // 9: Progress status
+    '#F7BF8E',
+    '#000000',
   ],
   // bg inactive, bg hover, icon
   smartInactive: [
     '#DBE1E1', // SMART inactive - NOT ACCESSIBLE
-    '#656F75', // SMART inactive hover
+    '#CFD0D1', // SMART inactive hover
     '#9BABAB', // SMART icon
   ],
 
   // other entities
   // [aqll #AA compliant]
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
-  measuresHover: ['#C75300'], // FFC107  AA compliant
-  measures: ['#ED7000'],
-  recommendationsHover: ['#023066', '#426BA6'], // accepted, noted ['#FF9B69', '#FFB28B'],
-  recommendations: ['#033A89', '#6889B8'],
-  indicatorsHover: ['#15881A'],
-  indicators: ['#1BAC29'],
+  measuresHover: ['#964B00'], // FFC107  AA compliant
+  measures: ['#BA5D03'],
+  recommendationsHover: ['#510064', 'transparent'], // accepted, noted ['#FF9B69', '#FFB28B'],
+  recommendations: ['#73018E', 'transparent'],
+  indicatorsHover: ['#F09F5B'],
+  indicators: ['#FFCEA5'],
   reportsHover: [error[1]],
   reports: [error[0]],
   attributesHover: [dark[2]],
@@ -211,9 +201,11 @@ theme.palette = {
   // UI PALETTES //////////////////////////////////////////////////////////////
   //
 
+  // main background
+  mainBackground: ['#f2f3f4'],
   // text
   // [#primaryFont, #secondaryFont, #inverse]
-  text: [dark[0], dark[3], primary[4]],
+  text: [dark[0], dark[1], primary[4]],
   background: [primary[4], light[0], secondary[0]],
 
   // links
@@ -239,16 +231,16 @@ theme.palette = {
   headerBrandHover: [dark[1], dark[3]], // WARNING component sets opacity
 
   // headerNavPages: [ '#bg' ],
-  headerNavPages: [light[0]],
+  headerNavPages: [secondary[2]],
   // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
-  headerNavPagesItem: [dark[3], primary[4], 'transparent', primary[2]],
-  headerNavPagesItemHover: [dark[2], primary[4], 'transparent', primary[0]],
+  headerNavPagesItem: [dark[0], secondary[0], 'transparent', 'transparent'],
+  headerNavPagesItemHover: [dark[0], secondary[0], 'transparent', 'transparent'],
 
   // headerNavAccount: [ '#bg' ],
   headerNavAccount: ['transparent'],
   // headerNavAccountItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border' ]
-  headerNavAccountItem: [primary[4], primary[4], dark[2], primary[2], dark[0]],
-  headerNavAccountItemHover: [primary[4], primary[4], dark[1], primary[2], dark[2]],
+  headerNavAccountItem: [secondary[4], secondary[4], dark[0], secondary[0], dark[0]],
+  headerNavAccountItemHover: [secondary[4], secondary[4], 'black', 'black', dark[0]],
 
   // headerNavMain: [ '#bg', '#border'  ],
   headerNavMain: [secondary[4], secondary[4]],
@@ -262,7 +254,7 @@ theme.palette = {
   // aside: ['#bg']
   aside: [primary[4]],
   // asideHeader: ['#bg']
-  asideHeader: [light[0]],
+  asideHeader: [primary[4]],
 
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
@@ -271,36 +263,39 @@ theme.palette = {
 
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
-  asideListItem: [dark[2], primary[4], primary[4], dark[2], light[0]],
-  asideListItemHover: [dark[1], primary[4], primary[4], dark[2], light[0]],
+  asideListItem: [dark[0], dark[0], primary[4], light[0], light[0]],
+  asideListItemHover: [dark[0], dark[0], light[2], light[2], light[0]],
 
   // asideHeader: [#color, '#bg',]
-  asideListGroup: [dark[2], light[1]],
-  asideListGroupHover: [dark[3], light[0]],
+  asideListGroup: [dark[1], light[0]],
+  asideListGroupHover: [dark[1], light[0]],
+
+  // mainListHeader
+  mainListHeader: [dark[0], '#E5E7E8'],
 
   // mainListItem: [#color, '#bg',], eg category and entity list items
   mainListItem: [dark[0], primary[4]],
-  mainListItemHover: [dark[3], primary[4]],
+  mainListItemHover: [dark[1], primary[4]],
 
   // multiselect header [#color, #bg]
   // compare asideListItem
-  multiSelectHeader: [primary[4], dark[2]],
+  multiSelectHeader: [dark[1], light[0]],
   multiSelectFieldButton: [dark[0], light[1]],
   multiSelectFieldButtonHover: [dark[0], light[2]],
   //
   // BUTTONS / LINKS
   //
   // button: ['#colorPrimary', '#colorSecondary', #disabled],
-  buttonFlat: [primary[1], dark[3], light[4]], // aka ghost button
+  buttonFlat: [primary[1], dark[1], light[4]], // aka ghost button
   buttonFlatHover: [primary[0], primary[1]],
   buttonCancel: [dark[3]], // form footer cancel
   buttonCancelHover: [primary[1]],
   // buttonDefault: ['#text', '#bg'],
-  buttonDefault: [primary[4], primary[2]], // with background
+  buttonDefault: [primary[4], primary[0]], // with background
   buttonDefaultHover: [primary[4], primary[0]],
   buttonDefaultDisabled: [light[0], dark[3]], // with background disabled
   // buttonPrimary: ['#text', '#bg', '#border'],
-  buttonDefaultIconOnly: [primary[4], primary[2], primary[1]], // with background, without text
+  buttonDefaultIconOnly: [primary[4], primary[0], primary[2]], // with background, without text
   buttonDefaultIconOnlyHover: [primary[4], primary[0], primary[0]],
   // buttonSecondary: ['#text', '#bg'],
   // buttonSecondary: [secondary[4], secondary[1]],
@@ -311,6 +306,9 @@ theme.palette = {
   // ButtonInverse: ['#color', '#bg'],
   buttonInverse: [primary[2], primary[4]], // used for taxonomy tags, background only
   buttonInverseHover: [primary[0], primary[4]],
+
+  // checkbox
+  checkbox: [dark[2]],
 };
 
 // fonts
