@@ -36,6 +36,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
+import Footer from 'containers/Footer';
 
 import {
   selectReady,
@@ -227,6 +228,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
               />
             )
           }
+          <Footer />
         </Content>
       </div>
     );

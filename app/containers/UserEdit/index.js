@@ -60,6 +60,8 @@ import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
+import Footer from 'containers/Footer';
+
 import appMessages from 'containers/App/messages';
 
 import {
@@ -299,6 +301,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           { saveSending
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );

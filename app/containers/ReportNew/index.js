@@ -59,6 +59,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -292,6 +293,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
           { saveSending
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );
