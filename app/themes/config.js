@@ -19,8 +19,8 @@ const SERVER_ENDPOINTS = {
   test: 'https://nz-dev-api.impactoss.org',
   development: 'https://nz-dev-6568bd13e406.herokuapp.com',
 };
-const IS_PROD = SERVER === 'production';
-const IS_TEST = SERVER === 'test';
+export const IS_PROD = SERVER === 'production';
+export const IS_TEST = SERVER === 'test';
 // const IS_DEV = SERVER === 'development';
 const version_text = IS_PROD ? '' : ` [${SERVER}]`;
 export const VERSION = `${version}${version_text}`;
@@ -212,6 +212,7 @@ export const CONTRIBUTOR_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create
 export const CONTRIBUTOR_MIN_ROLE_PUBLISH = USER_ROLES.MANAGER.value; // publish
 export const CONTRIBUTOR_MIN_ROLE_ASSIGNED = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
 export const SEE_DRAFT_MIN_ROLE = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
+export const SEE_META_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create when assigned
 
 // Map server database tables **************************
 export const DB_TABLES = [
@@ -242,4 +243,8 @@ export const COLUMN_WIDTHS = {
   HALF: 0.5,
   MAIN: 0.72,
   OTHER: 0.28,
+};
+
+export const SEARCH = {
+  MIN_LENGTH: 1,
 };

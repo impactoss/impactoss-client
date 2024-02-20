@@ -282,7 +282,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                   },
                   body: {
                     main: this.getBodyMainFields(),
-                    aside: canUserPublish && this.getBodyAsideFields(indicator),
+                    aside: this.getBodyAsideFields(indicator),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}

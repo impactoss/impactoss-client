@@ -28,9 +28,11 @@ import {
   getTitleField,
   getEmailField,
 } from 'utils/fields';
+import { canUserManageUsers, canUserSeeMeta } from 'utils/permissions';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import qe from 'utils/quasi-equals';
 
 import {
   loadEntitiesIfNeeded,
@@ -39,11 +41,14 @@ import {
   submitInvalid,
   saveErrorDismiss,
   openNewEntityModal,
+  redirectNotPermitted,
 } from 'containers/App/actions';
 
 import {
   selectReady,
   selectSessionUserHighestRoleId,
+  selectReadyForAuthCheck,
+  selectSessionUserId,
 } from 'containers/App/selectors';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
@@ -90,6 +95,13 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.initialiseForm('userEdit.form.data', this.getInitialFormData(nextProps));
     }
+    if (nextProps.dataReady && nextProps.authReady && nextProps.viewEntity) {
+      const canEdit = canUserManageUsers(nextProps.sessionUserHighestRoleId)
+        || (nextProps.viewEntity.get('id') === nextProps.sessionUserId && !ENABLE_AZURE);
+      if (!canEdit) {
+        this.props.onRedirectNotPermitted();
+      }
+    }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
       scrollToTop(this.scrollContainer.current);
     }
@@ -122,19 +134,23 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     }]);
   };
 
-  getHeaderAsideFields = (entity, roles) => {
+  getHeaderAsideFields = (entity, roles, userId, highestRole) => {
     const { intl } = this.context;
     let fields = [];
-    if (!ENABLE_AZURE && roles && roles.size > 0) {
+    const canSeeRole = canUserManageUsers(highestRole)
+      || qe(entity.get('id'), userId);
+    if (!ENABLE_AZURE && canUserManageUsers(highestRole)) {
       fields = [
         getRoleFormField(intl.formatMessage, roles),
       ];
-    } else {
+    } else if (canSeeRole) {
       fields = [
         getRoleField(entity),
       ];
     }
-    fields = [...fields, getMetaField(entity)];
+    if (canUserSeeMeta(highestRole)) {
+      fields = [...fields, getMetaField(entity)];
+    }
 
     return ([{ fields }]);
   };
@@ -177,6 +193,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   render() {
     const { intl } = this.context;
     const {
+      sessionUserId,
       viewEntity,
       dataReady,
       viewDomain,
@@ -263,7 +280,12 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(viewEntity, isManager),
-                    aside: this.getHeaderAsideFields(viewEntity, editableRoles),
+                    aside: this.getHeaderAsideFields(
+                      viewEntity,
+                      editableRoles,
+                      sessionUserId,
+                      sessionUserHighestRoleId,
+                    ),
                   },
                   body: {
                     main: this.getBodyMainFields(viewEntity),
@@ -301,6 +323,9 @@ UserEdit.propTypes = {
   onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
+  onRedirectNotPermitted: PropTypes.func,
+  // authReady: PropTypes.bool,
+  sessionUserId: PropTypes.string, // used in nextProps
 };
 
 UserEdit.contextTypes = {
@@ -311,9 +336,11 @@ const mapStateToProps = (state, props) => ({
   sessionUserHighestRoleId: selectSessionUserHighestRoleId(state),
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   roles: selectRoles(state, props.params.id),
+  sessionUserId: selectSessionUserId(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -324,6 +351,9 @@ function mapDispatchToProps(dispatch) {
     initialiseForm: (model, formData) => {
       dispatch(formActions.reset(model));
       dispatch(formActions.change(model, formData, { silent: true }));
+    },
+    onRedirectNotPermitted: () => {
+      dispatch(redirectNotPermitted());
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));

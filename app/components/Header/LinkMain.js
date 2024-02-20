@@ -18,7 +18,7 @@ export default styled(Link)`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     min-width: 120px;
     font-size: 0.9em;
-    padding: 8px ${(props) => props.theme.sizes.header.paddingLeft.small}px;
+    padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.small}px;
     height: ${(props) => props.theme.sizes.header.nav.height - 1}px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {

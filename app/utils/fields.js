@@ -83,22 +83,91 @@ export const getRoleField = (entity) => ({
   options: Object.values(USER_ROLES),
 });
 
-export const getMetaField = (entity) => {
+// export const getMetaField = (entity) => {
+//   const fields = [];
+//   if (entity.get('user') && entity.getIn(['user', 'attributes', 'name'])) {
+//     fields.push({
+//       label: appMessages.attributes.meta.updated_by,
+//       value: entity.get('user') && entity.getIn(['user', 'attributes', 'name']),
+//     });
+//   }
+//   fields.push({
+//     label: appMessages.attributes.meta.updated_at,
+//     value: entity.getIn(['attributes', 'updated_at']),
+//     date: true,
+//     time: true,
+//   });
+//   fields.push({
+//     label: appMessages.attributes.meta.created_at,
+//     value: entity.getIn(['attributes', 'created_at']),
+//     date: true,
+//   });
+//   return {
+//     controlType: 'info',
+//     type: 'meta',
+//     fields,
+//   };
+// };
+export const getMetaField = (entity, includeRelationshipUpdatedAt = true) => {
   const fields = [];
-  if (entity.get('user') && entity.getIn(['user', 'attributes', 'name'])) {
+  // updated
+  const updated = entity.getIn(['attributes', 'updated_at']);
+  const updatedRelationship = entity.getIn(['attributes', 'relationship_updated_at']);
+  const hasUpdated = updated && updated.trim() !== '';
+  const hasUpdatedRelationship = updatedRelationship && updatedRelationship.trim() !== '';
+
+  let useUpdated = false;
+  let useUpdatedRelationship = false;
+  if (hasUpdated && !hasUpdatedRelationship) {
+    useUpdated = true;
+  } else if (includeRelationshipUpdatedAt && !hasUpdated && hasUpdatedRelationship) {
+    useUpdatedRelationship = true;
+  } else if (includeRelationshipUpdatedAt && hasUpdated && hasUpdatedRelationship) {
+    const updatedEarlier = new Date(updatedRelationship) < new Date(updated);
+    if (updatedEarlier) {
+      useUpdated = true;
+    } else {
+      useUpdatedRelationship = true;
+    }
+  }
+
+  if (useUpdated) {
+    if (entity.get('user') && entity.getIn(['user', 'attributes', 'name'])) {
+      fields.push({
+        label: appMessages.attributes.updated_by_id,
+        value: entity.getIn(['user', 'attributes', 'name']),
+      });
+    }
     fields.push({
-      label: appMessages.attributes.meta.updated_by,
-      value: entity.get('user') && entity.getIn(['user', 'attributes', 'name']),
+      label: appMessages.attributes.updated_at,
+      value: entity.getIn(['attributes', 'updated_at']),
+      date: true,
+      time: true,
+    });
+  } else if (useUpdatedRelationship) {
+    // updated connections
+    if (entity.get('userRelationship') && entity.getIn(['userRelationship', 'attributes', 'name'])) {
+      fields.push({
+        label: appMessages.attributes.updated_by_id,
+        value: entity.getIn(['userRelationship', 'attributes', 'name']),
+      });
+    }
+    fields.push({
+      label: appMessages.attributes.updated_at,
+      value: entity.getIn(['attributes', 'relationship_updated_at']),
+      date: true,
+      time: true,
+    });
+  }
+  // creation
+  if (entity.get('creator') && entity.getIn(['creator', 'attributes', 'name'])) {
+    fields.push({
+      label: appMessages.attributes.created_by_id,
+      value: entity.getIn(['creator', 'attributes', 'name']),
     });
   }
   fields.push({
-    label: appMessages.attributes.meta.updated_at,
-    value: entity.getIn(['attributes', 'updated_at']),
-    date: true,
-    time: true,
-  });
-  fields.push({
-    label: appMessages.attributes.meta.created_at,
+    label: appMessages.attributes.created_at,
     value: entity.getIn(['attributes', 'created_at']),
     date: true,
   });
@@ -201,6 +270,7 @@ const mapDates = (dates) => dates
 export const getScheduleField = (dates) => ({
   type: 'schedule',
   values: mapDates(dates),
+  showEmpty: true,
 });
 
 export const getTaxonomyFields = (taxonomies) => taxonomies

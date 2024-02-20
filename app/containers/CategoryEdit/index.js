@@ -492,6 +492,9 @@ function mapDispatchToProps(dispatch, props) {
             connectionAttribute: 'associatedMeasures',
             createConnectionKey: 'measure_id',
             createKey: 'category_id',
+            allowMultiple: taxonomy.getIn(['attributes', 'allow_multiple']),
+            taxonomyCategoryIds: taxonomy.get('categories')
+              && taxonomy.get('categories').keySeq(),
           })
         );
       }
@@ -505,6 +508,9 @@ function mapDispatchToProps(dispatch, props) {
               connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
               createConnectionKey: 'recommendation_id',
               createKey: 'category_id',
+              allowMultiple: taxonomy.getIn(['attributes', 'allow_multiple']),
+              taxonomyCategoryIds: taxonomy.get('categories')
+                && taxonomy.get('categories').keySeq(),
             }))
             .reduce(
               (memo, deleteCreateLists) => {
