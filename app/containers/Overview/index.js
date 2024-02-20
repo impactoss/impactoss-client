@@ -30,7 +30,7 @@ import ContentHeader from 'components/ContentHeader';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 
-import ContainerFooter from '../Footer/ContainerFooter';
+import Footer from '../Footer';
 
 // relative
 import VerticalDiagram from './VerticalDiagram';
@@ -199,8 +199,8 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 />
               )}
             </Content>
+            <Footer />
           </Container>
-          <ContainerFooter />
         </ContainerWithSidebar>
       </div>
     );
