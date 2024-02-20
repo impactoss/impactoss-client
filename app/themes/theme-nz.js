@@ -174,6 +174,20 @@ theme.palette = {
     '#F7BF8E',
     '#000000',
   ],
+  taxonomiesTextColor: [
+    primary[4], // default, not used
+    primary[4], // 1: Human Rights Body
+    primary[4], // 2: Reporting Cycle
+    primary[4], // 3: Recommending State
+    primary[4], // 4: Human right
+    primary[4], // 5: Affected persons
+    dark[0], // 6: Thematic cluster
+    dark[0], // 7: Organisation
+    primary[4], // 8: SMART
+    primary[4], // 9: Progress status
+    primary[4],
+    primary[4],
+  ],
   // bg inactive, bg hover, icon
   smartInactive: [
     '#DBE1E1', // SMART inactive - NOT ACCESSIBLE
@@ -258,8 +272,8 @@ theme.palette = {
 
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
-  asideCatNavItem: [dark[2], primary[4], primary[4], primary[2], light[0]],
-  asideCatNavItemHover: [dark[1], primary[4], light[0], primary[2], light[0]],
+  asideCatNavItem: [dark[0], primary[4], primary[4], primary[2], light[0]],
+  asideCatNavItemHover: [primary[4], primary[4], light[0], primary[2], light[0]],
 
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],

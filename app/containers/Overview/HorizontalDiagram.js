@@ -99,7 +99,7 @@ const Annotation = styled.div`
   color: ${palette('text', 1)};
   line-height: 1.1;
   font-size: 0.85em;
-  margin-top: -2em;
+  margin-top: 1.6em;
   left: ${(props) => props.hasSDGs ? 31 : 30}%;
 `;
 const AnnotationMeasured = styled(Annotation)`
@@ -146,11 +146,11 @@ const CategorisedIcons = styled.div``;
 const CategorisedIcon = styled.a`
   display: inline-block;
   padding: 0;
-  color: ${(props) => props.active ? 'white' : palette('text', 1)};
+  color: ${(props) => props.active ? palette('taxonomiesTextColor', props.paletteId) : palette('text', 1)};
   background-color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : 'transparent'};
   border-radius: 4px;
   &:hover {
-    color: white;
+    color: ${(props) => palette('taxonomiesTextColor', props.paletteId)};
     background-color: ${(props) => palette('taxonomies', props.paletteId)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
@@ -196,11 +196,11 @@ const DiagramButton = styled(Button)`
     border-radius: 999px;
     font-weight: bold;
     font-size: 1.1em;
-    padding: 0.4em 0.5em 1em;
+    padding: 0.4em 1.2em 1em;
     min-width: 180px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding: 0.6em 1em 1.4em;
+    padding: 0.6em 1.2em 1.4em;
   }
 `;
 // font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
@@ -209,7 +209,7 @@ const DiagramButtonMain = styled(DiagramButton)`
   background-color: ${(props) => palette(props.paletteDefault, 0)};
   &:hover {
     background-color: ${(props) => palette(props.paletteHover, 0)};
-  } 
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0.4em 0.75em 1em;
     &:before {
