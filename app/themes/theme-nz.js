@@ -7,7 +7,6 @@ import footerLogo1 from 'themes/media/footer-logo-nzgov.png';
 import footerLogo2 from 'themes/media/footer-logo-nzjustice.png';
 
 import graphicHome from 'themes/media/homeGraphic.png';
-import graphicHome2x from 'themes/media/homeGraphic@2x.png';
 
 import impactossLogo from 'themes/media/impactossLogo.png';
 // import impactossLogo2x from 'themes/media/impactoss@2x.png';
@@ -17,10 +16,10 @@ const theme = {};
 // pass array for retina images: [normalSrc, retinaSrc],
 // or single image: src
 theme.media = {
-  headerLogo: [headerLogo, headerLogo],
-  graphicHome: [graphicHome, graphicHome2x],
+  headerLogo: [headerLogo],
+  graphicHome: [graphicHome],
   // titleHome: [titleHome, titleHome2x],
-  impactossLogo: [impactossLogo, impactossLogo],
+  impactossLogo: [impactossLogo],
   // up to 6 partner logos,
   // link text and title to be set in translations/[lang].js > app.components.Footer.partners.[]
   // partnerLogos: [
@@ -29,8 +28,8 @@ theme.media = {
   //   [partner3, partner3x2x],
   //   [partner4, partner4x2x],
   // ],
-  nzGovLogo: [footerLogo1, footerLogo1],
-  nzJusticeLogo: [footerLogo2, footerLogo2],
+  nzGovLogo: [footerLogo1],
+  nzJusticeLogo: [footerLogo2],
 };
 
 // grid-styles settings https://github.com/jxnblk/grid-styled
@@ -402,9 +401,9 @@ theme.sizes = {
     // px or em
     text: {
       title: '2.8em',
-      titleMobile: '1.4em',
-      claim: '1.3em',
-      claimMobile: '1em',
+      titleMobile: '1.6em',
+      claim: '2.2em',
+      claimMobile: '1.2em',
     },
     print: {
       title: '2.8em',

@@ -41,16 +41,16 @@ const FooterLink = styled.a`
 `;
 
 const Logo = styled(NormalImg)`
-  height: 40px;
+  height: 50px;
   padding-right: ${({ hasRightPadding }) => hasRightPadding ? '2em' : 0};
   @media (min-width: ${({ theme }) => theme.breakpoints.large}) {
-    height: 65px;
+    height: 75px;
   }
 `;
 
 const Wrapper = styled((p) => <Box margin={{ bottom: 'large' }} {...p} />)`
   font-size: 0.8em;
-  padding: 0px 30px;
+  padding: ${({ fill }) => fill ? 0 : '0px 30px'};
   @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
     width: 100%;
     font-size: 0.9em;
@@ -71,6 +71,7 @@ const Footer = ({
   theme,
   onPageLink,
   pages,
+  fill,
 }) => {
   const size = useContext(ResponsiveContext);
   const isMobile = !isMinSize(size, 'medium');
@@ -78,7 +79,7 @@ const Footer = ({
   return (
     <FooterMain>
       <Container noPaddingBottom>
-        <Wrapper>
+        <Wrapper fill={fill}>
           <BoxRow
             direction={isMobile ? 'column' : 'row'}
             justify="between"
@@ -184,6 +185,7 @@ Footer.propTypes = {
   theme: PropTypes.object.isRequired,
   onPageLink: PropTypes.func.isRequired,
   pages: PropTypes.object,
+  fill: PropTypes.bool,
   intl: intlShape,
 };
 
