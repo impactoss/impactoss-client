@@ -7,7 +7,7 @@ import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
 import { qe } from 'utils/quasi-equals';
 import Component from 'components/styled/Component';
-import Clear from 'components/styled/Clear';
+import SkipContent from 'components/styled/SkipContent';
 import { USER_ROLES, PROGRESS_TAXONOMY_ID } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -17,6 +17,7 @@ import EntityListItemMainBottom from './EntityListItemMainBottom';
 
 
 const Styled = styled(Component)`
+  position: relative;
   padding-right: 6px;
   padding-top: 4px;
   padding-bottom: 6px;
@@ -45,6 +46,7 @@ const EntityListItemMainTitleWrap = styled.a`
   text-decoration: none;
   display: block;
   padding: 6px 15px 8px 0;
+  margin-top: 15px;
   color: ${palette('mainListItem', 0)};
   &:hover {
     color: ${palette('mainListItemHover', 0)};
@@ -52,6 +54,21 @@ const EntityListItemMainTitleWrap = styled.a`
   @media print {
     padding: 1px 15px 5px 0;
   }
+`;
+
+const EntityListItemMainTopWrap = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-top: 4px;
+  padding-right: 6px;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
+    padding-right: ${(props) => (!props.theme.sizes)
+    ? 0
+    : props.theme.sizes.mainListItem.paddingHorizontal
+}px;
 `;
 
 class EntityListItemMain extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -199,16 +216,20 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
   }
 
   render() {
-    const { nestLevel, onEntityClick, taxonomies } = this.props;
+    const {
+      nestLevel,
+      onEntityClick,
+      taxonomies,
+      skipTargetId,
+    } = this.props;
+
     const entity = this.mapToEntityListItem(this.props);
 
     const bottomTaxonomies = taxonomies && taxonomies.filter((tax) => !qe(tax.get('id'), PROGRESS_TAXONOMY_ID));
-
     return (
       <Styled isManager={this.props.isManager} isConnection={this.props.isConnection}>
-        <EntityListItemMainTop entity={entity} />
-        <Clear />
         <EntityListItemMainTitleWrap
+          id={`list-item-${entity.id}`}
           ref={(el) => { this.title = el; }}
           onClick={(evt) => {
             evt.preventDefault();
@@ -220,6 +241,17 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             {entity.title}
           </EntityListItemMainTitle>
         </EntityListItemMainTitleWrap>
+        {skipTargetId && (
+          <SkipContent
+            href={skipTargetId}
+            title="Skip to next list item or group, continue to list item details"
+          >
+            Skip to next list item or group, continue to list item details
+          </SkipContent>
+        )}
+        <EntityListItemMainTopWrap>
+          <EntityListItemMainTop entity={entity} />
+        </EntityListItemMainTopWrap>
         { (entity.categories || (entity.connectedCounts && this.props.wrapper))
           && (
             <EntityListItemMainBottom
@@ -249,6 +281,7 @@ EntityListItemMain.propTypes = {
   onEntityClick: PropTypes.func,
   isConnection: PropTypes.bool,
   isFocus: PropTypes.bool,
+  skipTargetId: PropTypes.string,
 };
 EntityListItemMain.contextTypes = {
   intl: PropTypes.object,

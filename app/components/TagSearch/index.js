@@ -79,7 +79,7 @@ const SearchValuePrint = styled(PrintOnly)`
   font-size: ${(props) => props.theme.sizes.print.default};
   font-weight: bold;
 `;
-
+const ButtonTagSearch = styled.div``;
 const StyledLabel = styled.label``;
 
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -131,6 +131,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       searchQuery,
       onSearch,
       placeholder,
+      resultsId,
     } = this.props;
     const { intl } = this.context;
     // TODO set focus to input when clicking wrapper
@@ -252,15 +253,27 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             {searchQuery}
           </SearchValuePrint>
         )}
+        <ButtonTagSearch
+          as="a"
+          href={`#${resultsId}`}
+          title={this.context.intl.formatMessage(messages.skipToResults)}
+        >
+          <Icon name="search" size="1em" />
+        </ButtonTagSearch>
       </Search>
     );
   }
 }
 
+TagSearch.defaultProps = {
+  resultsId: 'entity-list-main',
+};
+
 TagSearch.propTypes = {
   filters: PropTypes.array,
   searchQuery: PropTypes.string,
   placeholder: PropTypes.string,
+  resultsId: PropTypes.string,
   onSearch: PropTypes.func,
   onClear: PropTypes.func,
   multiselect: PropTypes.bool,

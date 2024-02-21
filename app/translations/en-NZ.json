@@ -157,6 +157,7 @@
   "app.components.TagSearch.labelPrintKeywords": "Keyword search:",
   "app.components.TagSearch.removeTag": "Active filter: {title} - click to remove",
   "app.components.TagSearch.removeAll": "Click to remove all filters",
+  "app.components.TagSearch.skipToResults": "Skip to list of results",
   "app.components.TaxonomySidebar.title": "Select category group",
   "app.components.TaxonomySidebar.show": "Select category group",
   "app.components.TaxonomySidebar.hide": "Hide category groups",
