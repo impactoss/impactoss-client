@@ -49,6 +49,10 @@ const PrintHintKey = styled(PrintOnly)`
   margin-bottom: 20px;
 `;
 
+const StyledContent = styled(Content)`
+  margin-bottom: 10em;
+`;
+
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
@@ -205,7 +209,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     return (
       <ContainerWithSidebar ref={this.ScrollContainer}>
         <Container ref={this.ScrollReference}>
-          <Content>
+          <StyledContent>
             <ContentHeader
               type={CONTENT_LIST}
               icon={header.icon}
@@ -292,7 +296,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 </ListWrapper>
               </ListEntities>
             )}
-          </Content>
+          </StyledContent>
           <Footer />
         </Container>
       </ContainerWithSidebar>

@@ -33,7 +33,7 @@ const Styled = styled(Button)`
 `;
 
 const TaxTitle = styled.div`
-  font-weight: ${({ nested }) => nested ? 400 : 700};
+  font-weight: ${({ nested }) => nested ? 600 : 700};
   font-size: ${({ nested }) => nested ? 0.9 : 1}em;
   padding-left: ${({ nested }) => nested ? 20 : 0}px;
   vertical-align: middle;
