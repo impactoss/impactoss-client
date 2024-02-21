@@ -6,7 +6,4 @@ export default styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     float: right;
   }
-  @media (max-width: ${({ theme }) => theme.breakpoints.small}) {
-    width: 100%;
-  }
 `;
