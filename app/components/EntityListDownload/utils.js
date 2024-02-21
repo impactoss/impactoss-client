@@ -1,11 +1,10 @@
 
 import appMessages from 'containers/App/messages';
 
-import { snakeCase } from 'lodash/string';
 import { Set } from 'immutable';
 
 // const IN_CELL_SEPARATOR = ', \n';
-const IN_CELL_SEPARATOR = ', ';
+const IN_CELL_SEPARATOR = ' - ';
 
 export const getDateSuffix = (datetime) => {
   const date = datetime ? new Date(datetime) : new Date();
@@ -54,18 +53,14 @@ export const getActiveCount = (types) => Object.keys(types).reduce((counter, att
   return counter;
 }, 0);
 
-const getValue = ({
-  key, attribute, entity, typeNames, relationships,
+const getAttributeValue = ({
+  key, attribute, entity, relationships,
 }) => {
   const val = entity.getIn(['attributes', key]) || '';
-  if (key === 'measuretype_id' && typeNames) {
-    return typeNames.actiontypes[val] || val;
-  }
-  if (key === 'actortype_id' && typeNames) {
-    return typeNames.actortypes[val] || val;
-  }
   if (attribute.type === 'bool') {
-    return val || false;
+    return attribute.exportFlip
+      ? !val || true
+      : val || false;
   }
   if (attribute.type === 'date') {
     if (val && val !== '') {
@@ -92,92 +87,46 @@ const getValue = ({
   if (attribute.type === 'key' && relationships && relationships.get(attribute.table)) {
     const connectedEntity = relationships.getIn([attribute.table, `${val}`]);
     if (connectedEntity) {
-      const title = connectedEntity.getIn(['attributes', 'title']) || connectedEntity.getIn(['attributes', 'name']);
+      const title = connectedEntity.getIn(['attributes', 'title'])
+        || connectedEntity.getIn(['attributes', 'name']);
       if (title) {
-        const email = connectedEntity.getIn(['attributes', 'email']);
-        if (email) {
-          return `${title} (${email})`;
-        }
-        return title;
+        // const email = connectedEntity.getIn(['attributes', 'email']);
+        // if (email) {
+        //   return `${title} (${email})`;
+        // }
+        return `${title}[${val}]`;
       }
     }
   }
   return val;
 };
-export const getDefaultEntityTypes = (list, columnType) => list.reduce((memo, type) => {
-  const typeId = type.get('id');
-  const label = type.getIn(['attributes', 'title']);
-  return {
-    ...memo,
-    [typeId]: {
-      id: typeId,
-      label,
-      active: false,
-      column: `${columnType}_${snakeCase(label)}`,
-    },
-  };
-}, {});
-export const getIndicatorColumns = (indicatorsAsRows, connections, isAdmin) => {
-  let csvColumns = [];
-  if (!indicatorsAsRows) {
-    const indicatorColumns = connections.get('indicators').reduce((memo, indicator) => {
-      let displayName = `indicator_${indicator.get('id')}`;
-      if (indicator.getIn(['attributes', 'draft'])) {
-        displayName += '_DRAFT';
-      }
-      if (indicator.getIn(['attributes', 'private'])) {
-        displayName += '_PRIVATE';
-      }
-      return [
-        ...memo,
-        {
-          id: `indicator_${indicator.get('id')}`,
-          displayName,
-        },
-      ];
-    }, csvColumns);
-    csvColumns = [
-      ...csvColumns,
-      ...indicatorColumns,
-    ];
-  } else {
-    csvColumns = [
-      ...csvColumns,
-      { id: 'indicator_id', displayName: 'indicator_id' },
-      { id: 'indicator_title', displayName: 'indicator_title' },
-    ];
-    if (isAdmin) {
-      csvColumns = [
-        ...csvColumns,
-        { id: 'indicator_draft', displayName: 'indicator_draft' },
-        { id: 'indicator_private', displayName: 'indicator_private' },
-      ];
-    }
-  }
-  return csvColumns;
-};
+
+
 const prepConnnectionData = ({
   entity,
   relationships,
   connectionTypes,
   data,
 }) => Object.keys(connectionTypes)
-  .reduce((memo, connectionType) => {
-    if (!connectionTypes[connectionType].active) {
+  .reduce((memo, connectionTypeKey) => {
+    const type = connectionTypes[connectionTypeKey];
+    if (!type.active) {
       return memo;
     }
-    const entityConnectionIds = entity.get(connectionType)
+    const connectionPath = type.path || type.id;
+    const entityConnectionIds = entity.get(connectionPath)
       && entity
-        .get(connectionType)
+        .get(connectionPath)
         .map((typeId) => typeId);
     let connectionsValue = '';
     if (entityConnectionIds) {
       connectionsValue = entityConnectionIds.reduce((memo2, typeId) => {
-        const connection = relationships.getIn([connectionType, typeId.toString()]);
+        const connection = relationships.getIn([connectionPath, typeId.toString()]);
         if (connection) {
           const title = connection.getIn(['attributes', 'title']);
+          const ref = connection.getIn(['attributes', 'reference']) || connection.get('id');
           connectionsValue = addWarnings({
-            value: title,
+            value: `${title}[${ref}]`,
             entity: connection,
           });
           return memo2 === ''
@@ -189,25 +138,23 @@ const prepConnnectionData = ({
     }
     return ({
       ...memo,
-      [`connected_${connectionType}`]: sanitiseText(connectionsValue),
+      [`connected_${type.column}`]: sanitiseText(connectionsValue),
     });
   }, data);
 
 const prepAttributeData = ({
   entity,
   attributes,
-  typeNames,
   data,
   relationships,
 }) => Object.keys(attributes).reduce((memo, attKey) => {
   if (!attributes[attKey].active) {
     return memo;
   }
-  const value = getValue({
+  const value = getAttributeValue({
     key: attKey,
     attribute: attributes[attKey],
     entity,
-    typeNames,
     relationships,
   });
   return ({
@@ -237,14 +184,18 @@ const prepTaxonomyDataColumns = ({
     if (intersect && intersect.size > 0) {
       categoryValue = intersect.reduce((memo2, categoryId) => {
         const entityCategory = taxonomies.getIn([attKey, 'categories', categoryId, 'attributes', 'title']);
+        const entityCategoryShort = taxonomies.getIn([attKey, 'categories', categoryId, 'attributes', 'short_title']);
+        const label = entityCategoryShort
+          ? `${entityCategory}[${entityCategoryShort}]`
+          : entityCategory;
         return memo2 === ''
-          ? entityCategory
-          : `${memo2}${IN_CELL_SEPARATOR}${entityCategory}`;
+          ? label
+          : `${memo2}${IN_CELL_SEPARATOR}${label}`;
       }, '');
     }
     return ({
       ...memo,
-      [taxonomyColumns[attKey].column]: categoryValue,
+      [taxonomyColumns[attKey].column]: sanitiseText(categoryValue),
     });
   }, data);
 
@@ -290,7 +241,7 @@ export const prepareData = ({
 export const getAttributes = ({
   typeId,
   fieldAttributes,
-  isAdmin,
+  hasUserRole,
   intl,
 }) => {
   if (fieldAttributes) {
@@ -303,13 +254,7 @@ export const getAttributes = ({
         ? attValue.required
         : attValue.required && attValue.required.indexOf(typeId) > -1;
       let passAdmin = true;
-      if (
-        !isAdmin
-        && (
-          attValue.adminOnly
-          || (attValue.adminOnlyForTypes && attValue.adminOnlyForTypes.indexOf(typeId) > -1)
-        )
-      ) {
+      if (attValue.roleExport && !hasUserRole[attValue.roleExport]) {
         passAdmin = false;
       }
       if (

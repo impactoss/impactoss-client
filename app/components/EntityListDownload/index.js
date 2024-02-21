@@ -21,6 +21,8 @@ import {
   ResponsiveContext,
 } from 'grommet';
 
+import appMessage from 'utils/app-message';
+
 import appMessages from 'containers/App/messages';
 import { CONTENT_MODAL } from 'containers/App/constants';
 
@@ -92,13 +94,15 @@ export function EntityListDownload({
   config,
   fields,
   entities,
+  frameworks,
   taxonomies,
   connections,
   onClose,
   intl,
-  isAdmin,
+  hasUserRole,
   searchQuery,
   entityIdsSelected,
+  entityTitle,
 }) {
   const [typeTitle, setTypeTitle] = useState('entities');
   const [csvFilename, setCSVFilename] = useState('csv');
@@ -126,7 +130,7 @@ export function EntityListDownload({
         getAttributes({
           typeId, // optional
           fieldAttributes: fields && fields.ATTRIBUTES,
-          isAdmin,
+          hasUserRole,
           intl,
         })
       );
@@ -144,26 +148,49 @@ export function EntityListDownload({
         }).toJS()
       );
     }
-    if (hasConnections && connections) {
+    if (hasConnections && connections && config.connections && config.connections.options) {
       setConnectionTypes(
-        connections
-          .entrySeq()
-          .reduce((memo, [connectionType, value]) => {
-            // check is for empty indicator connection on recommendations
-            if (value.size > 0) {
-              const label = intl.formatMessage(appMessages.entities[connectionType].plural);
-              return {
-                ...memo,
-                [connectionType]: {
-                  id: connectionType,
-                  label,
-                  active: false,
-                  column: snakeCase(label),
-                },
-              };
+        config.connections.options.reduce(
+          (memo, option) => {
+            if (option.groupByFramework && frameworks) {
+              return frameworks
+                .filter((fw) => !option.frameworkFilter || fw.getIn(['attributes', option.frameworkFilter]))
+                .reduce(
+                  (memo2, fw) => {
+                    const id = `${option.path}_${fw.get('id')}`;
+                    const label = appMessage(
+                      intl,
+                      (option.message && option.message.indexOf('{fwid}') > -1)
+                        ? option.message.replace('{fwid}', fw.get('id'))
+                        : option.message,
+                    );
+                    return {
+                      ...memo2,
+                      [id]: {
+                        id,
+                        path: option.path,
+                        label,
+                        active: false,
+                        column: snakeCase(label),
+                      },
+                    };
+                  },
+                  memo,
+                );
             }
-            return memo;
-          }, {})
+            const label = appMessage(intl, option.message);
+            return {
+              ...memo,
+              [option.path]: {
+                id: option.path,
+                label,
+                active: false,
+                column: snakeCase(label),
+              },
+            };
+          },
+          {},
+        )
       );
     }
   }, [
@@ -200,22 +227,14 @@ export function EntityListDownload({
 
   // set initial csv file name
   useEffect(() => {
-    let title = 'unspecified';
-    let tTitle = 'unspecified';
-    if (config.serverPath === 'recommendations') {
-      title = intl.formatMessage(appMessages.entities.recommendations.plural);
-      tTitle = count !== 1 ? title : intl.formatMessage(appMessages.entities.recommendations.single);
+    let filename = 'unspecified';
+    let formTitle = 'unspecified';
+    if (entityTitle) {
+      filename = snakeCase(entityTitle.plural);
+      formTitle = count !== 1 ? entityTitle.plural : entityTitle.single;
     }
-    if (config.serverPath === 'measures') {
-      title = intl.formatMessage(appMessages.entities.measures.plural);
-      tTitle = count !== 1 ? title : intl.formatMessage(appMessages.entities.measures.single);
-    }
-    if (config.serverPath === 'indicators') {
-      title = intl.formatMessage(appMessages.entities.indicators.plural);
-      tTitle = count !== 1 ? title : intl.formatMessage(appMessages.entities.indicators.single);
-    }
-    setTypeTitle(tTitle);
-    setCSVFilename(snakeCase(title));
+    setTypeTitle(formTitle);
+    setCSVFilename(filename);
   }, [count]);
 
   const relationships = connections;
@@ -253,11 +272,14 @@ export function EntityListDownload({
   }
   if (hasConnections && includeConnections && count > 0) {
     csvColumns = Object.keys(connectionTypes)
-      .filter((connection) => connectionTypes[connection].active)
-      .reduce((memo, connection) => ([
-        ...memo,
-        { id: `connected_${connection}`, displayName: `connected_${connection}` },
-      ]), csvColumns);
+      .filter((connectionTypeKey) => connectionTypes[connectionTypeKey].active)
+      .reduce((memo, connectionTypeKey) => {
+        const type = connectionTypes[connectionTypeKey];
+        return ([
+          ...memo,
+          { id: `connected_${type.column}`, displayName: `connected_${type.column}` },
+        ]);
+      }, csvColumns);
   }
   let csvData;
   if (entities && count > 0) {
@@ -441,10 +463,12 @@ EntityListDownload.propTypes = {
   entities: PropTypes.instanceOf(List),
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
+  frameworks: PropTypes.instanceOf(Map),
   onClose: PropTypes.func,
-  isAdmin: PropTypes.bool,
   searchQuery: PropTypes.string,
   entityIdsSelected: PropTypes.object,
+  hasUserRole: PropTypes.object,
+  entityTitle: PropTypes.object,
   intl: intlShape,
 };
 

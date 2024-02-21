@@ -76,6 +76,7 @@ export function OptionGroup({
   if (!optionCount || optionCount === 0) {
     return null;
   }
+
   return (
     <Group>
       <OptionGroupToggle
@@ -120,7 +121,7 @@ export function OptionGroup({
                     ...memo,
                     [key]: {
                       ...options[key],
-                      active: selected,
+                      active: options[key].exportRequired || selected,
                     },
                   }), {});
                   onSetOptions(updated);

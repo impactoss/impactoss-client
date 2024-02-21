@@ -16,49 +16,7 @@ export const DEPENDENCIES = [
   'due_dates',
   'progress_reports',
 ];
-export const ACTION_FIELDS = {
-  ATTRIBUTES: {
-    measuretype_id: {
-      defaultValue: '1',
-      type: 'number',
-      skipImport: true,
-      exportColumn: 'activity_type',
-      export: true,
-    },
-    title: {
-      type: 'text',
-    },
-    description: {
-      type: 'markdown',
-    },
-    outcome: {
-      type: 'markdown',
-    },
-    reference: {
-      type: 'markdown',
-    },
-    indicator_summary: {
-      type: 'markdown',
-    },
-    created_at: {
-      type: 'date',
-    },
-    target_date: {
-      type: 'date',
-    },
-    updated_at: {
-      type: 'date',
-    },
-    target_date_comment: {
-      type: 'text',
-    },
-    draft: {
-      defaultValue: true,
-      type: 'bool',
-      skipImport: true,
-    },
-  },
-};
+
 export const CONFIG = {
   serverPath: 'measures',
   clientPath: 'actions',

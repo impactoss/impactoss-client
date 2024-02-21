@@ -321,6 +321,10 @@ export const selectFrameworks = createSelector(
   (state) => selectEntities(state, 'frameworks'),
   (entities) => entities
 );
+export const selectUsers = createSelector(
+  (state) => selectEntities(state, 'users'),
+  (entities) => entities
+);
 // use for testing single framework configuration
 // && entities.filter((fw) => fw.get('id') === '1')
 

@@ -15,50 +15,6 @@ export const DEPENDENCIES = [
   'frameworks',
   'framework_taxonomies',
 ];
-export const RECOMENDATION_FIELDS = {
-  ATTRIBUTES: {
-    recommendation_id: {
-      defaultValue: '1',
-      type: 'int',
-      exportColumn: 'recommendation_type',
-      export: true,
-    },
-    title: {
-      type: 'text',
-    },
-    description: {
-      type: 'text',
-    },
-    reference: {
-      type: 'text',
-    },
-    response: {
-      type: 'text',
-    },
-    draft: {
-      defaultValue: true,
-      type: 'bool',
-    },
-    accepted: {
-      type: 'bool',
-    },
-    created_at: {
-      type: 'datetime',
-      adminOnly: true,
-    },
-    updated_at: {
-      type: 'datetime',
-      adminOnly: true,
-      meta: true,
-    },
-    last_modified_user_id: {
-      type: 'int',
-      adminOnly: true,
-      meta: true,
-      exportColumn: 'updated_by',
-    },
-  },
-};
 
 export const CONFIG = {
   serverPath: 'recommendations',
@@ -121,17 +77,6 @@ export const CONFIG = {
         ownKey: 'recommendation_id',
         editForFrameworks: true,
         frameworkFilter: 'has_measures',
-      },
-      {
-        search: true,
-        message: 'entities.indicators.plural',
-        path: 'indicators',
-        clientPath: 'indicators', // filter by recommendation connection
-        key: 'indicator_id',
-        connectPath: 'recommendation_indicators',
-        ownKey: 'recommendation_id',
-        editForFrameworks: true,
-        frameworkFilter: 'has_indicators',
       },
     ],
   },

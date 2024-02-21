@@ -35,13 +35,8 @@ import {
   openNewEntityModal,
 } from 'containers/App/actions';
 
-import appMessages from 'containers/App/messages';
-
 import { PARAMS } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
-import { RECOMENDATION_FIELDS } from '../RecommendationList/constants';
-import { ACTION_FIELDS } from '../ActionList/constants';
-import { INDICATOR_FIELDS } from '../IndicatorList/constants';
+import { USER_ROLES, ENTITY_FIELDS } from 'themes/config';
 
 import {
   selectDomain,
@@ -116,19 +111,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
   onDownloadDismiss = () => {
     this.setState({ downloadActive: false });
-  };
-
-  getFields = (type) => {
-    switch (type) {
-      case 'measures':
-        return ACTION_FIELDS;
-      case 'recommendations':
-        return RECOMENDATION_FIELDS;
-      case 'indicators':
-        return INDICATOR_FIELDS;
-      default:
-        return null;
-    }
   };
 
   getMessageForType = (type) => {
@@ -214,15 +196,14 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           >
             <EntityListDownload
               config={config}
-              fields={this.getFields(config.serverPath)}
+              entityTitle={this.props.entityTitle}
+              fields={ENTITY_FIELDS[config.serverPath]}
               entities={entities}
               taxonomies={this.props.taxonomies}
               connections={this.props.connections}
               onClose={() => this.onDownloadDismiss()}
-              frameworks={this.props.frameworks && this.props.frameworks.map(
-                (type) => intl.formatMessage(appMessages.frameworks[`${type.get('id')}`])
-              ).toJS()}
-              isAdmin
+              frameworks={this.props.frameworks}
+              hasUserRole={this.props.hasUserRole}
             />
           </ReactModal>
         )}
