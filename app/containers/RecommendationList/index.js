@@ -95,6 +95,11 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         icon: 'print',
       });
     }
+    if (CONFIG.downloadCSV) {
+      headerOptions.actions.push({
+        type: 'download',
+      });
+    }
     if (isManager) {
       headerOptions.actionsAdmin.push({
         type: 'text',
