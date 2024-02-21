@@ -51,23 +51,6 @@ export function OptionsForEntityList({
           editColumnNames
         />
       )}
-      {hasConnections && (
-        <OptionGroup
-          groupId="connections"
-          label="Connections"
-          expandedId={expandGroup}
-          intro="The resulting CSV file will have one column for each type of connection"
-          onExpandGroup={(val) => setExpandGroup(val)}
-          activeOptionCount={activeConnectionsCount}
-          optionCount={Object.keys(connectionTypes).length}
-          active={includeConnections}
-          options={connectionTypes}
-          onSetOptions={(options) => setConnectionTypes(options)}
-          optionListLabels={{
-            attributes: 'Select connections',
-          }}
-        />
-      )}
       {hasTaxonomies && (
         <OptionGroup
           groupId="taxonomies"
@@ -84,6 +67,23 @@ export function OptionsForEntityList({
           }}
           onSetOptions={(options) => setTaxonomies(options)}
           editColumnNames
+        />
+      )}
+      {hasConnections && (
+        <OptionGroup
+          groupId="connections"
+          label="Connections"
+          expandedId={expandGroup}
+          intro="The resulting CSV file will have one column for each type of connection"
+          onExpandGroup={(val) => setExpandGroup(val)}
+          activeOptionCount={activeConnectionsCount}
+          optionCount={Object.keys(connectionTypes).length}
+          active={includeConnections}
+          options={connectionTypes}
+          onSetOptions={(options) => setConnectionTypes(options)}
+          optionListLabels={{
+            attributes: 'Select connections',
+          }}
         />
       )}
     </Box>
