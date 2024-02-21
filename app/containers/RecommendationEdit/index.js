@@ -30,7 +30,7 @@ import {
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
-
+import { canUserDeleteEntities } from 'utils/permissions';
 import { getMetaField } from 'utils/fields';
 import { qe } from 'utils/quasi-equals';
 
@@ -53,6 +53,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectIsUserAdmin,
+  selectSessionUserHighestRoleId,
   selectFrameworks,
 } from 'containers/App/selectors';
 
@@ -61,6 +62,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -303,7 +305,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 handleUpdate={this.props.handleUpdate}
-                handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+                handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(),
@@ -328,6 +330,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           { (saveSending || deleteSending)
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );
@@ -349,6 +352,7 @@ RecommendationEdit.propTypes = {
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
   isUserAdmin: PropTypes.bool,
+  highestRole: PropTypes.number,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
@@ -366,6 +370,7 @@ RecommendationEdit.contextTypes = {
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   isUserAdmin: selectIsUserAdmin(state),
+  highestRole: selectSessionUserHighestRoleId(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),

@@ -27,13 +27,11 @@ const Search = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
-  background-color: ${palette('background', 0)};
-  color: ${palette('dark', 2)};
-  padding: ${(props) => props.small ? '2px 7px' : '7px'};
-  border: 1px solid ${(props) => props.active ? palette('light', 4) : palette('light', 2)};
-  box-shadow: 0 0 3px 0 ${(props) => props.active ? palette('dark', 2) : 'transparent'};
+  background-color: ${palette('primary', 3)};
+  border: 1px solid ${palette('light', 3)};
+  color: ${palette('dark', 1)};
+  border-radius: 100px;
   min-height: ${(props) => props.small ? 30 : 36}px;
-  border-radius: 5px;
   position: relative;
   @media print {
     border: none;
@@ -43,9 +41,8 @@ const Search = styled.div`
   }
 `;
 const SearchInput = styled(DebounceInput)`
-  background-color: ${palette('background', 0)};
-  border: none;
-  padding: 3px;
+  padding: 10px;
+  padding-left: 16px;
   &:focus {
     outline: none;
   }
@@ -56,18 +53,18 @@ const SearchInput = styled(DebounceInput)`
   }
 `;
 const Tags = styled.div`
-  margin-top: -2px;
-  margin-bottom: -2px;
+  margin-top: 7px;
+  margin-left: 10px;
 `;
 
-const Clear = styled(Button)`
-  padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
+const StyledButton = styled(Button)`
+  padding: 10px 16px;
   position: absolute;
   top: 0;
   right: 0;
   background-color: ${palette('background', 4)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
+    padding: 10px 16px;
   }
   @media print {
     display: none;
@@ -126,21 +123,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       return this.getLabels(filter.labels);
     }
     return filter.label;
-  }
-
-  getFilterTitle = (filter) => {
-    let title = '';
-    if (filter.titleLabels) {
-      title = this.getLabels(filter.titleLabels);
-    } else {
-      title = filter.title || this.getFilterLabel(filter);
-    }
-    return this.context.intl.formatMessage(messages.removeTag, { title });
-  }
-
-  focusLastFilter = () => {
-    if (this.lastFilter) this.lastFilter.focus();
-  }
+  };
 
   render() {
     const {
@@ -148,7 +131,6 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       searchQuery,
       onSearch,
       placeholder,
-      onClear,
     } = this.props;
     const { intl } = this.context;
     // TODO set focus to input when clicking wrapper
@@ -179,7 +161,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             <FormattedMessage {...messages.labelPrintFilters} />
           </LabelPrint>
         )}
-        { filters.length > 0
+        {filters.length > 0
           && (
             <Tags>
               {
@@ -196,8 +178,8 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                       title={this.getFilterTitle(filter)}
                     >
                       {this.getFilterLabel(filter)}
-                      { filter.onClick
-                      && <Icon name="removeSmall" text textRight hidePrint />
+                      {filter.onClick
+                        && <Icon name="removeSmall" text textRight hidePrint />
                       }
                     </ButtonTagFilterInverse>
                   )
@@ -213,8 +195,8 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                       title={this.getFilterTitle(filter)}
                     >
                       {this.getFilterLabel(filter)}
-                      { filter.onClick
-                      && <Icon name="removeSmall" text textRight hidePrint />
+                      {filter.onClick
+                        && <Icon name="removeSmall" text textRight hidePrint />
                       }
                     </ButtonTagFilter>
                   ))
@@ -228,9 +210,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
           </StyledLabel>
         </ScreenReaderOnly>
         <SearchInput
-          id={inputId}
-          placeholder={inputPlaceholder}
-          inputRef={(el) => { this.input = el; }}
+          id="search-input"
           minLength={1}
           debounceTimeout={500}
           value={searchQuery || ''}
@@ -246,14 +226,21 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             }
           }}
         />
-        { hasFilters && (
-          <Clear
-            onClick={onClear}
+        {hasFilters && (
+          <StyledButton
+            onClick={this.props.onClear}
             small={this.props.multiselect}
             title={this.context.intl.formatMessage(messages.removeAll)}
           >
             <Icon name="removeSmall" />
-          </Clear>
+          </StyledButton>
+        )}
+        {!hasFilters && (
+          <StyledButton
+            small={this.props.multiselect}
+          >
+            <Icon title="Search" name="search" size="1em" />
+          </StyledButton>
         )}
         {searchQuery && (
           <LabelPrint>

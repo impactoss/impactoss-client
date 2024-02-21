@@ -30,6 +30,8 @@ import ContentHeader from 'components/ContentHeader';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 
+import Footer from '../Footer';
+
 // relative
 import VerticalDiagram from './VerticalDiagram';
 import HorizontalDiagram from './HorizontalDiagram';
@@ -45,6 +47,7 @@ import {
 } from './selectors';
 
 const Content = styled.div`
+  min-height: 80vH; 
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0 1em;
   }
@@ -108,13 +111,13 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     this.setState({
       mouseOverTaxonomyDiagram: isOver ? taxonomyId : null,
     });
-  }
+  };
 
   onTaxonomyMouseOver = (taxonomyId, isOver = true) => {
     this.setState({
       mouseOverTaxonomy: isOver ? taxonomyId : null,
     });
-  }
+  };
 
   resize = () => {
     // reset
@@ -186,6 +189,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 />
               )}
             </Content>
+            <Footer />
           </Container>
         </ContainerWithSidebar>
         {!dataReady && <EntityListSidebarLoading responsiveSmall />}

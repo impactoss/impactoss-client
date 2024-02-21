@@ -20,6 +20,7 @@ import {
   selectMeasureCategoriesByMeasure,
   selectMeasureIndicatorsByIndicator,
   selectRecommendationIndicatorsByIndicator,
+  selectUsers,
 } from 'containers/App/selectors';
 
 import {
@@ -61,16 +62,26 @@ export const selectConnections = createSelector(
   selectFWRecommendations,
   selectRecommendationCategoriesByRecommendation,
   (state) => selectEntities(state, 'categories'),
-  (ready, connections, recommendations, associationsGrouped, categories) => {
+  selectUsers,
+  (
+    ready,
+    connections,
+    recommendations,
+    associationsGrouped,
+    categories,
+    users,
+  ) => {
     if (ready) {
-      return connections.set(
-        'recommendations',
-        entitiesSetCategoryIds(
-          recommendations,
-          associationsGrouped,
-          categories,
-        )
-      );
+      return connections
+        .set('users', users)
+        .set(
+          'recommendations',
+          entitiesSetCategoryIds(
+            recommendations,
+            associationsGrouped,
+            categories,
+          )
+        );
     }
     return connections;
   }

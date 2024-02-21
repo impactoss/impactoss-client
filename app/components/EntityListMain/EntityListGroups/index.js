@@ -20,7 +20,6 @@ import { getPager } from './pagination';
 import messages from './messages';
 
 const ListEntitiesMain = styled.div`
-  padding-top: 0.5em;
 `;
 const ListEntitiesEmpty = styled.div``;
 const ListEntitiesGroup = styled.div`
@@ -192,7 +191,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
         entityIdsOnPage = entities.map((entity) => entity.get('id'));
         entityGroupsPaged = entityGroups;
       }
-    // no grouping required, paging required
+      // no grouping required, paging required
     } else if (entities.size > pageSize) {
       // get new pager object for specified page
       pager = getPager(
@@ -239,21 +238,21 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
           }}
         />
         <ListEntitiesMain>
-          { entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0)
+          {entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0)
             && (
               <ListEntitiesEmpty>
                 <FormattedMessage {...messages.listEmptyAfterQuery} />
               </ListEntitiesEmpty>
             )
           }
-          { entityIdsOnPage.size === 0 && !this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0)
+          {entityIdsOnPage.size === 0 && !this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0)
             && (
               <ListEntitiesEmpty>
                 <FormattedMessage {...messages.listEmpty} />
               </ListEntitiesEmpty>
             )
           }
-          { entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery)
+          {entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery)
             && errorsWithoutEntities && errorsWithoutEntities.size > 0
             && errors && errors.size > 0
             && (
@@ -262,7 +261,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
               </ListEntitiesEmpty>
             )
           }
-          { errorsWithoutEntities && errorsWithoutEntities.size > 0 && !this.hasLocationQueryFilters(locationQuery)
+          {errorsWithoutEntities && errorsWithoutEntities.size > 0 && !this.hasLocationQueryFilters(locationQuery)
             && errorsWithoutEntities.map((entityErrors, entityId) => (
               entityErrors.map((updateError, i) => (
                 <Messages
@@ -280,28 +279,49 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
               ))
             )).toList()
           }
-          { entityGroupsPaged.size > 0
+          {entityGroupsPaged.size > 0
             && (
               <div>
                 {
                   entityGroupsPaged.map((entityGroup, i) => (
                     <ListEntitiesGroup key={i}>
-                      { groupSelectValue && entityGroup.get('label')
-                      && <EntityListGroupHeader group={entityGroup} level={1} />
+                      {groupSelectValue && entityGroup.get('label')
+                        && <EntityListGroupHeader group={entityGroup} level={1} />
                       }
                       {
                         entityGroup.get('entityGroups')
-                      && entityGroup.get('entityGroups').toList().map((entitySubGroup, j) => (
-                        <ListEntitiesSubGroup key={j}>
-                          { subgroupSelectValue && entitySubGroup.get('label')
-                            && <EntityListGroupHeader group={entitySubGroup} level={2} />
-                          }
+                        && entityGroup.get('entityGroups').toList().map((entitySubGroup, j) => (
+                          <ListEntitiesSubGroup key={j}>
+                            {subgroupSelectValue && entitySubGroup.get('label')
+                              && <EntityListGroupHeader group={entitySubGroup} level={2} />
+                            }
+                            <EntityListItems
+                              taxonomies={this.props.taxonomies}
+                              connections={this.props.connections}
+                              config={config}
+                              entities={entitySubGroup.get('entities')}
+                              errors={errors}
+                              entityIdsSelected={entityIdsSelected}
+                              entityIcon={entityIcon}
+                              onEntityClick={onEntityClick}
+                              isManager={isManager}
+                              isContributor={isContributor}
+                              onEntitySelect={onEntitySelect}
+                              expandNo={expandNo}
+                              onExpand={onExpand}
+                              onDismissError={this.props.onDismissError}
+                            />
+                          </ListEntitiesSubGroup>
+                        ))
+                      }
+                      {entityGroup.get('entities') && !entityGroup.get('entityGroups')
+                        && (
                           <EntityListItems
                             taxonomies={this.props.taxonomies}
                             connections={this.props.connections}
-                            config={config}
-                            entities={entitySubGroup.get('entities')}
                             errors={errors}
+                            config={config}
+                            entities={entityGroup.get('entities')}
                             entityIdsSelected={entityIdsSelected}
                             entityIcon={entityIcon}
                             onEntityClick={onEntityClick}
@@ -312,28 +332,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             onExpand={onExpand}
                             onDismissError={this.props.onDismissError}
                           />
-                        </ListEntitiesSubGroup>
-                      ))
-                      }
-                      { entityGroup.get('entities') && !entityGroup.get('entityGroups')
-                      && (
-                        <EntityListItems
-                          taxonomies={this.props.taxonomies}
-                          connections={this.props.connections}
-                          errors={errors}
-                          config={config}
-                          entities={entityGroup.get('entities')}
-                          entityIdsSelected={entityIdsSelected}
-                          entityIcon={entityIcon}
-                          onEntityClick={onEntityClick}
-                          isManager={isManager}
-                          isContributor={isContributor}
-                          onEntitySelect={onEntitySelect}
-                          expandNo={expandNo}
-                          onExpand={onExpand}
-                          onDismissError={this.props.onDismissError}
-                        />
-                      )
+                        )
                       }
                     </ListEntitiesGroup>
                   ))
@@ -342,7 +341,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
             )
           }
         </ListEntitiesMain>
-        { entityGroupsPaged.size > 0
+        {entityGroupsPaged.size > 0
           && (
             <EntityListFooter
               pageSize={locationQuery.get('items') === 'all' ? 'all' : pageSize}

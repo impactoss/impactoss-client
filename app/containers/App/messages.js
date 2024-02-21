@@ -634,23 +634,33 @@ export default defineMessages({
         defaultMessage: 'No indicator reporter assigned',
       },
     },
-    meta: {
-      title: {
-        id: 'app.containers.App.attributes.meta.title',
-        defaultMessage: 'Meta',
-      },
-      updated_by: {
-        id: 'app.containers.App.attributes.meta.updated_by',
-        defaultMessage: 'Updated by',
-      },
-      updated_at: {
-        id: 'app.containers.App.attributes.meta.updated_at',
-        defaultMessage: 'Last updated',
-      },
-      created_at: {
-        id: 'app.containers.App.attributes.meta.created_at',
-        defaultMessage: 'Created',
-      },
+    metaTitle: {
+      id: 'app.containers.App.attributes.metaTitle',
+      defaultMessage: 'Meta',
+    },
+    updated_by_id: {
+      id: 'app.containers.App.attributes.updated_by_id',
+      defaultMessage: 'Updated by',
+    },
+    updated_at: {
+      id: 'app.containers.App.attributes.updated_at',
+      defaultMessage: 'Last updated',
+    },
+    relationship_updated_by_id: {
+      id: 'app.containers.App.attributes.relationship_updated_by_id',
+      defaultMessage: 'Connection last updated by',
+    },
+    relationship_updated_at: {
+      id: 'app.containers.App.attributes.relationship_updated_at',
+      defaultMessage: 'Connection last updated',
+    },
+    created_by_id: {
+      id: 'app.containers.App.attributes.created_by_id',
+      defaultMessage: 'Created by',
+    },
+    created_at: {
+      id: 'app.containers.App.attributes.created_at',
+      defaultMessage: 'Created',
     },
     framework_id: {
       id: 'app.containers.App.attributes.framework_id',
@@ -1445,6 +1455,14 @@ export default defineMessages({
     createdAsGuest: {
       id: 'app.containers.App.messages.createdAsGuest',
       defaultMessage: '{entityType} created successfully. It will become publicly available once verified and published by an authorised user.',
+    },
+    signingInServer: {
+      id: 'app.containers.App.messages.signingInServer',
+      defaultMessage: 'Note: signing in to {server} database',
+    },
+    registeringServer: {
+      id: 'app.containers.App.messages.registeringServer',
+      defaultMessage: 'Note: registering for {server} database',
     },
   },
   ui: {

@@ -19,11 +19,14 @@ import SkipContent from 'components/styled/SkipContent';
 import EntityNew from 'containers/EntityNew';
 
 import { sortEntities } from 'utils/sort';
+import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
+
+import { FOOTER } from 'themes/config';
 
 import {
   selectIsSignedIn,
-  selectIsUserManager,
   selectSessionUserAttributes,
+  selectSessionUserHighestRoleId,
   selectReady,
   selectFrameworks,
   selectEntitiesWhere,
@@ -53,7 +56,7 @@ const Main = styled.div`
   left: 0;
   right: 0;
   bottom:0;
-  background-color: ${(props) => props.isHome ? 'transparent' : palette('light', 0)};
+  background-color: ${(props) => props.isHome ? 'transparent' : palette('mainBackground', 0)};
   overflow: hidden;
 
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
@@ -88,6 +91,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     'order',
     'number'
   )
+    .filter((page) => FOOTER.INTERNAL_LINKS.indexOf(parseInt(page.get('id'), 10)) < 0)
     .map((page) => ({
       path: `${ROUTES.PAGES}/${page.get('id')}`,
       title: page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title']),
@@ -106,10 +110,10 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       label: intl.formatMessage(messages.frameworks.all),
       active: (activeId === 'all') || frameworks.size === 0,
     });
-  }
+  };
 
   prepareMainMenuItems = (
-    isManager,
+    highestRole,
     isUserSignedIn,
     currentPath,
     currentFrameworkId,
@@ -151,7 +155,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         currentPath.startsWith(ROUTES.INDICATORS)
         || currentPath.startsWith(ROUTES.PROGRESS_REPORTS),
     }]);
-    if (isManager) {
+    if (canUserManagePages(highestRole)) {
       navItems = navItems.concat([
         {
           path: ROUTES.PAGES,
@@ -159,6 +163,10 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           isAdmin: true,
           active: currentPath === ROUTES.PAGES,
         },
+      ]);
+    }
+    if (canUserManageUsers(highestRole)) {
+      navItems = navItems.concat([
         {
           path: ROUTES.USERS,
           title: intl.formatMessage(messages.nav.users),
@@ -178,14 +186,14 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       ]);
     }
     return navItems;
-  }
+  };
 
   render() {
     const {
       pages,
       onPageLink,
       isUserSignedIn,
-      isManager,
+      highestRole,
       location,
       newEntityModal,
       currentFrameworkId,
@@ -211,7 +219,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           user={user}
           pages={pages && this.preparePageMenuPages(pages)}
           navItems={this.prepareMainMenuItems(
-            isUserSignedIn && isManager,
+            highestRole,
             isUserSignedIn,
             location.pathname,
             currentFrameworkId,
@@ -232,6 +240,8 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
               currentFrameworkId,
             )
             : null}
+          currentPath={location.pathname}
+          brandPath={ROUTES.OVERVIEW}
         />
         <Main isHome={location.pathname === '/'} role="main" id="main-content">
           {React.Children.toArray(children)}
@@ -267,7 +277,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
 App.propTypes = {
   children: PropTypes.node,
   isUserSignedIn: PropTypes.bool,
-  isManager: PropTypes.bool,
+  highestRole: PropTypes.number,
   user: PropTypes.object,
   pages: PropTypes.object,
   validateToken: PropTypes.func,
@@ -287,7 +297,7 @@ App.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  isManager: selectIsUserManager(state),
+  highestRole: selectSessionUserHighestRoleId(state),
   isUserSignedIn: selectIsSignedIn(state),
   user: selectSessionUserAttributes(state),
   pages: selectEntitiesWhere(state, {

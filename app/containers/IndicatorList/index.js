@@ -47,6 +47,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
       supTitle: intl.formatMessage(messages.pageTitle),
       icon: 'indicators',
       actions: [],
+      actionsAdmin: [],
     };
     if (isUserSignedIn) {
       headerOptions.actions.push({
@@ -62,13 +63,18 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
         icon: 'print',
       });
     }
-    if (isManager) {
+    if (CONFIG.downloadCSV) {
       headerOptions.actions.push({
+        type: 'download',
+      });
+    }
+    if (isManager) {
+      headerOptions.actionsAdmin.push({
         type: 'text',
         title: intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
       });
-      headerOptions.actions.push({
+      headerOptions.actionsAdmin.push({
         type: 'add',
         title: [
           intl.formatMessage(appMessages.buttons.add),
