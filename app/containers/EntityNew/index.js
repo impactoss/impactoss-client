@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { Map, List } from 'immutable';
-
+import { Box } from 'grommet';
 import { getEntityAttributeFields } from 'utils/forms';
 import { qe } from 'utils/quasi-equals';
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -141,20 +141,22 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
           ref={this.scrollContainer}
           inModal={inModal}
         >
-          <ContentHeader
-            title={pageTitle}
-            type={CONTENT_MODAL}
-            icon={icon}
-            buttons={[{
-              type: 'cancel',
-              onClick: this.props.onCancel,
-            },
-            {
-              type: 'save',
-              disabled: saveSending,
-              onClick: () => this.props.handleSubmitRemote('entityNew.form.data'),
-            }]}
-          />
+          <Box margin={{ left: 'medium' }}>
+            <ContentHeader
+              title={pageTitle}
+              type={CONTENT_MODAL}
+              icon={icon}
+              buttons={[{
+                type: 'cancel',
+                onClick: this.props.onCancel,
+              },
+              {
+                type: 'save',
+                disabled: saveSending,
+                onClick: () => this.props.handleSubmitRemote('entityNew.form.data'),
+              }]}
+            />
+          </Box>
           {!submitValid
             && (
               <Messages
