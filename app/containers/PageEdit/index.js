@@ -27,6 +27,7 @@ import {
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import { canUserDeleteEntities } from 'utils/permissions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
@@ -45,6 +46,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectIsUserAdmin,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -52,6 +54,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -211,7 +214,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 handleUpdate={this.props.handleUpdate}
-                handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+                handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(),
@@ -228,6 +231,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           { (saveSending || deleteSending)
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );
@@ -250,6 +254,7 @@ PageEdit.propTypes = {
   isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   viewEntity: PropTypes.object,
+  highestRole: PropTypes.number,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
 };
@@ -261,6 +266,7 @@ PageEdit.contextTypes = {
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   isUserAdmin: selectIsUserAdmin(state),
+  highestRole: selectSessionUserHighestRoleId(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),

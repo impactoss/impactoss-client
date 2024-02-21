@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import { ROUTES, PARAMS } from 'containers/App/constants';
+import { ENABLE_AZURE } from 'themes/config';
 
 import LinkAccount from './LinkAccount';
 import LinkAccountLoading from './LinkAccountLoading';
@@ -14,9 +15,10 @@ import messages from './messages';
 
 const Styled = styled.div`
   background-color: ${palette('headerNavAccount', 0)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    float: right;
+  }
 `;
-
-
 class NavAccount extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   onClick = (evt, path, currentPath) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -38,9 +40,7 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
 
   render() {
     const { isSignedIn, currentPath, user } = this.props;
-
     const userPath = user ? `${ROUTES.USERS}/${user.id}` : '';
-
     return (
       <Styled>
         {isSignedIn && user
@@ -72,7 +72,7 @@ class NavAccount extends React.PureComponent { // eslint-disable-line react/pref
             </LinkAccount>
           )
         }
-        {!isSignedIn
+        {!isSignedIn && !ENABLE_AZURE
           && (
             <LinkAccount
               href={ROUTES.REGISTER}

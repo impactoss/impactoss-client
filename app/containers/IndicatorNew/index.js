@@ -59,6 +59,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -296,6 +297,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
               />
             )
           }
+          <Footer />
         </Content>
       </div>
     );

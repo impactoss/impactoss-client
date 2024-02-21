@@ -280,8 +280,11 @@ export const entitySetSingle = (
     )
   );
 
-export const entitySetUser = (entity, users) => entity
-  && entitySetSingle(entity, users, 'user', 'last_modified_user_id');
+export const entitySetUser = (entity, users) => {
+  let result = entitySetSingle(entity, users, 'creator', 'created_by_id');
+  result = entitySetSingle(result, users, 'user', 'updated_by_id');
+  return entitySetSingle(result, users, 'userRelationship', 'relationship_updated_by_id');
+};
 
 export const entitySetSingles = (entity, singles) => entity
   && singles.reduce(
@@ -390,7 +393,7 @@ export const prepareTaxonomiesIsAssociated = (
   ); // map/return
 };
 
-const getTaxCategories = (categories, taxonomy, tagsKey) => categories.filter(
+export const getTaxCategories = (categories, taxonomy, tagsKey) => categories.filter(
   (cat) => qe(
     cat.getIn(['attributes', 'taxonomy_id']),
     taxonomy.get('id')
@@ -479,6 +482,24 @@ export const prepareCategory = (
   }
   return null;
 };
+
+export const hasUserMinimumRole = (user, userRoles, minRoleId) => {
+  const pass = !!userRoles.find(
+    (association) => qe(
+      association.getIn(['attributes', 'user_id']),
+      user.get('id'),
+    ) && association.getIn(['attributes', 'role_id']) <= minRoleId,
+  );
+  return pass;
+};
+
+export const usersByMinimumRole = (
+  users,
+  userRoles,
+  roleId,
+) => users && users.filter(
+  (user) => hasUserMinimumRole(user, userRoles, roleId)
+);
 
 export const usersByRole = (
   users,

@@ -20,6 +20,8 @@ export const DEPENDENCIES = [
 export const CONFIG = {
   serverPath: 'measures',
   clientPath: 'actions',
+  types: 'measures',
+  downloadCSV: true,
   search: ['title', 'reference'],
   sorting: [
     {

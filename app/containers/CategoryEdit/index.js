@@ -38,6 +38,7 @@ import {
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import { canUserDeleteEntities } from 'utils/permissions';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
@@ -60,6 +61,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectIsUserAdmin,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -67,6 +69,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import Footer from 'containers/Footer';
 
 import { getEntityTitle } from 'utils/entities';
 
@@ -273,6 +276,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       viewEntity,
       dataReady,
       isAdmin,
+      highestRole,
       viewDomain,
       users,
       connectedTaxonomies,
@@ -369,8 +373,8 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
                 handleUpdate={this.props.handleUpdate}
-                handleDelete={() => isAdmin
-                  ? this.props.handleDelete(viewEntity.getIn(['attributes', 'taxonomy_id']))
+                handleDelete={canUserDeleteEntities(highestRole)
+                  ? () => this.props.handleDelete(viewEntity.getIn(['attributes', 'taxonomy_id']))
                   : null
                 }
                 fields={{
@@ -401,6 +405,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           {(saveSending || deleteSending)
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );
@@ -422,6 +427,7 @@ CategoryEdit.propTypes = {
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
+  highestRole: PropTypes.number,
   params: PropTypes.object,
   parentOptions: PropTypes.object,
   parentTaxonomy: PropTypes.object,
@@ -440,6 +446,7 @@ CategoryEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isAdmin: selectIsUserAdmin(state),
+  highestRole: selectSessionUserHighestRoleId(state),
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
@@ -487,6 +494,9 @@ function mapDispatchToProps(dispatch, props) {
             connectionAttribute: 'associatedMeasures',
             createConnectionKey: 'measure_id',
             createKey: 'category_id',
+            allowMultiple: taxonomy.getIn(['attributes', 'allow_multiple']),
+            taxonomyCategoryIds: taxonomy.get('categories')
+              && taxonomy.get('categories').keySeq(),
           })
         );
       }
@@ -500,6 +510,9 @@ function mapDispatchToProps(dispatch, props) {
               connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
               createConnectionKey: 'recommendation_id',
               createKey: 'category_id',
+              allowMultiple: taxonomy.getIn(['attributes', 'allow_multiple']),
+              taxonomyCategoryIds: taxonomy.get('categories')
+                && taxonomy.get('categories').keySeq(),
             }))
             .reduce(
               (memo, deleteCreateLists) => {

@@ -136,6 +136,9 @@ const MoreLink = styled(A)`
   font-weight: bold;
 `;
 
+const Input = styled.input`
+accent-color: ${palette('checkbox', 0)};
+`;
 const SHOW_INCREMENT = 20;
 
 class OptionList extends React.PureComponent {
@@ -205,7 +208,7 @@ class OptionList extends React.PureComponent {
                         }
                         { !isIndeterminate
                           && (
-                            <input
+                            <Input
                               id={id}
                               type="checkbox"
                               checked={checked}

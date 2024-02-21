@@ -21,6 +21,7 @@ import {
   selectMeasureCategoriesByMeasure,
   selectRecommendationMeasuresByRecommendation,
   selectRecommendationIndicatorsByRecommendation,
+  selectUsers,
 } from 'containers/App/selectors';
 
 import {
@@ -175,15 +176,18 @@ export const selectConnections = createSelector(
   selectConnectionsIndicators,
   selectFWMeasures,
   selectMeasureCategoriesByMeasure,
-  (ready, connections, measures, associationsGrouped) => {
+  selectUsers,
+  (ready, connections, measures, associationsGrouped, users) => {
     if (ready) {
-      return connections.set(
-        'measures',
-        entitiesSetCategoryIds(
-          measures,
-          associationsGrouped,
-        )
-      );
+      return connections
+        .set('users', users)
+        .set(
+          'measures',
+          entitiesSetCategoryIds(
+            measures,
+            associationsGrouped,
+          )
+        );
     }
     return connections;
   }

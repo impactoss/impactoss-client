@@ -24,10 +24,16 @@ import {
 
 import { getStatusField as getStatusInfoField } from 'utils/fields';
 
-import { qe } from 'utils/quasi-equals';
+import qe from 'utils/quasi-equals';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import {
+  canUserPublishReports,
+  canUserCreateOrEditReports,
+  canUserBeAssignedToReports,
+  canUserSeeDraftContent,
+} from 'utils/permissions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -38,13 +44,14 @@ import {
   updateEntityForm,
   submitInvalid,
   saveErrorDismiss,
+  redirectNotPermitted,
 } from 'containers/App/actions';
 
 import {
   selectReady,
-  selectIsUserContributor,
-  selectIsUserManager,
+  selectReadyForAuthCheck,
   selectSessionUserId,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -52,6 +59,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -66,7 +74,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   constructor(props) {
     super(props);
     this.state = {
-      guestDismissed: false,
+      draftNoteDismissed: false,
     };
     this.scrollContainer = React.createRef();
   }
@@ -85,6 +93,24 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     }
     if (nextProps.dataReady && !this.props.dataReady && nextProps.indicator) {
       this.props.initialiseForm('reportNew.form.data', this.getInitialFormData(nextProps));
+    }
+    // console.log('UNSAFE_componentWillReceiveProps', nextProps.indicator, this.props.indicator)
+    if (nextProps.dataAndAuthReady && nextProps.indicator) {
+      // to allow creating it requires
+      // user to have CONTRIBUTOR_MIN_ROLE
+      // OR
+      //    user to have CONTRIBUTOR_MIN_ROLE_ASSIGNED
+      //    AND
+      //    user to be assigned
+      //
+      // otherwise redirect to unauthorised
+      const hasUserMinimumRole = canUserCreateOrEditReports(nextProps.highestRole);
+      const isUserAssigned = canUserBeAssignedToReports(nextProps.highestRole)
+        && qe(nextProps.indicator.getIn(['attributes', 'manager_id']), nextProps.userId);
+      const canCreate = hasUserMinimumRole || isUserAssigned;
+      if (!canCreate) {
+        this.props.onRedirectNotPermitted();
+      }
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
       scrollToTop(this.scrollContainer.current);
@@ -156,26 +182,19 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     ]);
   };
 
-  dismissGuestMessage = (evt) => {
+  dismissDraftNote = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    this.setState({ guestDismissed: true });
+    this.setState({ draftNoteDismissed: true });
   }
-
-  canUserPublish = (isUserContributor, isUserManager, userId, indicator) => isUserManager || (isUserContributor && qe(userId, indicator.getIn(['attributes', 'manager_id'])));
 
   render() {
     const { intl } = this.context;
     const {
-      dataReady, indicator, viewDomain, isUserContributor, isUserManager, userId,
+      dataReady, indicator, viewDomain, highestRole,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const indicatorReference = this.props.params.id;
-    const canUserPublish = dataReady && this.canUserPublish(
-      isUserContributor,
-      isUserManager,
-      userId,
-      indicator
-    );
+    const canUserPublish = dataReady && canUserPublishReports(highestRole);
 
     const pageTitle = intl.formatMessage(messages.pageTitle, { indicatorReference });
 
@@ -204,18 +223,18 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                 type: 'save',
                 disabled: saveSending,
                 onClick: () => {
-                  this.dismissGuestMessage();
+                  this.dismissDraftNote();
                   this.props.handleSubmitRemote('reportNew.form.data');
                 },
               }] : null
             }
           />
-          { !canUserPublish && !this.state.guestDismissed && dataReady && !saveError && !!submitValid
+          { !canUserPublish && !this.state.draftNoteDismissed && dataReady && !saveError && !!submitValid
             && (
               <Messages
                 type="info"
-                message={intl.formatMessage(messages.guestNote)}
-                onDismiss={this.dismissGuestMessage}
+                message={intl.formatMessage(messages.draftNote)}
+                onDismiss={this.dismissDraftNote}
               />
             )
           }
@@ -247,11 +266,11 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                 formData={viewDomain.getIn(['form', 'data'])}
                 saving={saveSending}
                 handleSubmit={(formData) => {
-                  this.dismissGuestMessage();
+                  this.dismissDraftNote();
                   this.props.handleSubmit(
                     formData,
                     indicatorReference,
-                    canUserPublish
+                    highestRole
                   );
                 }}
                 handleSubmitFail={this.props.handleSubmitFail}
@@ -264,7 +283,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                   },
                   body: {
                     main: this.getBodyMainFields(),
-                    aside: canUserPublish && this.getBodyAsideFields(indicator),
+                    aside: this.getBodyAsideFields(indicator),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -274,6 +293,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
           { saveSending
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );
@@ -289,14 +309,15 @@ ReportNew.propTypes = {
   handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  onRedirectNotPermitted: PropTypes.func,
   indicator: PropTypes.object,
   params: PropTypes.object,
   initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
-  isUserContributor: PropTypes.bool,
-  isUserManager: PropTypes.bool,
-  userId: PropTypes.string,
+  highestRole: PropTypes.number,
+  // userId: PropTypes.string, // used in nextProps
+  // dataAndAuthReady: PropTypes.bool, // used in nextProps
 };
 
 ReportNew.contextTypes = {
@@ -306,10 +327,12 @@ ReportNew.contextTypes = {
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  dataAndAuthReady:
+    selectReady(state, { path: DEPENDENCIES })
+    && selectReadyForAuthCheck(state),
   indicator: selectIndicator(state, props.params.id),
-  isUserContributor: selectIsUserContributor(state),
-  isUserManager: selectIsUserManager(state),
   userId: selectSessionUserId(state),
+  highestRole: selectSessionUserHighestRoleId(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -327,13 +350,16 @@ function mapDispatchToProps(dispatch) {
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
     },
+    onRedirectNotPermitted: () => {
+      dispatch(redirectNotPermitted());
+    },
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, indicatorReference, canUserPublish) => {
+    handleSubmit: (formData, indicatorReference, highestRole) => {
       let saveData = formData;
 
       saveData = saveData.setIn(['attributes', 'indicator_id'], indicatorReference);
@@ -345,8 +371,8 @@ function mapDispatchToProps(dispatch) {
 
       dispatch(save(
         saveData.toJS(),
-        canUserPublish ? ROUTES.PROGRESS_REPORTS : `${ROUTES.INDICATORS}/${indicatorReference}`,
-        !canUserPublish // createAsGuest: do not append created id to redirect, do not create locally
+        canUserSeeDraftContent(highestRole) ? ROUTES.PROGRESS_REPORTS : `${ROUTES.INDICATORS}/${indicatorReference}`,
+        !canUserSeeDraftContent(highestRole) // createAsGuest: do not append created id to redirect, do not create locally
       ));
     },
     handleCancel: (indicatorReference) => {

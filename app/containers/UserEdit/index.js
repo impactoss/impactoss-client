@@ -17,7 +17,7 @@ import {
   renderTaxonomyControl,
   getCategoryUpdatesFromFormData,
   getTitleFormField,
-  getEmailField,
+  getEmailFormField,
   getHighestUserRoleId,
   getRoleFormField,
 } from 'utils/forms';
@@ -25,10 +25,14 @@ import {
 import {
   getMetaField,
   getRoleField,
+  getTitleField,
+  getEmailField,
 } from 'utils/fields';
+import { canUserManageUsers, canUserSeeMeta } from 'utils/permissions';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import qe from 'utils/quasi-equals';
 
 import {
   loadEntitiesIfNeeded,
@@ -37,21 +41,28 @@ import {
   submitInvalid,
   saveErrorDismiss,
   openNewEntityModal,
+  redirectNotPermitted,
 } from 'containers/App/actions';
 
 import {
   selectReady,
   selectSessionUserHighestRoleId,
+  selectReadyForAuthCheck,
+  selectSessionUserId,
 } from 'containers/App/selectors';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
 
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+
+import Footer from 'containers/Footer';
+
+import appMessages from 'containers/App/messages';
 
 import {
   selectDomain,
@@ -62,6 +73,7 @@ import {
 
 import { save } from './actions';
 import messages from './messages';
+
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class UserEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -85,6 +97,13 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.initialiseForm('userEdit.form.data', this.getInitialFormData(nextProps));
     }
+    if (nextProps.dataReady && nextProps.authReady && nextProps.viewEntity) {
+      const canEdit = canUserManageUsers(nextProps.sessionUserHighestRoleId)
+        || (nextProps.viewEntity.get('id') === nextProps.sessionUserId && !ENABLE_AZURE);
+      if (!canEdit) {
+        this.props.onRedirectNotPermitted();
+      }
+    }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
       scrollToTop(this.scrollContainer.current);
     }
@@ -105,33 +124,48 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     });
   }
 
-  getHeaderMainFields = () => {
+  getHeaderMainFields = (entity, isManager) => {
     const { intl } = this.context;
+    if (!ENABLE_AZURE) {
+      return ([{ // fieldGroup
+        fields: [getTitleFormField(intl.formatMessage, 'title', 'name')],
+      }]);
+    }
     return ([{ // fieldGroup
-      fields: [getTitleFormField(intl.formatMessage, 'title', 'name')],
+      fields: [getTitleField(entity, isManager, 'name', appMessages.attributes.name)],
     }]);
   };
 
-  getHeaderAsideFields = (entity, roles) => {
+  getHeaderAsideFields = (entity, roles, userId, highestRole) => {
     const { intl } = this.context;
-    return ([
-      {
-        fields: (roles && roles.size > 0) ? [
-          getRoleFormField(intl.formatMessage, roles),
-          getMetaField(entity),
-        ]
-          : [
-            getRoleField(entity),
-            getMetaField(entity),
-          ],
-      },
-    ]);
+    let fields = [];
+    const canSeeRole = canUserManageUsers(highestRole)
+      || qe(entity.get('id'), userId);
+    if (!ENABLE_AZURE && canUserManageUsers(highestRole)) {
+      fields = [
+        getRoleFormField(intl.formatMessage, roles),
+      ];
+    } else if (canSeeRole) {
+      fields = [
+        getRoleField(entity),
+      ];
+    }
+    if (canUserSeeMeta(highestRole)) {
+      fields = [...fields, getMetaField(entity)];
+    }
+
+    return ([{ fields }]);
   };
 
-  getBodyMainFields = () => {
+  getBodyMainFields = (entity) => {
     const { intl } = this.context;
+    if (!ENABLE_AZURE) {
+      return ([{
+        fields: [getEmailFormField(intl.formatMessage)],
+      }]);
+    }
     return ([{
-      fields: [getEmailField(intl.formatMessage)],
+      fields: [getEmailField(entity)],
     }]);
   };
 
@@ -161,8 +195,18 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   render() {
     const { intl } = this.context;
     const {
-      viewEntity, dataReady, viewDomain, taxonomies, roles, sessionUserHighestRoleId, onCreateOption,
+      sessionUserId,
+      viewEntity,
+      dataReady,
+      viewDomain,
+      taxonomies,
+      roles,
+      sessionUserHighestRoleId,
+      onCreateOption,
     } = this.props;
+    const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
+    const isAdmin = sessionUserHighestRoleId <= USER_ROLES.ADMIN.value;
+
     const reference = this.props.params.id;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
@@ -237,12 +281,17 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 handleUpdate={this.props.handleUpdate}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
-                    aside: this.getHeaderAsideFields(viewEntity, editableRoles),
+                    main: this.getHeaderMainFields(viewEntity, isManager),
+                    aside: this.getHeaderAsideFields(
+                      viewEntity,
+                      editableRoles,
+                      sessionUserId,
+                      sessionUserHighestRoleId,
+                    ),
                   },
                   body: {
-                    main: this.getBodyMainFields(),
-                    aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER.value) && this.getBodyAsideFields(taxonomies, onCreateOption),
+                    main: this.getBodyMainFields(viewEntity),
+                    aside: isAdmin && this.getBodyAsideFields(taxonomies, onCreateOption),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -252,6 +301,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           { saveSending
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );
@@ -276,6 +326,9 @@ UserEdit.propTypes = {
   onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
+  onRedirectNotPermitted: PropTypes.func,
+  // authReady: PropTypes.bool,
+  sessionUserId: PropTypes.string, // used in nextProps
 };
 
 UserEdit.contextTypes = {
@@ -286,9 +339,11 @@ const mapStateToProps = (state, props) => ({
   sessionUserHighestRoleId: selectSessionUserHighestRoleId(state),
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   roles: selectRoles(state, props.params.id),
+  sessionUserId: selectSessionUserId(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -299,6 +354,9 @@ function mapDispatchToProps(dispatch) {
     initialiseForm: (model, formData) => {
       dispatch(formActions.reset(model));
       dispatch(formActions.change(model, formData, { silent: true }));
+    },
+    onRedirectNotPermitted: () => {
+      dispatch(redirectNotPermitted());
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
