@@ -39,6 +39,8 @@ import {
   getMarkdownField,
 } from 'utils/fields';
 
+import { scrollToTop } from 'utils/scroll-to-component';
+
 import messages from './messages';
 import { selectViewEntity } from './selectors';
 import { DEPENDENCIES } from './constants';
@@ -57,7 +59,7 @@ const ViewContainer = styled(Container)`
 export class PageView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.topOfPageRef = createRef();
+    this.scrollContainerRef = createRef();
   }
 
   UNSAFE_componentWillMount() {
@@ -73,8 +75,8 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
 
   componentDidUpdate() {
     // if component is loaded, scroll to the top of the page
-    if (this.topOfPageRef.current) {
-      this.topOfPageRef.current.scrollIntoView();
+    if (this.scrollContainerRef.current) {
+      scrollToTop(this.scrollContainerRef.current);
     }
   }
 
@@ -128,9 +130,8 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Styled className={`content-${CONTENT_PAGE}`}>
+        <Styled className={`content-${CONTENT_PAGE}`} ref={this.scrollContainerRef}>
           <ViewContainer isNarrow={!isManager}>
-            <span ref={this.topOfPageRef} />
             <ContentHeader
               title={page ? page.getIn(['attributes', 'title']) : ''}
               supTitle={page ? page.getIn(['attributes', 'menu_title']) : ''}
