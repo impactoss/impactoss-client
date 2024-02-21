@@ -44,7 +44,7 @@ export const SHOW_HEADER_TITLE = false;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.header
-export const SHOW_HEADER_PATTERN = true;
+export const SHOW_HEADER_PATTERN = false;
 export const HEADER_PATTERN_HEIGHT = 254;
 
 // show header pattern
@@ -62,9 +62,11 @@ export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
 
 // show footer logo section
 export const FOOTER = {
-  PARTNERS: false,
-  LINK_TARGET_INTERNAL: true,
-  LINK_TARGET_INTERNAL_ID: 1,
+  INTERNAL_LINKS: [
+    1, // copyright (page db id as generated in seed file)
+    2, // disclaimer
+    3, // privacy
+  ],
 };
 
 // entitylists items-per-page options

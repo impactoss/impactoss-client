@@ -17,18 +17,21 @@ const Select = styled(PrintHide)`
     width: 40px;
   }
 `;
+const Input = styled.input`
+accent-color: ${palette('checkbox', 0)};
+`;
 
 export default class EntityListItemSelect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     checked: PropTypes.bool,
     onSelect: PropTypes.func,
-  }
+  };
 
   render() {
     const { checked, onSelect } = this.props;
     return (
       <Select>
-        <input
+        <Input
           type="checkbox"
           checked={checked}
           onChange={(evt) => onSelect(evt.target.checked)}

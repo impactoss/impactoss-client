@@ -29,14 +29,14 @@ const Styled = styled(Component)`
 `;
 const IconWrap = styled.span`
   display: inline-block;
-  color: ${palette('light', 3)};
+  color: ${palette('dark', 2)};
   top: -4px;
   position: relative;
 `;
 
 const Count = styled.span`
   display: inline-block;
-  color: ${palette('text', 1)};
+  color: ${palette('dark', 2)};
   padding: 0 8px;
   font-size: 1.5em;
   @media print {
@@ -80,7 +80,7 @@ class EntityListItemExpandable extends React.PureComponent { // eslint-disable-l
           <Icon name={icon} text iconRight />
         </IconWrap>
         <Count type={type} count={count}>{count}</Count>
-        { info
+        {info
           && info.map((infoItem, i) => (<Info key={i} palette={infoItem.style}>{infoItem.label}</Info>))
         }
       </Styled>

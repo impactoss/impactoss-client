@@ -13,7 +13,7 @@ import EntityListSidebarGroupLabel from './EntityListSidebarGroupLabel';
 import EntityListSidebarOption from './EntityListSidebarOption';
 
 const Group = styled.div`
-  border-bottom: 1px solid;
+  border-top: 1px solid;
   border-color: ${(props) => props.expanded ? palette('aside', 0) : palette('light', 2)};
   &:last-child {
     border-bottom: 0;
@@ -25,7 +25,7 @@ class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-li
     const { groups } = this.props;
     return (
       <div>
-        { groups && groups.entrySeq().map(([groupId, group]) => group.get('options') && group.get('options').size > 0
+        {groups && groups.entrySeq().map(([groupId, group]) => group.get('options') && group.get('options').size > 0
           ? (
             <Group key={groupId} expanded={this.props.expanded[groupId]}>
               <EntityListSidebarGroupLabel
@@ -37,22 +37,22 @@ class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-li
                   this.props.onToggleGroup(groupId, !this.props.expanded[groupId]);
                 }}
               />
-              { this.props.expanded[groupId]
-                  && (
-                    <div>
-                      {
-                        group.get('options').map((option, i) => (
-                          <EntityListSidebarOption
-                            key={i}
-                            option={option}
-                            groupId={group.get('id')}
-                            groupType={group.get('type')}
-                            onShowForm={this.props.onShowForm}
-                          />
-                        ))
-                      }
-                    </div>
-                  )
+              {this.props.expanded[groupId]
+                && (
+                  <div>
+                    {
+                      group.get('options').map((option, i) => (
+                        <EntityListSidebarOption
+                          key={i}
+                          option={option}
+                          groupId={group.get('id')}
+                          groupType={group.get('type')}
+                          onShowForm={this.props.onShowForm}
+                        />
+                      ))
+                    }
+                  </div>
+                )
               }
             </Group>
           )

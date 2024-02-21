@@ -20,6 +20,7 @@ import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
 import PrintOnly from 'components/styled/PrintOnly';
+import Footer from 'containers/Footer';
 
 import { CONTENT_LIST, PARAMS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -46,6 +47,10 @@ const PrintHintKey = styled(PrintOnly)`
   font-style: italic;
   font-size: ${(props) => props.theme.sizes.print.smaller};
   margin-bottom: 20px;
+`;
+
+const StyledContent = styled(Content)`
+  margin-bottom: 10em;
 `;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -204,7 +209,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     return (
       <ContainerWithSidebar ref={this.ScrollContainer}>
         <Container ref={this.ScrollReference}>
-          <Content>
+          <StyledContent>
             <ContentHeader
               type={CONTENT_LIST}
               icon={header.icon}
@@ -291,7 +296,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 </ListWrapper>
               </ListEntities>
             )}
-          </Content>
+          </StyledContent>
+          <Footer />
         </Container>
       </ContainerWithSidebar>
     );

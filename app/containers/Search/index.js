@@ -37,6 +37,8 @@ import qe from 'utils/quasi-equals';
 
 import EntityListItem from 'components/EntityListItem';
 
+import Footer from 'containers/Footer';
+
 import appMessages from 'containers/App/messages';
 
 import { DEPENDENCIES } from './constants';
@@ -307,6 +309,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                 </div>
               )}
             </Content>
+            <Footer />
           </Container>
         </ContainerWrapper>
       </div>

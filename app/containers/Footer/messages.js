@@ -10,6 +10,10 @@ export default defineMessages({
     id: 'app.containers.Footer.disclaimer',
     defaultMessage: 'Every care has been taken to ensure the accuracy of this data and information. Please send any feedback to ',
   },
+  disclaimer2: {
+    id: 'app.containers.Footer.disclaimer2',
+    defaultMessage: 'Every care has been taken to ensure the accuracy of this data and information.',
+  },
   contact: {
     email: {
       id: 'app.containers.Footer.contact.email',
@@ -19,6 +23,18 @@ export default defineMessages({
       id: 'app.containers.Footer.contact.anchor',
       defaultMessage: 'contact@project.url',
     },
+  },
+  govLinkHref: {
+    id: 'app.containers.Footer.govLinkHref',
+    defaultMessage: 'https://www.govt.nz',
+  },
+  govLinkAnchor: {
+    id: 'app.containers.Footer.govLinkAnchor',
+    defaultMessage: 'www.govt.nz',
+  },
+  contactUs: {
+    id: 'app.containers.Footer.contactUs',
+    defaultMessage: 'Contact Us',
   },
   responsible: {
     text: {
@@ -105,5 +121,6 @@ export default defineMessages({
       id: 'app.containers.Footer.partners.url6',
       defaultMessage: 'http://www.partner6.org',
     },
+
   },
 });

@@ -62,6 +62,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
 
@@ -347,6 +348,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           {(saveSending || deleteSending)
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );

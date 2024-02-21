@@ -4,7 +4,7 @@
  *
  */
 
-import React from 'react';
+import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
@@ -55,6 +55,11 @@ const ViewContainer = styled(Container)`
 `;
 
 export class PageView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.topOfPageRef = createRef();
+  }
+
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
@@ -63,6 +68,13 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+  }
+
+  componentDidUpdate() {
+    // if component is loaded, scroll to the top of the page
+    if (this.topOfPageRef.current) {
+      this.topOfPageRef.current.scrollIntoView();
     }
   }
 
@@ -118,6 +130,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
         />
         <Styled className={`content-${CONTENT_PAGE}`}>
           <ViewContainer isNarrow={!isManager}>
+            <span ref={this.topOfPageRef} />
             <ContentHeader
               title={page ? page.getIn(['attributes', 'title']) : ''}
               supTitle={page ? page.getIn(['attributes', 'menu_title']) : ''}
