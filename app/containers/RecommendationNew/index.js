@@ -294,7 +294,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
           { saveSending
             && <Loading />
           }
-          <Footer />
+          <Footer fill />
         </Content>
       </div>
     );

@@ -7,7 +7,6 @@ import footerLogo1 from 'themes/media/footer-logo-nzgov.png';
 import footerLogo2 from 'themes/media/footer-logo-nzjustice.png';
 
 import graphicHome from 'themes/media/homeGraphic.png';
-import graphicHome2x from 'themes/media/homeGraphic@2x.png';
 
 import impactossLogo from 'themes/media/impactossLogo.png';
 // import impactossLogo2x from 'themes/media/impactoss@2x.png';
@@ -17,10 +16,10 @@ const theme = {};
 // pass array for retina images: [normalSrc, retinaSrc],
 // or single image: src
 theme.media = {
-  headerLogo: [headerLogo, headerLogo],
-  graphicHome: [graphicHome, graphicHome2x],
+  headerLogo: [headerLogo],
+  graphicHome: [graphicHome],
   // titleHome: [titleHome, titleHome2x],
-  impactossLogo: [impactossLogo, impactossLogo],
+  impactossLogo: [impactossLogo],
   // up to 6 partner logos,
   // link text and title to be set in translations/[lang].js > app.components.Footer.partners.[]
   // partnerLogos: [
@@ -29,8 +28,8 @@ theme.media = {
   //   [partner3, partner3x2x],
   //   [partner4, partner4x2x],
   // ],
-  nzGovLogo: [footerLogo1, footerLogo1],
-  nzJusticeLogo: [footerLogo2, footerLogo2],
+  nzGovLogo: [footerLogo1],
+  nzJusticeLogo: [footerLogo2],
 };
 
 // grid-styles settings https://github.com/jxnblk/grid-styled
@@ -102,14 +101,14 @@ const secondary = coolorsToHex('https://coolors.co/ba5d03-ffffff-ffffff-ffffff-f
 // 2:  dark (AA)
 // 3:  medium gray 1 (AA) --- !!! AA compatible with light[0]
 // 4:  medium gray 2 (AA large)
-const dark = coolorsToHex('https://coolors.co/1e1f1f-6b6f73-73777b-cfd0d1-dfe1e3');
+const dark = coolorsToHex('https://coolors.co/1e1f1f-6b6f73-73777b-828587-97999B');
 // light grayscale: light to dark
 // 0:  lightest gray (background colour) - also used in global-styles.js !!! AA compatible with dark[3]
 // 1:  light gray (light lines, navigation filter panel)
 // 2:  gray 1 (gray pattern)
 // 3:  gray 2 (icons light)
 // 4:  gray 3 (dark lines)
-const light = coolorsToHex('https://coolors.co/f1f4f4-eaeaea-dfe1e3-cfd0d1-73777b');
+const light = coolorsToHex('https://coolors.co/f1f4f4-eaeaea-dfe1e3-cfd0d1-C0C2C4');
 
 // other palettes
 // 0: AA on light[0] and on error[3]
@@ -188,8 +187,8 @@ theme.palette = {
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
   measuresHover: ['#964B00'], // FFC107  AA compliant
   measures: ['#BA5D03'],
-  recommendationsHover: ['#510064', 'transparent'], // accepted, noted ['#FF9B69', '#FFB28B'],
-  recommendations: ['#73018E', 'transparent'],
+  recommendationsHover: ['#510064', '#a94dbf'], // accepted, noted ['#FF9B69', '#FFB28B'],
+  recommendations: ['#73018E', '#a94dbf'],
   indicatorsHover: ['#F09F5B'],
   indicators: ['#FFCEA5'],
   reportsHover: [error[1]],
@@ -208,7 +207,7 @@ theme.palette = {
   // text
   // [#primaryFont, #secondaryFont, #inverse]
   text: [dark[0], dark[1], primary[4]],
-  background: [primary[4], light[0], secondary[0]],
+  background: [primary[4], '#f2f3f4', secondary[0]],
 
   // links
   // also see global-styles.js for default link "a"
@@ -288,7 +287,7 @@ theme.palette = {
   // BUTTONS / LINKS
   //
   // button: ['#colorPrimary', '#colorSecondary', #disabled],
-  buttonFlat: [primary[1], dark[1], light[4]], // aka ghost button
+  buttonFlat: [primary[1], dark[1], dark[4]], // aka ghost button
   buttonFlatHover: [primary[0], primary[1]],
   buttonCancel: [dark[3]], // form footer cancel
   buttonCancelHover: [primary[1]],
@@ -402,9 +401,9 @@ theme.sizes = {
     // px or em
     text: {
       title: '2.8em',
-      titleMobile: '1.4em',
-      claim: '1.3em',
-      claimMobile: '1em',
+      titleMobile: '1.6em',
+      claim: '2.2em',
+      claimMobile: '1.2em',
     },
     print: {
       title: '2.8em',

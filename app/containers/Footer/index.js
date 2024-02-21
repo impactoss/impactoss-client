@@ -22,7 +22,7 @@ import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 const FooterMain = styled.div`
-  margin-top: 50px;
+  margin-top: 80px;
   background-color: transparent;
   color: ${palette('dark', 1)};
   padding: 0;
@@ -32,8 +32,9 @@ const FooterMain = styled.div`
 `;
 
 const FooterLink = styled.a`
-  display:inline-block;
-  font-weight:bold;
+  display: inline-block;
+  font-weight: 600;
+  font-size: ${({ theme }) => theme.text.xsmall.size};
   color: ${palette('dark', 1)};
   &:hover {
     color: ${palette('dark', 2)};
@@ -41,16 +42,16 @@ const FooterLink = styled.a`
 `;
 
 const Logo = styled(NormalImg)`
-  height: 40px;
+  height: 50px;
   padding-right: ${({ hasRightPadding }) => hasRightPadding ? '2em' : 0};
   @media (min-width: ${({ theme }) => theme.breakpoints.large}) {
-    height: 65px;
+    height: 75px;
   }
 `;
 
 const Wrapper = styled((p) => <Box margin={{ bottom: 'large' }} {...p} />)`
   font-size: 0.8em;
-  padding: 0px 30px;
+  padding: ${({ fill }) => fill ? 0 : '0px 30px'};
   @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
     width: 100%;
     font-size: 0.9em;
@@ -71,6 +72,7 @@ const Footer = ({
   theme,
   onPageLink,
   pages,
+  fill,
 }) => {
   const size = useContext(ResponsiveContext);
   const isMobile = !isMinSize(size, 'medium');
@@ -78,7 +80,7 @@ const Footer = ({
   return (
     <FooterMain>
       <Container noPaddingBottom>
-        <Wrapper>
+        <Wrapper fill={fill}>
           <BoxRow
             direction={isMobile ? 'column' : 'row'}
             justify="between"
@@ -138,22 +140,20 @@ const Footer = ({
                     )}
                   {pages && pages.size > 0 && FOOTER.INTERNAL_LINKS && FOOTER.INTERNAL_LINKS.map((pageId) => {
                     const page = pages.find((p) => qe(p.get('id'), pageId));
-                    return (
-                      <div key={pageId}>
-                        {page && (
-                          <FooterLink
-                            onClick={(evt) => {
-                              if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                              onPageLink(`${ROUTES.PAGES}/${pageId}`);
-                            }}
-                            href={`${ROUTES.PAGES}/${pageId}`}
-                          >
-                            {page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title'])}
-                          </FooterLink>
-                        )}
-                        {!page && 'page not found'}
-                      </div>
-                    );
+                    return page
+                      ? (
+                        <FooterLink
+                          key={pageId}
+                          onClick={(evt) => {
+                            if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                            onPageLink(`${ROUTES.PAGES}/${pageId}`);
+                          }}
+                          href={`${ROUTES.PAGES}/${pageId}`}
+                        >
+                          {page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title'])}
+                        </FooterLink>
+                      )
+                      : 'page not found';
                   })}
                   <FooterLink
                     target="_blank"
@@ -167,7 +167,7 @@ const Footer = ({
             </BoxRow>
             <BoxRow>
               <BoxColumn>
-                <Text size="small">
+                <Text size="xxxsmall">
                   {`${intl.formatMessage(appMessages.app.title)}, version: ${VERSION}`}
                 </Text>
               </BoxColumn>
@@ -184,6 +184,7 @@ Footer.propTypes = {
   theme: PropTypes.object.isRequired,
   onPageLink: PropTypes.func.isRequired,
   pages: PropTypes.object,
+  fill: PropTypes.bool,
   intl: intlShape,
 };
 
