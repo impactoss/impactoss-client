@@ -645,6 +645,14 @@ export default defineMessages({
       id: 'app.containers.App.attributes.updated_at',
       defaultMessage: 'Last updated',
     },
+    relationship_updated_by_id: {
+      id: 'app.containers.App.attributes.relationship_updated_by_id',
+      defaultMessage: 'Connection last updated by',
+    },
+    relationship_updated_at: {
+      id: 'app.containers.App.attributes.relationship_updated_at',
+      defaultMessage: 'Connection last updated',
+    },
     created_by_id: {
       id: 'app.containers.App.attributes.created_by_id',
       defaultMessage: 'Created by',
