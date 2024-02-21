@@ -14,11 +14,22 @@
 import { version } from '../../package.json';
 
 export const SERVER = (process && process.env && process.env.SERVER) || 'development';
-export const IS_DEV = SERVER !== 'production';
-export const VERSION = `${version}${IS_DEV ? ' [DEV]' : ''}`;
+const SERVER_ENDPOINTS = {
+  production: 'https://nz-api.impactoss.org',
+  test: 'https://nz-dev-api.impactoss.org',
+  development: 'https://nz-dev-6568bd13e406.herokuapp.com',
+};
+export const IS_PROD = SERVER === 'production';
+export const IS_TEST = SERVER === 'test';
+// const IS_DEV = SERVER === 'development';
+const version_text = IS_PROD ? '' : ` [${SERVER}]`;
+export const VERSION = `${version}${version_text}`;
+
+// enable azure for test and prod environments but not for dev
+export const ENABLE_AZURE = IS_PROD || IS_TEST;
 
 // default language locale
-export const DEFAULT_LOCALE = 'en-GB';
+export const DEFAULT_LOCALE = 'en-NZ';
 // date format - change to format according to locale, only used for form error message
 export const DATE_FORMAT = 'dd/MM/yyyy';
 export const NODE_ENV = sessionStorage.NODE_ENV || 'production';
@@ -105,14 +116,13 @@ export const CYCLE_TAXONOMY_ID = 2;
 // General ********************
 
 export const ENDPOINTS = {
-  API: IS_DEV
-    ? 'https://nz-dev-api.impactoss.org'
-    : 'https://nz-dev-api.impactoss.org', // server API endpoint
+  API: SERVER_ENDPOINTS[SERVER], // server API endpoint
   SIGNING_URL: 's3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
   PASSWORD: 'auth/password',
   VALIDATE_TOKEN: 'auth/validate_token',
+  SIGN_IN_AZURE: 'auth/azure_activedirectory_v2',
 };
 
 // API request Authentification keys
@@ -176,6 +186,16 @@ export const REPORT_FREQUENCIES = [
 
 export const DEFAULT_FRAMEWORK = 1;
 export const ENABLE_SDGS = false;
+// set to min role required or null to disable
+export const DELETE_MIN_ROLE = null;
+export const PAGE_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value;
+export const USER_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value;
+export const CATEGORY_MANAGER_MIN_ROLE = USER_ROLES.MANAGER.value;
+export const CONTRIBUTOR_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create
+export const CONTRIBUTOR_MIN_ROLE_PUBLISH = USER_ROLES.MANAGER.value; // publish
+export const CONTRIBUTOR_MIN_ROLE_ASSIGNED = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
+export const SEE_DRAFT_MIN_ROLE = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
+export const SEE_META_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create when assigned
 
 // Map server database tables **************************
 export const DB_TABLES = [
@@ -206,4 +226,8 @@ export const COLUMN_WIDTHS = {
   HALF: 0.5,
   MAIN: 0.72,
   OTHER: 0.28,
+};
+
+export const SEARCH = {
+  MIN_LENGTH: 1,
 };

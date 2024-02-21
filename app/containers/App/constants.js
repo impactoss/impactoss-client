@@ -10,6 +10,7 @@
  */
 
 export const REDIRECT_IF_NOT_PERMITTED = 'impactoss/App/REDIRECT_IF_NOT_PERMITTED';
+export const REDIRECT_NOT_PERMITTED = 'impactoss/App/REDIRECT_NOT_PERMITTED';
 export const LOAD_ENTITIES_IF_NEEDED = 'impactoss/App/LOAD_ENTITIES_IF_NEEDED';
 export const LOADING_ENTITIES = 'impactoss/App/LOADING_ENTITIES';
 export const LOAD_ENTITIES_SUCCESS = 'impactoss/App/LOAD_ENTITIES_SUCCESS';
@@ -20,6 +21,7 @@ export const RESET_PROGRESS = 'impactoss/App/RESET_PROGRESS';
 
 export const AUTHENTICATE_SENDING = 'impactoss/App/AUTHENTICATE_SENDING';
 export const AUTHENTICATE = 'impactoss/App/AUTHENTICATE';
+export const AUTHENTICATE_AZURE = 'impactoss/App/AUTHENTICATE_AZURE';
 export const RESET_PASSWORD = 'impactoss/App/RESET_PASSWORD';
 export const RECOVER_PASSWORD = 'impactoss/App/RECOVER_PASSWORD';
 export const AUTHENTICATE_SUCCESS = 'impactoss/App/AUTHENTICATE_SUCCESS';
@@ -127,6 +129,8 @@ export const ROUTES = {
   PASSWORD: '/password',
   OVERVIEW: '/overview',
   LOGIN: '/login',
+  LOGIN_OAUTH_SUCCESS: '/loginOAuthSuccess',
+  LOGIN_OAUTH_ERROR: '/loginOAuthError',
   BOOKMARKS: '/bookmarks',
   LOGOUT: '/logout',
   REGISTER: '/register',

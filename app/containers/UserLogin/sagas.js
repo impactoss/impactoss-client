@@ -3,19 +3,24 @@ import {
 } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
-import { authenticate } from 'containers/App/actions';
+import { authenticate, authenticateWithAzure } from 'containers/App/actions';
 
-import { LOGIN } from './constants';
+import { LOGIN, LOGIN_WITH_AZURE } from './constants';
 
-export function* login({ data }) {
+export function* loginSaga({ data }) {
   yield put(authenticate(data));
+}
+export function* loginWithAzureSaga() {
+  yield put(authenticateWithAzure());
 }
 
 export function* defaultSaga() {
-  const watcher = yield takeLatest(LOGIN, login);
+  const watcher = yield takeLatest(LOGIN, loginSaga);
+  const watcherAzure = yield takeLatest(LOGIN_WITH_AZURE, loginWithAzureSaga);
 
   yield take(LOCATION_CHANGE);
   yield cancel(watcher);
+  yield cancel(watcherAzure);
 }
 
 export default [

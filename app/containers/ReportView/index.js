@@ -21,6 +21,12 @@ import {
 } from 'utils/fields';
 
 import { getEntityTitleTruncated } from 'utils/entities';
+import {
+  canUserCreateOrEditReports,
+  canUserBeAssignedToReports,
+} from 'utils/permissions';
+
+import qe from 'utils/quasi-equals';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
@@ -33,9 +39,9 @@ import EntityView from 'components/EntityView';
 
 import {
   selectReady,
-  selectIsUserContributor,
   selectIsUserManager,
   selectSessionUserId,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -73,11 +79,11 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
     },
   ]);
 
-  getBodyMainFields = (entity, isContributor) => ([
+  getBodyMainFields = (entity, isManager) => ([
     {
       fields: [
         getMarkdownField(entity, 'description', true),
-        getDownloadField(entity, entity.getIn(['attributes', 'document_public']) || isContributor),
+        getDownloadField(entity, entity.getIn(['attributes', 'document_public']) || isManager),
       ],
     },
   ]);
@@ -95,17 +101,16 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
   render() {
     const { intl } = this.context;
     const {
-      viewEntity, dataReady, isContributor, isManager, sessionUserId,
+      viewEntity, dataReady, isManager, sessionUserId, highestRole,
     } = this.props;
+    const hasUserMinimumRole = dataReady
+      && canUserCreateOrEditReports(highestRole);
+    const isUserAssigned = dataReady
+      && canUserBeAssignedToReports(highestRole)
+      && viewEntity.get('indicator')
+      && qe(viewEntity.get('indicator').getIn(['attributes', 'manager_id']), sessionUserId);
+    const canEdit = hasUserMinimumRole || (isUserAssigned && viewEntity.getIn(['attributes', 'draft']));
 
-    const canEdit = isManager
-      || (
-        isContributor
-        && viewEntity
-        && viewEntity.get('indicator')
-        && viewEntity.get('indicator').getIn(['attributes', 'manager_id'])
-        && viewEntity.get('indicator').getIn(['attributes', 'manager_id']).toString() === sessionUserId
-      );
     let buttons = [];
     if (dataReady) {
       buttons.push({
@@ -167,12 +172,12 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
               <EntityView
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(viewEntity, isContributor, viewEntity.get('indicator')),
-                    aside: isContributor && this.getHeaderAsideFields(viewEntity),
+                    main: this.getHeaderMainFields(viewEntity, isManager, viewEntity.get('indicator')),
+                    aside: isManager && this.getHeaderAsideFields(viewEntity),
                   },
                   body: {
-                    main: this.getBodyMainFields(viewEntity, isContributor),
-                    aside: isContributor ? this.getBodyAsideFields(viewEntity) : null,
+                    main: this.getBodyMainFields(viewEntity, isManager),
+                    aside: isManager ? this.getBodyAsideFields(viewEntity) : null,
                   },
                 }}
               />
@@ -191,9 +196,9 @@ ReportView.propTypes = {
   viewEntity: PropTypes.object,
   sessionUserId: PropTypes.string,
   dataReady: PropTypes.bool,
-  isContributor: PropTypes.bool,
   isManager: PropTypes.bool,
   params: PropTypes.object,
+  highestRole: PropTypes.number,
 };
 
 ReportView.contextTypes = {
@@ -202,10 +207,10 @@ ReportView.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   sessionUserId: selectSessionUserId(state),
-  isContributor: selectIsUserContributor(state),
   isManager: selectIsUserManager(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
+  highestRole: selectSessionUserHighestRoleId(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

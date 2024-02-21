@@ -23,6 +23,7 @@ import {
   filterEntitiesByKeywords,
   entitiesSetCategoryIds,
   prepareTaxonomies,
+  getTaxCategories,
 } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
 import { PARAMS, ROUTES } from './constants';
@@ -407,8 +408,7 @@ export const selectFWIndicators = createSelector(
   selectFWMeasures,
   (state) => selectEntities(state, 'recommendation_indicators'),
   (state) => selectEntities(state, 'measure_indicators'),
-  selectIsUserManager,
-  (entities, frameworkId, recs, measures, recIndicators, measureIndicators, isManager) => {
+  (entities, frameworkId, recs, measures, recIndicators, measureIndicators) => {
     if (
       recs
       && measures
@@ -437,8 +437,7 @@ export const selectFWIndicators = createSelector(
           );
           // consider includes instead of !!find
           return (
-            isManager
-            && recIds.size === 0
+            recIds.size === 0
             && measureIds.size === 0
           ) || recIds.some(
             (id) => !!recs.find(
@@ -515,8 +514,9 @@ export const selectTaxonomies = createSelector(
 export const selectFWTaxonomies = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
   (state) => selectEntities(state, 'framework_taxonomies'),
+  (state) => selectEntities(state, 'categories'),
   selectCurrentFrameworkId,
-  (taxonomies, fwTaxonomies, frameworkId) => taxonomies
+  (taxonomies, fwTaxonomies, categories, frameworkId) => taxonomies
     && fwTaxonomies
     && taxonomies.map(
       (tax) => {
@@ -547,9 +547,11 @@ export const selectFWTaxonomies = createSelector(
           },
           List(),
         );
+        const taxCategories = getTaxCategories(categories, tax);
         return tax
           .setIn(['attributes', 'tags_recommendations'], hasFramework || connectedToFramework)
-          .set('frameworkIds', frameworkIds);
+          .set('frameworkIds', frameworkIds)
+          .set('categories', taxCategories);
       }
     ).filter(
       (tax) => tax.getIn(['attributes', 'tags_recommendations'])
