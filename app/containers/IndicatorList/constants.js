@@ -21,6 +21,7 @@ export const DEPENDENCIES = [
 export const CONFIG = {
   serverPath: 'indicators',
   clientPath: 'indicators',
+  downloadCSV: true,
   search: ['title', 'reference'],
   sorting: [
     {
@@ -50,11 +51,6 @@ export const CONFIG = {
     search: true,
     connections: [
       {
-        path: 'recommendations', // filter by recommendation connection
-        message: 'entities.recommendations.plural',
-        key: 'recommendation_id',
-      },
-      {
         path: 'measures', // filter by recommendation connection
         message: 'entities.measures.plural',
         key: 'measure_id',
@@ -64,17 +60,6 @@ export const CONFIG = {
   connections: { // filter by associated entity
     query: 'connected',
     options: [
-      {
-        search: true,
-        message: 'entities.recommendations_{fwid}.plural',
-        path: 'recommendations',
-        clientPath: 'recommendations',
-        key: 'recommendation_id',
-        connectPath: 'recommendation_indicators',
-        ownKey: 'indicator_id',
-        groupByFramework: true,
-        frameworkFilter: 'has_indicators',
-      },
       {
         search: true,
         message: 'entities.measures.plural',
