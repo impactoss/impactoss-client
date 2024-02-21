@@ -10,10 +10,12 @@ import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import ReactModal from 'react-modal';
 import GlobalStyle from 'global-styles';
+import { FormattedMessage } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import Header from 'components/Header';
+import SkipContent from 'components/styled/SkipContent';
 import EntityNew from 'containers/EntityNew';
 
 import { sortEntities } from 'utils/sort';
@@ -205,6 +207,12 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     const title = intl.formatMessage(messages.app.title);
     return (
       <div>
+        <SkipContent
+          href="#main-content"
+          title={this.context.intl.formatMessage(messages.screenreader.skipToContent)}
+        >
+          <FormattedMessage {...messages.screenreader.skipToContent} />
+        </SkipContent>
         <Helmet titleTemplate={`${title} - %s`} defaultTitle={title} />
         <Header
           isSignedIn={isUserSignedIn}
@@ -235,7 +243,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           currentPath={location.pathname}
           brandPath={ROUTES.OVERVIEW}
         />
-        <Main isHome={location.pathname === '/'}>
+        <Main isHome={location.pathname === '/'} role="main" id="main-content">
           {React.Children.toArray(children)}
         </Main>
         {newEntityModal

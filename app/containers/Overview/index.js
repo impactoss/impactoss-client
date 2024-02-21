@@ -149,17 +149,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        {!dataReady && <EntityListSidebarLoading responsiveSmall />}
-        {dataReady && (
-          <TaxonomySidebar
-            taxonomies={taxonomies}
-            frameworkId={frameworkId}
-            frameworks={frameworks}
-            onTaxonomyLink={onTaxonomyLink}
-            onTaxonomyOver={this.onTaxonomyMouseOver}
-            active={this.state.mouseOverTaxonomyDiagram}
-          />
-        )}
         <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
@@ -203,6 +192,17 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             <Footer />
           </Container>
         </ContainerWithSidebar>
+        {!dataReady && <EntityListSidebarLoading responsiveSmall />}
+        {dataReady && (
+          <TaxonomySidebar
+            taxonomies={taxonomies}
+            frameworkId={frameworkId}
+            frameworks={frameworks}
+            onTaxonomyLink={onTaxonomyLink}
+            onTaxonomyOver={this.onTaxonomyMouseOver}
+            active={this.state.mouseOverTaxonomyDiagram}
+          />
+        )}
       </div>
     );
   }

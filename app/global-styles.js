@@ -2,7 +2,6 @@ import { createGlobalStyle } from 'styled-components';
 
 /* eslint no-unused-expressions: 0 */
 const GlobalStyle = createGlobalStyle`
-
   html,
   body {
     height: 100%;
@@ -280,6 +279,16 @@ const GlobalStyle = createGlobalStyle`
         }
       }
     }
+  }
+
+  /* accessability styles */ 
+  
+  *:focus-visible {
+  outline: 3px black dashed;
+  box-shadow: 0 0 2px 2px black;
+  }
+  *:focus {
+    outline: none;
   }
 `;
 

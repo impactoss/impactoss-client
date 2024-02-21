@@ -104,9 +104,8 @@ export const TEXT_TRUNCATE = {
 export const PROGRESS_TAXONOMY_ID = 9;
 
 // WARNING: references as assigned by user
-export const PROGRESS_CATEGORY_REFERENCES = {
-  ONGOING: 1,
-  COMPLETED: 2,
+export const PROGRESS_CATEGORY_ID = {
+  COMPLETED: 8,
 };
 
 export const CYCLE_TAXONOMY_ID = 2;

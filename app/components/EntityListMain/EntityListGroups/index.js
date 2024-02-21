@@ -209,7 +209,6 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     }
 
     const errorsWithoutEntities = errors && errors.filter((error, id) => !entities.find((entity) => entity.get('id') === id));
-
     return (
       <div>
         <EntityListHeader

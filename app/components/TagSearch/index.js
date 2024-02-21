@@ -19,6 +19,7 @@ import ButtonTagFilter from 'components/buttons/ButtonTagFilter';
 import ButtonTagFilterInverse from 'components/buttons/ButtonTagFilterInverse';
 import DebounceInput from 'react-debounce-input';
 import PrintOnly from 'components/styled/PrintOnly';
+import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 
 import messages from './messages';
 
@@ -78,6 +79,8 @@ const SearchValuePrint = styled(PrintOnly)`
   font-size: ${(props) => props.theme.sizes.print.default};
   font-weight: bold;
 `;
+const ButtonTagSearch = styled.div``;
+const StyledLabel = styled.label``;
 
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor() {
@@ -86,6 +89,27 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       active: false,
     };
   }
+
+  componentDidMount() {
+    if (this.input && this.props.focusOnMount) this.input.focus();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.filters.length !== this.props.filters.length) {
+      if (this.props.filters.length > 0) {
+        this.focusLastFilter();
+      } else if (this.input) {
+        this.input.focus();
+      }
+    }
+  }
+
+  getLabels = (labels) => reduce(labels, (memo, label) => {
+    if (!label.label) return memo;
+    let labelValue = label.appMessage ? appMessage(this.context.intl, label.label) : label.label;
+    labelValue = label.postfix ? `${labelValue}${label.postfix}` : labelValue;
+    return `${memo}${label.lowerCase ? lowerCase(labelValue) : labelValue} `;
+  }, '').trim();
 
   getFilterLabel = (filter) => {
     const { intl } = this.context;
@@ -96,12 +120,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
         : appMessage(intl, filter.message);
     }
     if (filter.labels) {
-      return reduce(filter.labels, (memo, label) => {
-        if (!label.label) return memo;
-        let labelValue = label.appMessage ? appMessage(intl, label.label) : label.label;
-        labelValue = label.postfix ? `${labelValue}${label.postfix}` : labelValue;
-        return `${memo}${label.lowerCase ? lowerCase(labelValue) : labelValue} `;
-      }, '').trim();
+      return this.getLabels(filter.labels);
     }
     return filter.label;
   };
@@ -112,6 +131,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       searchQuery,
       onSearch,
       placeholder,
+      resultsId,
     } = this.props;
     const { intl } = this.context;
     // TODO set focus to input when clicking wrapper
@@ -122,6 +142,15 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     //   this.inputNode.focus()
     // }}
     const hasFilters = (searchQuery || filters.length > 0);
+
+    const inputPlaceholder = placeholder || (intl.formatMessage(
+      this.props.multiselect
+        ? messages.searchPlaceholderMultiSelect
+        : messages.searchPlaceholderEntities
+    ));
+
+    const inputId = this.props.multiselect ? 'ms-search' : 'search';
+
     return (
       <Search
         active={this.state.active}
@@ -140,12 +169,14 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                 filters.map((filter, i) => filter.inverse
                   ? (
                     <ButtonTagFilterInverse
+                      ref={(el) => { this.lastFilter = el; }}
                       key={i}
                       onClick={filter.onClick}
                       palette={filter.type || 'attributes'}
                       paletteHover={`${filter.type || 'attributes'}Hover`}
                       pIndex={parseInt(filter.id, 10) || 0}
                       disabled={!filter.onClick}
+                      title={this.getFilterTitle(filter)}
                     >
                       {this.getFilterLabel(filter)}
                       {filter.onClick
@@ -155,12 +186,14 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                   )
                   : (
                     <ButtonTagFilter
+                      ref={(el) => { this.lastFilter = el; }}
                       key={i}
                       onClick={filter.onClick}
                       palette={filter.type || 'attributes'}
                       paletteHover={`${filter.type || 'attributes'}Hover`}
                       pIndex={parseInt(filter.id, 10) || 0}
                       disabled={!filter.onClick}
+                      title={this.getFilterTitle(filter)}
                     >
                       {this.getFilterLabel(filter)}
                       {filter.onClick
@@ -172,6 +205,11 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             </Tags>
           )
         }
+        <ScreenReaderOnly>
+          <StyledLabel htmlFor={inputId}>
+            {inputPlaceholder}
+          </StyledLabel>
+        </ScreenReaderOnly>
         <SearchInput
           id="search-input"
           minLength={1}
@@ -180,16 +218,20 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
           onChange={(e) => onSearch(e.target.value)}
           onFocus={() => this.setState({ active: true })}
           onBlur={() => this.setState({ active: false })}
-          placeholder={placeholder || (intl.formatMessage(
-            this.props.multiselect
-              ? messages.searchPlaceholderMultiSelect
-              : messages.searchPlaceholderEntities
-          ))}
+          onKeyDown={(e) => {
+            if (filters.length > 0 && (!searchQuery || searchQuery.length === 0)) {
+              const key = e.keyCode || e.charCode;
+              if (key === 8) {
+                this.focusLastFilter();
+              }
+            }
+          }}
         />
         {hasFilters && (
           <StyledButton
             onClick={this.props.onClear}
             small={this.props.multiselect}
+            title={this.context.intl.formatMessage(messages.removeAll)}
           >
             <Icon name="removeSmall" />
           </StyledButton>
@@ -211,18 +253,31 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             {searchQuery}
           </SearchValuePrint>
         )}
+        <ButtonTagSearch
+          as="a"
+          href={`#${resultsId}`}
+          title={this.context.intl.formatMessage(messages.skipToResults)}
+        >
+          <Icon name="search" size="1em" />
+        </ButtonTagSearch>
       </Search>
     );
   }
 }
 
+TagSearch.defaultProps = {
+  resultsId: 'entity-list-main',
+};
+
 TagSearch.propTypes = {
   filters: PropTypes.array,
   searchQuery: PropTypes.string,
   placeholder: PropTypes.string,
+  resultsId: PropTypes.string,
   onSearch: PropTypes.func,
   onClear: PropTypes.func,
   multiselect: PropTypes.bool,
+  focusOnMount: PropTypes.bool,
 };
 
 TagSearch.contextTypes = {
