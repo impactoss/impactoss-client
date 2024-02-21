@@ -233,3 +233,211 @@ export const COLUMN_WIDTHS = {
 export const SEARCH = {
   MIN_LENGTH: 1,
 };
+
+export const ENTITY_FIELDS = {
+  measures: {
+    ATTRIBUTES: {
+      draft: {
+        defaultValue: true,
+        type: 'bool',
+        skipImport: true,
+        exportRequired: true,
+        roleExport: USER_ROLES.CONTRIBUTOR.value,
+        exportColumn: 'public',
+        exportFlip: true,
+      },
+      title: {
+        type: 'text',
+        exportDefault: true,
+      },
+      description: {
+        type: 'markdown',
+      },
+      outcome: {
+        type: 'markdown',
+      },
+      reference: {
+        type: 'markdown',
+      },
+      indicator_summary: {
+        type: 'markdown',
+      },
+      target_date: {
+        type: 'date',
+      },
+      target_date_comment: {
+        type: 'text',
+      },
+      created_at: {
+        type: 'date',
+        roleExport: USER_ROLES.MANAGER.value,
+      },
+      created_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'created_by',
+      },
+      updated_at: {
+        type: 'date',
+        roleExport: USER_ROLES.MANAGER.value,
+      },
+      updated_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'updated_by',
+      },
+      relationship_updated_at: {
+        skipImport: true,
+        type: 'datetime',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'connection_updated_at',
+      },
+      relationship_updated_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'connection_updated_by',
+      },
+    },
+  },
+  indicators: {
+    ATTRIBUTES: {
+      draft: {
+        defaultValue: true,
+        type: 'bool',
+        skipImport: true,
+        exportRequired: true,
+        roleExport: USER_ROLES.CONTRIBUTOR.value,
+        exportColumn: 'public',
+        exportFlip: true,
+      },
+      title: {
+        type: 'text',
+        exportDefault: true,
+      },
+      description: {
+        type: 'markdown',
+      },
+      start_date: {
+        type: 'date',
+      },
+      end_date: {
+        type: 'date',
+      },
+      frequency_months: {
+        type: 'int',
+      },
+      reference: {
+        type: 'text',
+      },
+      repeat: {
+        defaultValue: false,
+        type: 'bool',
+      },
+      created_at: {
+        type: 'date',
+        roleExport: USER_ROLES.MANAGER.value,
+      },
+      created_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'created_by',
+      },
+      updated_at: {
+        type: 'date',
+        roleExport: USER_ROLES.MANAGER.value,
+      },
+      updated_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'updated_by',
+      },
+      relationship_updated_at: {
+        skipImport: true,
+        type: 'datetime',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'connection_updated_at',
+      },
+      relationship_updated_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'connection_updated_by',
+      },
+    },
+  },
+  recommendations: {
+    ATTRIBUTES: {
+      draft: {
+        defaultValue: true,
+        type: 'bool',
+        skipImport: true,
+        exportRequired: true,
+        roleExport: USER_ROLES.CONTRIBUTOR.value,
+        exportColumn: 'public',
+        exportFlip: true,
+      },
+      title: {
+        type: 'text',
+        exportDefault: true,
+      },
+      description: {
+        type: 'text',
+      },
+      reference: {
+        type: 'text',
+      },
+      response: {
+        type: 'text',
+      },
+      accepted: {
+        type: 'bool',
+      },
+      created_at: {
+        type: 'date',
+        roleExport: USER_ROLES.MANAGER.value,
+      },
+      created_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'created_by',
+      },
+      updated_at: {
+        type: 'date',
+        roleExport: USER_ROLES.MANAGER.value,
+      },
+      updated_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'updated_by',
+      },
+      relationship_updated_at: {
+        skipImport: true,
+        type: 'datetime',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'connection_updated_at',
+      },
+      relationship_updated_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'connection_updated_by',
+      },
+    },
+  },
+};

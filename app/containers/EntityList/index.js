@@ -9,6 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import ReactModal from 'react-modal';
 
 import { Map, List, fromJS } from 'immutable';
 
@@ -20,6 +21,7 @@ import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 import EntityListPrintKey from 'components/EntityListPrintKey';
 import EntityListMain from 'components/EntityListMain';
+import EntityListDownload from 'components/EntityListDownload';
 import PrintOnly from 'components/styled/PrintOnly';
 
 import {
@@ -33,9 +35,8 @@ import {
   openNewEntityModal,
 } from 'containers/App/actions';
 
-// import appMessages from 'containers/App/messages';
 import { PARAMS } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, ENTITY_FIELDS } from 'themes/config';
 
 import {
   selectDomain,
@@ -91,11 +92,26 @@ const ProgressText = styled.div`
     font-size: ${(props) => props.theme.sizes.print.default};
   }
 `;
-
+const STATE_INITIAL = {
+  downloadActive: false,
+};
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor() {
+    super();
+    this.state = STATE_INITIAL;
+  }
+
   UNSAFE_componentWillMount() {
     this.props.updateClientPath();
   }
+
+  onDownloadClick = () => {
+    this.setState({ downloadActive: true });
+  };
+
+  onDownloadDismiss = () => {
+    this.setState({ downloadActive: false });
+  };
 
   getMessageForType = (type) => {
     switch (type) {
@@ -106,7 +122,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       default:
         return messages.updatesSuccess;
     }
-  }
+  };
 
   mapError = (error, key) => fromJS({
     type: error.data.type,
@@ -133,6 +149,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       progressTypes,
       onDismissAllErrors,
       allTaxonomies,
+      config,
     } = this.props;
 
     const sending = viewDomain.get('sending');
@@ -154,8 +171,49 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       && window.matchMedia('print').matches
     );
 
+    const header = this.props.header ? this.props.header : [];
+    if (config.downloadCSV) {
+      header.actions = header.actions.map(
+        (action) => {
+          if (action.type === 'download') {
+            return ({
+              ...action,
+              onClick: () => this.onDownloadClick(),
+              title: 'Download CSV',
+              icon: 'download',
+            });
+          }
+          return action;
+        }
+      );
+    }
     return (
       <div>
+        {config.downloadCSV && this.state.downloadActive && (
+          <ReactModal
+            isOpen
+            contentLabel="test"
+            onRequestClose={() => this.onDownloadDismiss()}
+            className="download-csv-modal"
+            overlayClassName="download-csv-modal-overlay"
+            style={{
+              overlay: { zIndex: 99999999 },
+            }}
+            appElement={document.getElementById('app')}
+          >
+            <EntityListDownload
+              config={config}
+              entityTitle={this.props.entityTitle}
+              fields={ENTITY_FIELDS[config.serverPath]}
+              entities={entities}
+              taxonomies={this.props.taxonomies}
+              connections={this.props.connections}
+              onClose={() => this.onDownloadDismiss()}
+              frameworks={this.props.frameworks}
+              hasUserRole={this.props.hasUserRole}
+            />
+          </ReactModal>
+        )}
         {!this.props.dataReady && <EntityListSidebarLoading />}
         {this.props.dataReady && this.props.showSidebar && !printing && (
           <EntityListSidebar
@@ -201,15 +259,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               : entityIdsSelectedFiltered
           }
           locationQuery={this.props.locationQuery}
-
           config={this.props.config}
-          header={this.props.header}
+          header={header}
           entityTitle={this.props.entityTitle}
-
           dataReady={this.props.dataReady}
           isManager={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
           isContributor={this.props.hasUserRole[USER_ROLES.CONTRIBUTOR.value]}
-
           entityIcon={this.props.entityIcon}
           onEntitySelect={this.props.onEntitySelect}
           onEntitySelectAll={this.props.onEntitySelectAll}
@@ -239,7 +294,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             />
           </PrintOnly>
         )}
-        { (progress !== null && progress < 100)
+        {(progress !== null && progress < 100)
           && (
             <Progress>
               <ProgressText>
@@ -249,9 +304,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                     processNo: Math.min(success.size + errors.size + 1, sending.size),
                     totalNo: sending.size,
                     types:
-                    intl.formatMessage(messages[
-                      `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
-                    ]),
+                      intl.formatMessage(messages[
+                        `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
+                      ]),
                   }}
                 />
               </ProgressText>
@@ -272,9 +327,9 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                     {
                       errorNo: viewDomain.get('errors').size,
                       types:
-                      intl.formatMessage(messages[
-                        `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
-                      ]),
+                        intl.formatMessage(messages[
+                          `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
+                        ]),
                     },
                   )
                 }
@@ -516,7 +571,7 @@ function mapDispatchToProps(dispatch, props) {
             ).toJS()
           ));
         }
-      // connections
+        // connections
       } else {
         // figure out connection deletions (not necessary for attributes as deletions will be overridden)
         const deletes = changes

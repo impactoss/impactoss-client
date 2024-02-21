@@ -187,7 +187,21 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
           ),
       });
     }
-    const headerActions = dataReady ? header.actions : [];
+    let headerActions = [];
+    if (dataReady) {
+      if (header.actions) {
+        headerActions = [
+          ...headerActions,
+          ...header.actions,
+        ];
+      }
+      if (header.actionsAdmin) {
+        headerActions = [
+          ...headerActions,
+          ...header.actionsAdmin,
+        ];
+      }
+    }
     return (
       <ContainerWithSidebar ref={this.ScrollContainer}>
         <Container ref={this.ScrollReference}>
