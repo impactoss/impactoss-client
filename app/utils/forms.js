@@ -552,6 +552,7 @@ export const getEmailFormField = (formatMessage, model = '.attributes.email') =>
     required: true,
     model,
   });
+  field.autoComplete = appMessages.htmlElementAttributes.autocomplete.email;
   field.validators.email = validateEmailFormat;
   field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
   return field;
@@ -565,10 +566,11 @@ export const getNameField = (formatMessage, model = '.attributes.name') => {
     required: true,
     model,
   });
+  field.autoComplete = appMessages.htmlElementAttributes.autocomplete.fullName;
   return field;
 };
 
-export const getPasswordField = (formatMessage, model = '.attributes.password') => {
+export const getPasswordField = (formatMessage, isAutoComplete = false, model = '.attributes.password') => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
@@ -577,6 +579,9 @@ export const getPasswordField = (formatMessage, model = '.attributes.password') 
     required: true,
     model,
   });
+  if (isAutoComplete) {
+    field.autoComplete = appMessages.htmlElementAttributes.autocomplete.currentPassword;
+  }
   field.validators.passwordLength = (val) => validateLength(val, 6);
   field.errorMessages.passwordLength = formatMessage(appMessages.forms.passwordShortError);
   return field;
@@ -592,6 +597,7 @@ export const getPasswordCurrentField = (formatMessage, model = '.attributes.pass
     required: true,
     model,
   });
+  field.autoComplete = appMessages.htmlElementAttributes.autocomplete.currentPassword;
   // field.validators.email = validateEmailFormat;
   // field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
   return field;

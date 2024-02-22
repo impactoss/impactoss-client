@@ -19,7 +19,6 @@ const Styled = styled.div`
     float: right;
   }
 `;
-
 class NavAccount extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   onClick = (evt, path, currentPath) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
