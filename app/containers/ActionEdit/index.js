@@ -295,7 +295,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
             )
           }
           {deleteError
-            && <Messages type="error" messages={deleteError} />
+            && <Messages type="error" messages={deleteError.messages} />
           }
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
