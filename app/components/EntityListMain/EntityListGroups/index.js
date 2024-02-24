@@ -285,14 +285,14 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                   entityGroupsPaged.map((entityGroup, i) => (
                     <ListEntitiesGroup key={i}>
                       {groupSelectValue && entityGroup.get('label')
-                        && <EntityListGroupHeader group={entityGroup} level={1} />
+                        && <EntityListGroupHeader group={entityGroup} level={1} expanded={config.expandableColumns && expandNo && !subgroupSelectValue} />
                       }
                       {
                         entityGroup.get('entityGroups')
                         && entityGroup.get('entityGroups').toList().map((entitySubGroup, j) => (
                           <ListEntitiesSubGroup key={j}>
                             {subgroupSelectValue && entitySubGroup.get('label')
-                              && <EntityListGroupHeader group={entitySubGroup} level={2} />
+                              && <EntityListGroupHeader expanded={config.expandableColumns && expandNo} group={entitySubGroup} level={2} />
                             }
                             <EntityListItems
                               taxonomies={this.props.taxonomies}

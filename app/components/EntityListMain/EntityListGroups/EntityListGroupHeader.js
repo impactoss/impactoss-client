@@ -42,15 +42,17 @@ const ListEntitiesSubgroupHeader = styled.h5`
     margin-bottom: 8px;
   }
 `;
-
+const Divider = styled.div`
+width: 100%;
+border-bottom: 1px solid ${palette('light', 3)};
+`;
 export class EntityListGroupHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { group, level } = this.props;
+    const { group, level, expanded } = this.props;
 
     if (group.get('id') === 'without') {
       return level === 1
         ? (
-
           <ListEntitiesGroupHeader>
             {group.get('label')}
           </ListEntitiesGroupHeader>
@@ -69,6 +71,7 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
               {group.get('label')}
             </ListEntitiesGroupHeader>
           </ListEntitiesGroupHeaderLink>
+          {expanded && <Divider />}
         </ListEntitiesGroupHeaderWrapper>
       )
       : (
@@ -78,6 +81,7 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
               {group.get('label')}
             </ListEntitiesSubgroupHeader>
           </ListEntitiesGroupHeaderLink>
+          {expanded && <Divider />}
         </ListEntitiesGroupHeaderWrapper>
       );
   }
@@ -85,5 +89,6 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
 EntityListGroupHeader.propTypes = {
   group: PropTypes.object,
   level: PropTypes.number,
+  expanded: PropTypes.bool,
 };
 export default EntityListGroupHeader;
