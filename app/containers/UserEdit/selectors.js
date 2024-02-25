@@ -73,7 +73,7 @@ export const selectRoles = createSelector(
           role.get('id'),
         )
       );
-      return role.set('associated', !!entityAssociation || false);
+      return role.set('associated', entityAssociation || null);
     }
   )
 );

@@ -34,4 +34,8 @@ export default defineMessages({
     id: 'app.containers.UserLogin.submit',
     defaultMessage: 'Sign in',
   },
+  devNote: {
+    id: 'app.containers.UserLogin.devNote',
+    defaultMessage: 'Note: signing in to {server} database',
+  },
 });

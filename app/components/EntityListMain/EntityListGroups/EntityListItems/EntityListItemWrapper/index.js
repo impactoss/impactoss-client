@@ -61,6 +61,7 @@ export class EntityListItemWrapper extends React.Component { // eslint-disable-l
         }}
       >
         {this.state.wrapper
+          && entity
           && (
             <div>
               <EntityListItem
@@ -131,7 +132,7 @@ export class EntityListItemWrapper extends React.Component { // eslint-disable-l
 }
 
 EntityListItemWrapper.propTypes = {
-  entity: PropTypes.instanceOf(Map).isRequired,
+  entity: PropTypes.instanceOf(Map),
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   errors: PropTypes.instanceOf(Map),

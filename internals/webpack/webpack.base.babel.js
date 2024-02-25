@@ -5,7 +5,7 @@
 const path = require('path');
 const webpack = require('webpack');
 
-module.exports = options => ({
+module.exports = (options) => ({
   mode: options.mode,
   entry: options.entry,
   output: Object.assign(
@@ -113,6 +113,7 @@ module.exports = options => ({
     // drop any unreachable code.
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
+      SERVER: 'development',
     }),
   ]),
   resolve: {

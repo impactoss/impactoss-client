@@ -12,7 +12,7 @@ import Container from 'components/styled/Container';
 import A from 'components/styled/A';
 
 import { PATHS } from 'containers/App/constants';
-import { FOOTER, DB_TABLES } from 'themes/config';
+import { VERSION, FOOTER, DB_TABLES } from 'themes/config';
 
 import messages from './messages';
 
@@ -201,6 +201,7 @@ class Footer extends React.PureComponent { // eslint-disable-line react/prefer-s
                   >
                     <FormattedMessage {...messages.contact.anchor} />
                   </FooterLink>
+                  <p>{`Version: ${VERSION}`}</p>
                 </TableCell>
                 <TableCellSmall>
                   { FOOTER.LINK_TARGET_INTERNAL

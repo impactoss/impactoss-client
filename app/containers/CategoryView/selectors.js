@@ -277,7 +277,7 @@ export const selectChildRecommendations = createSelector(
         (cat) => cat.set(
           'recommendations',
           cat.get('recommendations').map(
-            (rec) => rec.set(
+            (rec) => rec && rec.set(
               'categories',
               getEntityCategories(
                 rec.get('id'),
@@ -314,8 +314,14 @@ const selectMeasuresAssociated = createSelector(
   selectMeasureAssociations,
   selectFWMeasures,
   (tags, associations, measures) => tags
-    ? associations && associations.map(
-      (id) => measures.get(id.toString())
+    ? associations && associations.reduce(
+      (memo, id) => {
+        const entity = measures.get(id.toString());
+        return entity
+          ? memo.set(id, entity)
+          : memo;
+      },
+      Map(),
     )
     : null
 );
@@ -343,6 +349,7 @@ export const selectMeasures = createSelector(
       (measure) => {
         const entityRecs = measureRecommendations.get(parseInt(measure.get('id'), 10));
         const entityRecsByFw = entityRecs
+          && connections
           && connections.get('recommendations')
           && entityRecs.filter(
             (recId) => connections.getIn([
