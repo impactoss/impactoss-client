@@ -4,6 +4,41 @@ import { qe } from 'utils/quasi-equals';
 
 const checkFramework = (frameworks, attribute) => frameworks.some((fw) => fw.getIn(['attributes', attribute]));
 
+const getTaxOptions = (taxonomies, activeFilterOption, messages) => {
+  const taxonomiesGrouped = taxonomies.groupBy((tax) => tax.getIn(['attributes', 'parent_id']) ? 'children' : 'parents');
+  const parentTaxonomies = taxonomiesGrouped.get('parents');
+  if (!parentTaxonomies) return null;
+  return sortEntities(parentTaxonomies, 'asc', 'priority')
+    .reduce(
+      (memo, taxonomy) => {
+        let res = memo.concat([
+          {
+            id: taxonomy.get('id'), // filterOptionId
+            label: messages.taxonomies(taxonomy.get('id')),
+            active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
+          },
+        ]);
+        if (taxonomiesGrouped.get('children') && taxonomiesGrouped.get('children').size > 0) {
+          res = sortEntities(taxonomiesGrouped.get('children'), 'asc', 'priority')
+            .filter((childTaxonomy) => qe(taxonomy.get('id'), childTaxonomy.getIn(['attributes', 'parent_id'])))
+            .reduce(
+              (memo2, childTaxonomy) => memo2.concat([
+                {
+                  id: childTaxonomy.get('id'), // filterOptionId
+                  label: messages.taxonomies(childTaxonomy.get('id')),
+                  active: !!activeFilterOption && activeFilterOption.optionId === childTaxonomy.get('id'),
+                  nested: true,
+                },
+              ]),
+              res,
+            );
+        }
+        return res;
+      },
+      [],
+    );
+};
+
 // figure out filter groups for filter panel
 export const makeFilterGroups = (
   config,
@@ -42,68 +77,35 @@ export const makeFilterGroups = (
           return taxFwIds.size === 1
               && taxFwIds.find((fwid) => qe(fwid, fw.get('id')));
         });
+        const taxOptions = getTaxOptions(fwTaxonomies, activeFilterOption, messages);
         filterGroups[`taxonomies_${fw.get('id')}`] = {
           id: `taxonomies_${fw.get('id')}`, // filterGroupId
           type: 'taxonomies',
           label: messages.taxonomyGroupByFw(fw.get('id')),
           show: true,
           icon: 'categories',
-          options:
-            sortEntities(fwTaxonomies, 'asc', 'priority')
-              .reduce(
-                (memo, taxonomy) => memo.concat([
-                  {
-                    id: taxonomy.get('id'), // filterOptionId
-                    label: messages.taxonomies(taxonomy.get('id')),
-                    active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
-                    nested: taxonomy.getIn(['attributes', 'parent_id']),
-                  },
-                ]),
-                [],
-              ),
+          options: taxOptions,
         };
       });
       const commonTaxonomies = taxonomies.filter((tax) => tax.get('frameworkIds')
           && tax.get('frameworkIds').size > 1);
+      const taxOptions = getTaxOptions(commonTaxonomies, activeFilterOption, messages);
       filterGroups.taxonomies = {
         id: 'taxonomies', // filterGroupId
         label: messages.taxonomyGroupByFw('common'),
         show: true,
         icon: 'categories',
-        options:
-          sortEntities(commonTaxonomies, 'asc', 'priority')
-            .reduce(
-              (memo, taxonomy) => memo.concat([
-                {
-                  id: taxonomy.get('id'), // filterOptionId
-                  label: messages.taxonomies(taxonomy.get('id')),
-                  active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
-                  nested: taxonomy.getIn(['attributes', 'parent_id']),
-                },
-              ]),
-              [],
-            ),
+        options: taxOptions,
       };
     } else {
+      const taxOptions = getTaxOptions(taxonomies, activeFilterOption, messages);
       // first prepare taxonomy options
       filterGroups.taxonomies = {
         id: 'taxonomies', // filterGroupId
         label: messages.taxonomyGroup,
         show: true,
         icon: 'categories',
-        options:
-          sortEntities(taxonomies, 'asc', 'priority')
-            .reduce(
-              (memo, taxonomy) => memo.concat([
-                {
-                  id: taxonomy.get('id'), // filterOptionId
-                  label: messages.taxonomies(taxonomy.get('id')),
-                  active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
-                  nested: taxonomy.getIn(['attributes', 'parent_id']),
-                },
-              ]),
-              [],
-            ),
+        options: taxOptions,
       };
     }
   }
@@ -111,27 +113,13 @@ export const makeFilterGroups = (
   // connectedTaxonomies option group
   if (config.connectedTaxonomies) {
     // first prepare taxonomy options
+    const taxOptions = getTaxOptions(connectedTaxonomies, activeFilterOption, messages);
     filterGroups.connectedTaxonomies = {
       id: 'connectedTaxonomies', // filterGroupId
       label: messages.connectedTaxonomies,
       show: true,
       icon: 'connectedCategories',
-      options:
-        sortEntities(connectedTaxonomies, 'asc', 'priority')
-          .reduce(
-            (taxOptionsMemo, taxonomy) => (config.connectedTaxonomies.exclude
-            && taxonomy.getIn(['attributes', config.connectedTaxonomies.exclude]))
-              ? taxOptionsMemo
-              : taxOptionsMemo.concat([
-                {
-                  id: taxonomy.get('id'), // filterOptionId
-                  label: messages.taxonomies(taxonomy.get('id')),
-                  active: !!activeFilterOption && activeFilterOption.optionId === taxonomy.get('id'),
-                  nested: taxonomy.getIn(['attributes', 'parent_id']),
-                },
-              ]),
-            [],
-          ),
+      options: taxOptions,
     };
   }
 
