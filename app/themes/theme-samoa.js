@@ -124,7 +124,7 @@ theme.palette = {
     '#55B542', // 9: SDS Key outcome
     '#55B542', // 10: SDS priority area
     '#182635', // 11: Provenance
-    '#007c3a', // 12: PDS Strategic outcome
+    '#55B542', // 12: PDS Strategic outcome
     '#55B542', // 9: 13: PDS Key priority area
   ],
   taxonomiesHover: [
