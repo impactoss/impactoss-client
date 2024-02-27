@@ -110,7 +110,7 @@ export const CYCLE_TAXONOMY_ID = 2;
 
 export const ENDPOINTS = {
   API: SERVER_ENDPOINTS[SERVER], // server API endpoint
-  SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
+  SIGNING_URL: 's3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
   PASSWORD: 'auth/password',
