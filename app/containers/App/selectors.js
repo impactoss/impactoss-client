@@ -16,7 +16,7 @@ import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
 import { sortEntities } from 'utils/sort';
 
-import { USER_ROLES, DB_TABLES } from 'themes/config';
+import { USER_ROLES, DB_TABLES, ADMIN_ONLY_TAXONOMIES } from 'themes/config';
 
 import {
   filterEntitiesByAttributes,
@@ -456,8 +456,16 @@ export const selectFWEntitiesAll = createSelector(
     .set('indicators', indicators)
 );
 
-export const selectTaxonomies = createSelector(
+export const selectRoleTaxonomies = createSelector(
   (state) => selectEntities(state, 'taxonomies'),
+  selectIsUserContributor,
+  (taxonomies, canUserSeeTaxonomies) => taxonomies && taxonomies.filter(
+    (tax) => canUserSeeTaxonomies || ADMIN_ONLY_TAXONOMIES.indexOf(parseInt(tax.get('id'), 10)) === -1
+  )
+);
+
+export const selectTaxonomies = createSelector(
+  selectRoleTaxonomies,
   (state) => selectEntities(state, 'framework_taxonomies'),
   (taxonomies, fwTaxonomies) => taxonomies
     && fwTaxonomies
@@ -502,7 +510,7 @@ export const selectTaxonomies = createSelector(
 );
 
 export const selectFWTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
+  selectRoleTaxonomies,
   (state) => selectEntities(state, 'framework_taxonomies'),
   selectFrameworkQuery,
   (taxonomies, fwTaxonomies, framework) => taxonomies
@@ -732,7 +740,7 @@ export const selectRecommendationTaxonomies = createSelector(
   )
 );
 export const selectAllTaxonomiesWithCategories = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
+  selectRoleTaxonomies,
   (state) => selectEntities(state, 'categories'),
   (taxonomies, categories) => sortEntities(
     taxonomies,

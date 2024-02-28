@@ -94,6 +94,9 @@ export const TEXT_TRUNCATE = {
 
 export const PROGRESS_TAXONOMY_ID = 8;
 
+export const ADMIN_ONLY_TAXONOMIES = [9, 10];
+
+
 // WARNING: references as assigned by user
 export const PROGRESS_CATEGORY_REFERENCES = {
   ONGOING: 1,
