@@ -16,7 +16,6 @@ const ColumnHeader = styled.div`
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-top: 8px;
     padding-bottom: 8px;
-    padding-left: 8px;
     padding-right: 4px;
   }
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.medium : '993px'}) {
