@@ -15,7 +15,9 @@ const Status = styled.div`
     padding-left: 13px;
   }
 `;
-
+const StyledButtonTagCategoryInverse = styled((p) => <ButtonTagCategoryInverse {...p} />)`
+border-width: 1px;
+`;
 class ItemProgress extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { status } = this.props;
@@ -34,13 +36,13 @@ class ItemProgress extends React.PureComponent { // eslint-disable-line react/pr
                 </ButtonTagCategory>
               )
               : (
-                <ButtonTagCategoryInverse
+                <StyledButtonTagCategoryInverse
                   taxId={parseInt(status.attributes.taxonomy_id, 10)}
                   disabled
                   title={status.attributes.title}
                 >
                   {status.attributes.title}
-                </ButtonTagCategoryInverse>
+                </StyledButtonTagCategoryInverse>
               )
           }
         </Status>
