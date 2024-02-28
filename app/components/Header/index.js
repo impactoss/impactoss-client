@@ -128,7 +128,6 @@ const HideSecondaryWrap = styled.div`
 const HideSecondary = styled(Button)``;
 
 const LinkSuperTitle = styled.div`
-  color: ${(props) => props.active ? palette('text', 2) : 'inherit'};
   font-size: ${(props) => props.theme.sizes.text.smallMobile};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.theme.sizes.text.smaller};
@@ -140,7 +139,7 @@ const LinkSuperTitle = styled.div`
 const LinkTitle = styled.div`
   font-size: ${(props) => props.theme.sizes.text.small};
   font-weight: bold;
-  color: ${(props) => props.active ? palette('text', 2) : 'inherit'};
+  color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.theme.sizes.text.default};
   }
@@ -160,6 +159,10 @@ const SelectFrameworks = styled(LinkMain)`
 `;
 const Search = styled(LinkMain)`
   display: none;
+  color: ${(props) => props.active ? palette('headerNavMainItem', 1) : palette('headerNavMainItem', 0)};
+  &:hover {
+    color:${palette('headerNavMainItemHover', 0)};
+  }
   padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: inline-block;
@@ -172,12 +175,6 @@ const Search = styled(LinkMain)`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding-left: 24px;
     padding-right: 24px;
-  }
-`;
-const SearchSecondary = styled(LinkPage)`
-  display: block;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    display: none;
   }
 `;
 
@@ -206,6 +203,10 @@ const FrameworkOption = styled(Button)`
     color:${palette('headerNavMainItemHover', 0)};
   }
   color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
+`;
+const NavWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
 `;
 
 const STATE_INITIAL = {
@@ -291,7 +292,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     this.forceUpdate();
   };
 
-  renderSecondary = (navItemsAdmin, search) => (
+  renderSecondary = (navItemsAdmin) => (
     <PrintHide>
       <ShowSecondary
         visible={!this.state.showSecondary}
@@ -319,60 +320,50 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             <Icon name="close" size="30px" />
           </HideSecondary>
         </HideSecondaryWrap>
-        <NavAccount
-          isSignedIn={this.props.isSignedIn}
-          user={this.props.user}
-          onPageLink={(evt, path, query) => {
-            if (evt !== undefined && evt.stopPropagation) evt.stopPropagation();
-            this.onHideSecondary();
-            this.props.onPageLink(path, query);
-          }}
-          currentPath={this.props.currentPath}
-        />
-        {navItemsAdmin
-          && (
-            <NavAdmin>
-              {navItemsAdmin.map((item, i) => (
-                <LinkAdmin
-                  key={i}
-                  href={item.path}
-                  active={item.active}
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                    this.onHideSecondary();
-                    this.onClick(evt, item.path);
-                  }}
-                >
-                  {item.title}
-                </LinkAdmin>
-              ))}
-            </NavAdmin>
-          )
-        }
-        <NavPages>
-          {this.props.pages && this.props.pages.map((page, i) => (
-            <LinkPage
-              key={i}
-              href={page.path}
-              active={page.active || this.props.currentPath === page.path}
-              onClick={(evt) => this.onClick(evt, page.path)}
-            >
-              {page.title}
-            </LinkPage>
-          ))}
-          {search && (
-            <SearchSecondary
-              href={search.path}
-              active={search.active}
-              onClick={(evt) => this.onClick(evt, search.path)}
-            >
-              {search.title}
-              {search.icon
-                && <Icon title={search.title} name={search.icon} text textRight size="1em" />
-              }
-            </SearchSecondary>
-          )}
-        </NavPages>
+        <NavWrapper>
+          {navItemsAdmin
+            && (
+              <NavAdmin>
+                {navItemsAdmin.map((item, i) => (
+                  <LinkAdmin
+                    key={i}
+                    href={item.path}
+                    active={item.active}
+                    onClick={(evt) => {
+                      evt.stopPropagation();
+                      this.onHideSecondary();
+                      this.onClick(evt, item.path);
+                    }}
+                  >
+                    {item.title}
+                  </LinkAdmin>
+                ))}
+              </NavAdmin>
+            )
+          }
+          <NavPages>
+            {this.props.pages && this.props.pages.map((page, i) => (
+              <LinkPage
+                key={i}
+                href={page.path}
+                active={page.active || this.props.currentPath === page.path}
+                onClick={(evt) => this.onClick(evt, page.path)}
+              >
+                {page.title}
+              </LinkPage>
+            ))}
+          </NavPages>
+          <NavAccount
+            isSignedIn={this.props.isSignedIn}
+            user={this.props.user}
+            onPageLink={(evt, path, query) => {
+              if (evt !== undefined && evt.stopPropagation) evt.stopPropagation();
+              this.onHideSecondary();
+              this.props.onPageLink(path, query);
+            }}
+            currentPath={this.props.currentPath}
+          />
+        </NavWrapper>
       </NavSecondary>
     </PrintHide>
   );
@@ -383,7 +374,6 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       frameworkOptions,
       onSelectFramework,
       search,
-      brandPath,
     } = this.props;
     const { intl } = this.context;
     const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
@@ -423,7 +413,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         {!SHOW_BRAND_ON_HOME && isHome
           && (
             <HomeNavWrap>
-              {this.renderSecondary(navItemsAdmin, search)}
+              {this.renderSecondary(navItemsAdmin)}
             </HomeNavWrap>
           )
         }
@@ -432,8 +422,8 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             showPattern={(!isHome && SHOW_HEADER_PATTERN)}
           >
             <Brand
-              href={brandPath}
-              onClick={(evt) => this.onClick(evt, brandPath)}
+              href="/"
+              onClick={(evt) => this.onClick(evt, '/')}
               title={appTitle}
             >
               <Logo src={this.props.theme.media.headerLogo} alt={appTitle} />
@@ -448,11 +438,11 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 </BrandText>
               )}
             </Brand>
-            {this.renderSecondary(navItemsAdmin, search)}
+            {this.renderSecondary(navItemsAdmin)}
           </Banner>
         )}
         {!isHome && (
-          <NavMain hasBorder role="navigation" aria-label="primary">
+          <NavMain hasBorder>
             {frameworkOptions && (
               <SelectFrameworks
                 as="button"
@@ -462,7 +452,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                   : this.onShowFrameworks(evt)
                 }
               >
-                <LinkSuperTitle active>
+                <LinkSuperTitle>
                   {intl.formatMessage(appMessages.frameworks.single)}
                 </LinkSuperTitle>
                 {currentFrameworkOption && (
@@ -489,7 +479,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 active={item.active}
                 onClick={(evt) => this.onClick(evt, item.path)}
               >
-                <LinkSuperTitle active={item.active}>
+                <LinkSuperTitle>
                   {item.titleSuper}
                 </LinkSuperTitle>
                 <LinkTitle active={item.active}>
@@ -502,6 +492,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 href={search.path}
                 active={search.active}
                 onClick={(evt) => this.onClick(evt, search.path)}
+                icon={search.icon}
               >
                 {search.title}
                 {search.icon
@@ -532,12 +523,10 @@ Header.propTypes = {
   theme: PropTypes.object.isRequired,
   search: PropTypes.object,
   frameworkOptions: PropTypes.array,
-  brandPath: PropTypes.string,
 };
 
 Header.defaultProps = {
   isHome: true,
-  brandPath: '/',
 };
 
 export default withTheme(Header);
