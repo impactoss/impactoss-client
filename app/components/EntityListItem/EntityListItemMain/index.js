@@ -69,6 +69,10 @@ const EntityListItemMainTopWrap = styled.div`
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal
 }px;
+  padding-left: ${(props) => (!props.theme.sizes)
+    ? 0
+    : props.theme.sizes.mainListItem.paddingHorizontal
+}px;
 `;
 
 class EntityListItemMain extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
