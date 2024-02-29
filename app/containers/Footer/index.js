@@ -44,8 +44,11 @@ const FooterLink = styled.a`
 const Logo = styled(NormalImg)`
   height: 50px;
   padding-right: ${({ hasRightPadding }) => hasRightPadding ? '2em' : 0};
+  @media (min-width: ${({ theme }) => theme.breakpoints.medium}) {
+    height: 55px;
+  }
   @media (min-width: ${({ theme }) => theme.breakpoints.large}) {
-    height: 75px;
+    height: 68px;
   }
 `;
 
