@@ -57,11 +57,8 @@ const Tags = styled.div`
   margin-left: 10px;
 `;
 
-const StyledButton = styled(Button)`
-  padding: 10px 16px;
-  position: absolute;
-  top: 0;
-  right: 0;
+const ButtonTagSearch = styled(Button)`
+  padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
   background-color: ${palette('background', 4)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 10px 16px;
@@ -79,7 +76,7 @@ const SearchValuePrint = styled(PrintOnly)`
   font-size: ${(props) => props.theme.sizes.print.default};
   font-weight: bold;
 `;
-const ButtonTagSearch = styled.div``;
+// const ButtonTagSearch = styled.div``;
 const StyledLabel = styled.label``;
 
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -125,12 +122,27 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     return filter.label;
   };
 
+  getFilterTitle = (filter) => {
+    let title = '';
+    if (filter.titleLabels) {
+      title = this.getLabels(filter.titleLabels);
+    } else {
+      title = filter.title || this.getFilterLabel(filter);
+    }
+    return this.context.intl.formatMessage(messages.removeTag, { title });
+  };
+
+  focusLastFilter = () => {
+    if (this.lastFilter) this.lastFilter.focus();
+  };
+
   render() {
     const {
       filters,
       searchQuery,
       onSearch,
       placeholder,
+      onClear,
       resultsId,
     } = this.props;
     const { intl } = this.context;
@@ -211,7 +223,9 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
           </StyledLabel>
         </ScreenReaderOnly>
         <SearchInput
-          id="search-input"
+          id={inputId}
+          placeholder={inputPlaceholder}
+          inputRef={(el) => { this.input = el; }}
           minLength={1}
           debounceTimeout={500}
           value={searchQuery || ''}
@@ -228,20 +242,13 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
           }}
         />
         {hasFilters && (
-          <StyledButton
-            onClick={this.props.onClear}
+          <ButtonTagSearch
+            onClick={onClear}
             small={this.props.multiselect}
             title={this.context.intl.formatMessage(messages.removeAll)}
           >
             <Icon name="removeSmall" />
-          </StyledButton>
-        )}
-        {!hasFilters && (
-          <StyledButton
-            small={this.props.multiselect}
-          >
-            <Icon title="Search" name="search" size="1em" />
-          </StyledButton>
+          </ButtonTagSearch>
         )}
         {searchQuery && (
           <LabelPrint>

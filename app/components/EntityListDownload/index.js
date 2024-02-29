@@ -62,6 +62,12 @@ const Main = styled.div`
     margin: 0 0 50px;
   }
 `;
+const HeaderWrap = styled.div`
+  padding: 0;
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    padding-left: 24px;
+  }
+`;
 
 const Select = styled.div`
   width: 20px;
@@ -299,14 +305,16 @@ export function EntityListDownload({
   const size = React.useContext(ResponsiveContext);
   return (
     <Content inModal>
-      <ContentHeader
-        title={intl.formatMessage(messages.downloadCsvTitle)}
-        type={CONTENT_MODAL}
-        buttons={[{
-          type: 'cancel',
-          onClick: () => onClose(),
-        }]}
-      />
+      <HeaderWrap>
+        <ContentHeader
+          title={intl.formatMessage(messages.downloadCsvTitle)}
+          type={CONTENT_MODAL}
+          buttons={[{
+            type: 'cancel',
+            onClick: () => onClose(),
+          }]}
+        />
+      </HeaderWrap>
       <Main margin={{ bottom: 'large' }}>
         <Box margin={{ bottom: 'small' }}>
           <Text size="xxlarge" weight={700}>

@@ -570,7 +570,7 @@ export const getNameField = (formatMessage, model = '.attributes.name') => {
   return field;
 };
 
-export const getPasswordField = (formatMessage, isAutoComplete = false, model = '.attributes.password') => {
+export const getPasswordField = (formatMessage, model = '.attributes.password', isAutoComplete = false,) => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',

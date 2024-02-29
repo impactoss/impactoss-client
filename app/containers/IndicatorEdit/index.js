@@ -309,7 +309,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             )
           }
           {deleteError
-            && <Messages type="error" messages={deleteError} />
+            && <Messages type="error" messages={deleteError.messages} />
           }
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
