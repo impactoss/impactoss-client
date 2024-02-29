@@ -245,6 +245,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                       intl.formatMessage(messages.filterFormWithoutPrefix),
                       intl.formatMessage(messages.filterFormError),
                     )}
+                    searchAttributes={config.search}
                     searchQuery={locationQuery.get('search') || ''}
                     onSearch={onSearch}
                     onClear={() => {

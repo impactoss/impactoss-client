@@ -152,6 +152,7 @@
   "app.components.Messages.preBold": "Oh no! ",
   "app.components.Messages.preAdditional": "Something went wrong:",
   "app.components.TagSearch.searchPlaceholderEntities": "Filter items by reference or title",
+  "app.components.TagSearch.searchPlaceholderEntitiesAttributes": "Filter items by: {attributes}",
   "app.components.TagSearch.searchPlaceholderMultiSelect": "Filter options by reference or title",
   "app.components.TagSearch.labelPrintFilters": "Filters:",
   "app.components.TagSearch.labelPrintKeywords": "Keyword search:",
