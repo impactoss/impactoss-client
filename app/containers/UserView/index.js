@@ -16,6 +16,7 @@ import {
   getMetaField,
   getEmailField,
   getTaxonomyFields,
+  getTextField,
 } from 'utils/fields';
 
 import { getEntityTitle } from 'utils/entities';
@@ -157,7 +158,10 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
   };
 
   getBodyMainFields = (entity) => ([{
-    fields: [getEmailField(entity)],
+    fields: [
+      getEmailField(entity),
+      getTextField(entity, 'domain'),
+    ],
   }]);
 
   getBodyAsideFields = (taxonomies) => ([

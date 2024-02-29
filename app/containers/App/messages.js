@@ -544,6 +544,10 @@ export default defineMessages({
       id: 'app.containers.App.attributes.email',
       defaultMessage: 'Email address',
     },
+    domain: {
+      id: 'app.containers.App.attributes.domain',
+      defaultMessage: 'Domain (from Email)',
+    },
     status: {
       id: 'app.containers.App.attributes.status',
       defaultMessage: 'Status',
