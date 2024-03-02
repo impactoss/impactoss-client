@@ -140,7 +140,7 @@ const LinkSuperTitle = styled.div`
 const LinkTitle = styled.div`
   font-size: ${(props) => props.theme.sizes.text.small};
   font-weight: bold;
-  color: ${(props) => props.active ? palette('text', 2) : 'inherit'};
+  color: ${(props) => props.active ? palette('text', 2) : palette('text', 1)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.theme.sizes.text.default};
   }
