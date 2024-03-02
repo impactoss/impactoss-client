@@ -69,6 +69,10 @@ const EntityListItemMainTopWrap = styled.div`
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal
 }px;
+padding-left: ${(props) => (!props.theme.sizes || props.isManager)
+    ? 0
+    : props.theme.sizes.mainListItem.paddingHorizontal
+}px;
 `;
 
 class EntityListItemMain extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -249,7 +253,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             Skip to next list item or group, continue to list item details
           </SkipContent>
         )}
-        <EntityListItemMainTopWrap>
+        <EntityListItemMainTopWrap isManager={this.props.isManager}>
           <EntityListItemMainTop entity={entity} />
         </EntityListItemMainTopWrap>
         { (entity.categories || (entity.connectedCounts && this.props.wrapper))
