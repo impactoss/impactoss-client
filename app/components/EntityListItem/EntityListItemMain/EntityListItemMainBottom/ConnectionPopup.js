@@ -22,9 +22,9 @@ const Count = styled.span`
   top: 0;
   border-radius: 999px;
   font-size: 0.7em;
-  background-color: ${(props) => props.draft ? palette('buttonInverse', 1) : palette(props.pIndex, 0)};
-  color: ${(props) => props.draft ? palette(props.pIndex, 0) : palette('buttonDefault', 0)};
-  border: 1px solid ${(props) => palette(props.pIndex, 0)};
+  background-color: ${({ paletteDefault, paletteDefaultIndex }) => palette(paletteDefault, paletteDefaultIndex)};
+  color: ${({ fontColor, fontColorIndex }) => palette(fontColor, fontColorIndex)};
+  border: 1px solid ${({ paletteBorder }) => palette(paletteBorder, 0)};
   height: 1.8em;
   min-width: 1.8em;
   text-align: center;
@@ -166,7 +166,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
       return 'left';
     }
     return 'center';
-  }
+  };
 
   calcHeight = () => {
     let height = 1;
@@ -174,7 +174,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
     if (this.state.listItem_1) height += this.state.listItem_1.clientHeight;
     if (this.state.listItem_2) height += this.state.listItem_2.clientHeight;
     return height;
-  }
+  };
 
   openPopup() {
     this.setState({ popupOpen: true });
@@ -190,7 +190,6 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
     } = this.props;
     const { intl } = this.context;
     const entitiesTotal = entities ? entities.size : 0;
-
     return (
       <PopupWrapper
         onMouseOver={() => this.openPopup()}
@@ -204,7 +203,15 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
           }
         }}
       >
-        <Count pIndex={option.style} draft={draft}>{entitiesTotal}</Count>
+        <Count
+          paletteBorder={option.style}
+          paletteDefault={draft ? 'buttonInverse' : option.style}
+          paletteDefaultIndex={draft ? 1 : 0}
+          fontColor={`${option.style}ConnectionText`}
+          fontColorIndex={draft ? 0 : 1}
+        >
+          {entitiesTotal}
+        </Count>
         {this.state.popupOpen
           && (
             <Popup
@@ -216,12 +223,12 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
                   <PopupHeaderMain>
                     {`${entitiesTotal} ${option.label(entitiesTotal)}`}
                   </PopupHeaderMain>
-                  { draft
-                  && (
-                    <PopupHeaderMain>
-                      {` (${intl && intl.formatMessage(messages.draft)})`}
-                    </PopupHeaderMain>
-                  )
+                  {draft
+                    && (
+                      <PopupHeaderMain>
+                        {` (${intl && intl.formatMessage(messages.draft)})`}
+                      </PopupHeaderMain>
+                    )
                   }
                 </PopupHeader>
                 <PopupContent height={this.calcHeight()}>
@@ -236,8 +243,8 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
                             ref={(node) => i < 3 && this.setState({ [`listItem_${i}`]: node })}
                           >
                             <ListItemLink to={`/${option.path}/${entity.get('id')}`}>
-                              { entity.getIn(['attributes', 'draft'])
-                            && <ItemStatus draft />
+                              {entity.getIn(['attributes', 'draft'])
+                                && <ItemStatus draft />
                               }
                               <Id>{ref}</Id>
                               <IdSpacer />
