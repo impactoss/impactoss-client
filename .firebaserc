@@ -1,6 +1,7 @@
 {
   "projects": {
     "default": "impact-nz-dev",
-    "a11y": "impact-nz-dev-a11y"
+    "a11y": "impact-nz-dev-a11y",
+    "design": "impact-nz-dev"
   }
 }
