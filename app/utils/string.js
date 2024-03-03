@@ -8,6 +8,7 @@ export const lowerCase = (str) => loCase(str)
   .replace('\bupr\b', 'UPR')
   .replace('sdg', 'SDG')
   .replace('sds', 'SDS')
+  .replace('pds', 'PDS')
   .replace('\bsmart\b', 'SMART')
   .replace('sustainable development goal', 'Sustainable Development Goal');
 

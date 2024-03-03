@@ -1,6 +1,6 @@
 {
   "name": "sadata",
-  "version": "2.0.3",
+  "version": "2.0.8",
   "description": "Integrated Management and Planning of ACTions Open Source Software",
   "repository": {
     "type": "git",
@@ -22,8 +22,9 @@
     "prebuild": "npm run build:clean",
     "build": "cross-env NODE_ENV=production SERVER=production webpack --config internals/webpack/webpack.prod.babel.js --color --progress",
     "build:stage": "cross-env NODE_ENV=production SERVER=staging webpack --config internals/webpack/webpack.prod.babel.js --color --progress",
+    "build:dev": "cross-env NODE_ENV=production SERVER=development webpack --config internals/webpack/webpack.prod.babel.js --color --progress",
     "build:clean": "rimraf ./build",
-    "start": "cross-env NODE_ENV=development SERVER=staging node server",
+    "start": "cross-env NODE_ENV=development SERVER=development node server",
     "start:stage": "cross-env NODE_ENV=development SERVER=staging node server",
     "start:pdb": "cross-env NODE_ENV=development SERVER=production node server",
     "start:tunnel": "cross-env NODE_ENV=development ENABLE_TUNNEL=true node server",
@@ -139,6 +140,7 @@
     "circular-dependency-plugin": "5.0.2",
     "compare-versions": "3.4.0",
     "compression-webpack-plugin": "2.0.0",
+    "copy-webpack-plugin": "^5.1.2",
     "coveralls": "3.0.3",
     "css-loader": "2.1.1",
     "eslint": "5.16.0",

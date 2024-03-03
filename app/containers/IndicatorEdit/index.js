@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
@@ -215,12 +215,16 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             'start_date',
             repeat,
             repeat ? 'start_date' : 'start_date_only',
-            (model, value) => this.props.onStartDateChange(model, value, this.props.viewDomain.form.data, intl.formatMessage)
+            (model, value) => this.props.onStartDateChange(
+              model, value, this.props.viewDomain.getIn(['form', 'data']), intl.formatMessage,
+            )
           ),
           getCheckboxField(
             intl.formatMessage,
             'repeat',
-            (model, value) => this.props.onRepeatChange(model, value, this.props.viewDomain.form.data, intl.formatMessage)
+            (model, value) => this.props.onRepeatChange(
+              model, value, this.props.viewDomain.getIn(['form', 'data']), intl.formatMessage,
+            )
           ),
           repeat ? getFrequencyField(intl.formatMessage, entity) : null,
           repeat ? getDateField(
@@ -228,7 +232,9 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             'end_date',
             repeat,
             'end_date',
-            (model, value) => this.props.onEndDateChange(model, value, this.props.viewDomain.form.data, intl.formatMessage)
+            (model, value) => this.props.onEndDateChange(
+              model, value, this.props.viewDomain.getIn(['form', 'data']), intl.formatMessage,
+            )
           )
             : null,
           renderUserControl(
@@ -251,7 +257,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     } = viewDomain.get('page').toJS();
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },

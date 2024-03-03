@@ -16,7 +16,16 @@ export const SERVER = (process && process.env && process.env.SERVER) || 'develop
 const SERVER_ENDPOINTS = {
   production: 'https://sadata-production.herokuapp.com',
   staging: 'https://undp-sadata-staging.herokuapp.com',
+  development: 'https://undp-sadata-staging.herokuapp.com',
 };
+export const SERVER_ENDPOINT = SERVER_ENDPOINTS[SERVER];
+// used for redirect and canonical tag
+export const CLIENT_URLS = {
+  production: 'https://sadata.ws',
+  staging: 'https://sadata-staging.web.app',
+  development: 'https://sadata-dev.web.app',
+};
+export const CLIENT_URL = CLIENT_URLS[SERVER];
 export const IS_PROD = SERVER === 'production';
 const version_text = IS_PROD ? '' : ` [${SERVER}]`;
 export const VERSION = `${version}${version_text}`;
@@ -94,6 +103,9 @@ export const TEXT_TRUNCATE = {
 
 export const PROGRESS_TAXONOMY_ID = 8;
 
+export const ADMIN_ONLY_TAXONOMIES = [9, 10];
+
+
 // WARNING: references as assigned by user
 export const PROGRESS_CATEGORY_REFERENCES = {
   ONGOING: 1,
@@ -110,7 +122,7 @@ export const CYCLE_TAXONOMY_ID = 2;
 
 export const ENDPOINTS = {
   API: SERVER_ENDPOINTS[SERVER], // server API endpoint
-  SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
+  SIGNING_URL: 's3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
   PASSWORD: 'auth/password',

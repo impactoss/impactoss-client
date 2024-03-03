@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List } from 'immutable';
@@ -208,7 +208,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       || qe(currentFrameworkId, tax.getIn(['attributes', 'framework_id'])));
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle, { type })}`}
           meta={[
             {

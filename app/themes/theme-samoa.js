@@ -124,6 +124,8 @@ theme.palette = {
     '#55B542', // 9: SDS Key outcome
     '#55B542', // 10: SDS priority area
     '#182635', // 11: Provenance
+    '#55B542', // 12: PDS Strategic outcome
+    '#55B542', // 13: PDS Key priority area
   ],
   taxonomiesHover: [
     '#DBDCDD', // 0: default/fallback
@@ -138,6 +140,8 @@ theme.palette = {
     '#4EA53', // 9: SDS Key outcome
     '#4EA53', // 10: SDS priority area
     '#162331', // 11: Provenance
+    '#4EA53', // 12: PDS Strategic outcome
+    '#4EA53', // 13: PDS Key priority area
   ],
 
   // bg inactive, bg hover, icon

@@ -6,7 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fromJS } from 'immutable';
@@ -143,7 +143,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         false);
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.supTitle)}: ${contentTitle}`}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },

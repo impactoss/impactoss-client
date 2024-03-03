@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List, fromJS } from 'immutable';
@@ -186,7 +186,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
