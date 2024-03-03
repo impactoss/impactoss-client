@@ -6,7 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import { PathLine } from 'react-svg-pathline';
 import { palette } from 'styled-theme';
@@ -504,7 +504,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={intl.formatMessage(messages.supTitle)}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },

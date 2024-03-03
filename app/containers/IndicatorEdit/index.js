@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
@@ -257,7 +257,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     } = viewDomain.get('page').toJS();
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },

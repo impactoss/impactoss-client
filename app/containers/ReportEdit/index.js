@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
@@ -188,7 +188,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     }
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={pageTitle}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
