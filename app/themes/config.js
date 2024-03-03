@@ -16,9 +16,16 @@ export const SERVER = (process && process.env && process.env.SERVER) || 'develop
 const SERVER_ENDPOINTS = {
   production: 'https://sadata-production.herokuapp.com',
   staging: 'https://undp-sadata-staging.herokuapp.com',
+  development: 'https://undp-sadata-staging.herokuapp.com',
 };
+export const SERVER_ENDPOINT = SERVER_ENDPOINTS[SERVER];
 // used for redirect and canonical tag
-export const CLIENT_URL = 'https://sadata.ws';
+export const CLIENT_URLS = {
+  production: 'https://sadata.ws',
+  staging: 'https://sadata-staging.web.app',
+  development: 'https://sadata-dev.web.app',
+};
+export const CLIENT_URL = CLIENT_URLS[SERVER];
 export const IS_PROD = SERVER === 'production';
 const version_text = IS_PROD ? '' : ` [${SERVER}]`;
 export const VERSION = `${version}${version_text}`;
