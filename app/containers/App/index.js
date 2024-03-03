@@ -8,6 +8,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
+import { CLIENT_URL } from 'themes/config';
+
 import ReactModal from 'react-modal';
 import GlobalStyle from 'global-styles';
 
@@ -69,6 +71,21 @@ const Main = styled.div`
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   UNSAFE_componentWillMount() {
+    if (window && window.location) {
+      let canonical = CLIENT_URL;
+      const {
+        origin,
+        hostname,
+        pathname,
+        search,
+      } = window.location;
+      if (search !== '' || pathname !== '/') {
+        canonical = `${canonical}${pathname}${search}`;
+      }
+      if (origin !== CLIENT_URL && hostname !== 'localhost') {
+        window.location.replace(canonical);
+      }
+    }
     this.props.validateToken();
     this.props.loadEntitiesIfNeeded();
   }

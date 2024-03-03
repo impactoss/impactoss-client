@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { Map, fromJS } from 'immutable';
@@ -297,7 +297,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={intl.formatMessage(messages.pageTitle)}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },

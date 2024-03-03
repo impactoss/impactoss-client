@@ -17,6 +17,8 @@ const SERVER_ENDPOINTS = {
   production: 'https://sadata-production.herokuapp.com',
   staging: 'https://undp-sadata-staging.herokuapp.com',
 };
+// used for redirect and canonical tag
+export const CLIENT_URL = 'https://sadata-dev.impactoss.org';
 export const IS_PROD = SERVER === 'production';
 const version_text = IS_PROD ? '' : ` [${SERVER}]`;
 export const VERSION = `${version}${version_text}`;
