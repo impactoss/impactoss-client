@@ -28,8 +28,10 @@ theme.media = {
   //   [partner3, partner3x2x],
   //   [partner4, partner4x2x],
   // ],
-  nzGovLogo: [footerLogo1],
-  nzJusticeLogo: [footerLogo2],
+  agencyLogos: [
+    [footerLogo1],
+    [footerLogo2],
+  ],
 };
 
 // grid-styles settings https://github.com/jxnblk/grid-styled
