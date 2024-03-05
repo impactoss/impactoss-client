@@ -39,7 +39,6 @@ import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
-import Footer from 'containers/Footer';
 
 import { selectDomain } from './selectors';
 import { FORM_INITIAL } from './constants';
@@ -209,7 +208,6 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
           {saveSending
             && <Loading />
           }
-          <Footer />
         </Content>
       </div>
     );
