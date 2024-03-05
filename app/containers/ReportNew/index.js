@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map } from 'immutable';
@@ -200,7 +200,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={pageTitle}
           meta={[
             {

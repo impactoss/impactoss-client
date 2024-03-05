@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Helmet } from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import ReactModal from 'react-modal';
 import GlobalStyle from 'global-styles';
 import { FormattedMessage } from 'react-intl';
@@ -213,7 +213,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         >
           <FormattedMessage {...messages.screenreader.skipToContent} />
         </SkipContent>
-        <Helmet titleTemplate={`${title} - %s`} defaultTitle={title} />
+        <HelmetCanonical titleTemplate={`${title} - %s`} defaultTitle={title} />
         <Header
           isSignedIn={isUserSignedIn}
           user={user}
