@@ -1,7 +1,7 @@
 {
   "name": "impact-oss",
-  "version": "NZJ-0.1.6",
-  "description": "Integrated Management and Planning of ACTions Open Source Software",
+  "version": "0.1.7",
+  "description": "NZ version of Integrated Management and Planning of ACTions Open Source Software",
   "repository": {
     "type": "git",
     "url": "git://github.com/impactoss/impactoss.git"

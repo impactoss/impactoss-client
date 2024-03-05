@@ -168,7 +168,7 @@ const Footer = ({
             <BoxRow>
               <BoxColumn>
                 <Text size="xxxsmall">
-                  {`${intl.formatMessage(appMessages.app.title)}, version: ${VERSION}`}
+                  {`${intl.formatMessage(appMessages.app.title)}: v${VERSION}`}
                 </Text>
               </BoxColumn>
             </BoxRow>
