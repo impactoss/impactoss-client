@@ -15,10 +15,10 @@ import { Map } from 'immutable';
 import {
   getTitleFormField,
   getDueDateOptionsField,
-  getDocumentStatusField,
   getStatusField,
   getMarkdownField,
-  getUploadField,
+  // getUploadField,
+  // getDocumentStatusField,
   getDueDateDateOptions,
 } from 'utils/forms';
 
@@ -156,8 +156,8 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
       {
         fields: [
           getMarkdownField(intl.formatMessage),
-          getUploadField(intl.formatMessage),
-          getDocumentStatusField(intl.formatMessage),
+          // getUploadField(intl.formatMessage),
+          // getDocumentStatusField(intl.formatMessage),
         ],
       },
     ]);
