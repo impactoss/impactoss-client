@@ -14,7 +14,6 @@ margin-top: 10px;
   margin-top: 20px;
   margin-bottom: 20px;
   page-break-inside: avoid;
-  border-top: 1px solid ${palette('light', 1)};
 }
 `;
 
@@ -43,8 +42,11 @@ const ListEntitiesSubgroupHeader = styled.h5`
   }
 `;
 const Divider = styled.div`
-width: 100%;
-border-bottom: 1px solid ${palette('light', 3)};
+  width: 100%;
+  border-bottom: 1px solid ${palette('light', 3)};
+  @media print {
+    display: none;
+  }
 `;
 export class EntityListGroupHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {

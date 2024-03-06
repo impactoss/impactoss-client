@@ -69,6 +69,7 @@ const Wrapper = styled((p) => <Box margin={{ bottom: 'large' }} {...p} />)`
     font-size: 1em;
   }
   @media print {
+    padding: 0px;
     font-size: ${({ theme }) => theme.sizes.print.default};
   }
 `;
