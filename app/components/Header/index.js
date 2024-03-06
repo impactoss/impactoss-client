@@ -130,7 +130,9 @@ const HideSecondary = styled(Button)``;
 const LinkSuperTitle = styled.div`
   color: ${(props) => props.active ? palette('text', 2) : 'inherit'};
   font-size: ${(props) => props.theme.sizes.text.smallMobile};
+  display: none;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: block;
     font-size: ${(props) => props.theme.sizes.text.smaller};
   }
   @media print {

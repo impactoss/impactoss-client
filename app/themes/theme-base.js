@@ -379,7 +379,7 @@ theme.sizes = {
     },
     nav: {
       height: 50,
-      heightMobile: 32,
+      heightMobile: 37,
     },
     // px or em
     text: {

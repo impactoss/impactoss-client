@@ -10,7 +10,6 @@ import ButtonTagCategoryInverse from 'components/buttons/ButtonTagCategoryInvers
 const Status = styled.div`
   float: right;
   padding-left: 5px;
-  margin-top: -4px;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-left: 13px;
   }
