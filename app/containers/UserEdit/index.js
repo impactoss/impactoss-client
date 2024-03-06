@@ -275,6 +275,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                   formData,
                   taxonomies,
                   roles,
+                  viewEntity,
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
@@ -370,7 +371,7 @@ function mapDispatchToProps(dispatch) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, taxonomies, roles) => {
+    handleSubmit: (formData, taxonomies, roles, viewEntity) => {
       let saveData = formData
         .set(
           'userCategories',
@@ -405,6 +406,11 @@ function mapDispatchToProps(dispatch) {
           : memo,
         List()),
       }));
+
+      // check if attributes have changed
+      if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+        saveData = saveData.set('skipAttributes', true);
+      }
 
       dispatch(save(saveData.toJS()));
     },

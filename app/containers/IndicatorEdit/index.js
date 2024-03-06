@@ -331,6 +331,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                   formData,
                   measures,
                   recommendationsByFw,
+                  viewEntity,
                 )}
                 handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, intl.formatMessage)}
                 handleCancel={this.props.handleCancel}
@@ -512,7 +513,7 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, measures, recommendationsByFw) => {
+    handleSubmit: (formData, measures, recommendationsByFw, viewEntity) => {
       let saveData = formData
         .set(
           'measureIndicators',
@@ -569,6 +570,11 @@ function mapDispatchToProps(dispatch, props) {
           .setIn(['attributes', 'frequency_months'], null)
           .setIn(['attributes', 'end_date'], null);
       }
+      // check if attributes have changed
+      if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+        saveData = saveData.set('skipAttributes', true);
+      }
+
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {

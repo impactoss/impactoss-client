@@ -280,7 +280,10 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                 model="reportEdit.form.data"
                 formData={viewDomain.getIn(['form', 'data'])}
                 saving={saveSending}
-                handleSubmit={(formData) => this.props.handleSubmit(formData, viewEntity.getIn(['attributes', 'due_date_id']))}
+                handleSubmit={(formData) => this.props.handleSubmit(
+                  formData,
+                  viewEntity
+                )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
                 handleUpdate={this.props.handleUpdate}
@@ -379,9 +382,9 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, previousDateAssigned) => {
+    handleSubmit: (formData, viewEntity) => {
       let saveData = formData;
-
+      const previousDateAssigned = viewEntity.getIn(['attributes', 'due_date_id']);
       const dateAssigned = formData.getIn(['attributes', 'due_date_id']);
       saveData = saveData.setIn(
         ['attributes', 'due_date_id'],
@@ -389,7 +392,10 @@ function mapDispatchToProps(dispatch, props) {
           ? null
           : parseInt(dateAssigned, 10)
       );
-
+      // check if attributes have changed
+      if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+        saveData = saveData.set('skipAttributes', true);
+      }
       dispatch(save(
         saveData.toJS(),
         previousDateAssigned && previousDateAssigned !== dateAssigned
