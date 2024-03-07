@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 
 import {
@@ -16,6 +16,7 @@ import {
   getMetaField,
   getEmailField,
   getTaxonomyFields,
+  getTextField,
 } from 'utils/fields';
 
 import { getEntityTitle } from 'utils/entities';
@@ -157,7 +158,10 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
   };
 
   getBodyMainFields = (entity) => ([{
-    fields: [getEmailField(entity)],
+    fields: [
+      getEmailField(entity),
+      getTextField(entity, 'domain'),
+    ],
   }]);
 
   getBodyAsideFields = (taxonomies) => ([
@@ -189,7 +193,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={metaTitle}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },

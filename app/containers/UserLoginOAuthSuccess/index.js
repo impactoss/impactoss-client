@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 
 // import { ROUTES } from 'containers/App/constants';
 import { forwardOnAuthenticationChange } from 'containers/App/actions';
@@ -27,7 +27,7 @@ export class UserLoginOAuthSuccess extends React.PureComponent { // eslint-disab
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {

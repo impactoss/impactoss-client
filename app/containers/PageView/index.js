@@ -7,7 +7,7 @@
 import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -124,7 +124,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={page ? page.getIn(['attributes', 'title']) : `${intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },

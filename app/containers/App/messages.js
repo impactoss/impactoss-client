@@ -184,14 +184,6 @@ export default defineMessages({
       defaultMessage: 'Import',
     },
   },
-  htmlElementAttributes: {
-    autocomplete: {
-      fullName: 'name',
-      email: 'email',
-      username: 'username',
-      currentPassword: 'current-password',
-    },
-  },
   labels: {
     perPage: {
       id: 'app.containers.App.labels.perPage',
@@ -543,6 +535,10 @@ export default defineMessages({
     email: {
       id: 'app.containers.App.attributes.email',
       defaultMessage: 'Email address',
+    },
+    domain: {
+      id: 'app.containers.App.attributes.domain',
+      defaultMessage: 'Domain (from Email)',
     },
     status: {
       id: 'app.containers.App.attributes.status',
