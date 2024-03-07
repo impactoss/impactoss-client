@@ -75,7 +75,7 @@ const Wrapper = styled((p) => <Box margin={{ bottom: 'large' }} {...p} />)`
 `;
 const BoxRow = styled((p) => <Box direction="row" {...p} />)``;
 
-const FooterNote = styled((p) => <Text size="small" {...p} />)``;
+const FooterNote = styled((p) => <Text size="xsmall" {...p} />)``;
 const FooterVersion = styled((p) => <Text size="xxxsmall" {...p} />)``;
 
 const Footer = ({

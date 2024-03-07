@@ -15,7 +15,4 @@ export default styled.a`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 8px 1em;
   }
-  @media (max-width: ${({ theme }) => theme.breakpoints.small}) {
-    text-align: center;
-  }
 `;
