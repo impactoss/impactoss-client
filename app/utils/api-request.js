@@ -13,14 +13,28 @@ const AUTH_KEYS = [
 
 // Look at each authKey in session-storage, if found add to returned object
 export function getAuthValues() {
-  return AUTH_KEYS.reduce((headers, key) => {
-    const value = get(key);
-    return value ? { // value found in storage, add it to the headers object
-      ...headers,
-      [key]: value,
-    }
-      : headers; // no value found, return existing headers
-  }, {});
+  let authValues;
+  const params = Object.fromEntries(new URLSearchParams(window.location.search));
+  if (params.auth_token && params.client_id && params.uid) {
+    authValues = {
+      [KEYS.ACCESS_TOKEN]: params.auth_token,
+      [KEYS.TOKEN_TYPE]: null,
+      [KEYS.CLIENT]: params.client_id,
+      [KEYS.UID]: params.uid,
+      [KEYS.EXPIRY]: params.expiry,
+    };
+  } else {
+    authValues = AUTH_KEYS.reduce((headers, key) => {
+      const value = get(key);
+      return value ? { // value found in storage, add it to the headers object
+        ...headers,
+        [key]: value,
+      }
+        : headers; // no value found, return existing headers
+    }, {});
+  }
+
+  return authValues;
 }
 
 // Look at each authKey, if its in the response header save it to session-storage

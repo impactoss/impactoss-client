@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
@@ -30,7 +30,7 @@ import {
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
-
+import { canUserDeleteEntities } from 'utils/permissions';
 import { getMetaField } from 'utils/fields';
 import { qe } from 'utils/quasi-equals';
 
@@ -53,6 +53,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectIsUserAdmin,
+  selectSessionUserHighestRoleId,
   selectFrameworks,
 } from 'containers/App/selectors';
 
@@ -61,6 +62,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -233,7 +235,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle, { type })}: ${reference}`}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
@@ -275,7 +277,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
             )
           }
           {deleteError
-            && <Messages type="error" messages={deleteError} />
+            && <Messages type="error" messages={deleteError.messages} />
           }
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
@@ -299,11 +301,12 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                   measures,
                   indicators,
                   currentFramework,
+                  viewEntity,
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 handleUpdate={this.props.handleUpdate}
-                handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+                handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(),
@@ -328,6 +331,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           { (saveSending || deleteSending)
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );
@@ -349,6 +353,7 @@ RecommendationEdit.propTypes = {
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
   isUserAdmin: PropTypes.bool,
+  highestRole: PropTypes.number,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   measures: PropTypes.object,
@@ -366,6 +371,7 @@ RecommendationEdit.contextTypes = {
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   isUserAdmin: selectIsUserAdmin(state),
+  highestRole: selectSessionUserHighestRoleId(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
@@ -400,7 +406,14 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, taxonomies, measures, indicators, currentFramework) => {
+    handleSubmit: (
+      formData,
+      taxonomies,
+      measures,
+      indicators,
+      currentFramework,
+      viewEntity,
+    ) => {
       let saveData = formData
         .set(
           'recommendationCategories',
@@ -437,6 +450,10 @@ function mapDispatchToProps(dispatch, props) {
           .setIn(['attributes', 'response'], '');
       } else if (saveData.getIn(['attributes', 'accepted']) === '') {
         saveData = saveData.setIn(['attributes', 'accepted'], 'true');
+      }
+      // check if attributes have changed
+      if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+        saveData = saveData.set('skipAttributes', true);
       }
       dispatch(save(saveData.toJS()));
     },

@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "impact-nz-dev"
+    "default": "impact-nz-dev",
+    "dev": "impact-nz-dev",
+    "development": "impact-nz-dev",
+    "a11y": "impact-nz-dev-a11y"
   }
 }

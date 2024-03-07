@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
@@ -42,6 +42,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import Footer from 'containers/Footer';
 
 import { selectDomain } from './selectors';
 
@@ -107,7 +108,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
@@ -180,6 +181,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
           { saveSending
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );

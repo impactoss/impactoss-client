@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
@@ -27,6 +27,7 @@ import {
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import { canUserDeleteEntities } from 'utils/permissions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
@@ -45,6 +46,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectIsUserAdmin,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -52,6 +54,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -148,7 +151,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
@@ -189,7 +192,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
             )
           }
           {deleteError
-            && <Messages type="error" messages={deleteError} />
+            && <Messages type="error" messages={deleteError.messages} />
           }
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
@@ -207,11 +210,11 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
                 model="pageEdit.form.data"
                 formData={viewDomain.getIn(['form', 'data'])}
                 saving={saveSending}
-                handleSubmit={(formData) => this.props.handleSubmit(formData)}
+                handleSubmit={(formData) => this.props.handleSubmit(formData, viewEntity)}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 handleUpdate={this.props.handleUpdate}
-                handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+                handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(),
@@ -228,6 +231,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           { (saveSending || deleteSending)
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );
@@ -250,6 +254,7 @@ PageEdit.propTypes = {
   isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   viewEntity: PropTypes.object,
+  highestRole: PropTypes.number,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
 };
@@ -261,6 +266,7 @@ PageEdit.contextTypes = {
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   isUserAdmin: selectIsUserAdmin(state),
+  highestRole: selectSessionUserHighestRoleId(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
@@ -290,8 +296,13 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData) => {
-      dispatch(save(formData.toJS()));
+    handleSubmit: (formData, viewEntity) => {
+      let saveData = formData;
+      // check if attributes have changed
+      if (!saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+        saveData = saveData.set('skipAttributes', true);
+      }
+      dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
       dispatch(updatePath(`${ROUTES.PAGES}/${props.params.id}`, { replace: true }));

@@ -126,6 +126,7 @@ class ButtonFactory extends React.PureComponent { // eslint-disable-line react/p
         );
       case 'bookmarker':
         return <Bookmarker viewTitle={button.title} type={button.entityType} />;
+      case 'download':
       case 'icon':
         return (
           <ButtonFlatIconOnly

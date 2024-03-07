@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 
 import {
@@ -16,24 +16,34 @@ import {
   getMetaField,
   getEmailField,
   getTaxonomyFields,
+  getTextField,
 } from 'utils/fields';
 
 import { getEntityTitle } from 'utils/entities';
+import { canUserManageUsers, canUserSeeMeta } from 'utils/permissions';
+import qe from 'utils/quasi-equals';
 
-import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  updatePath,
+  closeEntity,
+  redirectNotPermitted,
+} from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
+import Footer from 'containers/Footer';
 
 import {
   selectReady,
   selectSessionUserId,
   selectSessionUserHighestRoleId,
+  selectReadyForAuthCheck,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -56,6 +66,17 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
+    // redirect if user not found, assuming no permissions
+    if (nextProps.dataReady && nextProps.authReady && !nextProps.user) {
+      this.props.onRedirectNotPermitted();
+    }
+    if (nextProps.dataReady && nextProps.authReady && nextProps.user) {
+      const canView = canUserManageUsers(nextProps.sessionUserHighestRoleId)
+        || (nextProps.user.get('id') === nextProps.sessionUserId);
+      if (!canView) {
+        this.props.onRedirectNotPermitted();
+      }
+    }
   }
 
   getButtons = ({
@@ -69,35 +90,47 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
   }) => {
     const { intl } = this.context;
     const userId = user.get('id') || user.getIn(['attributes', 'id']);
-    const buttons = [];
+    let buttons = [];
     if (dataReady) {
-      buttons.push({
-        type: 'icon',
-        onClick: () => window.print(),
-        title: 'Print',
-        icon: 'print',
-      });
+      buttons = [
+        ...buttons,
+        {
+          type: 'icon',
+          onClick: () => window.print(),
+          title: 'Print',
+          icon: 'print',
+        },
+      ];
     }
-    if (userId === sessionUserId) {
-      buttons.push({
-        type: 'edit',
-        title: intl.formatMessage(messages.editPassword),
-        onClick: () => handleEditPassword(userId),
-      });
+    if (userId === sessionUserId && !ENABLE_AZURE) {
+      buttons = [
+        ...buttons,
+        {
+          type: 'edit',
+          title: intl.formatMessage(messages.editPassword),
+          onClick: () => handleEditPassword(userId),
+        },
+      ];
     }
-    if (sessionUserHighestRoleId === USER_ROLES.ADMIN.value // is admin
-      || userId === sessionUserId // own profile
-      || sessionUserHighestRoleId < this.getHighestUserRoleId(user.get('roles'))
+    if (
+      canUserManageUsers(sessionUserHighestRoleId)
+      || (userId === sessionUserId && !ENABLE_AZURE)
     ) {
-      buttons.push({
-        type: 'edit',
-        onClick: () => handleEdit(userId),
-      });
+      buttons = [
+        ...buttons,
+        {
+          type: 'edit',
+          onClick: () => handleEdit(userId),
+        },
+      ];
     }
-    buttons.push({
-      type: 'close',
-      onClick: handleClose,
-    });
+    buttons = [
+      ...buttons,
+      {
+        type: 'close',
+        onClick: handleClose,
+      },
+    ];
     return buttons;
   };
 
@@ -105,15 +138,30 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     fields: [getTitleField(entity, isManager, 'name', appMessages.attributes.name)],
   }]);
 
-  getHeaderAsideFields = (entity) => ([{
-    fields: [
-      getRoleField(entity),
-      getMetaField(entity),
-    ],
-  }]);
+  getHeaderAsideFields = (entity, userId, highestRole) => {
+    let fields = [];
+    const canSeeRole = canUserManageUsers(highestRole)
+      || qe(entity.get('id'), userId);
+    if (canSeeRole) {
+      fields = [
+        ...fields,
+        getRoleField(entity),
+      ];
+    }
+    if (canUserSeeMeta(highestRole)) {
+      fields = [
+        ...fields,
+        getMetaField(entity),
+      ];
+    }
+    return [{ fields }];
+  };
 
   getBodyMainFields = (entity) => ([{
-    fields: [getEmailField(entity)],
+    fields: [
+      getEmailField(entity),
+      getTextField(entity, 'domain'),
+    ],
   }]);
 
   getBodyAsideFields = (taxonomies) => ([
@@ -129,7 +177,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
   render() {
     const { intl } = this.context;
     const {
-      user, dataReady, sessionUserHighestRoleId, taxonomies,
+      user, dataReady, sessionUserHighestRoleId, taxonomies, sessionUserId,
     } = this.props;
     const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
 
@@ -138,9 +186,14 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
       ? `${pageTitle}: ${getEntityTitle(user)}`
       : `${pageTitle} ${this.props.params.id}`;
 
+    const canSeeOrg = dataReady && (
+      canUserManageUsers(sessionUserHighestRoleId)
+      || qe(user.get('id'), sessionUserId)
+    );
+
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={metaTitle}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
@@ -169,16 +222,17 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(user, isManager),
-                    aside: isManager && this.getHeaderAsideFields(user),
+                    aside: this.getHeaderAsideFields(user, sessionUserId, sessionUserHighestRoleId),
                   },
                   body: {
                     main: this.getBodyMainFields(user),
-                    aside: isManager && this.getBodyAsideFields(taxonomies),
+                    aside: canSeeOrg && this.getBodyAsideFields(taxonomies),
                   },
                 }}
               />
             )
           }
+          <Footer />
         </Content>
       </div>
     );
@@ -187,6 +241,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
 
 UserView.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
+  onRedirectNotPermitted: PropTypes.func,
   // handleEdit: PropTypes.func,
   // handleEditPassword: PropTypes.func,
   // handleClose: PropTypes.func,
@@ -195,7 +250,7 @@ UserView.propTypes = {
   dataReady: PropTypes.bool,
   sessionUserHighestRoleId: PropTypes.number,
   params: PropTypes.object,
-  // sessionUserId: PropTypes.string,
+  sessionUserId: PropTypes.string,
 };
 
 UserView.contextTypes = {
@@ -205,6 +260,7 @@ UserView.contextTypes = {
 const mapStateToProps = (state, props) => ({
   sessionUserHighestRoleId: selectSessionUserHighestRoleId(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   sessionUserId: selectSessionUserId(state),
   user: selectViewEntity(state, props.params.id),
   // all connected categories for all user-taggable taxonomies
@@ -215,6 +271,9 @@ function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
+    },
+    onRedirectNotPermitted: () => {
+      dispatch(redirectNotPermitted());
     },
     handleEdit: (userId) => {
       dispatch(updatePath(`${ROUTES.USERS}${ROUTES.EDIT}/${userId}`, { replace: true }));

@@ -50,15 +50,16 @@ const ChangeHintHighlighted = styled.span`
 
 const ControlMain = styled.div`
   position: absolute;
-  top: 40px;
+  top: 80px;
   bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
   left: 0;
   right: 0;
   overflow-y: auto;
   padding:0;
   padding-bottom: ${(props) => props.hasChangeNote ? '50px' : '0px'};
+  border-top: 1px solid ${palette('primary', 4)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    top: 60px;
+    top: 80px;
   }
 `;
 const ControlFooter = styled.div`
@@ -159,14 +160,14 @@ class MultiSelect extends React.Component {
     this.setState({
       query: value,
     });
-  }
+  };
 
   onResetFilters = () => {
     this.setState({
       query: null,
       queryTags: [],
     });
-  }
+  };
 
   onTagSelected = (active, tagOption) => {
     this.setState(
@@ -176,7 +177,7 @@ class MultiSelect extends React.Component {
           : without(prevState.queryTags, tagOption.get('value')),
       })
     );
-  }
+  };
 
   setWrapperRef(node) {
     this.wrapperRef = node;
@@ -187,8 +188,8 @@ class MultiSelect extends React.Component {
     // do not update if required and change would result in empty list
     if (!checked && required) {
       const otherCheckedValues = values.find((v) => v.get('checked')
-          && v.get('value') !== option.get('value')
-          && (option.get('query') ? v.get('query') === option.get('query') : true));
+        && v.get('value') !== option.get('value')
+        && (option.get('query') ? v.get('query') === option.get('query') : true));
       if (!otherCheckedValues) {
         return values;
       }
@@ -197,7 +198,7 @@ class MultiSelect extends React.Component {
     // uncheck all others if single mode (!multiple)
     let nextValues = values;
     const existingValueIndex = values.findIndex((v) => v.get('value') === option.get('value')
-        && (option.get('query') ? v.get('query') === option.get('query') : true));
+      && (option.get('query') ? v.get('query') === option.get('query') : true));
     if (!multiple && checked) {
       // uncheck all other options
       nextValues = nextValues.map((value, index) => existingValueIndex !== index ? value.set('checked', false).set('hasChanged', true) : value);
@@ -206,7 +207,7 @@ class MultiSelect extends React.Component {
     const newValue = option.set('checked', checked).set('hasChanged', true);
     // set current value, add if not present
     return existingValueIndex > -1 ? nextValues.set(existingValueIndex, newValue) : nextValues.push(newValue);
-  }
+  };
 
   getAllSelectedValues = (checked, options) => {
     const { values } = this.props;
@@ -215,7 +216,7 @@ class MultiSelect extends React.Component {
     let nextValues = values;
     options.forEach((option) => {
       const existingValueIndex = values.findIndex((v) => v.get('value') === option.get('value')
-          && (option.get('query') ? v.get('query') === option.get('query') : true));
+        && (option.get('query') ? v.get('query') === option.get('query') : true));
       const newValue = option.set('checked', checked).set('hasChanged', true);
       // set new value
       // set current value, add if not present
@@ -224,7 +225,7 @@ class MultiSelect extends React.Component {
         : nextValues.push(newValue);
     });
     return nextValues;
-  }
+  };
 
   getSelectedState = (selectedTotal, allSelected) => {
     if (selectedTotal === 0) {
@@ -234,7 +235,7 @@ class MultiSelect extends React.Component {
       return CHECKBOX_STATES.CHECKED;
     }
     return CHECKBOX_STATES.INDETERMINATE;
-  }
+  };
 
   // props, state
   // map options
@@ -344,10 +345,11 @@ class MultiSelect extends React.Component {
           hasFooter={this.props.buttons}
           hasChangeNote={showChangeHint}
         >
-          { this.props.search
+          {this.props.search
             && (
               <Search>
                 <TagSearch
+                  resultsId="option-list"
                   onSearch={this.onSearch}
                   onClear={this.onResetFilters}
                   filters={this.currentFilters(this.state.queryTags, this.props.tagFilterGroups)}
@@ -357,7 +359,7 @@ class MultiSelect extends React.Component {
               </Search>
             )
           }
-          { this.props.advanced && this.props.tagFilterGroups
+          {this.props.advanced && this.props.tagFilterGroups
             && (
               <TagFilters
                 queryTags={this.state.queryTags}
@@ -366,7 +368,7 @@ class MultiSelect extends React.Component {
               />
             )
           }
-          { this.props.selectAll
+          {this.props.selectAll
             && (
               <SelectAll>
                 <CheckboxWrap>
@@ -396,30 +398,30 @@ class MultiSelect extends React.Component {
             }}
           />
         </ControlMain>
-        { showChangeHint
+        {showChangeHint
           && (
             <ChangeHint hasFooter={this.props.buttons}>
               <FormattedMessage {...messages.changeHint} />
               {optionsChangedToChecked.size > 0
-              && (
-                <ChangeHintHighlighted>
-                  <FormattedMessage {...messages.changeHintSelected} values={{ no: optionsChangedToChecked.size }} />
-                .
-                </ChangeHintHighlighted>
-              )
+                && (
+                  <ChangeHintHighlighted>
+                    <FormattedMessage {...messages.changeHintSelected} values={{ no: optionsChangedToChecked.size }} />
+                    .
+                  </ChangeHintHighlighted>
+                )
               }
               {optionsChangedToUnchecked.size > 0
-              && (
-                <ChangeHintHighlighted>
-                  <FormattedMessage {...messages.changeHintUnselected} values={{ no: optionsChangedToUnchecked.size }} />
-                .
-                </ChangeHintHighlighted>
-              )
+                && (
+                  <ChangeHintHighlighted>
+                    <FormattedMessage {...messages.changeHintUnselected} values={{ no: optionsChangedToUnchecked.size }} />
+                    .
+                  </ChangeHintHighlighted>
+                )
               }
             </ChangeHint>
           )
         }
-        { this.props.buttons
+        {this.props.buttons
           && (
             <ControlFooter>
               <ButtonGroup>

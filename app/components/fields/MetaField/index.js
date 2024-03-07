@@ -15,7 +15,7 @@ class MetaField extends React.PureComponent { // eslint-disable-line react/prefe
     return (
       <FieldWrap>
         <Label>
-          <FormattedMessage {...(field.label || appMessages.attributes.meta.title)} />
+          <FormattedMessage {...(field.label || appMessages.attributes.metaTitle)} />
         </Label>
         {
           field.fields.map((metaField, i) => {
