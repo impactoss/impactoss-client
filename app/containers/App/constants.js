@@ -122,12 +122,9 @@ export const VIEWPORTS = {
 };
 
 export const ROUTES = {
-  ID: '/:id',
-  NEW: '/new',
-  EDIT: '/edit',
-  IMPORT: '/import',
+  INTRO: '/intro',
+  OVERVIEW: '/',
   PASSWORD: '/password',
-  OVERVIEW: '/overview',
   LOGIN: '/login',
   LOGIN_OAUTH_SUCCESS: '/loginOAuthSuccess',
   LOGIN_OAUTH_ERROR: '/loginOAuthError',
@@ -146,4 +143,9 @@ export const ROUTES = {
   CATEGORIES: '/category',
   PAGES: '/pages',
   SEARCH: '/search',
+  // PATHS
+  ID: '/:id',
+  NEW: '/new',
+  EDIT: '/edit',
+  IMPORT: '/import',
 };
