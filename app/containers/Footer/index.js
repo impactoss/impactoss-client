@@ -95,9 +95,12 @@ const Footer = ({
             justify="between"
             border="top"
             align="start"
-            pad={{ top: 'medium' }}
+            pad={{ vertical: 'ms', bottom: 'medium' }}
           >
-            <Box gap="small" pad={{ bottom: isMobile ? 'medium' : 'small' }}>
+            <Box
+              gap="small"
+              pad={{ bottom: isMobile ? 'medium' : 'none' }}
+            >
               <Box>
                 <FooterNote>
                   <FormattedMessage {...messages.agencies.note} />
@@ -105,8 +108,9 @@ const Footer = ({
               </Box>
               <Box>
                 <Box
-                  direction={isMobile ? 'column' : 'row'}
+                  direction="row"
                   gap="xsmall"
+                  wrap
                 >
                   {theme.media.agencyLogos.map((src, i) => (
                     <LogoItemLink
@@ -126,7 +130,7 @@ const Footer = ({
               border={isMobile ? 'top' : false}
               pad={isMobile ? { top: 'medium' } : 'none'}
               align={isMobile ? 'start' : 'end'}
-              fill="horizontal"
+              fill={isMobile ? 'horizontal' : false}
             >
               <Box>
                 <FooterNote>
@@ -152,7 +156,6 @@ const Footer = ({
                 align="start"
                 gap={isMobile ? 'small' : 'none'}
                 border="top"
-                margin={{ top: 'medium' }}
                 pad={{ top: isMobile ? 'medium' : 'small' }}
               >
                 <FooterLink

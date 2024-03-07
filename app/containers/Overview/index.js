@@ -47,7 +47,7 @@ import {
 } from './selectors';
 
 const Content = styled.div`
-  min-height: 80vH; 
+  min-height: 80vH;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0 1em;
   }
@@ -189,7 +189,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 />
               )}
             </Content>
-            <Footer />
+            <Footer fill />
           </Container>
         </ContainerWithSidebar>
         {!dataReady && <EntityListSidebarLoading responsiveSmall />}
