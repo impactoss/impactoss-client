@@ -133,6 +133,13 @@ const getCurrentTaxonomyFilters = (
             const category = taxonomy.getIn(['categories', value]);
             tags.push({
               label: getCategoryLabel(category),
+              titleLabels: [
+                {
+                  label: `entities.taxonomies.${parseInt(taxonomy.get('id'), 10)}.single`,
+                  appMessage: true,
+                },
+                { label: category.getIn(['attributes', 'title']) },
+              ],
               type: 'taxonomies',
               id: taxonomy.get('id'),
               inverse: category.getIn(['attributes', 'draft']),
@@ -223,6 +230,13 @@ const getCurrentConnectedTaxonomyFilters = (
             const category = taxonomy.getIn(['categories', value]);
             tags.push({
               label: getCategoryLabel(category),
+              titleLabels: [
+                {
+                  label: `entities.taxonomies.${parseInt(taxonomy.get('id'), 10)}.single`,
+                  appMessage: true,
+                },
+                { label: category.getIn(['attributes', 'title']) },
+              ],
               type: 'taxonomies',
               id: taxonomy.get('id'),
               inverse: category.getIn(['attributes', 'draft']),
@@ -259,6 +273,13 @@ const getCurrentConnectionFilters = (
             if (connection) {
               tags.push({
                 label: getConnectionLabel(connection, value),
+                titleLabels: [
+                  {
+                    label: `entities.${connection.get('type')}.single`,
+                    appMessage: true,
+                  },
+                  { label: getConnectionLabel(connection, value) },
+                ],
                 type: option.path,
                 inverse: connection.getIn(['attributes', 'draft']),
                 onClick: () => onClick({

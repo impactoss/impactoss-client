@@ -11,7 +11,7 @@ import EntityListNestedNoItem from 'components/EntityListNestedList/EntityListNe
 
 const ItemWrapper = styled.div`
   padding: ${({ separated }) => separated ? '5px 0 10px' : '0'};
-  margin-top: 10px;
+  margin-top: 2px;
   @media print {
     margin-top: 20px;
     margin-bottom: 20px;
@@ -28,10 +28,10 @@ export class EntityListItemWrapper extends React.Component { // eslint-disable-l
 
   shouldComponentUpdate(nextProps, nextState) {
     return this.props.expandNo !== nextProps.expandNo
-    || this.props.entity !== nextProps.entity
-    || this.props.errors !== nextProps.errors
-    || this.props.entityIdsSelected !== nextProps.entityIdsSelected
-    || this.state.wrapper !== nextState.wrapper;
+      || this.props.entity !== nextProps.entity
+      || this.props.errors !== nextProps.errors
+      || this.props.entityIdsSelected !== nextProps.entityIdsSelected
+      || this.state.wrapper !== nextState.wrapper;
   }
 
   render() {
@@ -50,6 +50,8 @@ export class EntityListItemWrapper extends React.Component { // eslint-disable-l
       entity,
       entityPath,
       isConnection,
+      focusEntityId,
+      skipTargetId,
     } = this.props;
     return (
       <ItemWrapper
@@ -79,47 +81,49 @@ export class EntityListItemWrapper extends React.Component { // eslint-disable-l
               onEntityClick={onEntityClick}
               entityPath={entityPath}
               wrapper={this.state.wrapper}
+              isFocus={entity.get('id') === focusEntityId}
+              skipTargetId={skipTargetId}
             />
             {config && config.expandableColumns
-            && expandNo > 0
-            && entity.get('expanded')
-            && entity.get('expanded') !== 'reports'
-            && (!entity.get(entity.get('expanded')) || entity.get(entity.get('expanded')).size === 0)
-            && <EntityListNestedNoItem type={entity.get('expanded')} nestLevel={1} />
+              && expandNo > 0
+              && entity.get('expanded')
+              && entity.get('expanded') !== 'reports'
+              && (!entity.get(entity.get('expanded')) || entity.get(entity.get('expanded')).size === 0)
+              && <EntityListNestedNoItem type={entity.get('expanded')} nestLevel={1} />
             }
             {config && config.expandableColumns
-            && expandNo > 0
-            && entity.get('expanded')
-            && entity.get('expanded') !== 'reports'
-            && (
-              <EntityListNestedList
-                entities={
-                  entity.get(entity.get('expanded'))
-                    ? entity.get(entity.get('expanded')).toList()
-                    : List()
-                }
-                config={config}
-                nestLevel={1}
-                expandNo={expandNo}
-                onExpand={onExpand}
-                onEntityClick={onEntityClick}
-                isContributor={isContributor}
-              />
-            )
+              && expandNo > 0
+              && entity.get('expanded')
+              && entity.get('expanded') !== 'reports'
+              && (
+                <EntityListNestedList
+                  entities={
+                    entity.get(entity.get('expanded'))
+                      ? entity.get(entity.get('expanded')).toList()
+                      : List()
+                  }
+                  config={config}
+                  nestLevel={1}
+                  expandNo={expandNo}
+                  onExpand={onExpand}
+                  onEntityClick={onEntityClick}
+                  isContributor={isContributor}
+                />
+              )
             }
             {expandNo > 0
-            && entity.get('expanded')
-            && entity.get('expanded') === 'reports'
-            && entity.get('reports')
-            && (
-              <EntityListNestedReportList
-                reports={entity.get('reports').toList()}
-                dates={entity.get('dates')}
-                onEntityClick={onEntityClick}
-                isContributor={isContributor}
-                nestLevel={1}
-              />
-            )
+              && entity.get('expanded')
+              && entity.get('expanded') === 'reports'
+              && entity.get('reports')
+              && (
+                <EntityListNestedReportList
+                  reports={entity.get('reports').toList()}
+                  dates={entity.get('dates')}
+                  onEntityClick={onEntityClick}
+                  isContributor={isContributor}
+                  nestLevel={1}
+                />
+              )
             }
           </div>
         )}
@@ -143,8 +147,10 @@ EntityListItemWrapper.propTypes = {
   onDismissError: PropTypes.func,
   expandNo: PropTypes.number,
   entityPath: PropTypes.string,
+  skipTargetId: PropTypes.string,
   entityIcon: PropTypes.func,
   isConnection: PropTypes.bool,
+  focusEntityId: PropTypes.string,
 };
 
 export default EntityListItemWrapper;

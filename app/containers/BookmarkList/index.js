@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { List, fromJS } from 'immutable';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
@@ -37,6 +37,7 @@ import Content from 'components/styled/Content';
 import EntityListHeader from 'components/EntityListMain/EntityListGroups/EntityListHeader';
 import EntityListItemWrapper from 'components/EntityListMain/EntityListGroups/EntityListItems/EntityListItemWrapper';
 import PrintHide from 'components/styled/PrintHide';
+import Footer from 'containers/Footer';
 
 import {
   updateQuery,
@@ -185,7 +186,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
             <FormattedMessage {...messages.group} />
           </SidebarGroupLabel>
           <div>
-            { this.props.bookmarksForSearch && this.props.bookmarksForSearch
+            {this.props.bookmarksForSearch && this.props.bookmarksForSearch
               .groupBy((e) => e.getIn(['attributes', 'view', 'type']))
               .keySeq()
               .sort((a, b) => a > b ? 1 : -1)
@@ -247,16 +248,16 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
     const bookmarksFiltered = bookmarksForSearch.filter((e) => !filtered || qe(activeType, e.getIn(['attributes', 'view', 'type'])));
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={intl.formatMessage(messages.pageTitle)}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !dataReady
+        {!dataReady
           && <EntityListSidebarLoading responsiveSmall />
         }
-        { dataReady && this.state.viewport && this.state.viewport !== VIEWPORTS.MOBILE
+        {dataReady && this.state.viewport && this.state.viewport !== VIEWPORTS.MOBILE
           && (
             <PrintHide>
               <Sidebar responsiveSmall>
@@ -283,10 +284,10 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                 title={intl.formatMessage(messages.pageTitle)}
                 icon="bookmark_active"
               />
-              { !dataReady
+              {!dataReady
                 && <Loading />
               }
-              { dataReady && (
+              {dataReady && (
                 <div>
                   <EntityListSearch>
                     <TagSearch
@@ -330,7 +331,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                           onSortOrder={onSortOrder}
                         />
                         <ListEntitiesMain>
-                          { bookmarksFiltered.map((entity, key) => {
+                          {bookmarksFiltered.map((entity, key) => {
                             const type = entity.getIn(['attributes', 'view', 'type']);
                             const label = getTypeLabel(type, intl.formatMessage, false);
                             return (
@@ -349,6 +350,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                 </div>
               )}
             </Content>
+            <Footer />
           </Container>
         </ContainerWithSidebar>
       </div>

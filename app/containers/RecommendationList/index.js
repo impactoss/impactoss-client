@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { Map, List, fromJS } from 'immutable';
 
 import { getAcceptanceStatus } from 'utils/entities';
@@ -78,6 +78,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
       supTitle: intl.formatMessage(messages.pageTitle),
       icon: type,
       actions: [],
+      actionsAdmin: [],
     };
     if (isUserSignedIn) {
       headerOptions.actions.push({
@@ -94,13 +95,18 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         icon: 'print',
       });
     }
-    if (isManager) {
+    if (CONFIG.downloadCSV) {
       headerOptions.actions.push({
+        type: 'download',
+      });
+    }
+    if (isManager) {
+      headerOptions.actionsAdmin.push({
         type: 'text',
         title: intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
       });
-      headerOptions.actions.push({
+      headerOptions.actionsAdmin.push({
         type: 'add',
         title: [
           intl.formatMessage(appMessages.buttons.add),
@@ -121,7 +127,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     // }
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },

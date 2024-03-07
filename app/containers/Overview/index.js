@@ -6,7 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 
 import styled, { withTheme } from 'styled-components';
@@ -30,6 +30,8 @@ import ContentHeader from 'components/ContentHeader';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 
+import Footer from '../Footer';
+
 // relative
 import VerticalDiagram from './VerticalDiagram';
 import HorizontalDiagram from './HorizontalDiagram';
@@ -45,6 +47,7 @@ import {
 } from './selectors';
 
 const Content = styled.div`
+  min-height: 80vH; 
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0 1em;
   }
@@ -108,13 +111,13 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
     this.setState({
       mouseOverTaxonomyDiagram: isOver ? taxonomyId : null,
     });
-  }
+  };
 
   onTaxonomyMouseOver = (taxonomyId, isOver = true) => {
     this.setState({
       mouseOverTaxonomy: isOver ? taxonomyId : null,
     });
-  }
+  };
 
   resize = () => {
     // reset
@@ -140,23 +143,12 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={intl.formatMessage(messages.supTitle)}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        {!dataReady && <EntityListSidebarLoading responsiveSmall />}
-        {dataReady && (
-          <TaxonomySidebar
-            taxonomies={taxonomies}
-            frameworkId={frameworkId}
-            frameworks={frameworks}
-            onTaxonomyLink={onTaxonomyLink}
-            onTaxonomyOver={this.onTaxonomyMouseOver}
-            active={this.state.mouseOverTaxonomyDiagram}
-          />
-        )}
         <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
@@ -197,8 +189,20 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 />
               )}
             </Content>
+            <Footer />
           </Container>
         </ContainerWithSidebar>
+        {!dataReady && <EntityListSidebarLoading responsiveSmall />}
+        {dataReady && (
+          <TaxonomySidebar
+            taxonomies={taxonomies}
+            frameworkId={frameworkId}
+            frameworks={frameworks}
+            onTaxonomyLink={onTaxonomyLink}
+            onTaxonomyOver={this.onTaxonomyMouseOver}
+            active={this.state.mouseOverTaxonomyDiagram}
+          />
+        )}
       </div>
     );
   }

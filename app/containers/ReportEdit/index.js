@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
@@ -16,26 +16,37 @@ import { Map } from 'immutable';
 import {
   getTitleFormField,
   getDueDateOptionsField,
-  getDocumentStatusField,
   getStatusField,
   getMarkdownField,
-  getUploadField,
+  // getUploadField,
+  // getDocumentStatusField,
   getDueDateDateOptions,
 } from 'utils/forms';
 
 import {
   getMetaField,
+  getStatusField as getStatusInfoField,
 } from 'utils/fields';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import {
+  canUserCreateOrEditReports,
+  canUserBeAssignedToReports,
+  canUserDeleteEntities,
+  canUserPublishReports,
+} from 'utils/permissions';
+
+import qe from 'utils/quasi-equals';
+
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { CONTRIBUTOR_MIN_ROLE_ASSIGNED } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
   loadEntitiesIfNeeded,
+  redirectNotPermitted,
   redirectIfNotPermitted,
   updatePath,
   updateEntityForm,
@@ -47,7 +58,8 @@ import {
 import {
   selectReady,
   selectReadyForAuthCheck,
-  selectIsUserAdmin,
+  selectSessionUserHighestRoleId,
+  selectSessionUserId,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -55,6 +67,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -88,8 +101,25 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
       this.props.initialiseForm('reportEdit.form.data', this.getInitialFormData(nextProps));
     }
-    if (nextProps.authReady && !this.props.authReady) {
-      this.props.redirectIfNotPermitted();
+    if (nextProps.authReady) {
+      this.props.onRedirectIfNotPermitted();
+    }
+    if (nextProps.dataReady && nextProps.authReady && nextProps.viewEntity) {
+      // to allow creating it requires
+      // user to have CONTRIBUTOR_MIN_ROLE
+      // OR
+      //    user to have CONTRIBUTOR_MIN_ROLE_ASSIGNED
+      //    AND
+      //    user to be assigned
+      //
+      // otherwise redirect to unauthorised
+      const hasUserMinimumRole = canUserCreateOrEditReports(nextProps.highestRole);
+      const isUserAssigned = canUserBeAssignedToReports(nextProps.highestRole)
+        && qe(nextProps.viewEntity.get('indicator').getIn(['attributes', 'manager_id']), nextProps.userId);
+      const canEdit = hasUserMinimumRole || (isUserAssigned && nextProps.viewEntity.getIn(['attributes', 'draft']));
+      if (!canEdit) {
+        this.props.onRedirectNotPermitted();
+      }
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
       scrollToTop(this.scrollContainer.current);
@@ -125,12 +155,14 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     ]);
   };
 
-  getHeaderAsideFields = (entity) => {
+  getHeaderAsideFields = (entity, canUserPublish) => {
     const { intl } = this.context;
     return ([
       {
         fields: [
-          getStatusField(intl.formatMessage),
+          canUserPublish
+            ? getStatusField(intl.formatMessage)
+            : getStatusInfoField(entity),
           getMetaField(entity),
         ],
       },
@@ -143,8 +175,8 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
       {
         fields: [
           getMarkdownField(intl.formatMessage),
-          getUploadField(intl.formatMessage),
-          getDocumentStatusField(intl.formatMessage),
+          // getUploadField(intl.formatMessage),
+          // getDocumentStatusField(intl.formatMessage),
         ],
       },
     ]);
@@ -188,7 +220,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     }
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={pageTitle}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
@@ -230,7 +262,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
             )
           }
           {deleteError
-            && <Messages type="error" messages={deleteError} />
+            && <Messages type="error" messages={deleteError.messages} />
           }
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
@@ -248,18 +280,24 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                 model="reportEdit.form.data"
                 formData={viewDomain.getIn(['form', 'data'])}
                 saving={saveSending}
-                handleSubmit={(formData) => this.props.handleSubmit(formData, viewEntity.getIn(['attributes', 'due_date_id']))}
+                handleSubmit={(formData) => this.props.handleSubmit(
+                  formData,
+                  viewEntity
+                )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
                 handleUpdate={this.props.handleUpdate}
-                handleDelete={() => this.props.isUserAdmin
-                  ? this.props.handleDelete(viewEntity.getIn(['attributes', 'indicator_id']))
+                handleDelete={canUserDeleteEntities(this.props.highestRole)
+                  ? () => this.props.handleDelete(viewEntity.getIn(['attributes', 'indicator_id']))
                   : null
                 }
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(),
-                    aside: this.getHeaderAsideFields(viewEntity),
+                    aside: this.getHeaderAsideFields(
+                      viewEntity,
+                      canUserPublishReports(this.props.highestRole),
+                    ),
                   },
                   body: {
                     main: this.getBodyMainFields(),
@@ -273,6 +311,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           { (saveSending || deleteSending)
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );
@@ -281,7 +320,8 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
 
 ReportEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  redirectIfNotPermitted: PropTypes.func,
+  onRedirectIfNotPermitted: PropTypes.func,
+  onRedirectNotPermitted: PropTypes.func,
   initialiseForm: PropTypes.func,
   handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
@@ -293,10 +333,11 @@ ReportEdit.propTypes = {
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
-  isUserAdmin: PropTypes.bool,
+  highestRole: PropTypes.number,
   params: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
+  // userId: PropTypes.string, // used in nextProps
 };
 
 ReportEdit.contextTypes = {
@@ -305,10 +346,11 @@ ReportEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
-  isUserAdmin: selectIsUserAdmin(state),
+  highestRole: selectSessionUserHighestRoleId(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
+  userId: selectSessionUserId(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -319,8 +361,11 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(loadEntitiesIfNeeded('due_dates'));
       dispatch(loadEntitiesIfNeeded('indicators'));
     },
-    redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR.value));
+    onRedirectIfNotPermitted: () => {
+      dispatch(redirectIfNotPermitted(CONTRIBUTOR_MIN_ROLE_ASSIGNED));
+    },
+    onRedirectNotPermitted: () => {
+      dispatch(redirectNotPermitted());
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
@@ -337,9 +382,9 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, previousDateAssigned) => {
+    handleSubmit: (formData, viewEntity) => {
       let saveData = formData;
-
+      const previousDateAssigned = viewEntity.getIn(['attributes', 'due_date_id']);
       const dateAssigned = formData.getIn(['attributes', 'due_date_id']);
       saveData = saveData.setIn(
         ['attributes', 'due_date_id'],
@@ -347,7 +392,10 @@ function mapDispatchToProps(dispatch, props) {
           ? null
           : parseInt(dateAssigned, 10)
       );
-
+      // check if attributes have changed
+      if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+        saveData = saveData.set('skipAttributes', true);
+      }
       dispatch(save(
         saveData.toJS(),
         previousDateAssigned && previousDateAssigned !== dateAssigned

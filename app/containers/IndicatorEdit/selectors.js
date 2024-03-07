@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import { USER_ROLES } from 'themes/config';
+import { CONTRIBUTOR_MIN_ROLE_ASSIGNED } from 'themes/config';
 
 import {
   selectEntity,
@@ -16,7 +16,7 @@ import {
 import {
   entitiesSetAssociated,
   entitySetUser,
-  usersByRole,
+  usersByMinimumRole,
   prepareTaxonomiesMultiple,
 } from 'utils/entities';
 
@@ -88,9 +88,9 @@ export const selectRecommendationsByFw = createSelector(
 export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),
   (state) => selectEntities(state, 'user_roles'),
-  (entities, associations) => usersByRole(
+  (entities, associations) => usersByMinimumRole(
     entities,
     associations,
-    USER_ROLES.CONTRIBUTOR.value,
+    CONTRIBUTOR_MIN_ROLE_ASSIGNED,
   )
 );

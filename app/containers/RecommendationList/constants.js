@@ -20,6 +20,7 @@ export const CONFIG = {
   serverPath: 'recommendations',
   clientPath: 'recommendations',
   search: ['reference', 'title', 'description', 'response'],
+  downloadCSV: true,
   sorting: [
     {
       attribute: 'id', // proxy for created at
@@ -76,17 +77,6 @@ export const CONFIG = {
         ownKey: 'recommendation_id',
         editForFrameworks: true,
         frameworkFilter: 'has_measures',
-      },
-      {
-        search: true,
-        message: 'entities.indicators.plural',
-        path: 'indicators',
-        clientPath: 'indicators', // filter by recommendation connection
-        key: 'indicator_id',
-        connectPath: 'recommendation_indicators',
-        ownKey: 'recommendation_id',
-        editForFrameworks: true,
-        frameworkFilter: 'has_indicators',
       },
     ],
   },

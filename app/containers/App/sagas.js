@@ -20,6 +20,7 @@ import {
 import {
   LOAD_ENTITIES_IF_NEEDED,
   REDIRECT_IF_NOT_PERMITTED,
+  REDIRECT_NOT_PERMITTED,
   SAVE_ENTITY,
   SAVE_MULTIPLE_ENTITIES,
   NEW_ENTITY,
@@ -27,6 +28,7 @@ import {
   DELETE_ENTITY,
   DELETE_MULTIPLE_ENTITIES,
   AUTHENTICATE,
+  AUTHENTICATE_AZURE,
   LOGOUT,
   VALIDATE_TOKEN,
   INVALIDATE_ENTITIES,
@@ -48,6 +50,7 @@ import {
   ENDPOINTS,
   KEYS,
   DB_TABLES,
+  ENABLE_AZURE,
 } from 'themes/config';
 
 import {
@@ -106,13 +109,12 @@ export function* checkEntitiesSaga(payload) {
     // If haven't requested yet, do so now.
     if (!requestedAt) {
       const signedIn = yield select(selectIsSignedIn);
-
       try {
         // First record that we are requesting
         yield put(entitiesRequested(payload.path, Date.now()));
         // check role to prevent requesting endpoints not authorised
         // TODO check could be refactored
-        if (!signedIn && (payload.path === 'user_roles' || payload.path === 'users')) {
+        if (!signedIn && payload.path === 'users') {
           // store empty response so the app wont wait for the results
           yield put(entitiesLoaded({}, payload.path, Date.now()));
         } else {
@@ -155,6 +157,12 @@ export function* checkRoleSaga({ role }) {
     }
   }
 }
+/**
+ * Check if user is authorized
+ */
+export function* redirectNotPermittedSaga() {
+  yield put(replaceUnauthorised(replace));
+}
 
 export function* authenticateSaga(payload) {
   const { password, email } = payload.data;
@@ -167,6 +175,28 @@ export function* authenticateSaga(payload) {
   } catch (err) {
     err.response.json = yield err.response.json();
     yield put(authenticateError(err));
+  }
+}
+
+export function* authenticateWithAzureSaga() {
+  // let's get the path for successful redirects
+  const redirectPathname = yield select(selectRedirectOnAuthSuccessPath);
+  try {
+    yield put(authenticateSending());
+    // figure out success query and location
+    const querySuccess = {
+      [PARAMS.REDIRECT_ON_AUTH_SUCCESS]: redirectPathname,
+    };
+    const querySuccessString = getNextQueryString(querySuccess);
+    const successLocation = `${window.location.origin}${ROUTES.LOGIN_OAUTH_SUCCESS}?${querySuccessString}`;
+    let location = `${ENDPOINTS.API}/${ENDPOINTS.SIGN_IN_AZURE}?resource_class=User`;
+    location = `${location}&auth_origin_url=${encodeURIComponent(successLocation)}`;
+    window.location.href = location;
+  } catch (err) {
+    if (err.response) {
+      err.response.json = yield err.response.json();
+      yield put(authenticateError(err));
+    }
   }
 }
 
@@ -208,7 +238,12 @@ export function* logoutSaga() {
     yield call(apiRequest, 'delete', ENDPOINTS.SIGN_OUT);
     yield call(clearAuthValues);
     yield put(logoutSuccess());
-    yield put(updatePath(ROUTES.LOGIN, { replace: true }));
+    if (ENABLE_AZURE) {
+      // forward to home to prevent second login
+      yield put(updatePath('/', { replace: true }));
+    } else {
+      yield put(updatePath(ROUTES.LOGIN, { replace: true }));
+    }
   } catch (err) {
     yield call(clearAuthValues);
     yield put(authenticateError(err));
@@ -274,14 +309,17 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
   const dataTS = stampPayload(data, 'save');
   try {
     yield put(saveSending(dataTS));
-    // update entity attributes
-    const entityUpdated = yield call(updateEntityRequest, data.path, data.entity);
-    // and on the client
-    if (updateClient) {
-      yield put(updateEntity(data.path, {
-        id: entityUpdated.data.id,
-        attributes: entityUpdated.data.attributes,
-      }));
+
+    if (!data.entity.skipAttributes) {
+      // update entity attributes
+      const entityUpdated = yield call(updateEntityRequest, data.path, data.entity);
+      // and on the client
+      if (updateClient) {
+        yield put(updateEntity(data.path, {
+          id: entityUpdated.data.id,
+          attributes: entityUpdated.data.attributes,
+        }));
+      }
     }
     if (!multiple) {
       // update user-roles connections
@@ -704,10 +742,11 @@ export function* closeEntitySaga({ path }) {
  * Root saga manages watcher lifecycle
  */
 export default function* rootSaga() {
-  // console.log('calling rootSaga');
+  // console.log('calling rootSaga');)
   yield takeLatest(VALIDATE_TOKEN, validateTokenSaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
+  yield takeLatest(AUTHENTICATE_AZURE, authenticateWithAzureSaga);
   yield takeLatest(RECOVER_PASSWORD, recoverSaga);
   yield takeLatest(LOGOUT, logoutSaga);
   yield takeLatest(AUTHENTICATE_FORWARD, authChangeSaga);
@@ -722,6 +761,7 @@ export default function* rootSaga() {
 
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);
+  yield takeLatest(REDIRECT_NOT_PERMITTED, redirectNotPermittedSaga);
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
   yield takeEvery(UPDATE_PATH, updatePathSaga);
   yield takeEvery(SET_FRAMEWORK, setFrameworkSaga);

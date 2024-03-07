@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
@@ -32,6 +32,7 @@ import {
 import {
   getMetaField,
 } from 'utils/fields';
+import { canUserDeleteEntities } from 'utils/permissions';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
@@ -60,6 +61,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectIsUserAdmin,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -67,7 +69,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
-
+import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -250,14 +252,22 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   render() {
     const { intl } = this.context;
     const {
-      viewEntity, dataReady, viewDomain, connectedTaxonomies, measures, recommendationsByFw, users, onCreateOption,
+      viewEntity,
+      dataReady,
+      viewDomain,
+      connectedTaxonomies,
+      measures,
+      recommendationsByFw,
+      users,
+      onCreateOption,
     } = this.props;
+
     const {
       saveSending, saveError, deleteSending, deleteError, submitValid,
     } = viewDomain.get('page').toJS();
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
@@ -299,7 +309,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             )
           }
           {deleteError
-            && <Messages type="error" messages={deleteError} />
+            && <Messages type="error" messages={deleteError.messages} />
           }
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
@@ -321,11 +331,12 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                   formData,
                   measures,
                   recommendationsByFw,
+                  viewEntity,
                 )}
                 handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, intl.formatMessage)}
                 handleCancel={this.props.handleCancel}
                 handleUpdate={this.props.handleUpdate}
-                handleDelete={this.props.isUserAdmin ? this.props.handleDelete : null}
+                handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 validators={{
                   '': {
                   // Form-level validator
@@ -351,6 +362,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           { (saveSending || deleteSending)
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );
@@ -379,6 +391,7 @@ IndicatorEdit.propTypes = {
   recommendationsByFw: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   users: PropTypes.object,
+  highestRole: PropTypes.number,
   onCreateOption: PropTypes.func,
   onRepeatChange: PropTypes.func,
   onStartDateChange: PropTypes.func,
@@ -399,6 +412,7 @@ const mapStateToProps = (state, props) => ({
   recommendationsByFw: selectRecommendationsByFw(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
   users: selectUsers(state),
+  highestRole: selectSessionUserHighestRoleId(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -499,7 +513,7 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, measures, recommendationsByFw) => {
+    handleSubmit: (formData, measures, recommendationsByFw, viewEntity) => {
       let saveData = formData
         .set(
           'measureIndicators',
@@ -556,6 +570,11 @@ function mapDispatchToProps(dispatch, props) {
           .setIn(['attributes', 'frequency_months'], null)
           .setIn(['attributes', 'end_date'], null);
       }
+      // check if attributes have changed
+      if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+        saveData = saveData.set('skipAttributes', true);
+      }
+
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
