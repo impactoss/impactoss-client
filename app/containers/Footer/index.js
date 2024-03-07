@@ -9,7 +9,7 @@ import { updatePath } from 'containers/App/actions';
 import A from 'components/styled/A';
 
 import qe from 'utils/quasi-equals';
-import { isMinSize } from 'utils/responsive';
+import { isMaxSize } from 'utils/responsive';
 
 import { selectEntitiesWhere } from 'containers/App/selectors';
 
@@ -60,10 +60,10 @@ const Logo = styled(NormalImg)`
 
 const Wrapper = styled((p) => <Box margin={{ bottom: 'large' }} {...p} />)`
   font-size: 0.8em;
-  padding: ${({ fill }) => fill ? 0 : '0px 30px'};
   @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
     width: 100%;
     font-size: 0.9em;
+    padding: ${({ fill }) => fill ? 0 : '0px 30px'};
   }
   @media (min-width: ${({ theme }) => theme.breakpoints.large}) {
     font-size: 1em;
@@ -73,7 +73,6 @@ const Wrapper = styled((p) => <Box margin={{ bottom: 'large' }} {...p} />)`
     font-size: ${({ theme }) => theme.sizes.print.default};
   }
 `;
-const BoxRow = styled((p) => <Box direction="row" {...p} />)``;
 
 const FooterNote = styled((p) => <Text size="xsmall" {...p} />)``;
 const FooterVersion = styled((p) => <Text size="xxxsmall" {...p} />)``;
@@ -86,7 +85,7 @@ const Footer = ({
   fill,
 }) => {
   const size = useContext(ResponsiveContext);
-  const isMobile = !isMinSize(size, 'medium');
+  const isMobile = isMaxSize(size, 'small');
   return (
     <FooterMain>
       <Container noPaddingBottom>
@@ -105,7 +104,10 @@ const Footer = ({
                 </FooterNote>
               </Box>
               <Box>
-                <BoxRow gap="xsmall">
+                <Box
+                  direction={isMobile ? 'column' : 'row'}
+                  gap="xsmall"
+                >
                   {theme.media.agencyLogos.map((src, i) => (
                     <LogoItemLink
                       key={i}
@@ -116,10 +118,16 @@ const Footer = ({
                       <Logo src={src} alt={intl.formatMessage(messages.agencies[`title${i + 1}`])} />
                     </LogoItemLink>
                   ))}
-                </BoxRow>
+                </Box>
               </Box>
             </Box>
-            <Box gap="small" align="end">
+            <Box
+              gap="small"
+              border={isMobile ? 'top' : false}
+              pad={isMobile ? { top: 'medium' } : 'none'}
+              align={isMobile ? 'start' : 'end'}
+              fill="horizontal"
+            >
               <Box>
                 <FooterNote>
                   <FormattedMessage {...messages.project.text} />
@@ -136,64 +144,60 @@ const Footer = ({
               </Box>
             </Box>
           </Box>
-          <Box gap="xsmall">
-            <Box
-              direction={isMobile ? 'column' : 'row'}
-              justify="between"
-              border="top"
-              margin={{ top: 'medium' }}
-              pad={{ top: 'small' }}
-            >
-              {!isMobile
-                && (
-                  <Box>
-                    <FooterLink
-                      target="_blank"
-                      href={`mailto:${intl.formatMessage(messages.contact.email)}`}
-                      title={intl.formatMessage(messages.contactUs)}
-                    >
-                      <FormattedMessage {...messages.contactUs} />
-                    </FooterLink>
-                  </Box>
-                )}
-              <BoxRow gap="small" align="end">
-                {isMobile
-                  && (
-                    <FooterLink
-                      target="_blank"
-                      href={`mailto:${intl.formatMessage(messages.contact.email)}`}
-                      title={intl.formatMessage(messages.contactUs)}
-                    >
-                      <FormattedMessage {...messages.contactUs} />
-                    </FooterLink>
-                  )}
-                {pages && pages.size > 0 && FOOTER.INTERNAL_LINKS && FOOTER.INTERNAL_LINKS.map((pageId) => {
-                  const page = pages.find((p) => qe(p.get('id'), pageId));
-                  return page
-                    ? (
-                      <FooterLink
-                        key={pageId}
-                        onClick={(evt) => {
-                          if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                          onPageLink(`${ROUTES.PAGES}/${pageId}`);
-                        }}
-                        href={`${ROUTES.PAGES}/${pageId}`}
-                      >
-                        {page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title'])}
-                      </FooterLink>
-                    )
-                    : 'page not found';
-                })}
+          <Box gap={isMobile ? 'medium' : 'xsmall'}>
+            {pages && (
+              <Box
+                direction={isMobile ? 'column' : 'row'}
+                justify={isMobile ? 'start' : 'between'}
+                align="start"
+                gap={isMobile ? 'small' : 'none'}
+                border="top"
+                margin={{ top: 'medium' }}
+                pad={{ top: isMobile ? 'medium' : 'small' }}
+              >
                 <FooterLink
                   target="_blank"
-                  href={`${intl.formatMessage(messages.govLinkHref)}`}
-                  title={intl.formatMessage(messages.govLinkAnchor)}
+                  href={`mailto:${intl.formatMessage(messages.contact.email)}`}
+                  title={intl.formatMessage(messages.contactUs)}
                 >
-                  <FormattedMessage {...messages.govLinkAnchor} />
+                  <FormattedMessage {...messages.contactUs} />
                 </FooterLink>
-              </BoxRow>
-            </Box>
-            <Box>
+                <Box
+                  direction={isMobile ? 'column' : 'row'}
+                  gap="small"
+                  align={isMobile ? 'start' : 'end'}
+                >
+                  {pages.size > 0 && FOOTER.INTERNAL_LINKS && FOOTER.INTERNAL_LINKS.map((pageId) => {
+                    const page = pages.find((p) => qe(p.get('id'), pageId));
+                    return page
+                      ? (
+                        <FooterLink
+                          key={pageId}
+                          onClick={(evt) => {
+                            if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                            onPageLink(`${ROUTES.PAGES}/${pageId}`);
+                          }}
+                          href={`${ROUTES.PAGES}/${pageId}`}
+                        >
+                          {page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title'])}
+                        </FooterLink>
+                      )
+                      : 'page not found';
+                  })}
+                  <FooterLink
+                    target="_blank"
+                    href={`${intl.formatMessage(messages.govLinkHref)}`}
+                    title={intl.formatMessage(messages.govLinkAnchor)}
+                  >
+                    <FormattedMessage {...messages.govLinkAnchor} />
+                  </FooterLink>
+                </Box>
+              </Box>
+            )}
+            <Box
+              border={isMobile ? 'top' : false}
+              pad={isMobile ? { top: 'medium' } : 'none'}
+            >
               <FooterVersion>
                 {`${intl.formatMessage(appMessages.app.title)}: v${VERSION}`}
               </FooterVersion>
