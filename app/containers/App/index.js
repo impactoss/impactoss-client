@@ -126,7 +126,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         titleSuper: intl.formatMessage(messages.nav.overviewSuper),
         title: intl.formatMessage(messages.nav.overview),
         active:
-          currentPath.startsWith(ROUTES.OVERVIEW)
+          currentPath === ROUTES.OVERVIEW
           || currentPath.startsWith(ROUTES.TAXONOMIES)
           || currentPath.startsWith(ROUTES.CATEGORIES),
       },
