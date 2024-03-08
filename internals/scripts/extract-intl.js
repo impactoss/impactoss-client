@@ -173,6 +173,7 @@ const extractFromFile = async filename => {
     }
   } catch (error) {
     process.stderr.write(`\nError transforming file: ${filename}\n${error}\n`);
+    process.exit(1);
   }
 };
 
