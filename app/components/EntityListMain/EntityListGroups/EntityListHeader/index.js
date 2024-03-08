@@ -127,7 +127,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
     const sortOption = getSortOption(sortOptions, this.props.sortBy);
 
     return (
-      <Styled>
+      <Styled isManager={isManager}>
         <ColumnSelect
           width={firstColumnWidth}
           isSelect={isManager}

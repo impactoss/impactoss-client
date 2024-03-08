@@ -4,6 +4,10 @@ import { palette } from 'styled-theme';
 const ColumnHeader = styled.div`
   font-size: 0.75em;
   padding: 4px;
+  padding-left: ${(props) => (props.isSelect)
+    ? 0
+    : 4
+}px
   word-break: break-word;
   width: ${(props) => props.colWidth}%;
   position: relative;
@@ -16,6 +20,11 @@ const ColumnHeader = styled.div`
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-top: 8px;
     padding-bottom: 8px;
+    padding-left: 8px;
+    padding-left: ${(props) => (props.isSelect)
+    ? 0
+    : props.theme.sizes.mainListItem.paddingHorizontal
+}px;
     padding-right: 4px;
   }
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.medium : '993px'}) {
