@@ -14,7 +14,7 @@ const Select = styled(PrintHide)`
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-right: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
     padding-left: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
-    width: 40px;
+    width: 43px;
   }
 `;
 const Input = styled.input`
