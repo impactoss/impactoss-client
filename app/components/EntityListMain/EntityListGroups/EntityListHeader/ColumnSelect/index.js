@@ -28,7 +28,7 @@ const LabelWrap = styled.div`
   display: table-cell;
   padding-right: 4px;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
-    padding-left: ${(props) => props.isSelect ? 0 : 7}px;
+    padding-left: 0px;
   }
 `;
 const CheckboxWrap = styled(PrintHide)`
