@@ -23,7 +23,7 @@ let plugins = babel.plugins || [];
 plugins.push('react-intl');
 
 // NOTE: styled-components plugin is filtered out as it creates errors when used with transform
-plugins = plugins.filter(p => p !== 'styled-components');
+plugins = plugins.filter((p) => p !== 'styled-components');
 
 // Glob to match all js files except test files
 const FILES_TO_PARSE = 'app/**/!(*.test).js';
@@ -32,11 +32,11 @@ const newLine = () => process.stdout.write('\n');
 
 // Progress Logger
 let progress;
-const task = message => {
+const task = (message) => {
   progress = animateProgress(message);
   process.stdout.write(message);
 
-  return error => {
+  return (error) => {
     if (error) {
       process.stderr.write(error);
     }
@@ -46,22 +46,20 @@ const task = message => {
 };
 
 // Wrap async functions below into a promise
-const glob = pattern =>
-  new Promise((resolve, reject) => {
-    nodeGlob(
-      pattern,
-      (error, value) => (error ? reject(error) : resolve(value)),
-    );
-  });
+const glob = (pattern) => new Promise((resolve, reject) => {
+  nodeGlob(
+    pattern,
+    (error, value) => (error ? reject(error) : resolve(value)),
+  );
+});
 
-const readFile = fileName =>
-  new Promise((resolve, reject) => {
-    fs.readFile(
-      fileName,
-      'utf8',
-      (error, value) => (error ? reject(error) : resolve(value)),
-    );
-  });
+const readFile = (fileName) => new Promise((resolve, reject) => {
+  fs.readFile(
+    fileName,
+    'utf8',
+    (error, value) => (error ? reject(error) : resolve(value)),
+  );
+});
 
 // Store existing translations into memory
 const oldLocaleMappings = [];
@@ -89,7 +87,7 @@ for (const locale of appLocales) {
     }
   }
 }
-//convert the js-like object string to valid JSON
+// convert the js-like object string to valid JSON
 function convertToJSON(str) {
   const removeNewLineRegex = /\n/g;
   const trailingCommaRegex = /,(\s*})/g;
@@ -101,17 +99,15 @@ function convertToJSON(str) {
   return str
     .replace(removeNewLineRegex, '')
     .replace(trailingCommaRegex, '$1')
-    .replace(valuesSurroundedInQuotes, (_, value) => {
-      //  Wrap the value with double quotes and replace double quotes inside with single quotes 
-      return `"${value.replace(/"/g, "'")}"`;
-    })
+    //  Wrap the value with double quotes and replace double quotes inside with single quotes
+    .replace(valuesSurroundedInQuotes, (_, value) => `"${value.replace(/"/g, "'")}"`)
     .replace(wordKeysRegex, '"$1"')
     .replace(numberKeysRegex, '"$1":')
     .replace(escapedCharsRegex, '');
 }
 
 function flattenContents(data, filename) {
-  //check to see if file contains defineMessage 
+  // check to see if file contains defineMessage
   const defineMessageMatch = data.match(/export\s+default\s+defineMessages\(({[\s\S]*?})\);/);
 
   if (defineMessageMatch && defineMessageMatch.length > 1) {
@@ -121,7 +117,7 @@ function flattenContents(data, filename) {
 
     const flattenedDefineMessage = {};
 
-    //check if last level of object
+    // check if last level of object
     const isLastLevel = (obj) => {
       for (const key in obj) {
         if (typeof obj[key] === 'object' && obj[key] !== null) {
@@ -131,7 +127,7 @@ function flattenContents(data, filename) {
       return true;
     };
 
-    //flatten the defineMessage object so there are no nested objects
+    // flatten the defineMessage object so there are no nested objects
     const flatten = (obj, prefix = '') => {
       for (const key in obj) {
         if (typeof obj[key] === 'object' && obj[key] !== null) {
@@ -145,17 +141,17 @@ function flattenContents(data, filename) {
         }
       }
     };
-    //flatten object to 1 level
+    // flatten object to 1 level
     flatten(parsedJSON);
-    //convert the flattened object back to a string
+    // convert the flattened object back to a string
     const flattenedDefineMessageString = JSON.stringify(flattenedDefineMessage, null, 2);
-    //add contents it back into the file data 
+    // add contents it back into the file data
     return data.replace(/defineMessages\(\s*\{[^]*?}\s*\);/, `defineMessages(${flattenedDefineMessageString})`);
   }
 
   return data;
 }
-const extractFromFile = async filename => {
+const extractFromFile = async (filename) => {
   try {
     const code = await readFile(filename);
     const parsedCode = flattenContents(code, filename);
@@ -180,11 +176,11 @@ const extractFromFile = async filename => {
 const memoryTask = glob(FILES_TO_PARSE);
 const memoryTaskDone = task('Storing language files in memory');
 
-memoryTask.then(files => {
+memoryTask.then((files) => {
   memoryTaskDone();
 
   const extractTask = Promise.all(
-    files.map(fileName => extractFromFile(fileName)),
+    files.map((fileName) => extractFromFile(fileName)),
   );
   const extractTaskDone = task('Run extraction on all files');
   // Run extraction on all files that match the glob on line 16
@@ -208,7 +204,7 @@ memoryTask.then(files => {
       const messages = {};
       Object.keys(localeMappings[locale])
         .sort()
-        .forEach(key => {
+        .forEach((key) => {
           messages[key] = localeMappings[locale][key];
         });
 
