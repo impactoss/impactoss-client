@@ -145,7 +145,7 @@ const CategorisedIcons = styled.div``;
 
 const CategorisedIcon = styled.a`
   display: inline-block;
-  padding: 0;
+  padding: 6px;
   color: ${(props) => props.active ? palette('taxonomiesTextColor', props.paletteId) : palette('text', 1)};
   background-color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : 'transparent'};
   border-radius: 4px;
@@ -154,8 +154,8 @@ const CategorisedIcon = styled.a`
     background-color: ${(props) => palette('taxonomies', props.paletteId)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: 0 1px;
-    margin: 0 1px;
+    padding: 1px;
+    margin: 1px;
   }
 `;
 // color: ${(props) => props.active ? palette('primary', 0) : palette('dark', 3)};
@@ -455,7 +455,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
         >
           <Icon
             name={`taxonomy_${tax.get('id')}`}
-            size={this.state.viewport < VIEWPORTS.SMALL ? '1.6em' : '2em'}
+            size="24px"
           />
         </CategorisedIcon>
       ))}
