@@ -1,6 +1,6 @@
 {
   "name": "impact-oss",
-  "version":"NZJ-0.1.5",
+  "version":"NZJ-0.1.5-update-dependencies",
   "description": "NZ version of Integrated Management and Planning of ACTions Open Source Software",
   "repository": {
     "type": "git",
