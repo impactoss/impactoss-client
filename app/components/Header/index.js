@@ -95,7 +95,7 @@ const NavSecondary = styled(PrintHide)`
   bottom: 0;
   width: 100%;
   z-index: 99999;
-  background-color:  ${palette('header', 0)};
+  background-color: transparent;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     position: relative;
     top: auto;
@@ -298,7 +298,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         onClick={this.onShowSecondary}
       >
         <ScreenReaderOnly>
-          <FormattedMessage {...appMessages.buttons.showSecondaryNavigation} />
+          <FormattedMessage {...appMessages.screenreader.showSecondaryNavigation} />
         </ScreenReaderOnly>
         <Icon name="menu" hasStroke />
       </ShowSecondary>
@@ -314,7 +314,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             onClick={this.onHideSecondary}
           >
             <ScreenReaderOnly>
-              <FormattedMessage {...appMessages.buttons.hideSecondaryNavigation} />
+              <FormattedMessage {...appMessages.screenreader.hideSecondaryNavigation} />
             </ScreenReaderOnly>
             <Icon name="close" size="30px" />
           </HideSecondary>
@@ -452,7 +452,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
           </Banner>
         )}
         {!isHome && (
-          <NavMain hasBorder>
+          <NavMain hasBorder role="navigation" aria-label="primary">
             {frameworkOptions && (
               <SelectFrameworks
                 as="button"

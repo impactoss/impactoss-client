@@ -12,7 +12,7 @@ export const DEPENDENCIES = [
 export const CONFIG = {
   clientPath: 'users',
   serverPath: 'users',
-  search: ['name'],
+  search: ['name', 'domain'],
   sorting: [
     {
       attribute: 'id', // proxy for created at

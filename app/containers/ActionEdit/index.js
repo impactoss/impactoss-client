@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { Map, fromJS } from 'immutable';
@@ -116,13 +116,13 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       viewEntity, taxonomies, recommendationsByFw, indicators,
     } = props;
     let attributes = viewEntity.get('attributes');
-    if (!attributes.get('reference')) {
+    if (!attributes.get('reference') || attributes.get('reference') === '') {
       attributes = attributes.set('reference', viewEntity.get('id'));
     }
     return viewEntity
       ? Map({
         id: viewEntity.get('id'),
-        attributes: viewEntity.get('attributes').mergeWith(
+        attributes: attributes.mergeWith(
           (oldVal, newVal) => oldVal === null ? newVal : oldVal,
           FORM_INITIAL.get('attributes')
         ),
@@ -251,7 +251,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
@@ -295,7 +295,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
             )
           }
           {deleteError
-            && <Messages type="error" messages={deleteError} />
+            && <Messages type="error" messages={deleteError.messages} />
           }
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
@@ -318,6 +318,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                   taxonomies,
                   recommendationsByFw,
                   indicators,
+                  viewEntity,
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
@@ -422,7 +423,7 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, taxonomies, recommendationsByFw, indicators) => {
+    handleSubmit: (formData, taxonomies, recommendationsByFw, indicators, viewEntity) => {
       let saveData = formData
         .set(
           'measureCategories',
@@ -471,6 +472,11 @@ function mapDispatchToProps(dispatch, props) {
       if (formRef.trim() === '') {
         saveData = saveData.setIn(['attributes', 'reference'], formData.get('id'));
       }
+      // check if attributes have changed
+      if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+        saveData = saveData.set('skipAttributes', true);
+      }
+
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {

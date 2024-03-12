@@ -44,6 +44,9 @@ const PopupWrapper = styled.div`
   position: relative;
   margin-right: 5px;
   text-align: left;
+  &:last-child {
+    margin-right: 0;
+  }
   @media print {
     font-size: ${(props) => props.theme.sizes.print.default};
   }

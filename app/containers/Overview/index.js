@@ -6,7 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 
 import styled, { withTheme } from 'styled-components';
@@ -143,23 +143,12 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={intl.formatMessage(messages.supTitle)}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        {!dataReady && <EntityListSidebarLoading responsiveSmall />}
-        {dataReady && (
-          <TaxonomySidebar
-            taxonomies={taxonomies}
-            frameworkId={frameworkId}
-            frameworks={frameworks}
-            onTaxonomyLink={onTaxonomyLink}
-            onTaxonomyOver={this.onTaxonomyMouseOver}
-            active={this.state.mouseOverTaxonomyDiagram}
-          />
-        )}
         <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
@@ -203,6 +192,17 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             <Footer />
           </Container>
         </ContainerWithSidebar>
+        {!dataReady && <EntityListSidebarLoading responsiveSmall />}
+        {dataReady && (
+          <TaxonomySidebar
+            taxonomies={taxonomies}
+            frameworkId={frameworkId}
+            frameworks={frameworks}
+            onTaxonomyLink={onTaxonomyLink}
+            onTaxonomyOver={this.onTaxonomyMouseOver}
+            active={this.state.mouseOverTaxonomyDiagram}
+          />
+        )}
       </div>
     );
   }

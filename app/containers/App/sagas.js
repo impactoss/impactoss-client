@@ -309,14 +309,17 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
   const dataTS = stampPayload(data, 'save');
   try {
     yield put(saveSending(dataTS));
-    // update entity attributes
-    const entityUpdated = yield call(updateEntityRequest, data.path, data.entity);
-    // and on the client
-    if (updateClient) {
-      yield put(updateEntity(data.path, {
-        id: entityUpdated.data.id,
-        attributes: entityUpdated.data.attributes,
-      }));
+
+    if (!data.entity.skipAttributes) {
+      // update entity attributes
+      const entityUpdated = yield call(updateEntityRequest, data.path, data.entity);
+      // and on the client
+      if (updateClient) {
+        yield put(updateEntity(data.path, {
+          id: entityUpdated.data.id,
+          attributes: entityUpdated.data.attributes,
+        }));
+      }
     }
     if (!multiple) {
       // update user-roles connections

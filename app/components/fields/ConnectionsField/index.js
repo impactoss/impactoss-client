@@ -28,7 +28,25 @@ const PrintHint = styled(PrintOnly)`
 class ConnectionsField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor() {
     super();
-    this.state = { showAllConnections: false };
+    this.state = {
+      showAllConnections: false,
+      focusItem: null,
+    };
+  }
+
+  getItemIdAt = (items, index) => {
+    const itemsSliced = items.slice(index - 1, index);
+    return itemsSliced ? itemsSliced.first().get('id') : null;
+  }
+
+  toggleAllItems = (evt) => {
+    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+    this.setState(
+      (prevState) => ({
+        showAllConnections: !prevState.showAllConnections,
+        focusItem: !prevState.showAllConnections ? CONNECTIONMAX + 1 : null,
+      }),
+    );
   }
 
   render() {
@@ -75,15 +93,10 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
               onEntityClick={field.onEntityClick}
               entityPath={field.entityPath}
               isConnection
+              focusEntityId={this.state.focusItem ? this.getItemIdAt(field.values, this.state.focusItem) : null}
             />
             {field.values.size > CONNECTIONMAX && (
-              <ToggleAllItems
-                onClick={() => this.setState(
-                  (prevState) => (
-                    { showAllConnections: !prevState.showAllConnections }
-                  )
-                )}
-              >
+              <ToggleAllItems onClick={this.toggleAllItems}>
                 { this.state.showAllConnections
                 && <FormattedMessage {...appMessages.entities.showLess} />
                 }

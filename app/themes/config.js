@@ -16,11 +16,17 @@ import { version } from '../../package.json';
 export const SERVER = (process && process.env && process.env.SERVER) || 'development';
 const SERVER_ENDPOINTS = {
   production: 'https://nz-api.impactoss.org',
-  test: 'https://nz-dev-api.impactoss.org',
+  UAT: 'https://nz-dev-api.impactoss.org',
   development: 'https://nz-dev-6568bd13e406.herokuapp.com',
 };
+export const SERVER_ENDPOINT = SERVER_ENDPOINTS[SERVER];
+// used for redirect and canonical tag
+
+export const CLIENT_URL = 'https://humanrights.govt.nz';
+export const S3_USE_CLIENT_URL = true;
+export const S3_HAS_ASSET_FOLDER = true;
 export const IS_PROD = SERVER === 'production';
-export const IS_TEST = SERVER === 'test';
+export const IS_TEST = SERVER === 'UAT';
 // const IS_DEV = SERVER === 'development';
 const version_text = IS_PROD ? '' : ` [${SERVER}]`;
 export const VERSION = `${version}${version_text}`;
@@ -104,9 +110,8 @@ export const TEXT_TRUNCATE = {
 export const PROGRESS_TAXONOMY_ID = 9;
 
 // WARNING: references as assigned by user
-export const PROGRESS_CATEGORY_REFERENCES = {
-  ONGOING: 1,
-  COMPLETED: 2,
+export const PROGRESS_CATEGORY_ID = {
+  COMPLETED: 8,
 };
 
 export const CYCLE_TAXONOMY_ID = 2;

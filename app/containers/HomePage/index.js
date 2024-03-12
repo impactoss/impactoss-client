@@ -6,7 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import ReactMarkdown from 'react-markdown';
 import styled, { withTheme } from 'styled-components';
@@ -199,7 +199,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
     const appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={intl.formatMessage(messages.pageTitle)}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
@@ -260,7 +260,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                   </Row>
                 )}
                 {dataReady && !signingIn && frameworks.size > 1 && (
-                  <span>
+                  <span role="navigation" aria-label="Primary">
                     <Row>
                       <GridSpace lg={1 / 6} sm={1 / 8} />
                       <Grid lg={2 / 3} sm={3 / 4} xs={1}>
@@ -296,7 +296,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                 {dataReady && !signingIn && frameworks.size === 1 && (
                   <Row>
                     <GridSpace lg={1 / 6} sm={1 / 8} />
-                    <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                    <Grid lg={2 / 3} sm={3 / 4} xs={1} role="navigation" aria-label="Primary">
                       <FrameworkButton
                         single
                         onClick={() => onPageLink(ROUTES.OVERVIEW)}

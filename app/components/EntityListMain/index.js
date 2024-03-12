@@ -16,6 +16,8 @@ import { qe } from 'utils/quasi-equals';
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
 import Content from 'components/styled/Content';
+import SkipContent from 'components/styled/SkipContent';
+
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
@@ -41,7 +43,9 @@ const EntityListSearch = styled.div`
   }
 `;
 
-const ListEntities = styled.div``;
+const ListEntities = styled.div`
+  position: relative;
+`;
 const ListWrapper = styled.div``;
 const PrintHintKey = styled(PrintOnly)`
   font-style: italic;
@@ -241,6 +245,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                       intl.formatMessage(messages.filterFormWithoutPrefix),
                       intl.formatMessage(messages.filterFormError),
                     )}
+                    searchAttributes={config.search}
                     searchQuery={locationQuery.get('search') || ''}
                     onSearch={onSearch}
                     onClear={() => {
@@ -249,6 +254,12 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     }}
                   />
                 </EntityListSearch>
+                <SkipContent
+                  href="#filter-options"
+                  title={this.context.intl.formatMessage(appMessages.screenreader.skipToListFilter)}
+                >
+                  <FormattedMessage {...appMessages.screenreader.skipToListFilter} />
+                </SkipContent>
                 <EntityListOptions
                   groupOptions={getGroupOptions(taxonomies, intl)}
                   subgroupOptions={getGroupOptions(taxonomies, intl)}

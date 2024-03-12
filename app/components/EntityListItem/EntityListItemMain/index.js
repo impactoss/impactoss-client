@@ -7,7 +7,7 @@ import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
 import { qe } from 'utils/quasi-equals';
 import Component from 'components/styled/Component';
-import Clear from 'components/styled/Clear';
+import SkipContent from 'components/styled/SkipContent';
 import { USER_ROLES, PROGRESS_TAXONOMY_ID } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -15,12 +15,27 @@ import EntityListItemMainTop from './EntityListItemMainTop';
 import EntityListItemMainTitle from './EntityListItemMainTitle';
 import EntityListItemMainBottom from './EntityListItemMainBottom';
 
-
 const Styled = styled(Component)`
+  position: relative;
+  padding-left: 0;
+  box-shadow: ${({ isConnection }) => isConnection ? '0px 0px 6px 0px rgba(0,0,0,0.2)' : 'none'};
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    padding-left: ${(props) => (!props.theme.sizes || props.isManager)
+    ? 0
+    : props.theme.sizes.mainListItem.paddingHorizontal
+}px;
+  }
+  @media print {
+    box-shadow: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
+`;
+const Wrapper = styled(Component)`
+  position: relative;
   padding-right: 6px;
   padding-top: 4px;
   padding-bottom: 6px;
-  padding-left: ${(props) => props.isManager ? 0 : 6}px;
   box-shadow: ${({ isConnection }) => isConnection ? '0px 0px 6px 0px rgba(0,0,0,0.2)' : 'none'};
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-right: ${(props) => (!props.theme.sizes)
@@ -29,10 +44,6 @@ const Styled = styled(Component)`
 }px;
     padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
     padding-bottom: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingBottom}px;
-    padding-left: ${(props) => (!props.theme.sizes || props.isManager)
-    ? 0
-    : props.theme.sizes.mainListItem.paddingHorizontal
-}px;
   }
   @media print {
     box-shadow: none;
@@ -45,6 +56,7 @@ const EntityListItemMainTitleWrap = styled.a`
   text-decoration: none;
   display: block;
   padding: 6px 15px 8px 0;
+  margin-top: 15px;
   color: ${palette('mainListItem', 0)};
   &:hover {
     color: ${palette('mainListItemHover', 0)};
@@ -54,7 +66,26 @@ const EntityListItemMainTitleWrap = styled.a`
   }
 `;
 
+const EntityListItemMainTopWrap = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-top: 4px;
+  padding-right: 6px;
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
+    padding-right: ${(props) => (!props.theme.sizes)
+    ? 0
+    : props.theme.sizes.mainListItem.paddingHorizontal
+}px;
+`;
+
 class EntityListItemMain extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  componentDidMount() {
+    if (this.props.isFocus) this.title.focus();
+  }
+
   getConnections = (entity, connectionOptions, connections) => {
     const { intl } = this.context;
     return reduce(connectionOptions, (memo, option) => {
@@ -195,37 +226,55 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
   }
 
   render() {
-    const { nestLevel, onEntityClick, taxonomies } = this.props;
+    const {
+      nestLevel,
+      onEntityClick,
+      taxonomies,
+      skipTargetId,
+    } = this.props;
+
     const entity = this.mapToEntityListItem(this.props);
 
     const bottomTaxonomies = taxonomies && taxonomies.filter((tax) => !qe(tax.get('id'), PROGRESS_TAXONOMY_ID));
-
     return (
       <Styled isManager={this.props.isManager} isConnection={this.props.isConnection}>
-        <EntityListItemMainTop entity={entity} />
-        <Clear />
-        <EntityListItemMainTitleWrap
-          onClick={(evt) => {
-            evt.preventDefault();
-            onEntityClick(entity.id, entity.path);
-          }}
-          href={`/${entity.path}/${entity.id}`}
-        >
-          <EntityListItemMainTitle nested={nestLevel && nestLevel > 0}>
-            {entity.title}
-          </EntityListItemMainTitle>
-        </EntityListItemMainTitleWrap>
-        { (entity.categories || (entity.connectedCounts && this.props.wrapper))
-          && (
-            <EntityListItemMainBottom
-              connections={entity.connectedCounts}
-              wrapper={this.props.wrapper}
-              categories={entity.categories}
-              taxonomies={bottomTaxonomies}
-              onEntityClick={onEntityClick}
-            />
-          )
-        }
+        <Wrapper>
+          <EntityListItemMainTitleWrap
+            id={`list-item-${entity.id}`}
+            ref={(el) => { this.title = el; }}
+            onClick={(evt) => {
+              evt.preventDefault();
+              onEntityClick(entity.id, entity.path);
+            }}
+            href={`/${entity.path}/${entity.id}`}
+          >
+            <EntityListItemMainTitle nested={nestLevel && nestLevel > 0}>
+              {entity.title}
+            </EntityListItemMainTitle>
+          </EntityListItemMainTitleWrap>
+          {skipTargetId && (
+            <SkipContent
+              href={skipTargetId}
+              title="Skip to next list item or group, continue to list item details"
+            >
+              Skip to next list item or group, continue to list item details
+            </SkipContent>
+          )}
+          <EntityListItemMainTopWrap>
+            <EntityListItemMainTop entity={entity} />
+          </EntityListItemMainTopWrap>
+          { (entity.categories || (entity.connectedCounts && this.props.wrapper))
+            && (
+              <EntityListItemMainBottom
+                connections={entity.connectedCounts}
+                wrapper={this.props.wrapper}
+                categories={entity.categories}
+                taxonomies={bottomTaxonomies}
+                onEntityClick={onEntityClick}
+              />
+            )
+          }
+        </Wrapper>
       </Styled>
     );
   }
@@ -238,11 +287,13 @@ EntityListItemMain.propTypes = {
   config: PropTypes.object, // eslint-disable-line react/no-unused-prop-types
   entityIcon: PropTypes.func, // eslint-disable-line react/no-unused-prop-types
   entityPath: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
-  isManager: PropTypes.bool,
   wrapper: PropTypes.object,
   nestLevel: PropTypes.number,
   onEntityClick: PropTypes.func,
   isConnection: PropTypes.bool,
+  isManager: PropTypes.bool,
+  isFocus: PropTypes.bool,
+  skipTargetId: PropTypes.string,
 };
 EntityListItemMain.contextTypes = {
   intl: PropTypes.object,

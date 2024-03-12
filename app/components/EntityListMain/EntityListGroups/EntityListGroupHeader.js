@@ -50,8 +50,7 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
     if (group.get('id') === 'without') {
       return level === 1
         ? (
-
-          <ListEntitiesGroupHeader>
+          <ListEntitiesGroupHeader id={`list-group-${group.get('id')}`}>
             {group.get('label')}
           </ListEntitiesGroupHeader>
         )
@@ -63,13 +62,14 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
     }
     return level === 1
       ? (
-        <ListEntitiesGroupHeaderWrapper>
-          <ListEntitiesGroupHeaderLink to={`${ROUTES.CATEGORIES}/${group.get('id')}`}>
-            <ListEntitiesGroupHeader>
-              {group.get('label')}
-            </ListEntitiesGroupHeader>
-          </ListEntitiesGroupHeaderLink>
-        </ListEntitiesGroupHeaderWrapper>
+        <ListEntitiesGroupHeaderLink
+          id={`list-group-${group.get('id')}`}
+          to={`${ROUTES.CATEGORIES}/${group.get('id')}`}
+        >
+          <ListEntitiesGroupHeader>
+            {group.get('label')}
+          </ListEntitiesGroupHeader>
+        </ListEntitiesGroupHeaderLink>
       )
       : (
         <ListEntitiesGroupHeaderWrapper>

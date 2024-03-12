@@ -21,7 +21,7 @@ const SortButton = styled(ButtonFlatIconOnly)`
     padding: 0;
   }
 `;
-const Styled = styled(ColumnHeader)`
+const Styled = styled((p) => <ColumnHeader {...p} />)`
   padding-right: 0;
 `;
 const LabelWrap = styled.div`
@@ -34,9 +34,10 @@ const LabelWrap = styled.div`
 const CheckboxWrap = styled(PrintHide)`
   display: table-cell;
   text-align: center;
+  vertical-align: middle;
   width: 20px;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
-    width: 40px;
+    width: 43px;
   }
 `;
 const Checkbox = styled(IndeterminateCheckbox)`
@@ -74,7 +75,7 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
     const nextSortOrderOption = sortOrderOption && this.props.sortOrderOptions.find((option) => sortOrderOption.nextValue === option.value);
 
     return (
-      <Styled colWidth={width * 100}>
+      <Styled colWidth={width * 100} isSelect={isSelect}>
         <Wrapper>
           {isSelect
             && (

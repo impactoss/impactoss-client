@@ -183,14 +183,6 @@ export default defineMessages({
       id: 'app.containers.App.buttons.import',
       defaultMessage: 'Import',
     },
-    hideSecondaryNavigation: {
-      id: 'app.containers.App.buttons.hideSecondaryNavigation',
-      defaultMessage: 'Hide top menu',
-    },
-    showSecondaryNavigation: {
-      id: 'app.containers.App.buttons.showSecondaryNavigation',
-      defaultMessage: 'Show top menu',
-    },
   },
   labels: {
     perPage: {
@@ -268,6 +260,7 @@ export default defineMessages({
       defaultMessage: '"Reference" is required. ',
     },
   },
+
   hints: {
     autoReference: {
       id: 'app.containers.App.hints.autoReference',
@@ -542,6 +535,10 @@ export default defineMessages({
     email: {
       id: 'app.containers.App.attributes.email',
       defaultMessage: 'Email address',
+    },
+    domain: {
+      id: 'app.containers.App.attributes.domain',
+      defaultMessage: 'Domain (from Email)',
     },
     status: {
       id: 'app.containers.App.attributes.status',
@@ -1546,6 +1543,28 @@ export default defineMessages({
         id: 'app.containers.App.ui.pageItemOptions.all',
         defaultMessage: 'All',
       },
+    },
+  },
+  screenreader: {
+    hideSecondaryNavigation: {
+      id: 'app.containers.App.buttons.hideSecondaryNavigation',
+      defaultMessage: 'Hide top menu',
+    },
+    showSecondaryNavigation: {
+      id: 'app.containers.App.buttons.showSecondaryNavigation',
+      defaultMessage: 'Show top menu',
+    },
+    skipToContent: {
+      id: 'app.containers.App.screenreader.skipToContent',
+      defaultMessage: 'Skip to content',
+    },
+    skipBackToContent: {
+      id: 'app.containers.App.screenreader.skipBackToContent',
+      defaultMessage: 'Skip back to content',
+    },
+    skipToListFilter: {
+      id: 'app.containers.App.screenreader.skipToListFilter',
+      defaultMessage: 'Skip to list filter options',
     },
   },
 });

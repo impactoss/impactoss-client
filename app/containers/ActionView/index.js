@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 
 import {
@@ -227,7 +227,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={metaTitle}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
