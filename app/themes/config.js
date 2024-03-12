@@ -23,8 +23,6 @@ export const SERVER_ENDPOINT = SERVER_ENDPOINTS[SERVER];
 // used for redirect and canonical tag
 
 export const CLIENT_URL = 'https://uat.humanrights.govt.nz';
-export const S3_USE_CLIENT_URL = true;
-export const S3_HAS_ASSET_FOLDER = true;
 export const IS_PROD = SERVER === 'production';
 export const IS_TEST = SERVER === 'UAT';
 // const IS_DEV = SERVER === 'development';
