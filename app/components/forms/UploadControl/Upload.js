@@ -8,17 +8,13 @@ import { palette } from 'styled-theme';
 import { getPathFromUrl } from 'utils/string';
 
 import appMessages from 'containers/App/messages';
-import {
-  ENDPOINTS,
-  CLIENT_URL,
-  S3_USE_CLIENT_URL,
-  S3_HAS_ASSET_FOLDER,
-} from 'themes/config';
+import { ENDPOINTS } from 'themes/config';
 
 import Icon from 'components/Icon';
 import DocumentView from 'components/DocumentView';
 import DocumentWrap from 'components/fields/DocumentWrap';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
+import { getDateSuffix } from 'components/EntityListDownload/utils';
 
 import Loading from 'components/Loading';
 import Messages from 'components/Messages';
@@ -92,21 +88,7 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
   }
 
   onUploadFinish = ({ signedUrl }) => {
-    let fileURL = getPathFromUrl(signedUrl);
-    if (S3_USE_CLIENT_URL) {
-      // remove 'http(s)://'
-      const [, path] = fileURL.split('//');
-      // remove s3 url and bucket name
-      if (S3_HAS_ASSET_FOLDER) {
-        // combine folder and filename with CLIENT_URL
-        const [, , folder, filename] = path.split('/');
-        fileURL = `${CLIENT_URL}/${folder}/${filename}`;
-      } else {
-        // combine filename with CLIENT_URL
-        const [, , filename] = path.split('/');
-        fileURL = `${CLIENT_URL}/${filename}`;
-      }
-    }
+    const fileURL = getPathFromUrl(signedUrl);
     this.props.onChange(fileURL);
   }
 
@@ -115,6 +97,9 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
       progress,
     });
   }
+
+  // do not output signed url
+  onSignedUrl = () => null
 
   onUploadError = (error) => {
     this.setState({
@@ -177,7 +162,7 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
                 onFinish={this.onUploadFinish}
                 server={`${ENDPOINTS.API}/`}
                 preprocess={this.modifyFileType}
-                scrubFilename={(filename) => filename.replace(/(\.[\w\d_-]+)$/i, `_${Date.now()}$1`)}
+                scrubFilename={(filename) => filename.replace(/(\.[\w\d_-]+)$/i, `_${getDateSuffix()}$1`)}
               />
             </ReactS3UploaderLabelWrap>
           )
