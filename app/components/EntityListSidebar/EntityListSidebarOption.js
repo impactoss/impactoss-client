@@ -84,52 +84,55 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
 
   render() {
     const {
-      option, onShowForm, groupId, groupType,
+      option, onShowForm, groupId, groupType, formOptions,
     } = this.props;
     const { intl } = this.context;
     return (
-      <Styled
-        active={option.get('active')}
-        small={option.get('nested')}
-        onClick={() => onShowForm({
-          group: groupType || groupId,
-          optionId: option.get('id'),
-          path: option.get('path'),
-          connection: option.get('connection'),
-          key: option.get('key'),
-          ownKey: option.get('ownKey'),
-          active: option.get('active'),
-          create: option.get('create') && option.get('create').toJS(),
-        })}
-        title={intl.formatMessage(
-          option.get('active') ? messages.groupOptionSelect.hide : messages.groupOptionSelect.show
-        )}
-      >
-        <Label>
-          { option.get('message')
-            ? appMessage(intl, option.get('message'))
-            : option.get('label')
-          }
-        </Label>
-        { option.get('icon')
-          && (
-            <IconWrapper>
-              <Icon name={option.get('icon')} />
-            </IconWrapper>
-          )
-        }
-        {(!option.get('nested') || option.get('nested') === false) && (
-          <DotWrapper>
-            {
-              this.renderDot(
-                groupType || groupId,
-                option.get('color') || option.get('id'),
-                option.get('active'),
-              )
+      <div>
+        <Styled
+          active={option.get('active')}
+          small={option.get('nested')}
+          onClick={() => onShowForm({
+            group: groupType || groupId,
+            optionId: option.get('id'),
+            path: option.get('path'),
+            connection: option.get('connection'),
+            key: option.get('key'),
+            ownKey: option.get('ownKey'),
+            active: option.get('active'),
+            create: option.get('create') && option.get('create').toJS(),
+          })}
+          title={intl.formatMessage(
+            option.get('active') ? messages.groupOptionSelect.hide : messages.groupOptionSelect.show
+          )}
+        >
+          <Label>
+            { option.get('message')
+              ? appMessage(intl, option.get('message'))
+              : option.get('label')
             }
-          </DotWrapper>
-        )}
-      </Styled>
+          </Label>
+          { option.get('icon')
+            && (
+              <IconWrapper>
+                <Icon name={option.get('icon')} />
+              </IconWrapper>
+            )
+          }
+          {(!option.get('nested') || option.get('nested') === false) && (
+            <DotWrapper>
+              {
+                this.renderDot(
+                  groupType || groupId,
+                  option.get('color') || option.get('id'),
+                  option.get('active'),
+                )
+              }
+            </DotWrapper>
+          )}
+        </Styled>
+        {option.get('active') && formOptions}
+      </div>
     );
   }
 }
@@ -139,6 +142,7 @@ EntityListSidebarOption.propTypes = {
   groupId: PropTypes.string.isRequired,
   groupType: PropTypes.string,
   onShowForm: PropTypes.func.isRequired,
+  formOptions: PropTypes.node,
 };
 
 

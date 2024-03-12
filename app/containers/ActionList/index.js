@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { List, Map, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
@@ -57,6 +57,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       supTitle: intl.formatMessage(messages.pageTitle),
       icon: 'measures',
       actions: [],
+      actionsAdmin: [],
     };
     if (isUserSignedIn) {
       headerOptions.actions.push({
@@ -72,13 +73,18 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
         icon: 'print',
       });
     }
-    if (isManager) {
+    if (CONFIG.downloadCSV) {
       headerOptions.actions.push({
+        type: 'download',
+      });
+    }
+    if (isManager) {
+      headerOptions.actionsAdmin.push({
         type: 'text',
         title: intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
       });
-      headerOptions.actions.push({
+      headerOptions.actionsAdmin.push({
         type: 'add',
         title: [
           intl.formatMessage(appMessages.buttons.add),
@@ -92,7 +98,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     }
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={intl.formatMessage(messages.pageTitle)}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },

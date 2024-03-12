@@ -29,8 +29,8 @@ const Styled = styled(ContainerWithSidebar)`
 `;
 
 const FormWrapper = styled.div`
-  position: absolute;
-  top: 0;
+  position: fixed;
+  top: ${(props) => props.theme.sizes.header.banner.heightMobile + props.theme.sizes.header.nav.heightMobile}px;
   bottom: 0;
   left: 0;
   background: ${palette('primary', 4)};
@@ -39,10 +39,18 @@ const FormWrapper = styled.div`
   width: 100%;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     width: ${(props) => props.wide ? '100%' : '350px'};
+    left: ${(props) => props.responsiveSmall
+    ? props.theme.sizes.aside.width.small
+    : props.theme.sizes.aside.width.large
+}px;
+    top: ${(props) => props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height}px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     width: ${(props) => props.wide ? 692 : 350}px;
     z-index: 99;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    left: ${(props) => props.theme.sizes.aside.width.large}px;
   }
 `;
 // z-index:-1;

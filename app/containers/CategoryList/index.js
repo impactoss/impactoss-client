@@ -6,7 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fromJS } from 'immutable';
@@ -34,6 +34,8 @@ import ContentHeader from 'components/ContentHeader';
 import CategoryListItems from 'components/categoryList/CategoryListItems';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
+
+import Footer from 'containers/Footer';
 
 // relative
 import messages from './messages';
@@ -143,16 +145,16 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         false);
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.supTitle)}: ${contentTitle}`}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !dataReady
+        {!dataReady
           && <EntityListSidebarLoading responsiveSmall />
         }
-        { taxonomies && frameworks && typeof reference !== 'undefined'
+        {taxonomies && frameworks && typeof reference !== 'undefined'
           && (
             <TaxonomySidebar
               taxonomies={taxonomies}
@@ -173,13 +175,13 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 title={contentTitle}
                 buttons={buttons}
               />
-              { contentDescription
+              {contentDescription
                 && <Description>{contentDescription}</Description>
               }
-              { !dataReady
+              {!dataReady
                 && <Loading />
               }
-              { dataReady && taxonomy
+              {dataReady && taxonomy
                 && (
                   <CategoryListItems
                     taxonomy={taxonomy}
@@ -194,14 +196,14 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                   />
                 )
               }
-              { hasUserCategories
+              {hasUserCategories
                 && (
                   <UsersOnly>
                     <FormattedMessage {...messages.usersOnly} />
                   </UsersOnly>
                 )
               }
-              { dataReady && taxonomy && hasUserCategories
+              {dataReady && taxonomy && hasUserCategories
                 && (
                   <CategoryListItems
                     taxonomy={taxonomy}
@@ -218,8 +220,22 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 )
               }
             </Content>
+            <Footer />
           </Container>
         </ContainerWithSidebar>
+        {!dataReady && <EntityListSidebarLoading responsiveSmall />}
+        {taxonomies
+          && frameworks
+          && typeof reference !== 'undefined'
+          && (
+            <TaxonomySidebar
+              taxonomies={taxonomies}
+              active={reference}
+              frameworkId={frameworkId}
+              frameworks={frameworks}
+              onTaxonomyLink={onTaxonomyLink}
+            />
+          )}
       </div>
     );
   }

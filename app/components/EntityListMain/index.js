@@ -16,10 +16,13 @@ import { qe } from 'utils/quasi-equals';
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
 import Content from 'components/styled/Content';
+import SkipContent from 'components/styled/SkipContent';
+
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
 import PrintOnly from 'components/styled/PrintOnly';
+import Footer from 'containers/Footer';
 
 import { CONTENT_LIST, PARAMS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -40,12 +43,18 @@ const EntityListSearch = styled.div`
   }
 `;
 
-const ListEntities = styled.div``;
+const ListEntities = styled.div`
+  position: relative;
+`;
 const ListWrapper = styled.div``;
 const PrintHintKey = styled(PrintOnly)`
   font-style: italic;
   font-size: ${(props) => props.theme.sizes.print.smaller};
   margin-bottom: 20px;
+`;
+
+const StyledContent = styled(Content)`
+  margin-bottom: 10em;
 `;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -186,11 +195,25 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
           ),
       });
     }
-    const headerActions = dataReady ? header.actions : [];
+    let headerActions = [];
+    if (dataReady) {
+      if (header.actions) {
+        headerActions = [
+          ...headerActions,
+          ...header.actions,
+        ];
+      }
+      if (header.actionsAdmin) {
+        headerActions = [
+          ...headerActions,
+          ...header.actionsAdmin,
+        ];
+      }
+    }
     return (
       <ContainerWithSidebar ref={this.ScrollContainer}>
         <Container ref={this.ScrollReference}>
-          <Content>
+          <StyledContent>
             <ContentHeader
               type={CONTENT_LIST}
               icon={header.icon}
@@ -222,6 +245,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                       intl.formatMessage(messages.filterFormWithoutPrefix),
                       intl.formatMessage(messages.filterFormError),
                     )}
+                    searchAttributes={config.search}
                     searchQuery={locationQuery.get('search') || ''}
                     onSearch={onSearch}
                     onClear={() => {
@@ -230,6 +254,12 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     }}
                   />
                 </EntityListSearch>
+                <SkipContent
+                  href="#filter-options"
+                  title={this.context.intl.formatMessage(appMessages.screenreader.skipToListFilter)}
+                >
+                  <FormattedMessage {...appMessages.screenreader.skipToListFilter} />
+                </SkipContent>
                 <EntityListOptions
                   groupOptions={getGroupOptions(taxonomies, intl)}
                   subgroupOptions={getGroupOptions(taxonomies, intl)}
@@ -277,7 +307,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 </ListWrapper>
               </ListEntities>
             )}
-          </Content>
+          </StyledContent>
+          <Footer />
         </Container>
       </ContainerWithSidebar>
     );

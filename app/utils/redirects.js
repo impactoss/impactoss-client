@@ -1,4 +1,4 @@
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
 import { ROUTES, PARAMS } from 'containers/App/constants';
 import {
   selectIsSignedIn,
@@ -31,6 +31,9 @@ export function hasRoleRequired(roleIds, roleRequired) {
 function redirectIfSignedIn(store) {
   return (nextState, replace) => selectIsSignedIn(store.getState()) && replaceAlreadySignedIn(replace);
 }
+function redirectIfAzureEnabled() {
+  return (nextState, replace) => ENABLE_AZURE && replace({ pathname: '/' });
+}
 
 function redirectIfNotSignedIn(store, info = PARAMS.NOT_SIGNED_IN) {
   return (nextState, replace) => {
@@ -58,6 +61,7 @@ export function getRedirects(store) {
 
   return {
     redirectIfSignedIn: (info) => redirectIfSignedIn(store, info),
+    redirectIfAzureEnabled: () => redirectIfAzureEnabled(),
     redirectIfNotSignedIn: (info) => redirectIfNotSignedIn(store, info),
     redirectIfNotPermitted: (roleRequired, replacePath) => redirectIfNotPermitted(store, roleRequired, replacePath),
   };

@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { List, fromJS } from 'immutable';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
@@ -55,7 +55,7 @@ export class PageList extends React.PureComponent { // eslint-disable-line react
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={intl.formatMessage(messages.pageTitle)}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },

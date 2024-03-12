@@ -19,7 +19,7 @@ import { sortEntities, getSortOption } from 'utils/sort';
 import { CONFIG } from './constants';
 
 
-const selectPathQuery = createSelector(
+export const selectPathQuery = createSelector(
   (state, locationQuery) => locationQuery,
   (locationQuery) => locationQuery && locationQuery.get('path')
 );
@@ -105,11 +105,11 @@ export const selectEntitiesByQuery = createSelector(
                   // if filtered by path
                   if (
                     path === fwTargetPath
-                  || (
-                    !path
-                    && !active
-                    && filteredEntities.size > 0
-                  )
+                    || (
+                      !path
+                      && !active
+                      && filteredEntities.size > 0
+                    )
                   ) {
                     active = true;
                     // only sort the active entities that will be displayed
@@ -140,18 +140,18 @@ export const selectEntitiesByQuery = createSelector(
               // if filtered by path
               if (
                 path === target.get('path')
-              || (
-                !path
-                && !active
-                && filteredEntities.size > 0
-              )
+                || (
+                  !path
+                  && !active
+                  && filteredEntities.size > 0
+                )
               ) {
                 active = true;
                 // only sort the active entities that will be displayed
                 const sortOption = getSortOption(target.get('sorting') && target.get('sorting').toJS(), sort);
                 return memo.push(
                   target
-                    .set('active', searchQuery && true)
+                    .set('active', path === target.get('path'))
                     .set('results', sortEntities(
                       filteredEntities,
                       order || (sortOption ? sortOption.order : 'desc'),

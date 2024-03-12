@@ -96,6 +96,8 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
       connections,
       error,
       isConnection,
+      isFocus,
+      skipTargetId,
     } = this.props;
 
     return (
@@ -118,7 +120,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
         ))}
         <Item error={error}>
           <MainWrapper expandable={entity.get('expandable')}>
-            <MainInnerWrapper>
+            <MainInnerWrapper isManager={isManager}>
               {isManager
                 && <EntityListItemSelect checked={isSelected} onSelect={onSelect} />
               }
@@ -133,6 +135,8 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
                 wrapper={this.props.wrapper}
                 isManager={isManager}
                 isConnection={isConnection}
+                isFocus={isFocus}
+                skipTargetId={skipTargetId}
               />
             </MainInnerWrapper>
           </MainWrapper>
@@ -163,6 +167,7 @@ EntityListItem.propTypes = {
   isManager: PropTypes.bool,
   isSelected: PropTypes.bool,
   isConnection: PropTypes.bool,
+  isFocus: PropTypes.bool,
   onSelect: PropTypes.func,
   expandNo: PropTypes.number,
   onExpand: PropTypes.func,
@@ -172,6 +177,7 @@ EntityListItem.propTypes = {
   onEntityClick: PropTypes.func,
   onDismissError: PropTypes.func,
   wrapper: PropTypes.object,
+  skipTargetId: PropTypes.string,
 };
 
 EntityListItem.defaultProps = {

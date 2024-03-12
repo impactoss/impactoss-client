@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
@@ -39,7 +39,7 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {

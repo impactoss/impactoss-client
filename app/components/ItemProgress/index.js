@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { PROGRESS_CATEGORY_REFERENCES } from 'themes/config';
+import { PROGRESS_CATEGORY_ID } from 'themes/config';
 import { qe } from 'utils/quasi-equals';
 import ButtonTagCategory from 'components/buttons/ButtonTagCategory';
 import ButtonTagCategoryInverse from 'components/buttons/ButtonTagCategoryInverse';
@@ -23,7 +23,7 @@ class ItemProgress extends React.PureComponent { // eslint-disable-line react/pr
       ? (
         <Status>
           {
-            qe(status.attributes.reference, PROGRESS_CATEGORY_REFERENCES.COMPLETED)
+            qe(status.id, PROGRESS_CATEGORY_ID.COMPLETED)
               ? (
                 <ButtonTagCategory
                   title={status.attributes.title}

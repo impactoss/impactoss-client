@@ -16,7 +16,8 @@ import ColumnExpand from './ColumnExpand';
 
 const Styled = styled.div`
   width:100%;
-  background-color: ${palette('light', 1)};
+  color: ${palette('mainListHeader', 0)};
+  background-color: ${palette('mainListHeader', 1)};
   display: table;
 `;
 
@@ -126,7 +127,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
     const sortOption = getSortOption(sortOptions, this.props.sortBy);
 
     return (
-      <Styled>
+      <Styled isManager={isManager}>
         <ColumnSelect
           width={firstColumnWidth}
           isSelect={isManager}

@@ -3,6 +3,13 @@ import { palette } from 'styled-theme';
 
 import Button from '../Button';
 
+const getFontColor = ({ isSmart, taxId, isHover = false }) => {
+  if (!isSmart && (taxId === 6 || taxId === 7 || taxId === 8)) {
+    return isHover ? palette('dark', 1) : palette('dark', 0);
+  }
+  return palette('text', 2);
+};
+
 const getColor = (props, isHover = false) => {
   if (props.isSmartTag) {
     if (props.isSmart) {
@@ -22,7 +29,7 @@ const getColor = (props, isHover = false) => {
 
 // eslint-disable no-nested-ternary
 const ButtonTagCategory = styled(Button)`
-  color: ${palette('text', 2)};
+  color: ${(props) => getFontColor(props)}};
   background-color: ${(props) => getColor(props)};
   margin-right: 2px;
   border-radius: ${(props) => props.isSmartTag ? 9999 : 3}px;
@@ -31,7 +38,7 @@ const ButtonTagCategory = styled(Button)`
   cursor:${(props) => props.disabled ? 'default' : 'pointer'};
   border: 1px solid ${(props) => getColor(props)};
   &:hover {
-    color: ${palette('text', 2)};
+    color: ${(props) => getFontColor(props)};
     background-color: ${(props) => getColor(props, true)};
     border-color: ${(props) => getColor(props, true)};
   }

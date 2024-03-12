@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { Map, List } from 'immutable';
-
+import { Box } from 'grommet';
 import { getEntityAttributeFields } from 'utils/forms';
 import { qe } from 'utils/quasi-equals';
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -39,6 +39,7 @@ import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import Footer from 'containers/Footer';
 
 import { selectDomain } from './selectors';
 import { FORM_INITIAL } from './constants';
@@ -140,20 +141,22 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
           ref={this.scrollContainer}
           inModal={inModal}
         >
-          <ContentHeader
-            title={pageTitle}
-            type={CONTENT_MODAL}
-            icon={icon}
-            buttons={[{
-              type: 'cancel',
-              onClick: this.props.onCancel,
-            },
-            {
-              type: 'save',
-              disabled: saveSending,
-              onClick: () => this.props.handleSubmitRemote('entityNew.form.data'),
-            }]}
-          />
+          <Box margin={{ left: 'medium' }}>
+            <ContentHeader
+              title={pageTitle}
+              type={CONTENT_MODAL}
+              icon={icon}
+              buttons={[{
+                type: 'cancel',
+                onClick: this.props.onCancel,
+              },
+              {
+                type: 'save',
+                disabled: saveSending,
+                onClick: () => this.props.handleSubmitRemote('entityNew.form.data'),
+              }]}
+            />
+          </Box>
           {!submitValid
             && (
               <Messages
@@ -206,6 +209,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
           {saveSending
             && <Loading />
           }
+          <Footer />
         </Content>
       </div>
     );

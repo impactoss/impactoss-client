@@ -8,12 +8,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import styled from 'styled-components';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
-  getEmailField,
+  getEmailFormField,
 } from 'utils/forms';
 
 import Icon from 'components/Icon';
@@ -48,7 +48,7 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
@@ -76,7 +76,7 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
                 handleCancel={this.props.handleCancel}
                 labels={{ submit: intl.formatMessage(messages.submit) }}
                 fields={[
-                  getEmailField(intl.formatMessage, '.email'),
+                  getEmailFormField(intl.formatMessage, '.email'),
                 ]}
               />
             )

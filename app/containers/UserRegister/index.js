@@ -8,13 +8,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import styled from 'styled-components';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
   getNameField,
-  getEmailField,
+  getEmailFormField,
   getPasswordField,
   getPasswordConfirmationField,
 } from 'utils/forms';
@@ -31,6 +31,7 @@ import { selectQueryMessages } from 'containers/App/selectors';
 import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
 import { ROUTES } from 'containers/App/constants';
+import { IS_PROD, SERVER } from 'themes/config';
 
 import messages from './messages';
 
@@ -52,7 +53,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
@@ -65,6 +66,13 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
           <ContentHeader
             title={intl.formatMessage(messages.pageTitle)}
           />
+          {!IS_PROD && (
+            <Messages
+              type="info"
+              messageKey="registeringServer"
+              messageArgs={{ server: SERVER }}
+            />
+          )}
           {this.props.queryMessages.info
             && (
               <Messages
@@ -95,7 +103,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
                 labels={{ submit: intl.formatMessage(messages.submit) }}
                 fields={[
                   getNameField(intl.formatMessage),
-                  getEmailField(intl.formatMessage),
+                  getEmailFormField(intl.formatMessage),
                   getPasswordField(intl.formatMessage),
                   getPasswordConfirmationField(intl.formatMessage),
                 ]}

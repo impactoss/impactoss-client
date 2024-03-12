@@ -8,7 +8,12 @@ import { palette } from 'styled-theme';
 import { getPathFromUrl } from 'utils/string';
 
 import appMessages from 'containers/App/messages';
-import { ENDPOINTS } from 'themes/config';
+import {
+  ENDPOINTS,
+  CLIENT_URL,
+  S3_USE_CLIENT_URL,
+  S3_HAS_ASSET_FOLDER,
+} from 'themes/config';
 
 import Icon from 'components/Icon';
 import DocumentView from 'components/DocumentView';
@@ -87,7 +92,22 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
   }
 
   onUploadFinish = ({ signedUrl }) => {
-    this.props.onChange(getPathFromUrl(signedUrl));
+    let fileURL = getPathFromUrl(signedUrl);
+    if (S3_USE_CLIENT_URL) {
+      // remove 'http(s)://'
+      const [, path] = fileURL.split('//');
+      // remove s3 url and bucket name
+      if (S3_HAS_ASSET_FOLDER) {
+        // combine folder and filename with CLIENT_URL
+        const [, , folder, filename] = path.split('/');
+        fileURL = `${CLIENT_URL}/${folder}/${filename}`;
+      } else {
+        // combine filename with CLIENT_URL
+        const [, , filename] = path.split('/');
+        fileURL = `${CLIENT_URL}/${filename}`;
+      }
+    }
+    this.props.onChange(fileURL);
   }
 
   onUploadProgress = (progress) => {

@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { List, fromJS } from 'immutable';
@@ -60,6 +60,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import Footer from 'containers/Footer';
 
 import { getEntityTitle } from 'utils/entities';
 
@@ -254,7 +255,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={intl.formatMessage(messages.pageTitle)}
           meta={[
             {
@@ -337,6 +338,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               />
             )
           }
+          <Footer />
         </Content>
       </div>
     );

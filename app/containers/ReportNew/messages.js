@@ -18,8 +18,8 @@ export default defineMessages({
     id: 'app.containers.ReportNew.header',
     defaultMessage: 'New Report',
   },
-  guestNote: {
-    id: 'app.containers.ReportNew.guestNote',
+  draftNote: {
+    id: 'app.containers.ReportNew.draftNote',
     defaultMessage: 'Please note: you are contributing as a guest user. Your report will only be publicly available once verified and published by an authorised user.',
   },
 });

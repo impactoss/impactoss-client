@@ -16,11 +16,11 @@ const Styled = styled(Button)`
   width: 100%;
   padding:  ${({ small }) => small ? '0.15em 8px 0.15em 32px' : '0.3em 8px 0.3em 12px'};
   text-align: left;
-  color:  ${(props) => props.active ? palette('asideCatNavItem', 1) : palette('asideCatNavItem', 0)};
+  color:  ${(props) => props.active ? palette('taxonomiesTextColor', props.paletteId) : palette('asideCatNavItem', 0)};
   background-color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : palette('asideCatNavItem', 2)};
   border-bottom: 1px solid ${palette('asideCatNavItem', 4)};
   &:hover {
-    color: ${palette('asideCatNavItemHover', 1)};
+    color: ${(props) => palette('taxonomiesTextColor', props.paletteId)};
     background-color: ${(props) => props.active ? palette('taxonomiesHover', props.paletteId) : palette('taxonomies', props.paletteId)};
     border-bottom-color: ${palette('asideCatNavItemHover', 4)};
   }
@@ -33,7 +33,9 @@ const Styled = styled(Button)`
 `;
 
 const TaxTitle = styled.div`
-  font-weight: bold;
+  font-weight: ${({ nested }) => nested ? 600 : 700};
+  font-size: ${({ nested }) => nested ? 0.9 : 1}em;
+  padding-left: ${({ nested }) => nested ? 20 : 0}px;
   vertical-align: middle;
   display: table-cell;
 `;
@@ -57,7 +59,7 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
     } = this.props;
     return (
       <Styled
-        small={nested}
+        small={false}
         onClick={(evt) => {
           onTaxonomyClick(evt);
           taxonomy.onLink(taxonomy.active);
@@ -72,10 +74,10 @@ class TaxonomySidebarItem extends React.PureComponent { // eslint-disable-line r
         <TaxIcon>
           <Icon
             name={`taxonomy_${taxonomy.id}`}
-            size={nested ? '28px' : '40px'}
+            size="40px"
           />
         </TaxIcon>
-        <TaxTitle>
+        <TaxTitle nested={nested}>
           <FormattedMessage {...appMessages.entities.taxonomies[taxonomy.id].plural} />
         </TaxTitle>
       </Styled>

@@ -7,6 +7,7 @@ const { HashedModuleIdsPlugin } = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const WebpackGitHash = require('webpack-git-hash');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = require('./webpack.base.babel')({
   mode: 'production',
@@ -149,6 +150,10 @@ module.exports = require('./webpack.base.babel')({
       hashDigest: 'hex',
       hashDigestLength: 20,
     }),
+
+    new CopyPlugin([
+      { from: 'app/robots.txt', to: 'robots.txt' },
+    ]),
   ],
 
   performance: {

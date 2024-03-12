@@ -21,6 +21,7 @@ const Styled = styled(Button)`
   text-align: left;
   color: ${palette('asideListGroup', 0)};
   background-color: ${palette('asideListGroup', 1)};
+  border-bottom: 1px solid ${palette('primary', 4)};
   padding: 0.25em 8px 0.25em 16px;
   font-size: 0.9em;
   &:hover {

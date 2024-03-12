@@ -4,7 +4,12 @@ import { palette } from 'styled-theme';
 import Button from '../Button';
 
 const ButtonTagFilter = styled(Button)`
-  color: ${palette('text', 2)};
+  color: ${({ pIndex }) => {
+    if (pIndex === 0 || pIndex === 6 || pIndex === 7) {
+      return palette('dark', 0);
+    }
+    return palette('text', 2);
+  }};
   background-color: ${(props) => palette(props.palette, props.pIndex || 0)};
   padding: 1px 6px;
   margin-right: 2px;

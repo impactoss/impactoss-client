@@ -19,20 +19,20 @@ import ButtonTagFilter from 'components/buttons/ButtonTagFilter';
 import ButtonTagFilterInverse from 'components/buttons/ButtonTagFilterInverse';
 import DebounceInput from 'react-debounce-input';
 import PrintOnly from 'components/styled/PrintOnly';
+import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 const Search = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
-  background-color: ${palette('background', 0)};
-  color: ${palette('dark', 2)};
-  padding: ${(props) => props.small ? '2px 7px' : '7px'};
-  border: 1px solid ${(props) => props.active ? palette('light', 4) : palette('light', 2)};
-  box-shadow: 0 0 3px 0 ${(props) => props.active ? palette('dark', 2) : 'transparent'};
+  background-color: ${palette('primary', 3)};
+  border: 1px solid ${palette('light', 3)};
+  color: ${palette('dark', 1)};
+  border-radius: 100px;
   min-height: ${(props) => props.small ? 30 : 36}px;
-  border-radius: 5px;
   position: relative;
   @media print {
     border: none;
@@ -42,9 +42,8 @@ const Search = styled.div`
   }
 `;
 const SearchInput = styled(DebounceInput)`
-  background-color: ${palette('background', 0)};
-  border: none;
-  padding: 3px;
+  padding: 10px;
+  padding-left: 16px;
   &:focus {
     outline: none;
   }
@@ -55,18 +54,15 @@ const SearchInput = styled(DebounceInput)`
   }
 `;
 const Tags = styled.div`
-  margin-top: -2px;
-  margin-bottom: -2px;
+  margin-top: 7px;
+  margin-left: 10px;
 `;
 
-const Clear = styled(Button)`
+const ButtonTagSearch = styled(Button)`
   padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
-  position: absolute;
-  top: 0;
-  right: 0;
   background-color: ${palette('background', 4)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
+    padding: 10px 16px;
   }
   @media print {
     display: none;
@@ -81,6 +77,8 @@ const SearchValuePrint = styled(PrintOnly)`
   font-size: ${(props) => props.theme.sizes.print.default};
   font-weight: bold;
 `;
+// const ButtonTagSearch = styled.div``;
+const StyledLabel = styled.label``;
 
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor() {
@@ -89,6 +87,27 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       active: false,
     };
   }
+
+  componentDidMount() {
+    if (this.input && this.props.focusOnMount) this.input.focus();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.filters.length !== this.props.filters.length) {
+      if (this.props.filters.length > 0) {
+        this.focusLastFilter();
+      } else if (this.input) {
+        this.input.focus();
+      }
+    }
+  }
+
+  getLabels = (labels) => reduce(labels, (memo, label) => {
+    if (!label.label) return memo;
+    let labelValue = label.appMessage ? appMessage(this.context.intl, label.label) : label.label;
+    labelValue = label.postfix ? `${labelValue}${label.postfix}` : labelValue;
+    return `${memo}${label.lowerCase ? lowerCase(labelValue) : labelValue} `;
+  }, '').trim();
 
   getFilterLabel = (filter) => {
     const { intl } = this.context;
@@ -99,15 +118,24 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
         : appMessage(intl, filter.message);
     }
     if (filter.labels) {
-      return reduce(filter.labels, (memo, label) => {
-        if (!label.label) return memo;
-        let labelValue = label.appMessage ? appMessage(intl, label.label) : label.label;
-        labelValue = label.postfix ? `${labelValue}${label.postfix}` : labelValue;
-        return `${memo}${label.lowerCase ? lowerCase(labelValue) : labelValue} `;
-      }, '').trim();
+      return this.getLabels(filter.labels);
     }
     return filter.label;
-  }
+  };
+
+  getFilterTitle = (filter) => {
+    let title = '';
+    if (filter.titleLabels) {
+      title = this.getLabels(filter.titleLabels);
+    } else {
+      title = filter.title || this.getFilterLabel(filter);
+    }
+    return this.context.intl.formatMessage(messages.removeTag, { title });
+  };
+
+  focusLastFilter = () => {
+    if (this.lastFilter) this.lastFilter.focus();
+  };
 
   render() {
     const {
@@ -115,6 +143,9 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       searchQuery,
       onSearch,
       placeholder,
+      onClear,
+      resultsId,
+      searchAttributes,
     } = this.props;
     const { intl } = this.context;
     // TODO set focus to input when clicking wrapper
@@ -125,6 +156,39 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     //   this.inputNode.focus()
     // }}
     const hasFilters = (searchQuery || filters.length > 0);
+    let inputPlaceholder;
+    if (placeholder) {
+      inputPlaceholder = placeholder;
+    } else if (searchAttributes) {
+      const attLength = searchAttributes.length;
+      inputPlaceholder = intl.formatMessage(
+        messages.searchPlaceholderEntitiesAttributes,
+        {
+          attributes: searchAttributes.reduce(
+            (memo, att, position) => {
+              const value = intl.formatMessage(appMessages.attributes[att]);
+              if (position === 0) {
+                return value;
+              }
+              if (position + 1 === attLength) {
+                return `${memo} or ${value}`;
+              }
+              return `${memo}, ${value}`;
+            },
+            '',
+          ),
+        }
+      );
+    } else {
+      inputPlaceholder = intl.formatMessage(
+        this.props.multiselect
+          ? messages.searchPlaceholderMultiSelect
+          : messages.searchPlaceholderEntities
+      );
+    }
+
+    const inputId = this.props.multiselect ? 'ms-search' : 'search';
+
     return (
       <Search
         active={this.state.active}
@@ -136,38 +200,42 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             <FormattedMessage {...messages.labelPrintFilters} />
           </LabelPrint>
         )}
-        { filters.length > 0
+        {filters.length > 0
           && (
             <Tags>
               {
                 filters.map((filter, i) => filter.inverse
                   ? (
                     <ButtonTagFilterInverse
+                      ref={(el) => { this.lastFilter = el; }}
                       key={i}
                       onClick={filter.onClick}
                       palette={filter.type || 'attributes'}
                       paletteHover={`${filter.type || 'attributes'}Hover`}
                       pIndex={parseInt(filter.id, 10) || 0}
                       disabled={!filter.onClick}
+                      title={this.getFilterTitle(filter)}
                     >
                       {this.getFilterLabel(filter)}
-                      { filter.onClick
-                      && <Icon name="removeSmall" text textRight hidePrint />
+                      {filter.onClick
+                        && <Icon name="removeSmall" text textRight hidePrint />
                       }
                     </ButtonTagFilterInverse>
                   )
                   : (
                     <ButtonTagFilter
+                      ref={(el) => { this.lastFilter = el; }}
                       key={i}
                       onClick={filter.onClick}
                       palette={filter.type || 'attributes'}
                       paletteHover={`${filter.type || 'attributes'}Hover`}
                       pIndex={parseInt(filter.id, 10) || 0}
                       disabled={!filter.onClick}
+                      title={this.getFilterTitle(filter)}
                     >
                       {this.getFilterLabel(filter)}
-                      { filter.onClick
-                      && <Icon name="removeSmall" text textRight hidePrint />
+                      {filter.onClick
+                        && <Icon name="removeSmall" text textRight hidePrint />
                       }
                     </ButtonTagFilter>
                   ))
@@ -175,27 +243,38 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             </Tags>
           )
         }
+        <ScreenReaderOnly>
+          <StyledLabel htmlFor={inputId}>
+            {inputPlaceholder}
+          </StyledLabel>
+        </ScreenReaderOnly>
         <SearchInput
-          id="search"
+          id={inputId}
+          placeholder={inputPlaceholder}
+          inputRef={(el) => { this.input = el; }}
           minLength={1}
           debounceTimeout={500}
           value={searchQuery || ''}
           onChange={(e) => onSearch(e.target.value)}
           onFocus={() => this.setState({ active: true })}
           onBlur={() => this.setState({ active: false })}
-          placeholder={placeholder || (intl.formatMessage(
-            this.props.multiselect
-              ? messages.searchPlaceholderMultiSelect
-              : messages.searchPlaceholderEntities
-          ))}
+          onKeyDown={(e) => {
+            if (filters.length > 0 && (!searchQuery || searchQuery.length === 0)) {
+              const key = e.keyCode || e.charCode;
+              if (key === 8) {
+                this.focusLastFilter();
+              }
+            }
+          }}
         />
-        { hasFilters && (
-          <Clear
-            onClick={this.props.onClear}
+        {hasFilters && (
+          <ButtonTagSearch
+            onClick={onClear}
             small={this.props.multiselect}
+            title={this.context.intl.formatMessage(messages.removeAll)}
           >
             <Icon name="removeSmall" />
-          </Clear>
+          </ButtonTagSearch>
         )}
         {searchQuery && (
           <LabelPrint>
@@ -207,18 +286,32 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             {searchQuery}
           </SearchValuePrint>
         )}
+        <ButtonTagSearch
+          as="a"
+          href={`#${resultsId}`}
+          title={this.context.intl.formatMessage(messages.skipToResults)}
+        >
+          <Icon name="search" size="1em" />
+        </ButtonTagSearch>
       </Search>
     );
   }
 }
 
+TagSearch.defaultProps = {
+  resultsId: 'entity-list-main',
+};
+
 TagSearch.propTypes = {
   filters: PropTypes.array,
+  searchAttributes: PropTypes.array,
   searchQuery: PropTypes.string,
   placeholder: PropTypes.string,
+  resultsId: PropTypes.string,
   onSearch: PropTypes.func,
   onClear: PropTypes.func,
   multiselect: PropTypes.bool,
+  focusOnMount: PropTypes.bool,
 };
 
 TagSearch.contextTypes = {

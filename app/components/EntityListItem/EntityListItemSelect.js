@@ -14,21 +14,24 @@ const Select = styled(PrintHide)`
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-right: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
     padding-left: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingHorizontal}px;
-    width: 40px;
+    width: 43px;
   }
+`;
+const Input = styled.input`
+accent-color: ${palette('checkbox', 0)};
 `;
 
 export default class EntityListItemSelect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     checked: PropTypes.bool,
     onSelect: PropTypes.func,
-  }
+  };
 
   render() {
     const { checked, onSelect } = this.props;
     return (
       <Select>
-        <input
+        <Input
           type="checkbox"
           checked={checked}
           onChange={(evt) => onSelect(evt.target.checked)}

@@ -279,6 +279,8 @@ export const getConnectionUpdatesFromFormData = ({
   connectionAttribute,
   createConnectionKey,
   createKey,
+  allowMultiple = true,
+  taxonomyCategoryIds,
 }) => {
   let formConnectionIds = List();
   if (formData) {
@@ -290,22 +292,52 @@ export const getConnectionUpdatesFromFormData = ({
   }
   // store associated Actions as { [action.id]: [association.id], ... }
   const associatedConnections = getAssociatedEntities(connections);
-  return Map({
-    delete: associatedConnections.reduce(
-      (associatedIds, associatedId, id) => !formConnectionIds.includes(id)
-        ? associatedIds.push(associatedId)
-        : associatedIds,
-      List()
-    ),
-    create: formConnectionIds.reduce(
-      (payloads, id) => !associatedConnections.has(id)
-        ? payloads.push(Map({
-          [createConnectionKey]: id,
-          [createKey]: formData.get('id'),
-        }))
-        : payloads,
+  const createList = formConnectionIds.reduce(
+    (payloads, id) => !associatedConnections.has(id)
+      ? payloads.push(Map({
+        [createConnectionKey]: id,
+        [createKey]: formData.get('id'),
+      }))
+      : payloads,
+    List(),
+  );
+  let deleteList = associatedConnections.reduce(
+    (associatedIds, associatedId, id) => !formConnectionIds.includes(id)
+      ? associatedIds.push(associatedId)
+      : associatedIds,
+    List()
+  );
+  // also remove any other category associations an entity may have
+  // if it cannot have multiple categories ()
+  // only makes sense if there are any connections to create
+  if (!allowMultiple && taxonomyCategoryIds && createList.size > 0) {
+    // for each payload in the create list...
+    const deleteList1 = createList.reduce(
+      (memo, payload) => {
+        // get the entity and existing category connections ...
+        const connectionId = payload.get(createConnectionKey);
+        const connection = connections.get(connectionId);
+        const connectionCategories = connection.get('categories');
+        // and figure out those that are of the same taxonomy
+        const associationsToRemove = connectionCategories.keySeq().filter(
+          (associationId) => {
+            const otherId = connectionCategories.get(associationId);
+            return taxonomyCategoryIds.includes(`${otherId}`);
+          }
+        );
+        return associationsToRemove
+          ? memo.concat(associationsToRemove)
+          : memo;
+      },
       List(),
-    ),
+    );
+    if (deleteList1) {
+      deleteList = deleteList.concat(deleteList1);
+    }
+  }
+  return Map({
+    delete: deleteList,
+    create: createList,
   });
 };
 
@@ -511,7 +543,7 @@ export const getUploadField = (formatMessage) => getFormField({
   placeholder: 'url',
 });
 
-export const getEmailField = (formatMessage, model = '.attributes.email') => {
+export const getEmailFormField = (formatMessage, model = '.attributes.email') => {
   const field = getFormField({
     formatMessage,
     controlType: 'email',

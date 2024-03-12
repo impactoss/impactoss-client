@@ -4,7 +4,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
@@ -24,7 +24,7 @@ export class Unauthorised extends React.PureComponent { // eslint-disable-line r
     const { intl } = this.context;
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={intl.formatMessage(messages.pageTitle)}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },

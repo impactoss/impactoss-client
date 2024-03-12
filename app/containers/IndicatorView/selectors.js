@@ -38,7 +38,7 @@ export const selectViewEntity = createSelector(
     {
       related: users,
       key: 'user',
-      relatedKey: 'last_modified_user_id',
+      relatedKey: 'updated_by_id',
     },
     {
       related: users,
@@ -219,10 +219,10 @@ export const selectReports = createSelector(
         const reportX = report.set(
           'user',
           users.find(
-            (user) => report.getIn(['attributes', 'last_modified_user_id'])
+            (user) => report.getIn(['attributes', 'updated_by_id'])
               && qe(
                 user.get('id'),
-                report.getIn(['attributes', 'last_modified_user_id'])
+                report.getIn(['attributes', 'updated_by_id'])
               )
           )
         );

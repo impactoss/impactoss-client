@@ -31,6 +31,37 @@ export const makeFilterGroups = (
       }],
     };
   }
+
+  // attributes
+  if (config.attributes) {
+    // first prepare taxonomy options
+    filterGroups.attributes = {
+      id: 'attributes', // filterGroupId
+      label: messages.attributes,
+      show: true,
+      options: reduce(
+        config.attributes.options,
+        (options, option) => (
+          (
+            typeof option.role === 'undefined'
+            || (hasUserRole && hasUserRole[option.role])
+          )
+          && (
+            typeof option.frameworkFilter === 'undefined'
+            || checkFramework(frameworks, option.frameworkFilter)
+          )
+        )
+          ? options.concat([{
+            id: option.attribute, // filterOptionId
+            label: option.label,
+            message: option.message,
+            active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
+          }])
+          : options,
+        [],
+      ),
+    };
+  }
   // taxonomy option group
   if (config.taxonomies && taxonomies) {
     // multi framework mode
@@ -173,37 +204,6 @@ export const makeFilterGroups = (
             active: !!activeFilterOption && activeFilterOption.optionId === option.path,
           });
         },
-        [],
-      ),
-    };
-  }
-
-  // attributes
-  if (config.attributes) {
-    // first prepare taxonomy options
-    filterGroups.attributes = {
-      id: 'attributes', // filterGroupId
-      label: messages.attributes,
-      show: true,
-      options: reduce(
-        config.attributes.options,
-        (options, option) => (
-          (
-            typeof option.role === 'undefined'
-            || (hasUserRole && hasUserRole[option.role])
-          )
-          && (
-            typeof option.frameworkFilter === 'undefined'
-            || checkFramework(frameworks, option.frameworkFilter)
-          )
-        )
-          ? options.concat([{
-            id: option.attribute, // filterOptionId
-            label: option.label,
-            message: option.message,
-            active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
-          }])
-          : options,
         [],
       ),
     };
