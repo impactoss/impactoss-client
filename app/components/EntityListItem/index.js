@@ -120,7 +120,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
         ))}
         <Item error={error}>
           <MainWrapper expandable={entity.get('expandable')}>
-            <MainInnerWrapper>
+            <MainInnerWrapper isManager={isManager}>
               {isManager
                 && <EntityListItemSelect checked={isSelected} onSelect={onSelect} />
               }

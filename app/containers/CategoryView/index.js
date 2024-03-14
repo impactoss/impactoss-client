@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 
 import {
@@ -326,7 +326,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={metaTitle}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },

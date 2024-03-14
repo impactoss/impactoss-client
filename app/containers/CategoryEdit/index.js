@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
@@ -304,7 +304,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
@@ -368,7 +368,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                   formData,
                   measures,
                   recommendationsByFw,
-                  viewEntity.get('taxonomy'),
+                  viewEntity,
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
@@ -483,7 +483,8 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, measures, recommendationsByFw, taxonomy) => {
+    handleSubmit: (formData, measures, recommendationsByFw, viewEntity) => {
+      const taxonomy = viewEntity.get('taxonomy');
       let saveData = formData;
       if (taxonomy.getIn(['attributes', 'tags_measures'])) {
         saveData = saveData.set(
@@ -543,6 +544,10 @@ function mapDispatchToProps(dispatch, props) {
         saveData = saveData.setIn(['attributes', 'parent_id'], formCategoryIds.first());
       } else {
         saveData = saveData.setIn(['attributes', 'parent_id'], null);
+      }
+
+      if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+        saveData = saveData.set('skipAttributes', true);
       }
       dispatch(save(saveData.toJS()));
     },

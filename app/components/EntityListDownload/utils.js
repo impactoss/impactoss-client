@@ -3,8 +3,8 @@ import appMessages from 'containers/App/messages';
 
 import { Set } from 'immutable';
 
-// const IN_CELL_SEPARATOR = ', \n';
-const IN_CELL_SEPARATOR = ' - ';
+const IN_CELL_SEPARATOR = '\n';
+const IN_CELL_LIST_ITEM = '- ';
 
 export const getDateSuffix = (datetime) => {
   const date = datetime ? new Date(datetime) : new Date();
@@ -19,7 +19,7 @@ export const getDateSuffix = (datetime) => {
 
 const sanitiseText = (text) => {
   let val = text ? `${text}`.trim() : '';
-  if (val.startsWith('-') || val.startsWith('+')) {
+  if (val.startsWith('+')) {
     val = `'${val}`;
   }
   return `"${val
@@ -94,7 +94,7 @@ const getAttributeValue = ({
         // if (email) {
         //   return `${title} (${email})`;
         // }
-        return `${title}[${val}]`;
+        return `${title} [${val}]`;
       }
     }
   }
@@ -120,15 +120,19 @@ const prepConnnectionData = ({
         .map((typeId) => typeId);
     let connectionsValue = '';
     if (entityConnectionIds) {
+      const multiple = entityConnectionIds.size > 1;
       connectionsValue = entityConnectionIds.reduce((memo2, typeId) => {
         const connection = relationships.getIn([connectionPath, typeId.toString()]);
         if (connection) {
           const title = connection.getIn(['attributes', 'title']);
           const ref = connection.getIn(['attributes', 'reference']) || connection.get('id');
           connectionsValue = addWarnings({
-            value: `${title}[${ref}]`,
+            value: `${title} [${ref}]`,
             entity: connection,
           });
+          if (multiple) {
+            connectionsValue = `${IN_CELL_LIST_ITEM}${connectionsValue}`;
+          }
           return memo2 === ''
             ? connectionsValue
             : `${memo2}${IN_CELL_SEPARATOR}${connectionsValue}`;
@@ -182,12 +186,16 @@ const prepTaxonomyDataColumns = ({
     const intersect = entityCategories && activeTaxonomyCategories
       && entityCategories.intersect(activeTaxonomyCategories);
     if (intersect && intersect.size > 0) {
+      const multiple = intersect.size > 1;
       categoryValue = intersect.reduce((memo2, categoryId) => {
         const entityCategory = taxonomies.getIn([attKey, 'categories', categoryId, 'attributes', 'title']);
         const entityCategoryShort = taxonomies.getIn([attKey, 'categories', categoryId, 'attributes', 'short_title']);
-        const label = entityCategoryShort
-          ? `${entityCategory}[${entityCategoryShort}]`
+        let label = entityCategoryShort
+          ? `${entityCategory} [${entityCategoryShort}]`
           : entityCategory;
+        if (multiple) {
+          label = `${IN_CELL_LIST_ITEM}${label}`;
+        }
         return memo2 === ''
           ? label
           : `${memo2}${IN_CELL_SEPARATOR}${label}`;

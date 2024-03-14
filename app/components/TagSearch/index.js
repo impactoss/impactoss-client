@@ -21,6 +21,7 @@ import DebounceInput from 'react-debounce-input';
 import PrintOnly from 'components/styled/PrintOnly';
 import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 const Search = styled.div`
@@ -144,6 +145,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       placeholder,
       onClear,
       resultsId,
+      searchAttributes,
     } = this.props;
     const { intl } = this.context;
     // TODO set focus to input when clicking wrapper
@@ -154,12 +156,36 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     //   this.inputNode.focus()
     // }}
     const hasFilters = (searchQuery || filters.length > 0);
-
-    const inputPlaceholder = placeholder || (intl.formatMessage(
-      this.props.multiselect
-        ? messages.searchPlaceholderMultiSelect
-        : messages.searchPlaceholderEntities
-    ));
+    let inputPlaceholder;
+    if (placeholder) {
+      inputPlaceholder = placeholder;
+    } else if (searchAttributes) {
+      const attLength = searchAttributes.length;
+      inputPlaceholder = intl.formatMessage(
+        messages.searchPlaceholderEntitiesAttributes,
+        {
+          attributes: searchAttributes.reduce(
+            (memo, att, position) => {
+              const value = intl.formatMessage(appMessages.attributes[att]);
+              if (position === 0) {
+                return value;
+              }
+              if (position + 1 === attLength) {
+                return `${memo} or ${value}`;
+              }
+              return `${memo}, ${value}`;
+            },
+            '',
+          ),
+        }
+      );
+    } else {
+      inputPlaceholder = intl.formatMessage(
+        this.props.multiselect
+          ? messages.searchPlaceholderMultiSelect
+          : messages.searchPlaceholderEntities
+      );
+    }
 
     const inputId = this.props.multiselect ? 'ms-search' : 'search';
 
@@ -278,6 +304,7 @@ TagSearch.defaultProps = {
 
 TagSearch.propTypes = {
   filters: PropTypes.array,
+  searchAttributes: PropTypes.array,
   searchQuery: PropTypes.string,
   placeholder: PropTypes.string,
   resultsId: PropTypes.string,

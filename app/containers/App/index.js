@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Helmet } from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import ReactModal from 'react-modal';
 import GlobalStyle from 'global-styles';
 import { FormattedMessage } from 'react-intl';
@@ -126,7 +126,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         titleSuper: intl.formatMessage(messages.nav.overviewSuper),
         title: intl.formatMessage(messages.nav.overview),
         active:
-          currentPath.startsWith(ROUTES.OVERVIEW)
+          currentPath === ROUTES.OVERVIEW
           || currentPath.startsWith(ROUTES.TAXONOMIES)
           || currentPath.startsWith(ROUTES.CATEGORIES),
       },
@@ -213,7 +213,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         >
           <FormattedMessage {...messages.screenreader.skipToContent} />
         </SkipContent>
-        <Helmet titleTemplate={`${title} - %s`} defaultTitle={title} />
+        <HelmetCanonical titleTemplate={`${title} - %s`} defaultTitle={title} />
         <Header
           isSignedIn={isUserSignedIn}
           user={user}
@@ -232,7 +232,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             icon: 'search',
           }}
           onPageLink={onPageLink}
-          isHome={location.pathname === '/'}
+          isHome={location.pathname === ROUTES.INTRO}
           onSelectFramework={onSelectFramework}
           frameworkOptions={frameworks && frameworks.size > 1
             ? this.prepareFrameworkOptions(
@@ -243,7 +243,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           currentPath={location.pathname}
           brandPath={ROUTES.OVERVIEW}
         />
-        <Main isHome={location.pathname === '/'} role="main" id="main-content">
+        <Main isHome={location.pathname === ROUTES.INTRO} role="main" id="main-content">
           {React.Children.toArray(children)}
         </Main>
         {newEntityModal

@@ -27,7 +27,6 @@ const MainWrapper = styled(Component)`
   display: table-cell;
   width: ${(props) => props.expandable ? COLUMN_WIDTHS.MAIN * 100 : 100}%;
   border-left: 3px solid ${palette('background', 1)};
-  border-right: 3px solid ${palette('background', 1)};
   @media print {
     border: none;
     padding: 0 5px

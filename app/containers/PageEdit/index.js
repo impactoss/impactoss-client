@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
@@ -151,7 +151,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
@@ -210,7 +210,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
                 model="pageEdit.form.data"
                 formData={viewDomain.getIn(['form', 'data'])}
                 saving={saveSending}
-                handleSubmit={(formData) => this.props.handleSubmit(formData)}
+                handleSubmit={(formData) => this.props.handleSubmit(formData, viewEntity)}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 handleUpdate={this.props.handleUpdate}
@@ -296,8 +296,13 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData) => {
-      dispatch(save(formData.toJS()));
+    handleSubmit: (formData, viewEntity) => {
+      let saveData = formData;
+      // check if attributes have changed
+      if (!saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+        saveData = saveData.set('skipAttributes', true);
+      }
+      dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
       dispatch(updatePath(`${ROUTES.PAGES}/${props.params.id}`, { replace: true }));

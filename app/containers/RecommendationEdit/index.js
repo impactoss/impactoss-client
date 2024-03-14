@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
@@ -235,7 +235,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={`${intl.formatMessage(messages.pageTitle, { type })}: ${reference}`}
           meta={[
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
@@ -301,6 +301,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                   measures,
                   indicators,
                   currentFramework,
+                  viewEntity,
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
@@ -405,7 +406,14 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitRemote: (model) => {
       dispatch(formActions.submit(model));
     },
-    handleSubmit: (formData, taxonomies, measures, indicators, currentFramework) => {
+    handleSubmit: (
+      formData,
+      taxonomies,
+      measures,
+      indicators,
+      currentFramework,
+      viewEntity,
+    ) => {
       let saveData = formData
         .set(
           'recommendationCategories',
@@ -442,6 +450,10 @@ function mapDispatchToProps(dispatch, props) {
           .setIn(['attributes', 'response'], '');
       } else if (saveData.getIn(['attributes', 'accepted']) === '') {
         saveData = saveData.setIn(['attributes', 'accepted'], 'true');
+      }
+      // check if attributes have changed
+      if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+        saveData = saveData.set('skipAttributes', true);
       }
       dispatch(save(saveData.toJS()));
     },
