@@ -151,20 +151,6 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        {!dataReady
-          && <EntityListSidebarLoading responsiveSmall />
-        }
-        {taxonomies && frameworks && typeof reference !== 'undefined'
-          && (
-            <TaxonomySidebar
-              taxonomies={taxonomies}
-              active={reference}
-              frameworkId={frameworkId}
-              frameworks={frameworks}
-              onTaxonomyLink={onTaxonomyLink}
-            />
-          )
-        }
         <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
