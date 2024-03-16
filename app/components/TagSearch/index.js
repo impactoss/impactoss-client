@@ -45,7 +45,7 @@ const SearchInput = styled(DebounceInput)`
   padding: 10px;
   padding-left: 16px;
   &:focus {
-    outline: none;
+    border-radius: 100px 0px 0px 100px;
   }
   flex: 1;
   font-size: 0.85em;
