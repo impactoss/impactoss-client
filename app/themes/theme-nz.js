@@ -298,7 +298,7 @@ theme.palette = {
   buttonCancelHover: [primary[1]],
   // buttonDefault: ['#text', '#bg'],
   buttonDefault: [primary[4], primary[0]], // with background
-  buttonDefaultHover: [primary[4], primary[0]],
+  buttonDefaultHover: [primary[4], primary[1]],
   buttonDefaultDisabled: [light[0], dark[3]], // with background disabled
   // buttonPrimary: ['#text', '#bg', '#border'],
   buttonDefaultIconOnly: [primary[4], primary[0], primary[2]], // with background, without text
