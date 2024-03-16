@@ -1,6 +1,6 @@
 {
   "name": "impact-oss",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "NZ version of Integrated Management and Planning of ACTions Open Source Software",
   "repository": {
     "type": "git",
@@ -44,7 +44,8 @@
     "lint:staged": "lint-staged",
     "pretest": "npm run test:clean && npm run lint",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "prettify": "prettier --write"
+    "prettify": "prettier --write",
+    "predeploy:copy": "rimraf ../human-rights-website/* && cp ./build/* ../human-rights-website/"
   },
   "browserslist": [
     "last 2 versions",
