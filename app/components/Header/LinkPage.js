@@ -6,7 +6,7 @@ import LinkSecondary from './LinkSecondary';
 export default styled(LinkSecondary)`
   color:${(props) => props.active ? palette('headerNavPagesItem', 1) : palette('headerNavPagesItem', 0)};
   background-color: transparent;
-  &:hover {
+  &:hover, &:focus {
     color:${(props) => props.active ? palette('headerNavPagesItemHover', 1) : palette('headerNavPagesItemHover', 0)};
     text-decoration: ${(props) => props.active ? 'none' : 'underline'};
   }

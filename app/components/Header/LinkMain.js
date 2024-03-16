@@ -8,7 +8,7 @@ export default styled(Link)`
   vertical-align: top;
   color: ${({ active }) => active ? palette('text', 2) : palette('dark', 3)};
   background:  ${({ active }) => active ? palette('primary', 0) : 'transparent'};
-  &:hover {
+  &:hover, &:focus {
     color:${({ active }) => active ? palette('text', 2) : palette('headerNavMainItemHover', 0)};
   }
   font-size: 0.8em;

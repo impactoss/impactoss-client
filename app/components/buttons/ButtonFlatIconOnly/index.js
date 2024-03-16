@@ -5,7 +5,7 @@ import Button from '../Button';
 
 const ButtonFlatIconOnly = styled(Button)`
   color: ${({ subtle }) => (subtle ? palette('text', 1) : palette('buttonFlat', 0))};
-  &:hover {
+  &:hover, &:focus {
     color: ${({ subtle }) => (subtle ? palette('buttonFlat', 0) : palette('buttonFlatHover', 0))};
   }
 `;

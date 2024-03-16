@@ -149,7 +149,7 @@ const CategorisedIcon = styled.a`
   color: ${(props) => props.active ? palette('taxonomiesTextColor', props.paletteId) : palette('text', 1)};
   background-color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : 'transparent'};
   border-radius: 4px;
-  &:hover {
+  &:hover, &:focus {
     color: ${(props) => palette('taxonomiesTextColor', props.paletteId)};
     background-color: ${(props) => palette('taxonomies', props.paletteId)};
   }

@@ -27,7 +27,7 @@ const Styled = styled(Button)`
   color:  ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
   background-color: ${(props) => props.active ? palette('asideListItem', 3) : palette('asideListItem', 2)};
   border-bottom: 1px solid ${palette('asideListItem', 4)};
-  &:hover {
+  &:hover, &:focus {
     color: ${(props) => props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0)};
     background-color: ${(props) => props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2)};
     border-bottom-color: ${palette('asideListItemHover', 4)}
@@ -80,7 +80,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
       default:
         return null;
     }
-  }
+  };
 
   render() {
     const {
@@ -107,12 +107,12 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
           )}
         >
           <Label>
-            { option.get('message')
+            {option.get('message')
               ? appMessage(intl, option.get('message'))
               : option.get('label')
             }
           </Label>
-          { option.get('icon')
+          {option.get('icon')
             && (
               <IconWrapper>
                 <Icon name={option.get('icon')} />
