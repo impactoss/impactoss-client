@@ -60,7 +60,11 @@ const Tags = styled.div`
 
 const ButtonTagSearch = styled(Button)`
   padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
+  color: ${palette('dark', 1)};
   background-color: ${palette('background', 4)};
+  &:hover {
+    color: ${palette('primary', 0)};
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 10px 16px;
   }
