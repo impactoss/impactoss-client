@@ -28,8 +28,10 @@ theme.media = {
   //   [partner3, partner3x2x],
   //   [partner4, partner4x2x],
   // ],
-  nzGovLogo: [footerLogo1],
-  nzJusticeLogo: [footerLogo2],
+  agencyLogos: [
+    [footerLogo1],
+    [footerLogo2],
+  ],
 };
 
 // grid-styles settings https://github.com/jxnblk/grid-styled
@@ -187,10 +189,13 @@ theme.palette = {
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
   measuresHover: ['#964B00'], // FFC107  AA compliant
   measures: ['#BA5D03'],
+  measuresConnectionText: [light[0], primary[4]], // published, draft
   recommendationsHover: ['#510064', '#a94dbf'], // accepted, noted ['#FF9B69', '#FFB28B'],
   recommendations: ['#73018E', '#a94dbf'],
+  recommendationsConnectionText: [light[0], primary[4]], // published, draft
   indicatorsHover: ['#F09F5B'],
   indicators: ['#FFCEA5'],
+  indicatorsConnectionText: [dark[0], dark[0]], // published, draft
   reportsHover: [error[1]],
   reports: [error[0]],
   attributesHover: [dark[2]],
@@ -293,7 +298,7 @@ theme.palette = {
   buttonCancelHover: [primary[1]],
   // buttonDefault: ['#text', '#bg'],
   buttonDefault: [primary[4], primary[0]], // with background
-  buttonDefaultHover: [primary[4], primary[0]],
+  buttonDefaultHover: [primary[4], primary[1]],
   buttonDefaultDisabled: [light[0], dark[3]], // with background disabled
   // buttonPrimary: ['#text', '#bg', '#border'],
   buttonDefaultIconOnly: [primary[4], primary[0], primary[2]], // with background, without text
@@ -374,11 +379,11 @@ theme.sizes = {
   header: {
     banner: {
       height: 88,
-      heightMobile: 50,
+      heightMobile: 40,
     },
     nav: {
       height: 50,
-      heightMobile: 32,
+      heightMobile: 40,
     },
     // px or em
     text: {
@@ -392,8 +397,8 @@ theme.sizes = {
       claim: '9pt',
     },
     paddingLeft: {
-      mobile: 3,
-      small: 6,
+      mobile: 6,
+      small: 8,
       large: 10,
     },
   },

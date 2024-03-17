@@ -6,9 +6,10 @@ import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { Box, Text, ResponsiveContext } from 'grommet';
 import { updatePath } from 'containers/App/actions';
+import A from 'components/styled/A';
 
 import qe from 'utils/quasi-equals';
-import { isMinSize } from 'utils/responsive';
+import { isMaxSize } from 'utils/responsive';
 
 import { selectEntitiesWhere } from 'containers/App/selectors';
 
@@ -31,7 +32,7 @@ const FooterMain = styled.div`
   }
 `;
 
-const FooterLink = styled.a`
+const FooterLink = styled(A)`
   display: inline-block;
   font-weight: 600;
   font-size: ${({ theme }) => theme.text.xsmall.size};
@@ -41,31 +42,40 @@ const FooterLink = styled.a`
   }
 `;
 
+const LogoItemLink = styled(A)`
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
 const Logo = styled(NormalImg)`
   height: 50px;
-  padding-right: ${({ hasRightPadding }) => hasRightPadding ? '2em' : 0};
+  @media (min-width: ${({ theme }) => theme.breakpoints.medium}) {
+    height: 55px;
+  }
   @media (min-width: ${({ theme }) => theme.breakpoints.large}) {
-    height: 75px;
+    height: 68px;
   }
 `;
 
 const Wrapper = styled((p) => <Box margin={{ bottom: 'large' }} {...p} />)`
   font-size: 0.8em;
-  padding: ${({ fill }) => fill ? 0 : '0px 30px'};
   @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
     width: 100%;
     font-size: 0.9em;
+    padding: ${({ fill }) => fill ? 0 : '0px 30px'};
   }
   @media (min-width: ${({ theme }) => theme.breakpoints.large}) {
     font-size: 1em;
   }
   @media print {
+    padding: 0px;
     font-size: ${({ theme }) => theme.sizes.print.default};
   }
 `;
-const BoxRow = styled((p) => <Box direction="row" {...p} />)``;
 
-const BoxColumn = styled((p) => <Box {...p} />)``;
+const FooterNote = styled((p) => <Text size="xsmall" {...p} />)``;
+const FooterVersion = styled((p) => <Text size="xxxsmall" {...p} />)``;
 
 const Footer = ({
   intl,
@@ -75,70 +85,92 @@ const Footer = ({
   fill,
 }) => {
   const size = useContext(ResponsiveContext);
-  const isMobile = !isMinSize(size, 'medium');
-  const appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
+  const isMobile = isMaxSize(size, 'small');
   return (
     <FooterMain>
       <Container noPaddingBottom>
         <Wrapper fill={fill}>
-          <BoxRow
+          <Box
             direction={isMobile ? 'column' : 'row'}
             justify="between"
             border="top"
             align="start"
-            pad={{ top: 'medium' }}
+            pad={{ vertical: 'ms', bottom: 'medium' }}
           >
-            <BoxColumn gap="medium" pad={{ bottom: isMobile ? 'medium' : 'small' }}>
-              <BoxColumn>
-                <FormattedMessage {...messages.disclaimer2} />
-              </BoxColumn>
-              <BoxColumn>
-                <BoxRow>
-                  <Logo src={theme.media.nzGovLogo} alt={appTitle} hasRightPadding />
-                  <Logo src={theme.media.nzJusticeLogo} alt={appTitle} />
-                </BoxRow>
-              </BoxColumn>
-            </BoxColumn>
-            <BoxColumn gap="medium">
-              <BoxColumn>Powered By</BoxColumn>
-              <BoxColumn>
-                <Logo src={theme.media.impactossLogo} alt={intl.formatMessage(messages.project.anchor)} />
-              </BoxColumn>
-            </BoxColumn>
-          </BoxRow>
-          <BoxColumn gap="xsmall">
-            <BoxRow
-              direction={isMobile ? 'column' : 'row'}
-              justify="between"
-              border="top"
-              margin={{ top: 'medium' }}
-              pad={{ top: 'small' }}
+            <Box
+              gap="small"
+              pad={{ bottom: isMobile ? 'medium' : 'none' }}
             >
-              {!isMobile
-                && (
-                  <BoxColumn>
-                    <FooterLink
+              <Box>
+                <FooterNote>
+                  <FormattedMessage {...messages.agencies.note} />
+                </FooterNote>
+              </Box>
+              <Box>
+                <Box
+                  direction="row"
+                  gap="xsmall"
+                  wrap
+                >
+                  {theme.media.agencyLogos.map((src, i) => (
+                    <LogoItemLink
+                      key={i}
+                      href={intl.formatMessage(messages.agencies[`url${i + 1}`])}
+                      title={intl.formatMessage(messages.agencies[`title${i + 1}`])}
                       target="_blank"
-                      href={`mailto:${intl.formatMessage(messages.contact.email)}`}
-                      title={intl.formatMessage(messages.contactUs)}
                     >
-                      <FormattedMessage {...messages.contactUs} />
-                    </FooterLink>
-                  </BoxColumn>
-                )}
-              <BoxColumn>
-                <BoxRow gap="small" align="end">
-                  {isMobile
-                    && (
-                      <FooterLink
-                        target="_blank"
-                        href={`mailto:${intl.formatMessage(messages.contact.email)}`}
-                        title={intl.formatMessage(messages.contactUs)}
-                      >
-                        <FormattedMessage {...messages.contactUs} />
-                      </FooterLink>
-                    )}
-                  {pages && pages.size > 0 && FOOTER.INTERNAL_LINKS && FOOTER.INTERNAL_LINKS.map((pageId) => {
+                      <Logo src={src} alt={intl.formatMessage(messages.agencies[`title${i + 1}`])} />
+                    </LogoItemLink>
+                  ))}
+                </Box>
+              </Box>
+            </Box>
+            <Box
+              gap="small"
+              border={isMobile ? 'top' : false}
+              pad={isMobile ? { top: 'medium' } : 'none'}
+              align={isMobile ? 'start' : 'end'}
+              fill={isMobile ? 'horizontal' : false}
+            >
+              <Box>
+                <FooterNote>
+                  <FormattedMessage {...messages.project.text} />
+                </FooterNote>
+              </Box>
+              <Box>
+                <LogoItemLink
+                  href={intl.formatMessage(messages.project.url)}
+                  title={intl.formatMessage(messages.project.anchor)}
+                  target="_blank"
+                >
+                  <Logo src={theme.media.impactossLogo} alt={intl.formatMessage(messages.project.anchor)} />
+                </LogoItemLink>
+              </Box>
+            </Box>
+          </Box>
+          <Box gap={isMobile ? 'medium' : 'xsmall'}>
+            {pages && (
+              <Box
+                direction={isMobile ? 'column' : 'row'}
+                justify={isMobile ? 'start' : 'between'}
+                align="start"
+                gap={isMobile ? 'small' : 'none'}
+                border="top"
+                pad={{ top: isMobile ? 'medium' : 'small' }}
+              >
+                <FooterLink
+                  target="_blank"
+                  href={`mailto:${intl.formatMessage(messages.contact.email)}`}
+                  title={intl.formatMessage(messages.contactUs)}
+                >
+                  <FormattedMessage {...messages.contactUs} />
+                </FooterLink>
+                <Box
+                  direction={isMobile ? 'column' : 'row'}
+                  gap="small"
+                  align={isMobile ? 'start' : 'end'}
+                >
+                  {pages.size > 0 && FOOTER.INTERNAL_LINKS && FOOTER.INTERNAL_LINKS.map((pageId) => {
                     const page = pages.find((p) => qe(p.get('id'), pageId));
                     return page
                       ? (
@@ -162,17 +194,18 @@ const Footer = ({
                   >
                     <FormattedMessage {...messages.govLinkAnchor} />
                   </FooterLink>
-                </BoxRow>
-              </BoxColumn>
-            </BoxRow>
-            <BoxRow>
-              <BoxColumn>
-                <Text size="xxxsmall">
-                  {`${intl.formatMessage(appMessages.app.title)}: v${VERSION}`}
-                </Text>
-              </BoxColumn>
-            </BoxRow>
-          </BoxColumn>
+                </Box>
+              </Box>
+            )}
+            <Box
+              border={isMobile ? 'top' : false}
+              pad={isMobile ? { top: 'medium' } : 'none'}
+            >
+              <FooterVersion>
+                {`${intl.formatMessage(appMessages.app.title)}: v${VERSION}`}
+              </FooterVersion>
+            </Box>
+          </Box>
         </Wrapper>
       </Container>
     </FooterMain>
