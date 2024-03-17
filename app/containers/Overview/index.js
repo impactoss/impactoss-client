@@ -20,6 +20,7 @@ import {
   selectCurrentFrameworkId,
 } from 'containers/App/selectors';
 import { CONTENT_LIST } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 
 // components
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
@@ -29,6 +30,7 @@ import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
+import SkipContent from 'components/styled/SkipContent';
 
 import Footer from '../Footer';
 
@@ -160,6 +162,12 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
               <Description>
                 <FormattedMessage {...messages.description} />
               </Description>
+              <SkipContent
+                href="#filter-options"
+                title={this.context.intl.formatMessage(appMessages.screenreader.skipToListFilter)}
+              >
+                <FormattedMessage {...appMessages.screenreader.skipToListFilter} />
+              </SkipContent>
               {!dataReady && <Loading />}
               {dataReady && frameworks.size > 1 && (
                 <VerticalDiagram

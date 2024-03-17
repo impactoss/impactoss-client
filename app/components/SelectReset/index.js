@@ -49,7 +49,7 @@ const Reset = styled(ButtonSimple)`
   padding: 0 0.5em 0 0;
   vertical-align: middle;
   color: ${palette('link', 2)};
-  &:hover {
+  &:hover, &:focus {
     color: ${palette('linkHover', 2)};
   }
   margin-right: 20px;
@@ -78,9 +78,9 @@ export class SelectReset extends React.PureComponent { // eslint-disable-line re
     return (
       <Styled hidePrint={hidePrint}>
         {label
-          && <Label htmlFor={index}>{ label }</Label>
+          && <Label htmlFor={index}>{label}</Label>
         }
-        { (!isReset || optionActive.value === emptyValue)
+        {(!isReset || optionActive.value === emptyValue)
           && (
             <Select
               id={index}
@@ -88,7 +88,7 @@ export class SelectReset extends React.PureComponent { // eslint-disable-line re
               value={value}
               active={false}
             >
-              { options.map((option, i) => (
+              {options.map((option, i) => (
                 <Option
                   key={i}
                   value={option.value}
@@ -102,7 +102,7 @@ export class SelectReset extends React.PureComponent { // eslint-disable-line re
             </Select>
           )
         }
-        { isReset && optionActive.value !== emptyValue
+        {isReset && optionActive.value !== emptyValue
           && (
             <Reset onClick={() => onChange(emptyValue)}>
               {optionActive.label}

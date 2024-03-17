@@ -9,7 +9,7 @@ const ButtonTagFilterInverse = styled(ButtonTagFilter)`
   padding: 1px 6px;
   border: 1px solid;
   border-color: ${(props) => palette(props.palette, props.pIndex || 0)};
-  &:hover {
+  &:hover, &:focus {
     color: ${(props) => palette(props.paletteHover, props.pIndex || 0)};
     background-color: ${palette('buttonInverseHover', 1)};
   }

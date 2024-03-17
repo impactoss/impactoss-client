@@ -39,7 +39,7 @@ const ListEntitiesHeaderOptionLink = styled(Button)`
     font-weight: 500;
     padding: 0 0.5em;
     color: ${palette('buttonFlat', 0)};
-    &:hover {
+    &:hover, &:focus {
       color: ${palette('buttonFlatHover', 0)};
     }
     &:last-child {
@@ -71,41 +71,41 @@ export class EntityListOptions extends React.Component { // eslint-disable-line 
     } = this.props;
     return (
       <Styled>
-        { groupOptions.size > 0
+        {groupOptions.size > 0
           && (
             <EntityListGroupBy
               value={groupSelectValue}
               options={groupOptions
-              && groupOptions.filter((option) => option.get('value') !== subgroupSelectValue).toJS()
+                && groupOptions.filter((option) => option.get('value') !== subgroupSelectValue).toJS()
               }
               onChange={onGroupSelect}
             />
           )
         }
-        { groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET && subgroupOptions.size > 0
+        {groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET && subgroupOptions.size > 0
           && (
             <EntityListGroupBy
               value={subgroupSelectValue}
               options={subgroupOptions
-              && subgroupOptions.filter((option) => option.get('value') !== groupSelectValue).toJS()
+                && subgroupOptions.filter((option) => option.get('value') !== groupSelectValue).toJS()
               }
               onChange={onSubgroupSelect}
               isSubgroup
             />
           )
         }
-        { (expandable)
+        {(expandable)
           && (
             <ListEntitiesHeaderOptionLink
               onClick={this.props.onExpand}
             >
               {
                 !expanded
-              && <FormattedMessage {...messages.expand} />
+                && <FormattedMessage {...messages.expand} />
               }
               {
                 expanded
-              && <FormattedMessage {...messages.collapse} />
+                && <FormattedMessage {...messages.collapse} />
               }
             </ListEntitiesHeaderOptionLink>
           )

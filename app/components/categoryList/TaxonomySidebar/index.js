@@ -135,7 +135,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
         }
         { (this.state.visible || this.state.viewport >= VIEWPORTS.SMALL)
           && (
-            <Sidebar responsiveSmall>
+            <Sidebar responsiveSmall id="filter-options">
               <Scrollable>
                 <Component>
                   <SidebarHeader responsiveSmall>

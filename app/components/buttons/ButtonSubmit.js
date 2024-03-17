@@ -12,7 +12,7 @@ const ButtonSubmit = styled(ButtonForm)`
     ? palette('buttonDefaultDisabled', 1)
     : palette('buttonDefault', 1)
 };
-  &:hover {
+  &:hover, &:focus {
     background-color: ${(props) => props.disabled
     ? palette('buttonDefaultDisabled', 1)
     : palette('buttonDefaultHover', 1)
