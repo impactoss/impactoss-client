@@ -270,7 +270,7 @@ theme.palette = {
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
   asideListItem: [dark[0], dark[0], primary[4], light[0], light[0]],
-  asideListItemHover: [dark[0], dark[0], light[2], light[2], light[0]],
+  asideListItemHover: [dark[0], dark[0], light[2], light[1], light[0]],
 
   // asideHeader: [#color, '#bg',]
   asideListGroup: [dark[1], light[0]],
@@ -302,7 +302,7 @@ theme.palette = {
   buttonDefaultDisabled: [light[0], dark[3]], // with background disabled
   // buttonPrimary: ['#text', '#bg', '#border'],
   buttonDefaultIconOnly: [primary[4], primary[0], primary[2]], // with background, without text
-  buttonDefaultIconOnlyHover: [primary[4], primary[0], primary[0]],
+  buttonDefaultIconOnlyHover: [primary[4], primary[1], primary[0]],
   // buttonSecondary: ['#text', '#bg'],
   // buttonSecondary: [secondary[4], secondary[1]],
   // buttonSecondaryHover: [secondary[4], secondary[0]],

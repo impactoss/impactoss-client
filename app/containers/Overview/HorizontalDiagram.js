@@ -184,7 +184,7 @@ const DiagramButtonWrap = styled.div`
 
 const DiagramButton = styled(Button)`
   background-color: ${(props) => palette(props.paletteDefault, 0)};
-  &:hover {
+  &:hover, &:focus {
     background-color: ${(props) => palette(props.paletteHover, 0)};
   }
   color: ${(props) => props.fontColor ? palette(props.fontColor, props.fontColorIndex) : palette('primary', 4)};
@@ -207,7 +207,7 @@ const DiagramButton = styled(Button)`
 
 const DiagramButtonMain = styled(DiagramButton)`
   background-color: ${(props) => palette(props.paletteDefault, 0)};
-  &:hover {
+  &:hover, &:focus {
     background-color: ${(props) => palette(props.paletteHover, 0)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {

@@ -37,7 +37,7 @@ const ButtonTagCategory = styled(Button)`
   font-size: 0.85em;
   cursor:${(props) => props.disabled ? 'default' : 'pointer'};
   border: 1px solid ${(props) => getColor(props)};
-  &:hover {
+  &:hover, &:focus {
     color: ${(props) => getFontColor(props)};
     background-color: ${(props) => getColor(props, true)};
     border-color: ${(props) => getColor(props, true)};

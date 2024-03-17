@@ -58,7 +58,7 @@ const EntityListItemMainTitleWrap = styled.a`
   padding: 6px 15px 8px 0;
   margin-top: 15px;
   color: ${palette('mainListItem', 0)};
-  &:hover {
+  &:hover, &:focus {
     color: ${palette('mainListItemHover', 0)};
   }
   @media print {

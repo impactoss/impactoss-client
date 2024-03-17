@@ -30,6 +30,10 @@ const Count = styled.span`
   text-align: center;
   line-height: 1.7;
   padding: 0 0.25em;
+  &:hover, &:focus {
+    background-color: ${({ paletteDefault, paletteDefaultIndex }) => palette(`${paletteDefault}Hover`, paletteDefaultIndex)};
+    border: 1px solid ${({ paletteDefault, paletteDefaultIndex }) => palette(`${paletteDefault}Hover`, paletteDefaultIndex)};
+  }
   @media print {
     color: ${palette('text', 1)};
     background: transparent;
@@ -141,7 +145,7 @@ const ListItem = styled.div`
 
 const ListItemLink = styled(Link)`
   color: ${palette('mainListItem', 0)};
-  &:hover {
+  &:hover, &:focus {
     color: ${palette('mainListItemHover', 0)};
   }
 `;
