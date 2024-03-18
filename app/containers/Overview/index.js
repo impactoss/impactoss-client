@@ -164,9 +164,9 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
               </Description>
               <SkipContent
                 href="#filter-options"
-                title={this.context.intl.formatMessage(appMessages.screenreader.skipToListFilter)}
+                title={this.context.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
               >
-                <FormattedMessage {...appMessages.screenreader.skipToListFilter} />
+                <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
               </SkipContent>
               {!dataReady && <Loading />}
               {dataReady && frameworks.size > 1 && (

@@ -28,6 +28,7 @@ import appMessages from 'containers/App/messages';
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
 import Content from 'components/styled/Content';
+import SkipContent from 'components/styled/SkipContent';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
@@ -164,6 +165,12 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
               {contentDescription
                 && <Description>{contentDescription}</Description>
               }
+              <SkipContent
+                href="#filter-options"
+                title={this.context.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
+              >
+                <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
+              </SkipContent>
               {!dataReady
                 && <Loading />
               }

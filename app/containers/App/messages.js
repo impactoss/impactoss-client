@@ -1566,5 +1566,13 @@ export default defineMessages({
       id: 'app.containers.App.screenreader.skipToListFilter',
       defaultMessage: 'Skip to list filter options',
     },
+    skipToListFilterEdit: {
+      id: 'app.containers.App.screenreader.skipToListFilterEdit',
+      defaultMessage: 'Skip to list filter and batch edit options',
+    },
+    skipToCategorySelect: {
+      id: 'app.containers.App.screenreader.skipToCategorySelect',
+      defaultMessage: 'Skip to category group options',
+    },
   },
 });

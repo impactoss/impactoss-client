@@ -21,9 +21,13 @@ const Styled = styled.button`
   display: block;
   margin-bottom: 2px;
   line-height: 1.428571429;
-  &:hover {
+  &:hover, &:focus-visible {
     color: ${palette('mainListItemHover', 0)};
     background-color: ${palette('mainListItemHover', 1)};
+  }
+  &:focus-visible {
+    outline: 2px solid ${({ subtle }) => (subtle ? palette('buttonFlat', 0) : palette('buttonFlatHover', 0))};
+    outline-offset: 0px;
   }
   @media print {
     padding: 1em 0;
