@@ -208,7 +208,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
           paletteDefault={draft ? 'buttonInverse' : option.style}
           paletteDefaultIndex={draft ? 1 : 0}
           fontColor={`${option.style}ConnectionText`}
-          fontColorIndex={draft ? 0 : 1}
+          fontColorIndex={draft ? 1 : 0}
         >
           {entitiesTotal}
         </Count>
