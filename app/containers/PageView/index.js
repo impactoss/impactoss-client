@@ -20,7 +20,6 @@ import {
 
 import { ROUTES, CONTENT_PAGE } from 'containers/App/constants';
 
-import Footer from 'containers/Footer';
 import Loading from 'components/Loading';
 import Container from 'components/styled/Container';
 import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
@@ -157,7 +156,6 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
               )
             }
           </ViewContainer>
-          <Footer />
         </Styled>
       </div>
     );
