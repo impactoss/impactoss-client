@@ -44,11 +44,12 @@ const Search = styled.div`
 const SearchInput = styled(DebounceInput)`
   padding: 10px;
   padding-left: 16px;
-  &:focus {
-    border-radius: 100px 0px 0px 100px;
-  }
   flex: 1;
   font-size: 0.85em;
+  &:focus-visible {
+    border-radius: ${({ hasFilters }) => !hasFilters ? '100px 0px 0px 100px' : 'none'};
+    outline: 2px solid ${palette('primary', 0)};
+  }
   @media print {
     display: none;
   }
@@ -62,8 +63,12 @@ const ButtonTagSearch = styled(Button)`
   padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
   color: ${palette('dark', 1)};
   background-color: ${palette('background', 4)};
-  &:hover, &:focus {
+  &:hover, &:focus-visible {
     color: ${palette('primary', 0)};
+  }
+  &:focus-visible {
+    border-radius: ${({ isSearchIcon }) => isSearchIcon ? '0px 100px 100px 0px' : 'none'};
+    outline: 2px solid ${palette('primary', 0)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 10px 16px;
@@ -259,6 +264,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
           minLength={1}
           debounceTimeout={500}
           value={searchQuery || ''}
+          hasFilters={hasFilters}
           onChange={(e) => onSearch(e.target.value)}
           onFocus={() => this.setState({ active: true })}
           onBlur={() => this.setState({ active: false })}
@@ -294,6 +300,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
           as="a"
           href={`#${resultsId}`}
           title={this.context.intl.formatMessage(messages.skipToResults)}
+          isSearchIcon
         >
           <Icon name="search" size="1em" />
         </ButtonTagSearch>

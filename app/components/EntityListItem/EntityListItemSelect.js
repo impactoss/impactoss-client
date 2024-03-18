@@ -18,7 +18,10 @@ const Select = styled(PrintHide)`
   }
 `;
 const Input = styled.input`
-accent-color: ${palette('checkbox', 0)};
+  accent-color: ${palette('checkbox', 0)};
+  &:focus-visible {
+    outline: 1px solid ${palette('primary', 0)};
+  }
 `;
 
 export default class EntityListItemSelect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

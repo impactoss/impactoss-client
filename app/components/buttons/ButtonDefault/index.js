@@ -34,7 +34,7 @@ const ButtonDefault = styled(Button)`
   border-radius: 999px;
   padding: 0.5em 1.75em;
   cursor: ${(props) => props.disabled ? 'default' : 'pointer'};
-  &:hover, &:focus {
+  &:hover, &:focus-visible {
     color: ${(props) => props.inactive
     ? palette('buttonToggleInactiveHover', 0)
     : palette('buttonDefaultHover', 0)

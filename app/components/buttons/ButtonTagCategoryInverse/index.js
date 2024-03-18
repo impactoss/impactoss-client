@@ -13,7 +13,7 @@ const ButtonTagCategoryInverse = styled(Button)`
   font-size: 0.85em;
   border: 2px solid ${(props) => palette('taxonomies', props.taxId || 0)};
   cursor:${(props) => props.disabled ? 'default' : 'pointer'};
-  &:hover, &:focus {
+  &:hover, &:focus-visible {
     background-color: ${palette('buttonInverseHover', 1)};
     color: ${(props) => props.disabled
     ? palette('dark', 2)

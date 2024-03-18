@@ -39,8 +39,12 @@ const ListEntitiesHeaderOptionLink = styled(Button)`
     font-weight: 500;
     padding: 0 0.5em;
     color: ${palette('buttonFlat', 0)};
-    &:hover, &:focus {
+    &:hover, &:focus-visible {
       color: ${palette('buttonFlatHover', 0)};
+    }
+    &:focus-visible {
+      outline: none;
+      text-decoration: underline;
     }
     &:last-child {
       padding: 0 0 0 0.5em;

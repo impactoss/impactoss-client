@@ -27,10 +27,11 @@ const Styled = styled(Button)`
   color: ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
   background-color: ${(props) => props.active ? palette('asideListItem', 3) : palette('asideListItem', 2)};
   border-bottom: 1px solid ${palette('asideListItem', 4)};
-  &:hover, &:focus {
+  &:hover, &:focus-visible {
     color: ${(props) => props.active ? palette('taxonomiesHover', 1) : palette('asideListItemHover', 0)};
     background-color: ${(props) => props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2)};
     border-bottom-color: ${palette('asideListItemHover', 4)};
+    outline: none;
   }
   &:last-child {
     border-bottom: 0;

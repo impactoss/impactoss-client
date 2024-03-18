@@ -149,9 +149,12 @@ const CategorisedIcon = styled.a`
   color: ${(props) => props.active ? palette('taxonomiesTextColor', props.paletteId) : palette('text', 1)};
   background-color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : 'transparent'};
   border-radius: 4px;
-  &:hover, &:focus {
+  &:hover, &:focus-visible {
     color: ${(props) => palette('taxonomiesTextColor', props.paletteId)};
     background-color: ${(props) => palette('taxonomies', props.paletteId)};
+  }
+  &:focus-visible {
+    outline: 2px solid ${(props) => palette('taxonomies', props.paletteId)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 1px;
@@ -184,14 +187,18 @@ const DiagramButtonWrap = styled.div`
 
 const DiagramButton = styled(Button)`
   background-color: ${(props) => palette(props.paletteDefault, 0)};
-  &:hover, &:focus {
-    background-color: ${(props) => palette(props.paletteHover, 0)};
-  }
   color: ${(props) => props.fontColor ? palette(props.fontColor, props.fontColorIndex) : palette('primary', 4)};
   padding: 0.4em 0.5em 0.75em;
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   font-size: 0.8em;
   border-radius: 10px;
+
+  &:hover, &:focus-visible {
+    background-color: ${(props) => palette(props.paletteHover, 0)};
+  }
+  &:focus-visible {
+    outline: 2px solid ${(props) => palette(props.paletteHover, 0)};
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     border-radius: 999px;
     font-weight: bold;
@@ -207,8 +214,11 @@ const DiagramButton = styled(Button)`
 
 const DiagramButtonMain = styled(DiagramButton)`
   background-color: ${(props) => palette(props.paletteDefault, 0)};
-  &:hover, &:focus {
+  &:hover, &:focus-visible {
     background-color: ${(props) => palette(props.paletteHover, 0)};
+  }
+  &:focus-visible {
+    outline: 2px solid ${(props) => palette(props.paletteHover, 0)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0.4em 0.75em 1em;

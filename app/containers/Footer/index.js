@@ -37,8 +37,12 @@ const FooterLink = styled(A)`
   font-weight: 600;
   font-size: ${({ theme }) => theme.text.xsmall.size};
   color: ${palette('dark', 1)};
-  &:hover {
-    color: ${palette('dark', 2)};
+  &:hover, &:focus-visible {
+    color: ${palette('primary', 0)};
+  }
+  &:focus-visible {
+    text-decoration: underline;
+    outline: none;
   }
 `;
 

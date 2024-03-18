@@ -19,8 +19,11 @@ margin-top: 10px;
 
 const ListEntitiesGroupHeaderLink = styled(Link)`
   color: ${palette('link', 2)};
-  &:hover, &:focus {
+  &:hover, &:focus-visible {
     color: ${palette('linkHover', 2)};
+  }
+  &:focus-visible {
+    text-decoration: underline;
   }
 `;
 

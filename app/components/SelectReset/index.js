@@ -32,6 +32,10 @@ const Select = styled.select`
   vertical-align: middle;
   display: inline-block;
   cursor: pointer;
+  &:focus-visible {
+    border-radius: 2px;
+    outline: 2px solid ${palette('linkHover', 2)};
+  }
   @media print {
     appearance: none;
     text-overflow: '';
@@ -46,16 +50,17 @@ const Option = styled.option`
   background-color: ${(props) => props.active && (!props.isPlaceholder) ? palette('primary', 1) : palette('background', 0)};
 `;
 const Reset = styled(ButtonSimple)`
-  padding: 0 0.5em 0 0;
   vertical-align: middle;
   color: ${palette('link', 2)};
-  &:hover, &:focus {
+  margin-right: 20px;
+  font-weight: 500; 
+
+  &:hover, &:focus-visible {
     color: ${palette('linkHover', 2)};
   }
-  margin-right: 20px;
-  font-weight: 500;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: 0 0.5em 0 0;
+  &:focus-visible {
+    border-radius: 2px;
+    outline: 2px solid ${palette('linkHover', 2)};
   }
   @media print {
     font-size: ${(props) => props.theme.sizes.print.small};

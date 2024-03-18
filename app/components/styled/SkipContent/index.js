@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 const SkipContent = styled.a`
   position: absolute;
@@ -9,7 +10,7 @@ const SkipContent = styled.a`
   width: 1px;
   height: 1px;
 
-  &:focus {
+  &:focus-visible {
     opacity: 1;
     left: 0;
     width: auto;
@@ -17,6 +18,10 @@ const SkipContent = styled.a`
     background-color: #fff;
     z-index: 99999;
     box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+    color: ${palette('primary', 0)};
+    border-radius: 2px;
+    outline: 1px solid ${palette('primary', 0)};
+    outline-offset: 0px;
   }
 }`;
 
