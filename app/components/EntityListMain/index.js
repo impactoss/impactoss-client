@@ -253,13 +253,18 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                       onDismissAllErrors();
                     }}
                   />
+                  <SkipContent
+                    href="#filter-options"
+                    title={this.context.intl.formatMessage(appMessages.screenreader[
+                      isManager ? 'skipToListFilterEdit' : 'skipToListFilter'])}
+                  >
+                    <FormattedMessage
+                      {...appMessages.screenreader[
+                        isManager ? 'skipToListFilterEdit' : 'skipToListFilter'
+                      ]}
+                    />
+                  </SkipContent>
                 </EntityListSearch>
-                <SkipContent
-                  href="#filter-options"
-                  title={this.context.intl.formatMessage(appMessages.screenreader.skipToListFilter)}
-                >
-                  <FormattedMessage {...appMessages.screenreader.skipToListFilter} />
-                </SkipContent>
                 <EntityListOptions
                   groupOptions={getGroupOptions(taxonomies, intl)}
                   subgroupOptions={getGroupOptions(taxonomies, intl)}
