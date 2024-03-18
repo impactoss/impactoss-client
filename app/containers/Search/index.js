@@ -310,7 +310,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                 </div>
               )}
             </Content>
-            <Footer />
+            <Footer fill />
           </Container>
         </ContainerWrapper>
       </div>
