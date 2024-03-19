@@ -162,15 +162,17 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 title={contentTitle}
                 buttons={buttons}
               />
-              {contentDescription
-                && <Description>{contentDescription}</Description>
-              }
-              <SkipContent
-                href="#filter-options"
-                title={this.context.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
-              >
-                <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
-              </SkipContent>
+              <div style={{ position: 'relative' }}>
+                {contentDescription
+                  && <Description>{contentDescription}</Description>
+                }
+                <SkipContent
+                  href="#sidebar-taxonomy-options"
+                  title={this.context.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
+                >
+                  <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
+                </SkipContent>
+              </div>
               {!dataReady
                 && <Loading />
               }

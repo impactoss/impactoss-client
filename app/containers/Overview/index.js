@@ -159,15 +159,17 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 supTitle={intl.formatMessage(messages.supTitle)}
                 title={intl.formatMessage(messages.title)}
               />
-              <Description>
-                <FormattedMessage {...messages.description} />
-              </Description>
-              <SkipContent
-                href="#filter-options"
-                title={this.context.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
-              >
-                <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
-              </SkipContent>
+              <div style={{ position: 'relative' }}>
+                <Description>
+                  <FormattedMessage {...messages.description} />
+                </Description>
+                <SkipContent
+                  href="#sidebar-taxonomy-options"
+                  title={this.context.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
+                >
+                  <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
+                </SkipContent>
+              </div>
               {!dataReady && <Loading />}
               {dataReady && frameworks.size > 1 && (
                 <VerticalDiagram
