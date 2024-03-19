@@ -10,6 +10,7 @@ import { find } from 'lodash/collection';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 import ScreenReaderHide from 'components/styled/ScreenReaderHide';
 import ButtonSimple from 'components/buttons/ButtonSimple';
 import Icon from 'components/Icon';
@@ -81,14 +82,20 @@ export class SelectReset extends React.PureComponent { // eslint-disable-line re
       isReset,
       index,
       hidePrint,
+      labelScreenreaderOnly,
     } = this.props;
     const { intl } = this.context;
     const optionActive = find(options, (option) => option.value === value);
     return (
       <Styled hidePrint={hidePrint}>
-        {label
-          && <Label htmlFor={index}>{label}</Label>
-        }
+        {(label || labelScreenreaderOnly) && (
+          <Label htmlFor={index}>
+            {label || ''}
+            {labelScreenreaderOnly && (
+              <ScreenReaderOnly>{labelScreenreaderOnly}</ScreenReaderOnly>
+            )}
+          </Label>
+        )}
         {(!isReset || optionActive.value === emptyValue) && (
           <Select
             id={index}
@@ -109,20 +116,18 @@ export class SelectReset extends React.PureComponent { // eslint-disable-line re
             ))}
           </Select>
         )}
-        {isReset && optionActive.value !== emptyValue
-          && (
-            <Reset
-              id={index}
-              onClick={() => onChange(emptyValue)}
-              title={intl.formatMessage(messages.resetTitle, { label: optionActive.label })}
-            >
-              <ScreenReaderHide>
-                {optionActive.label}
-              </ScreenReaderHide>
-              <Icon name="removeSmall" text textRight hidePrint />
-            </Reset>
-          )
-        }
+        {isReset && optionActive.value !== emptyValue && (
+          <Reset
+            id={index}
+            onClick={() => onChange(emptyValue)}
+            title={intl.formatMessage(messages.resetTitle, { label: optionActive.label })}
+          >
+            <ScreenReaderHide>
+              {optionActive.label}
+            </ScreenReaderHide>
+            <Icon name="removeSmall" text textRight hidePrint />
+          </Reset>
+        )}
       </Styled>
     );
   }
@@ -132,6 +137,7 @@ SelectReset.propTypes = {
   value: PropTypes.string,
   emptyValue: PropTypes.string,
   label: PropTypes.string,
+  labelScreenreaderOnly: PropTypes.string,
   index: PropTypes.string,
   options: PropTypes.array,
   onChange: PropTypes.func,
