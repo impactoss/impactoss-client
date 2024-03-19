@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { map } from 'lodash/collection';
 
+import asArray from 'utils/as-array';
+
 import ButtonDefault from 'components/buttons/ButtonDefault';
 import Icon from 'components/Icon';
 
@@ -88,10 +90,24 @@ class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line
     return '';
   }
 
+  renderButtonTitle = (title) => asArray(title).reduce((memo, label) => {
+    let value = '';
+    if (
+      typeof label === 'object'
+      && label.title
+    ) {
+      value = label.title;
+    } else if (typeof label === 'string') {
+      value = label;
+    }
+    return memo === '' ? value : `${memo} ${value}`;
+  }, '');
+
   render() {
     const {
       icon, title, onClick, iconRight, fullWidth, disabled, inactive, align, strong, border, outline,
     } = this.props;
+
     return (
       <Button
         onClick={onClick}
@@ -100,7 +116,7 @@ class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line
         inactive={inactive}
         align={align}
         strong={strong}
-        title={title}
+        title={this.renderButtonTitle(title)}
         border={border}
         outline={outline}
       >

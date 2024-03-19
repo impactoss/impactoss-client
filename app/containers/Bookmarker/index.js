@@ -12,6 +12,8 @@ import { selectReady, selectLocation, selectEntities } from 'containers/App/sele
 import Icon from 'components/Icon';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 
+import messages from './messages';
+
 import BookmarkForm from './BookmarkForm';
 import { DEPENDENCIES } from './constants';
 import { selectBookmarkForLocation } from './selectors';
@@ -55,11 +57,17 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
       type,
     } = this.props;
 
+    const { intl } = this.context;
+
     if (dataReady) {
       return (
         <BookmarkerContainer>
           <ButtonFlatIconOnly
             subtle
+            title={bookmark
+              ? intl.formatMessage(messages.editBookmark)
+              : intl.formatMessage(messages.newBookmark)
+            }
             onClick={
               () => {
                 if (!bookmark) {
@@ -129,6 +137,10 @@ Bookmarker.propTypes = {
   location: PropTypes.object,
   viewTitle: PropTypes.string,
   type: PropTypes.string,
+};
+
+Bookmarker.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({

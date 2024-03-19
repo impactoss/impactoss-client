@@ -183,6 +183,10 @@ export default defineMessages({
       id: 'app.containers.App.buttons.import',
       defaultMessage: 'Import',
     },
+    importTitle: {
+      id: 'app.containers.App.buttons.importTitle',
+      defaultMessage: 'Import multiple {type}',
+    },
     printTitle: {
       id: 'app.containers.App.buttons.printTitle',
       defaultMessage: 'Print current view or save as PDF',

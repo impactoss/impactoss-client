@@ -38,4 +38,8 @@ export default defineMessages({
     id: 'app.containers.EntityList.type_delete',
     defaultMessage: 'deletion(s)',
   },
+  downloadCSV: {
+    id: 'app.containers.EntityList.downloadCSV',
+    defaultMessage: 'Export current list items as CSV',
+  },
 });

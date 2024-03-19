@@ -1,12 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl, intlShape } from 'react-intl';
-import { ResponsiveContext } from 'grommet';
 
 import Icon from 'components/Icon';
 import appMessages from 'containers/App/messages';
-import asArray from 'utils/as-array';
-import { isMinSize } from 'utils/responsive';
 
 import ButtonDefaultWithIcon from '../ButtonDefaultWithIcon';
 import ButtonDefault from '../ButtonDefault';
@@ -18,20 +15,7 @@ import ButtonFlatIconOnly from '../ButtonFlatIconOnly';
 import Bookmarker from '../../../containers/Bookmarker';
 
 const ButtonFactory = ({ button, intl }) => {
-  const size = React.useContext(ResponsiveContext);
-  const title = button.title && asArray(button.title).reduce((memo, label) => {
-    let value = '';
-    if (
-      typeof label === 'object'
-      && label.title
-      && (!label.hiddenSmall || isMinSize(size, 'medium'))
-    ) {
-      value = label.title;
-    } else if (typeof label === 'string') {
-      value = label;
-    }
-    return memo === '' ? value : `${memo} ${value}`;
-  }, '');
+  const { title } = button;
   switch (button.type) {
     case 'primary':
       return (
@@ -39,6 +23,7 @@ const ButtonFactory = ({ button, intl }) => {
           onClick={button.onClick && (() => button.onClick())}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
+          title={button.buttonTitle || title}
         >
           {title}
         </ButtonDefault>
@@ -49,6 +34,7 @@ const ButtonFactory = ({ button, intl }) => {
           onClick={button.onClick && (() => button.onClick())}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
+          title={button.buttonTitle || title}
         >
           {title}
         </ButtonSubmit>
@@ -60,7 +46,7 @@ const ButtonFactory = ({ button, intl }) => {
           icon="add"
           strong
           type={button.submit ? 'submit' : 'button'}
-          title={title || intl.formatMessage(appMessages.buttons.add)}
+          title={button.title || intl.formatMessage(appMessages.buttons.add)}
           disabled={button.disabled}
         />
       );
@@ -83,6 +69,7 @@ const ButtonFactory = ({ button, intl }) => {
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
+          title={button.buttonTitle || title || intl.formatMessage(appMessages.buttons.save)}
         >
           {title || intl.formatMessage(appMessages.buttons.save)}
         </ButtonFlat>
@@ -93,6 +80,7 @@ const ButtonFactory = ({ button, intl }) => {
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
+          title={button.buttonTitle || title || intl.formatMessage(appMessages.buttons.cancel)}
         >
           {title || intl.formatMessage(appMessages.buttons.cancel)}
         </ButtonFlat>
@@ -103,6 +91,7 @@ const ButtonFactory = ({ button, intl }) => {
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
+          title={button.buttonTitle || title || intl.formatMessage(appMessages.buttons.edit)}
         >
           {title || intl.formatMessage(appMessages.buttons.edit)}
         </ButtonFlat>
@@ -124,6 +113,7 @@ const ButtonFactory = ({ button, intl }) => {
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
+          title={button.buttonTitle || title || intl.formatMessage(appMessages.buttons.close)}
           inForm
         >
           {title || intl.formatMessage(appMessages.buttons.close)}
@@ -136,12 +126,13 @@ const ButtonFactory = ({ button, intl }) => {
           primary
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
+          title={button.buttonTitle || title}
         >
           {title}
         </ButtonFlat>
       );
     case 'bookmarker':
-      return <Bookmarker viewTitle={button.title} type={button.entityType} />;
+      return <Bookmarker type={button.entityType} />;
     case 'download':
     case 'icon':
       return (
@@ -162,6 +153,7 @@ const ButtonFactory = ({ button, intl }) => {
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
+          title={button.buttonTitle || title}
         >
           {title}
         </ButtonFlat>
