@@ -6,7 +6,7 @@ import Icon from 'components/Icon';
 import ColumnHeader from 'components/styled/ColumnHeader';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 import PrintHide from 'components/styled/PrintHide';
-
+import messages from './messages';
 
 const Styled = styled(ColumnHeader)`
   display: none;
@@ -53,6 +53,7 @@ class ColumnExpand extends React.PureComponent { // eslint-disable-line react/pr
     const {
       isExpand, label, width, onExpand,
     } = this.props;
+    const { intl } = this.context;
     return (
       <Styled colWidth={width * 100}>
         <Wrapper>
@@ -60,13 +61,13 @@ class ColumnExpand extends React.PureComponent { // eslint-disable-line react/pr
           <ExpandWrapper>
             <ExpandButton
               onClick={onExpand}
+              title={isExpand
+                ? intl.formatMessage(messages.collapseColumn, { label })
+                : intl.formatMessage(messages.expandColumn, { label })
+              }
             >
-              {isExpand
-                && <Icon name="columnCollapse" />
-              }
-              {!isExpand
-                && <Icon name="columnExpand" />
-              }
+              {isExpand && <Icon name="columnCollapse" />}
+              {!isExpand && <Icon name="columnExpand" />}
             </ExpandButton>
           </ExpandWrapper>
         </Wrapper>
@@ -82,6 +83,9 @@ ColumnExpand.propTypes = {
 };
 ColumnExpand.defaultProps = {
   label: 'label',
+};
+ColumnExpand.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default ColumnExpand;

@@ -69,7 +69,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       headerOptions.actions.push({
         type: 'icon',
         onClick: () => window.print(),
-        title: 'Print',
+        title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
     }
@@ -82,6 +82,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       headerOptions.actionsAdmin.push({
         type: 'text',
         title: intl.formatMessage(appMessages.buttons.import),
+        buttonTitle: intl.formatMessage(appMessages.buttons.importTitle, { type: intl.formatMessage(appMessages.entities.measures.plural) }),
         onClick: () => this.props.handleImport(),
       });
       headerOptions.actionsAdmin.push({

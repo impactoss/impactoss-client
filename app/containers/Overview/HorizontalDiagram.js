@@ -19,6 +19,7 @@ import appMessages from 'containers/App/messages';
 // components
 import Button from 'components/buttons/Button';
 import Icon from 'components/Icon';
+import ScreenReaderHide from 'components/styled/ScreenReaderHide';
 
 // relative
 import messages from './messages';
@@ -145,17 +146,20 @@ const CategorisedIcons = styled.div``;
 
 const CategorisedIcon = styled.a`
   display: inline-block;
-  padding: 0;
+  padding: 6px;
   color: ${(props) => props.active ? palette('taxonomiesTextColor', props.paletteId) : palette('text', 1)};
   background-color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : 'transparent'};
   border-radius: 4px;
-  &:hover {
+  &:hover, &:focus-visible {
     color: ${(props) => palette('taxonomiesTextColor', props.paletteId)};
     background-color: ${(props) => palette('taxonomies', props.paletteId)};
   }
+  &:focus-visible {
+    outline: 2px solid ${(props) => palette('taxonomies', props.paletteId)};
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: 0 1px;
-    margin: 0 1px;
+    padding: 1px;
+    margin: 1px;
   }
 `;
 // color: ${(props) => props.active ? palette('primary', 0) : palette('dark', 3)};
@@ -184,14 +188,18 @@ const DiagramButtonWrap = styled.div`
 
 const DiagramButton = styled(Button)`
   background-color: ${(props) => palette(props.paletteDefault, 0)};
-  &:hover {
-    background-color: ${(props) => palette(props.paletteHover, 0)};
-  }
   color: ${(props) => props.fontColor ? palette(props.fontColor, props.fontColorIndex) : palette('primary', 4)};
   padding: 0.4em 0.5em 0.75em;
   box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
   font-size: 0.8em;
   border-radius: 10px;
+
+  &:hover, &:focus-visible {
+    background-color: ${(props) => palette(props.paletteHover, 0)};
+  }
+  &:focus-visible {
+    outline: 2px solid ${(props) => palette(props.paletteHover, 0)};
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     border-radius: 999px;
     font-weight: bold;
@@ -207,8 +215,11 @@ const DiagramButton = styled(Button)`
 
 const DiagramButtonMain = styled(DiagramButton)`
   background-color: ${(props) => palette(props.paletteDefault, 0)};
-  &:hover {
+  &:hover, &:focus-visible {
     background-color: ${(props) => palette(props.paletteHover, 0)};
+  }
+  &:focus-visible {
+    outline: 2px solid ${(props) => palette(props.paletteHover, 0)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0.4em 0.75em 1em;
@@ -451,11 +462,14 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
           onMouseOut={() => onTaxonomyIconMouseOver(tax.get('id'), false)}
           onBlur={() => onTaxonomyIconMouseOver(tax.get('id'), false)}
           active={activeTaxonomyId === tax.get('id')}
-          title={this.context.intl.formatMessage(appMessages.entities.taxonomies[tax.get('id')].plural)}
+          title={this.context.intl.formatMessage(
+            messages.buttons.titleCategoryIcon,
+            { label: this.context.intl.formatMessage(appMessages.entities.taxonomies[tax.get('id')].plural) },
+          )}
         >
           <Icon
             name={`taxonomy_${tax.get('id')}`}
-            size={this.state.viewport < VIEWPORTS.SMALL ? '1.6em' : '2em'}
+            size="24px"
           />
         </CategorisedIcon>
       ))}
@@ -527,35 +541,46 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
     draftCount,
     stateButton,
     onPageLink,
-  }) => (
-    <DiagramButton
-      onClick={() => onPageLink(path)}
-      paletteDefault={paletteDefault}
-      paletteHover={paletteHover}
-      fontColorIndex={fontColorIndex}
-      fontColor={fontColor}
-      ref={(node) => {
-        if (!this.state[stateButton]) {
-          this.setState({ [stateButton]: node });
-        }
-      }}
-    >
-      <DiagramButtonIcon>
-        <Icon name={icon} />
-      </DiagramButtonIcon>
-      <div>
-        {`${count || 0} ${this.context.intl.formatMessage(appMessages.entities[type][count !== 1 ? 'plural' : 'single'])}`}
-      </div>
-      {draftCount > 0 && (
-        <DraftEntities>
-          <FormattedMessage
-            {...messages.buttons.draft}
-            values={{ count: draftCount }}
-          />
-        </DraftEntities>
-      )}
-    </DiagramButton>
-  );
+  }) => {
+    const { intl } = this.context;
+    const label = `${count || 0} ${intl.formatMessage(appMessages.entities[type][count !== 1 ? 'plural' : 'single'])}`;
+    const labelDraft = draftCount > 0
+      ? intl.formatMessage(messages.buttons.draft, { count: draftCount })
+      : null;
+    return (
+      <DiagramButton
+        onClick={() => onPageLink(path)}
+        paletteDefault={paletteDefault}
+        paletteHover={paletteHover}
+        fontColorIndex={fontColorIndex}
+        fontColor={fontColor}
+        ref={(node) => {
+          if (!this.state[stateButton]) {
+            this.setState({ [stateButton]: node });
+          }
+        }}
+        title={intl.formatMessage(
+          messages.buttons.title,
+          {
+            label,
+            additional: labelDraft,
+          },
+        )}
+      >
+        <ScreenReaderHide>
+          <DiagramButtonIcon>
+            <Icon name={icon} />
+          </DiagramButtonIcon>
+          <div>
+            {label}
+          </div>
+          {draftCount > 0 && (
+            <DraftEntities>{labelDraft}</DraftEntities>
+          )}
+        </ScreenReaderHide>
+      </DiagramButton>
+    );
+  };
 
   renderCategoryIcons = (
     tags,
@@ -616,6 +641,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
     onTaxonomyIconMouseOver,
     mouseOverTaxonomy,
   ) => {
+    const { intl } = this.context;
     let iconSize = '5em';
     if (this.state.viewport === VIEWPORTS.MOBILE) {
       iconSize = null;
@@ -624,6 +650,11 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
       iconSize = '4em';
     }
     const taxonomiesByTagging = taxonomies && this.getTaxonomiesByTagging(taxonomies, 'tags_measures');
+    const header = intl.formatMessage(messages.buttons.measuresTitle);
+    const label = intl.formatMessage(messages.buttons.measuresAdditional, { count: measureCount || '0' });
+    const labelDraft = measureDraftCount > 0
+      ? intl.formatMessage(messages.buttons.draft, { count: measureDraftCount })
+      : null;
     return (
       <DiagramButtonWrap>
         <DiagramButtonMain
@@ -635,23 +666,20 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
               this.setState({ buttonMeasures: node });
             }
           }}
+          title={intl.formatMessage(messages.buttons.title, { label })}
         >
-          <DiagramButtonMainInside>
-            <DiagramButtonIcon>
-              <Icon name="measures" size={iconSize} />
-            </DiagramButtonIcon>
-            <DiagramButtonMainTop>
-              <FormattedMessage {...messages.buttons.measuresTitle} />
-            </DiagramButtonMainTop>
-            <DiagramButtonMainBottom>
-              <FormattedMessage {...messages.buttons.measuresAdditional} values={{ count: measureCount || '0' }} />
-            </DiagramButtonMainBottom>
-            {measureDraftCount > 0 && (
-              <DraftEntities>
-                <FormattedMessage {...messages.buttons.draft} values={{ count: measureDraftCount }} />
-              </DraftEntities>
-            )}
-          </DiagramButtonMainInside>
+          <ScreenReaderHide>
+            <DiagramButtonMainInside>
+              <DiagramButtonIcon>
+                <Icon name="measures" size={iconSize} />
+              </DiagramButtonIcon>
+              <DiagramButtonMainTop>{header}</DiagramButtonMainTop>
+              <DiagramButtonMainBottom>{label}</DiagramButtonMainBottom>
+              {labelDraft && (
+                <DraftEntities>{labelDraft}</DraftEntities>
+              )}
+            </DiagramButtonMainInside>
+          </ScreenReaderHide>
         </DiagramButtonMain>
         {taxonomiesByTagging.size > 0
           && this.renderCategoryIcons(

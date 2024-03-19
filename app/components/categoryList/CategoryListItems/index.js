@@ -14,7 +14,7 @@ import CategoryListItem from 'components/categoryList/CategoryListItem';
 
 import { SORT_ORDER_OPTIONS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
-
+import messages from '../messages';
 const Styled = styled.div`
   position: relative;
 `;
@@ -152,6 +152,15 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     const titleColumnActive = titleColumnSortOption.query === sortOptionActive.query;
     const titleColumnSortOrderOption = SORT_ORDER_OPTIONS.find((option) => (sortOrder || titleColumnSortOption.order) === option.value);
     const headerAttributes = this.getHeaderAttributes(taxonomy, frameworkId, frameworks);
+    let titleColumnSortTitle = intl.formatMessage(messages.titleColumnSortTitle);
+    if (titleColumnActive) {
+      titleColumnSortTitle = intl.formatMessage(messages.titleColumnSortTitleSorted);
+      if (titleColumnSortOrderOption && titleColumnSortOrderOption.value === 'asc') {
+        titleColumnSortTitle = `${titleColumnSortTitle} ${intl.formatMessage(messages.columnSortTitleSortedAsc)}`;
+      } else if (titleColumnSortOrderOption && titleColumnSortOrderOption.value === 'desc') {
+        titleColumnSortTitle = `${titleColumnSortTitle} ${intl.formatMessage(messages.columnSortTitleSortedDesc)}`;
+      }
+    }
     // category title column
     const columns = [
       {
@@ -170,6 +179,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         sortIcon: titleColumnActive && titleColumnSortOrderOption
           ? titleColumnSortOrderOption.icon
           : 'sorting',
+        sortTitle: titleColumnSortTitle,
         onClick: () => {
           if (titleColumnActive) {
             const nextSortOrderOption = SORT_ORDER_OPTIONS.find((option) => titleColumnSortOrderOption.nextValue === option.value);
@@ -187,12 +197,22 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         const columnSortOption = sortOptions.find((option) => option.query === attribute.query);
         const columnActive = columnSortOption.query === sortOptionActive.query;
         const columnSortOrderOption = SORT_ORDER_OPTIONS.find((option) => (sortOrder || columnSortOption.order) === option.value);
+        let numberColumnSortTitle = intl.formatMessage(messages.numberColumnSortTitle, { value: attribute.label });
+        if (columnActive) {
+          numberColumnSortTitle = intl.formatMessage(messages.numberColumnSortTitleSorted, { value: attribute.label });
+          if (columnSortOrderOption && columnSortOrderOption.value === 'asc') {
+            numberColumnSortTitle = `${numberColumnSortTitle} ${intl.formatMessage(messages.columnSortTitleSortedAsc)}`;
+          } else if (columnSortOrderOption && columnSortOrderOption.value === 'desc') {
+            numberColumnSortTitle = `${numberColumnSortTitle} ${intl.formatMessage(messages.columnSortTitleSortedDesc)}`;
+          }
+        }
         return {
           header: attribute.label,
           via: attribute.via,
           active: columnActive,
           width: ((1 - TITLE_COL_RATIO) / headerAttributes.length) * 100,
           keys: attribute.keys,
+          sortTitle: numberColumnSortTitle,
           sortIcon: columnActive && columnSortOrderOption
             ? columnSortOrderOption.icon
             : 'sorting',

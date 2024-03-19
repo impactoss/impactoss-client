@@ -24,9 +24,10 @@ const Styled = styled(Button)`
   border-bottom: 1px solid ${palette('primary', 4)};
   padding: 0.25em 8px 0.25em 16px;
   font-size: 0.9em;
-  &:hover {
+  &:hover, &:focus-visible {
     color: ${palette('asideListGroupHover', 0)};
     background-color: ${palette('asideListGroupHover', 1)};
+    outline: none;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0.25em 8px 0.25em 16px;

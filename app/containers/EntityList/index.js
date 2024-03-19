@@ -179,7 +179,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             return ({
               ...action,
               onClick: () => this.onDownloadClick(),
-              title: 'Download CSV',
+              title: intl.formatMessage(messages.downloadCSV),
               icon: 'download',
             });
           }

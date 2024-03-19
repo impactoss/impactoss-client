@@ -7,7 +7,31 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   selectAll: {
     id: 'app.components.ColumnSelect.selectAll',
-    defaultMessage: 'Select all {number}.',
+    defaultMessage: 'Select all {number} items in list.',
+  },
+  selectAllTitle: {
+    id: 'app.components.ColumnSelect.selectAllTitle',
+    defaultMessage: 'Select all {number} items in list.',
+  },
+  selectAllOnPage: {
+    id: 'app.components.ColumnSelect.selectAllOnPage',
+    defaultMessage: 'Click to select all items on page.',
+  },
+  unselectAll: {
+    id: 'app.components.ColumnSelect.unselectAll',
+    defaultMessage: 'Uncheck to unselect all selected items',
+  },
+  sortSelectLabel: {
+    id: 'app.components.ColumnSelect.sortSelectLabel',
+    defaultMessage: 'Sorted by',
+  },
+  sortOrderAsc: {
+    id: 'app.components.ColumnSelect.sortOrderAsc',
+    defaultMessage: 'Sort order ascending - click to reverse',
+  },
+  sortOrderDesc: {
+    id: 'app.components.ColumnSelect.sortOrderDesc',
+    defaultMessage: 'Sort order descending - click to reverse',
   },
   sortAttributes: {
     id: {

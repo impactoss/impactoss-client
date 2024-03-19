@@ -10,10 +10,13 @@ const ButtonDefaultIconOnly = styled(ButtonDefault)`
   &:active {
     border: 2px solid ${palette('buttonDefaultIconOnly', 2)};
   }
-  &:hover {
+  &:hover, &:focus-visible {
     color: ${palette('buttonDefaultIconOnlyHover', 0)};
     background-color: ${palette('buttonDefaultIconOnlyHover', 1)};
     border-color: ${palette('buttonDefaultIconOnlyHover', 2)};
+  }
+  &:focus-visible {
+    outline: 2px solid  ${palette('buttonDefaultIconOnlyHover', 1)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0;

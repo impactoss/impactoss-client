@@ -19,10 +19,11 @@ const Styled = styled(Button)`
   color:  ${(props) => props.active ? palette('taxonomiesTextColor', props.paletteId) : palette('asideCatNavItem', 0)};
   background-color: ${(props) => props.active ? palette('taxonomies', props.paletteId) : palette('asideCatNavItem', 2)};
   border-bottom: 1px solid ${palette('asideCatNavItem', 4)};
-  &:hover {
+  &:hover, &:focus-visible {
     color: ${(props) => palette('taxonomiesTextColor', props.paletteId)};
     background-color: ${(props) => props.active ? palette('taxonomiesHover', props.paletteId) : palette('taxonomies', props.paletteId)};
     border-bottom-color: ${palette('asideCatNavItemHover', 4)};
+    outline: none;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding:  ${({ small }) => small ? '0.15em 8px 0.15em 32px' : '0.3em 8px 0.3em 12px'};

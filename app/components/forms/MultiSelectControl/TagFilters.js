@@ -22,6 +22,11 @@ const Styled = styled.div`
 // padding: 0.75em 2em;
 const Group = styled(Button)`
   padding: 0 0.5em;
+
+  &:focus-visible {
+    border-radius: 2px;
+    outline: 1px solid ${palette('primary', 0)};
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0 0.5em;
   }

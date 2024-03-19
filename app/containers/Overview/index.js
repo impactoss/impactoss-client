@@ -20,6 +20,7 @@ import {
   selectCurrentFrameworkId,
 } from 'containers/App/selectors';
 import { CONTENT_LIST } from 'containers/App/constants';
+import appMessages from 'containers/App/messages';
 
 // components
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
@@ -29,6 +30,7 @@ import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
+import SkipContent from 'components/styled/SkipContent';
 
 import Footer from '../Footer';
 
@@ -47,7 +49,7 @@ import {
 } from './selectors';
 
 const Content = styled.div`
-  min-height: 80vH; 
+  min-height: 80vH;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0 1em;
   }
@@ -157,9 +159,17 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 supTitle={intl.formatMessage(messages.supTitle)}
                 title={intl.formatMessage(messages.title)}
               />
-              <Description>
-                <FormattedMessage {...messages.description} />
-              </Description>
+              <div style={{ position: 'relative' }}>
+                <Description>
+                  <FormattedMessage {...messages.description} />
+                </Description>
+                <SkipContent
+                  href="#sidebar-taxonomy-options"
+                  title={this.context.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
+                >
+                  <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
+                </SkipContent>
+              </div>
               {!dataReady && <Loading />}
               {dataReady && frameworks.size > 1 && (
                 <VerticalDiagram
@@ -189,7 +199,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 />
               )}
             </Content>
-            <Footer />
+            <Footer fill />
           </Container>
         </ContainerWithSidebar>
         {!dataReady && <EntityListSidebarLoading responsiveSmall />}

@@ -9,7 +9,11 @@ const Styled = styled.div`
   height: 50px;
   max-width: 230px;
 `;
-
+const StyledButton = styled(ButtonDefaultWithIcon)`
+  &:focus-visible {
+    outline-offset: 4px !important;
+  }
+`;
 const ButtonActive = styled.span`
   min-width: 52%;
   position:absolute;
@@ -42,7 +46,7 @@ class ButtonToggle extends React.PureComponent { // eslint-disable-line react/pr
                   left={i === 0}
                   right={i === 1}
                 >
-                  <ButtonDefaultWithIcon
+                  <StyledButton
                     icon={option.icon}
                     iconRight={i !== 0}
                     title={option.label}
@@ -64,7 +68,7 @@ class ButtonToggle extends React.PureComponent { // eslint-disable-line react/pr
                 left={i === 0}
                 right={i === 1}
               >
-                <ButtonDefaultWithIcon
+                <StyledButton
                   icon={option.icon}
                   iconRight={i !== 0}
                   title={option.label}

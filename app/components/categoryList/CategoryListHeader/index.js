@@ -98,15 +98,13 @@ class CategoryListHeader extends React.PureComponent { // eslint-disable-line re
                   <span>{col.by}</span>
                 )}
               </Title>
-              {col.onClick
-                && (
-                  <SortWrapper>
-                    <SortButton onClick={col.onClick}>
-                      <Icon name={col.sortIcon} hidePrint={!col.active} />
-                    </SortButton>
-                  </SortWrapper>
-                )
-              }
+              {col.onClick && (
+                <SortWrapper>
+                  <SortButton onClick={col.onClick} title={col.sortTitle || 'Sort'}>
+                    <Icon name={col.sortIcon} hidePrint={!col.active} />
+                  </SortButton>
+                </SortWrapper>
+              )}
               {col.keys && (
                 <CategoryListKey keys={col.keys} />
               )}
