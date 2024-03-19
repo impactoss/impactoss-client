@@ -39,7 +39,7 @@ const Search = styled.div`
   border: 1px solid ${palette('light', 3)};
   color: ${palette('dark', 1)};
   border-radius: 22px;
-  min-height: ${(props) => props.small ? 30 : 36}px;
+  min-height: ${(props) => props.small ? 30 : 40}px;
   position: relative;
   outline: ${({ hasFocus }) => hasFocus ? 2 : 0}px solid ${palette('primary', 0)};
   cursor: text;
@@ -49,7 +49,7 @@ const Search = styled.div`
     padding: 0;
     display: ${({ hidePrint }) => hidePrint ? 'none' : 'block'};
   }
-  padding: 2px 3px 2px 12px;
+  padding: 4px 4px 4px 12px;
 `;
 const SearchInput = styled((p) => <DebounceInput {...p} />)`
   margin: 2px 0;
@@ -65,20 +65,23 @@ const SearchInput = styled((p) => <DebounceInput {...p} />)`
 const Tags = styled((p) => <Box direction="row" align="center" wrap {...p} />)``;
 
 const ButtonTagSearch = styled(Button)`
-  padding: 6px;
   color: ${palette('dark', 1)};
-  background-color: 'transparent';
-  width: 40px;
-  height: 40px;
+  background-color: transparent;
   border-radius: 999px;
-  cursor: ${({ isDisabled }) => isDisabled ? 'auto' : 'pointer'};
   &:hover, &:focus-visible {
-    color: ${({ isDisabled }) => isDisabled ? palette('dark', 1) : palette('primary', 0)};
-    background-color: ${({ isDisabled }) => isDisabled ? 'transparent' : palette('background', 1)};
-    outline: 0;
+    color: ${palette('primary', 0)};
+    background-color: ${palette('background', 1)};
   }
+  &:focus-visible {
+    outline: 1px solid ${palette('primary', 0)};
+  }
+  width: 30px;
+  height: 30px;
+  padding: 6px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: 10px;
+    width: 36px;
+    height: 36px;
+    padding: 6px;
   }
   @media print {
     display: none;
