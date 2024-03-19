@@ -4,7 +4,7 @@ import { palette } from 'styled-theme';
 import Button from '../Button';
 
 function getTextColor(pIndex) {
-  if (pIndex === 0 || pIndex === 6 || pIndex === 7) {
+  if (pIndex === 6 || pIndex === 7) {
     return palette('dark', 0);
   }
   return palette('text', 2);

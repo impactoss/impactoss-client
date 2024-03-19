@@ -10,6 +10,8 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { reduce } from 'lodash/collection';
+import { Box } from 'grommet';
+
 import appMessage from 'utils/app-message';
 import { lowerCase } from 'utils/string';
 
@@ -28,50 +30,55 @@ const Search = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
+  height: 100%;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
   background-color: ${palette('primary', 3)};
   border: 1px solid ${palette('light', 3)};
   color: ${palette('dark', 1)};
-  border-radius: 100px;
+  border-radius: 22px;
   min-height: ${(props) => props.small ? 30 : 36}px;
   position: relative;
+  outline: ${({ hasFocus }) => hasFocus ? 2 : 0}px solid ${palette('primary', 0)};
+  cursor: text;
   @media print {
     border: none;
     box-shadow: none;
     padding: 0;
     display: ${({ hidePrint }) => hidePrint ? 'none' : 'block'};
   }
+  padding: 2px 3px 2px 12px;
 `;
-const SearchInput = styled(DebounceInput)`
-  padding: 10px;
-  padding-left: 16px;
+const SearchInput = styled((p) => <DebounceInput {...p} />)`
+  margin: 2px 0;
   flex: 1;
   font-size: 0.85em;
-  &:focus-visible {
-    border-radius: ${({ hasFilters }) => !hasFilters ? '100px 0px 0px 100px' : 'none'};
-    outline: 2px solid ${palette('primary', 0)};
+  &:focus-visible, &:focus {
+    outline: 0;
   }
   @media print {
     display: none;
   }
 `;
-const Tags = styled.div`
-  margin-top: 7px;
-  margin-left: 10px;
-`;
+const Tags = styled((p) => <Box direction="row" align="center" wrap {...p} />)``;
 
 const ButtonTagSearch = styled(Button)`
-  padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
+  padding: 6px;
   color: ${palette('dark', 1)};
-  background-color: ${palette('background', 4)};
+  background-color: 'transparent';
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  cursor: ${({ isDisabled }) => isDisabled ? 'auto' : 'pointer'};
   &:hover, &:focus-visible {
-    color: ${palette('primary', 0)};
-  }
-  &:focus-visible {
-    border-radius: ${({ isSearchIcon }) => isSearchIcon ? '0px 100px 100px 0px' : 'none'};
-    outline: 2px solid ${palette('primary', 0)};
+    color: ${({ isDisabled }) => isDisabled ? palette('dark', 1) : palette('primary', 0)};
+    background-color: ${({ isDisabled }) => isDisabled ? 'transparent' : palette('background', 1)};
+    outline: 0;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: 10px 16px;
+    padding: 10px;
   }
   @media print {
     display: none;
@@ -94,11 +101,14 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     super();
     this.state = {
       active: false,
+      hasFocus: false,
     };
   }
 
   componentDidMount() {
-    if (this.input && this.props.focusOnMount) this.input.focus();
+    if (this.input && this.props.focusOnMount) {
+      this.input.focus();
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -157,14 +167,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       searchAttributes,
     } = this.props;
     const { intl } = this.context;
-    // TODO set focus to input when clicking wrapper
-    //  see https://github.com/nkbt/react-debounce-input/issues/65
-    //  https://github.com/yannickcr/eslint-plugin-react/issues/678
-    // for now this works all right thanks to flex layout
-    // onClick={() => {
-    //   this.inputNode.focus()
-    // }}
-    const hasFilters = (searchQuery || filters.length > 0);
+    const searchHasFilters = (searchQuery || filters.length > 0);
     let inputPlaceholder;
     if (placeholder) {
       inputPlaceholder = placeholder;
@@ -202,18 +205,29 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       <Search
         active={this.state.active}
         small={this.props.multiselect}
-        hidePrint={!hasFilters}
+        hidePrint={!searchHasFilters}
+        hasFocus={this.state.hasFocus}
+        onClick={() => this.input && this.input.focus()}
       >
+        <ScreenReaderOnly>
+          <StyledLabel htmlFor={inputId}>
+            {inputPlaceholder}
+          </StyledLabel>
+        </ScreenReaderOnly>
         {filters.length > 0 && (
           <LabelPrint>
             <FormattedMessage {...messages.labelPrintFilters} />
           </LabelPrint>
         )}
-        {filters.length > 0
-          && (
-            <Tags>
-              {
-                filters.map((filter, i) => filter.inverse
+        <Box direction="row" fill="horizontal" justify="between">
+          <Box
+            direction={filters && filters.length > 3 ? 'column' : 'row'}
+            gap="xsmall"
+            fill="horizontal"
+          >
+            {filters.length > 0 && (
+              <Tags>
+                {filters.map((filter, i) => filter.inverse
                   ? (
                     <ButtonTagFilterInverse
                       ref={(el) => { this.lastFilter = el; }}
@@ -224,6 +238,13 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                       pIndex={parseInt(filter.id, 10) || 0}
                       disabled={!filter.onClick}
                       title={this.getFilterTitle(filter)}
+                      onKeyDown={(e) => {
+                        const key = e.keyCode || e.charCode;
+                        if (filter.onClick && key === 8) {
+                          filter.onClick();
+                          this.focusLastFilter();
+                        }
+                      }}
                     >
                       {this.getFilterLabel(filter)}
                       {filter.onClick
@@ -241,6 +262,13 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                       pIndex={parseInt(filter.id, 10) || 0}
                       disabled={!filter.onClick}
                       title={this.getFilterTitle(filter)}
+                      onKeyDown={(e) => {
+                        const key = e.keyCode || e.charCode;
+                        if (filter.onClick && key === 8) {
+                          filter.onClick();
+                          this.focusLastFilter();
+                        }
+                      }}
                     >
                       {this.getFilterLabel(filter)}
                       {filter.onClick
@@ -248,62 +276,63 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                       }
                     </ButtonTagFilter>
                   ))
-              }
-            </Tags>
-          )
-        }
-        <ScreenReaderOnly>
-          <StyledLabel htmlFor={inputId}>
-            {inputPlaceholder}
-          </StyledLabel>
-        </ScreenReaderOnly>
-        <SearchInput
-          id={inputId}
-          placeholder={inputPlaceholder}
-          inputRef={(el) => { this.input = el; }}
-          minLength={1}
-          debounceTimeout={500}
-          value={searchQuery || ''}
-          hasFilters={hasFilters}
-          onChange={(e) => onSearch(e.target.value)}
-          onFocus={() => this.setState({ active: true })}
-          onBlur={() => this.setState({ active: false })}
-          onKeyDown={(e) => {
-            if (filters.length > 0 && (!searchQuery || searchQuery.length === 0)) {
-              const key = e.keyCode || e.charCode;
-              if (key === 8) {
-                this.focusLastFilter();
-              }
-            }
-          }}
-        />
-        {hasFilters && (
-          <ButtonTagSearch
-            onClick={onClear}
-            small={this.props.multiselect}
-            title={this.context.intl.formatMessage(messages.removeAll)}
-          >
-            <Icon name="removeSmall" />
-          </ButtonTagSearch>
-        )}
-        {searchQuery && (
-          <LabelPrint>
-            <FormattedMessage {...messages.labelPrintKeywords} />
-          </LabelPrint>
-        )}
-        {searchQuery && (
-          <SearchValuePrint>
-            {searchQuery}
-          </SearchValuePrint>
-        )}
-        <ButtonTagSearch
-          as="a"
-          href={`#${resultsId}`}
-          title={this.context.intl.formatMessage(messages.skipToResults)}
-          isSearchIcon
-        >
-          <Icon name="search" size="1em" />
-        </ButtonTagSearch>
+                }
+              </Tags>
+            )}
+            <SearchInput
+              id={inputId}
+              placeholder={inputPlaceholder}
+              inputRef={(el) => { this.input = el; }}
+              minLength={1}
+              debounceTimeout={500}
+              value={searchQuery || ''}
+              onChange={(e) => onSearch(e.target.value)}
+              onFocus={() => this.setState({ active: true, hasFocus: true })}
+              onBlur={() => this.setState({ active: false, hasFocus: false })}
+              onKeyDown={(e) => {
+                const key = e.keyCode || e.charCode;
+                if (filters.length > 0 && (!searchQuery || searchQuery.length === 0)) {
+                  // backspace
+                  if (key === 8) {
+                    this.focusLastFilter();
+                  }
+                  // enter
+                } else if (this.props.onSkipToResults && key === 13) {
+                  this.props.onSkipToResults();
+                }
+              }}
+            />
+          </Box>
+          <Box direction="row" align="center" fill="vertical" flex={{ shrink: 0 }}>
+            {searchHasFilters && (
+              <ButtonTagSearch
+                onClick={onClear}
+                small={this.props.multiselect}
+                title={this.context.intl.formatMessage(messages.removeAll)}
+              >
+                <Icon name="removeSmall" />
+              </ButtonTagSearch>
+            )}
+            {searchQuery && (
+              <LabelPrint>
+                <FormattedMessage {...messages.labelPrintKeywords} />
+              </LabelPrint>
+            )}
+            {searchQuery && (
+              <SearchValuePrint>
+                {searchQuery}
+              </SearchValuePrint>
+            )}
+            <ButtonTagSearch
+              as="a"
+              href={`#${resultsId}`}
+              title={this.context.intl.formatMessage(messages.skipToResults)}
+              isSearchIcon
+            >
+              <Icon name="search" size="1em" />
+            </ButtonTagSearch>
+          </Box>
+        </Box>
       </Search>
     );
   }
@@ -320,6 +349,7 @@ TagSearch.propTypes = {
   placeholder: PropTypes.string,
   resultsId: PropTypes.string,
   onSearch: PropTypes.func,
+  onSkipToResults: PropTypes.func,
   onClear: PropTypes.func,
   multiselect: PropTypes.bool,
   focusOnMount: PropTypes.bool,
