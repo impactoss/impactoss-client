@@ -14,6 +14,7 @@ import { isEqual } from 'lodash/lang';
 
 import { PARAMS } from 'containers/App/constants';
 import Button from 'components/buttons/Button';
+import ScreenReaderHide from 'components/styled/ScreenReaderHide';
 
 import EntityListGroupBy from './EntityListGroupBy';
 
@@ -73,6 +74,7 @@ export class EntityListOptions extends React.Component { // eslint-disable-line 
       groupOptions,
       subgroupOptions,
     } = this.props;
+    const { intl } = this.context;
     return (
       <Styled>
         {groupOptions.size > 0
@@ -98,22 +100,20 @@ export class EntityListOptions extends React.Component { // eslint-disable-line 
             />
           )
         }
-        {(expandable)
-          && (
-            <ListEntitiesHeaderOptionLink
-              onClick={this.props.onExpand}
-            >
-              {
-                !expanded
-                && <FormattedMessage {...messages.expand} />
-              }
-              {
-                expanded
-                && <FormattedMessage {...messages.collapse} />
-              }
-            </ListEntitiesHeaderOptionLink>
-          )
-        }
+        {(expandable) && (
+          <ListEntitiesHeaderOptionLink
+            onClick={this.props.onExpand}
+            title={!expanded
+              ? intl.formatMessage(messages.expandTitle)
+              : intl.formatMessage(messages.collapseTitle)
+            }
+          >
+            <ScreenReaderHide>
+              {!expanded && <FormattedMessage {...messages.expand} />}
+              {expanded && <FormattedMessage {...messages.collapse} />}
+            </ScreenReaderHide>
+          </ListEntitiesHeaderOptionLink>
+        )}
       </Styled>
     );
   }
@@ -129,6 +129,10 @@ EntityListOptions.propTypes = {
   onExpand: PropTypes.func,
   expanded: PropTypes.bool,
   expandable: PropTypes.bool,
+};
+
+EntityListOptions.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default EntityListOptions;
