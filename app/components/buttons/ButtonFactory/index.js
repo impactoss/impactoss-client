@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { injectIntl, intlShape } from 'react-intl';
 
 import Icon from 'components/Icon';
+import ScreenReaderHide from 'components/styled/ScreenReaderHide';
 import appMessages from 'containers/App/messages';
 
 import ButtonDefaultWithIcon from '../ButtonDefaultWithIcon';
@@ -15,7 +16,7 @@ import ButtonFlatIconOnly from '../ButtonFlatIconOnly';
 import Bookmarker from '../../../containers/Bookmarker';
 
 const ButtonFactory = ({ button, intl }) => {
-  const { title } = button;
+  let { title } = button;
   switch (button.type) {
     case 'primary':
       return (
@@ -25,7 +26,9 @@ const ButtonFactory = ({ button, intl }) => {
           disabled={button.disabled}
           title={button.buttonTitle || title}
         >
-          {title}
+          <ScreenReaderHide>
+            {title}
+          </ScreenReaderHide>
         </ButtonDefault>
       );
     case 'formPrimary':
@@ -36,7 +39,9 @@ const ButtonFactory = ({ button, intl }) => {
           disabled={button.disabled}
           title={button.buttonTitle || title}
         >
-          {title}
+          <ScreenReaderHide>
+            {title}
+          </ScreenReaderHide>
         </ButtonSubmit>
       );
     case 'add':
@@ -63,37 +68,40 @@ const ButtonFactory = ({ button, intl }) => {
         />
       );
     case 'save':
+      title = title || intl.formatMessage(appMessages.buttons.save);
       return (
         <ButtonFlat
           primary
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
-          title={button.buttonTitle || title || intl.formatMessage(appMessages.buttons.save)}
+          title={button.buttonTitle || title}
         >
-          {title || intl.formatMessage(appMessages.buttons.save)}
+          <ScreenReaderHide>{title}</ScreenReaderHide>
         </ButtonFlat>
       );
     case 'cancel':
+      title = title || intl.formatMessage(appMessages.buttons.cancel);
       return (
         <ButtonFlat
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
-          title={button.buttonTitle || title || intl.formatMessage(appMessages.buttons.cancel)}
+          title={button.buttonTitle || title}
         >
-          {title || intl.formatMessage(appMessages.buttons.cancel)}
+          <ScreenReaderHide>{title}</ScreenReaderHide>
         </ButtonFlat>
       );
     case 'edit':
+      title = title || intl.formatMessage(appMessages.buttons.edit);
       return (
         <ButtonFlat
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
-          title={button.buttonTitle || title || intl.formatMessage(appMessages.buttons.edit)}
+          title={button.buttonTitle || title}
         >
-          {title || intl.formatMessage(appMessages.buttons.edit)}
+          <ScreenReaderHide>{title}</ScreenReaderHide>
         </ButtonFlat>
       );
     case 'close':
@@ -108,15 +116,16 @@ const ButtonFactory = ({ button, intl }) => {
         </ButtonDefaultIconOnly>
       );
     case 'closeText':
+      title = title || intl.formatMessage(appMessages.buttons.close);
       return (
         <ButtonFlat
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
-          title={button.buttonTitle || title || intl.formatMessage(appMessages.buttons.close)}
+          title={button.buttonTitle || title}
           inForm
         >
-          {title || intl.formatMessage(appMessages.buttons.close)}
+          <ScreenReaderHide>{title}</ScreenReaderHide>
         </ButtonFlat>
       );
     case 'textPrimary':
@@ -128,7 +137,7 @@ const ButtonFactory = ({ button, intl }) => {
           disabled={button.disabled}
           title={button.buttonTitle || title}
         >
-          {title}
+          <ScreenReaderHide>{title}</ScreenReaderHide>
         </ButtonFlat>
       );
     case 'bookmarker':
@@ -155,7 +164,7 @@ const ButtonFactory = ({ button, intl }) => {
           disabled={button.disabled}
           title={button.buttonTitle || title}
         >
-          {title}
+          <ScreenReaderHide>{title}</ScreenReaderHide>
         </ButtonFlat>
       );
   }
