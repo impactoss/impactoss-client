@@ -54,7 +54,6 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
-import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -231,7 +230,6 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           { (saveSending || deleteSending)
             && <Loading />
           }
-          <Footer />
         </Content>
       </div>
     );

@@ -64,12 +64,10 @@ const Target = styled(Button)`
   padding: 0 12px;
   text-align: left;
   color: ${palette('asideListGroup', 0)};
-  background-color: ${({ active }) => active ? palette('light', 1) : 'transparent'};
+  background-color: ${palette('light', 1)};
   &:hover {
-    background-color: ${({ disabled, active }) => {
-    if (active) return palette('light', 1);
-    return disabled ? 'transparent' : palette('light', 1);
-  }};
+    color: ${palette('text', 0)};
+    background-color: ${palette('light', 2)};
   }
   border-bottom: 1px solid ${palette('asideListGroup', 1)};
   margin-bottom: 8px;
@@ -109,6 +107,10 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     return intl.formatMessage(
       appMessages.entities[target.get('path')][isSingle ? 'single' : 'plural']
     );
+  };
+
+  focusResults = () => {
+    if (this.searchResults) this.searchResults.focus();
   };
 
   render() {
@@ -162,7 +164,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     const headerButtons = [{
       type: 'icon',
       onClick: () => window.print(),
-      title: 'Print',
+      title: intl.formatMessage(appMessages.buttons.printTitle),
       icon: 'print',
     }];
     return (
@@ -194,9 +196,17 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       onSearch={onSearch}
                       onClear={() => onClear(['search'])}
                       focusOnMount
+                      resultsId="search-results"
+                      onSkipToResults={() => {
+                        this.focusResults();
+                      }}
                     />
                   </EntityListSearch>
-                  <ListWrapper>
+                  <ListWrapper
+                    id="search-results"
+                    ref={(el) => { this.searchResults = el; }}
+                    tabindex="0"
+                  >
                     {noEntry && (
                       <ListHint>
                         <FormattedMessage {...messages.hints.noEntry} />
@@ -216,13 +226,11 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       <Box>
                         <ListHint>
                           <Text>
-                            <FormattedMessage {...messages.hints.resultsFound} values={{ count: countResults }} />
+                            {`${intl.formatMessage(messages.hints.resultsFound, { count: countResults })}`}
+                            {countTargets > 1
+                              && ` ${intl.formatMessage(messages.hints.hasCountTargets)}`
+                            }
                           </Text>
-                          {countTargets > 1 && (
-                            <Text>
-                              <FormattedMessage {...messages.hints.hasCountTargets} />
-                            </Text>
-                          )}
                         </ListHint>
                         {entities.map(
                           (group, id) => {
@@ -310,7 +318,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                 </div>
               )}
             </Content>
-            <Footer />
+            <Footer fill />
           </Container>
         </ContainerWrapper>
       </div>

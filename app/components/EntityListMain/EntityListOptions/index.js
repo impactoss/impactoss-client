@@ -14,6 +14,7 @@ import { isEqual } from 'lodash/lang';
 
 import { PARAMS } from 'containers/App/constants';
 import Button from 'components/buttons/Button';
+import ScreenReaderHide from 'components/styled/ScreenReaderHide';
 
 import EntityListGroupBy from './EntityListGroupBy';
 
@@ -39,8 +40,12 @@ const ListEntitiesHeaderOptionLink = styled(Button)`
     font-weight: 500;
     padding: 0 0.5em;
     color: ${palette('buttonFlat', 0)};
-    &:hover {
+    &:hover, &:focus-visible {
       color: ${palette('buttonFlatHover', 0)};
+    }
+    &:focus-visible {
+      outline: none;
+      text-decoration: underline;
     }
     &:last-child {
       padding: 0 0 0 0.5em;
@@ -69,47 +74,46 @@ export class EntityListOptions extends React.Component { // eslint-disable-line 
       groupOptions,
       subgroupOptions,
     } = this.props;
+    const { intl } = this.context;
     return (
       <Styled>
-        { groupOptions.size > 0
+        {groupOptions.size > 0
           && (
             <EntityListGroupBy
               value={groupSelectValue}
               options={groupOptions
-              && groupOptions.filter((option) => option.get('value') !== subgroupSelectValue).toJS()
+                && groupOptions.filter((option) => option.get('value') !== subgroupSelectValue).toJS()
               }
               onChange={onGroupSelect}
             />
           )
         }
-        { groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET && subgroupOptions.size > 0
+        {groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET && subgroupOptions.size > 0
           && (
             <EntityListGroupBy
               value={subgroupSelectValue}
               options={subgroupOptions
-              && subgroupOptions.filter((option) => option.get('value') !== groupSelectValue).toJS()
+                && subgroupOptions.filter((option) => option.get('value') !== groupSelectValue).toJS()
               }
               onChange={onSubgroupSelect}
               isSubgroup
             />
           )
         }
-        { (expandable)
-          && (
-            <ListEntitiesHeaderOptionLink
-              onClick={this.props.onExpand}
-            >
-              {
-                !expanded
-              && <FormattedMessage {...messages.expand} />
-              }
-              {
-                expanded
-              && <FormattedMessage {...messages.collapse} />
-              }
-            </ListEntitiesHeaderOptionLink>
-          )
-        }
+        {(expandable) && (
+          <ListEntitiesHeaderOptionLink
+            onClick={this.props.onExpand}
+            title={!expanded
+              ? intl.formatMessage(messages.expandTitle)
+              : intl.formatMessage(messages.collapseTitle)
+            }
+          >
+            <ScreenReaderHide>
+              {!expanded && <FormattedMessage {...messages.expand} />}
+              {expanded && <FormattedMessage {...messages.collapse} />}
+            </ScreenReaderHide>
+          </ListEntitiesHeaderOptionLink>
+        )}
       </Styled>
     );
   }
@@ -125,6 +129,10 @@ EntityListOptions.propTypes = {
   onExpand: PropTypes.func,
   expanded: PropTypes.bool,
   expandable: PropTypes.bool,
+};
+
+EntityListOptions.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
 export default EntityListOptions;

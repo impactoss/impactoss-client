@@ -24,13 +24,14 @@ const Styled = styled(Button)`
   font-weight: bold;
   padding: ${(props) => props.small ? '0.5em 8px 0.5em 36px' : '0.75em 8px 0.75em 16px'};
   text-align: left;
-  color:  ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
+  color: ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
   background-color: ${(props) => props.active ? palette('asideListItem', 3) : palette('asideListItem', 2)};
   border-bottom: 1px solid ${palette('asideListItem', 4)};
-  &:hover {
-    color: ${(props) => props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0)};
+  &:hover, &:focus-visible {
+    color: ${(props) => props.active ? palette('taxonomiesHover', 1) : palette('asideListItemHover', 0)};
     background-color: ${(props) => props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2)};
-    border-bottom-color: ${palette('asideListItemHover', 4)}
+    border-bottom-color: ${palette('asideListItemHover', 4)};
+    outline: none;
   }
   &:last-child {
     border-bottom: 0;
@@ -80,7 +81,7 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
       default:
         return null;
     }
-  }
+  };
 
   render() {
     const {
@@ -107,12 +108,12 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
           )}
         >
           <Label>
-            { option.get('message')
+            {option.get('message')
               ? appMessage(intl, option.get('message'))
               : option.get('label')
             }
           </Label>
-          { option.get('icon')
+          {option.get('icon')
             && (
               <IconWrapper>
                 <Icon name={option.get('icon')} />

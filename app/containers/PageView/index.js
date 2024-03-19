@@ -20,7 +20,6 @@ import {
 
 import { ROUTES, CONTENT_PAGE } from 'containers/App/constants';
 
-import Footer from 'containers/Footer';
 import Loading from 'components/Loading';
 import Container from 'components/styled/Container';
 import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
@@ -40,7 +39,7 @@ import {
 } from 'utils/fields';
 
 import { scrollToTop } from 'utils/scroll-to-component';
-
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 import { selectViewEntity } from './selectors';
 import { DEPENDENCIES } from './constants';
@@ -111,7 +110,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
       buttons.push({
         type: 'icon',
         onClick: () => window.print(),
-        title: 'Print',
+        title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
       if (isAdmin) {
@@ -157,7 +156,6 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
               )
             }
           </ViewContainer>
-          <Footer />
         </Styled>
       </div>
     );

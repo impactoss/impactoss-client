@@ -89,6 +89,9 @@ const TextInput = styled(DebounceInput)`
 
 const StyledInput = styled.input`
   accent-color: ${({ theme }) => theme.global.colors.highlight};
+  &:focus-visible {
+    outline: 1px solid ${palette('primary', 0)};
+  }
 `;
 
 const OptionLabel = styled((p) => <Text as="label" {...p} />)`

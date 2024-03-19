@@ -183,6 +183,14 @@ export default defineMessages({
       id: 'app.containers.App.buttons.import',
       defaultMessage: 'Import',
     },
+    importTitle: {
+      id: 'app.containers.App.buttons.importTitle',
+      defaultMessage: 'Import multiple {type}',
+    },
+    printTitle: {
+      id: 'app.containers.App.buttons.printTitle',
+      defaultMessage: 'Print current view or save as PDF',
+    },
   },
   labels: {
     perPage: {
@@ -1565,6 +1573,14 @@ export default defineMessages({
     skipToListFilter: {
       id: 'app.containers.App.screenreader.skipToListFilter',
       defaultMessage: 'Skip to list filter options',
+    },
+    skipToListFilterEdit: {
+      id: 'app.containers.App.screenreader.skipToListFilterEdit',
+      defaultMessage: 'Skip to list filter and batch edit options',
+    },
+    skipToCategorySelect: {
+      id: 'app.containers.App.screenreader.skipToCategorySelect',
+      defaultMessage: 'Skip to category group options',
     },
   },
 });
