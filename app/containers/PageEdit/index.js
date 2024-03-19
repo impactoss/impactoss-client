@@ -297,7 +297,7 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmit: (formData, viewEntity) => {
       let saveData = formData;
       // check if attributes have changed
-      if (!saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+      if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
         saveData = saveData.set('skipAttributes', true);
       }
       dispatch(save(saveData.toJS()));
