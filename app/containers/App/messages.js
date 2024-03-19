@@ -183,6 +183,10 @@ export default defineMessages({
       id: 'app.containers.App.buttons.import',
       defaultMessage: 'Import',
     },
+    printTitle: {
+      id: 'app.containers.App.buttons.printTitle',
+      defaultMessage: 'Print current view or save as PDF',
+    },
   },
   labels: {
     perPage: {

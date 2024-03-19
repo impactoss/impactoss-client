@@ -96,7 +96,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
         {
           type: 'icon',
           onClick: () => window.print(),
-          title: 'Print',
+          title: intl.formatMessage(appMessages.buttons.printTitle),
           icon: 'print',
         },
       ];

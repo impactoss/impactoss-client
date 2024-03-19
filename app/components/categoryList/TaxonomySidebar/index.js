@@ -78,13 +78,12 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
     window.removeEventListener('resize', this.resize);
   }
 
-  onShowSidebar = (evt) => {
-    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+  onShowSidebar = () => {
     this.setState({ visible: true });
   };
 
-  onHideSidebar = (evt) => {
-    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+  onHideSidebar = () => {
+    // if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ visible: false });
   };
 
@@ -125,17 +124,17 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
     );
     const { intl } = this.context;
     return (
-      <PrintHide>
+      <PrintHide id="sidebar-taxonomy-options">
         { (!this.state.visible && this.state.viewport < VIEWPORTS.SMALL)
           && (
-            <ToggleShow onClick={this.onShowSidebar}>
+            <ToggleShow id="sidebar-taxonomy-options" onClick={this.onShowSidebar}>
               <FormattedMessage {...messages.show} />
             </ToggleShow>
           )
         }
         { (this.state.visible || this.state.viewport >= VIEWPORTS.SMALL)
           && (
-            <Sidebar responsiveSmall id="sidebar-taxonomy-options">
+            <Sidebar responsiveSmall>
               <Scrollable>
                 <Component>
                   <SidebarHeader responsiveSmall>
@@ -198,6 +197,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
               <SkipContent
                 href="#main-content"
                 title={this.context.intl.formatMessage(appMessages.screenreader.skipBackToContent)}
+                onClick={this.onHideSidebar}
               >
                 <FormattedMessage {...appMessages.screenreader.skipBackToContent} />
               </SkipContent>

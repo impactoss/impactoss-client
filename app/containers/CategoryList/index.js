@@ -121,7 +121,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       buttons.push({
         type: 'icon',
         onClick: () => window.print(),
-        title: 'Print',
+        title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
       if (isManager && typeof reference !== 'undefined') {
