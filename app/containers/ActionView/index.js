@@ -114,8 +114,8 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     groups.push({
       fields: [
         getMarkdownField(entity, 'description', true),
-        // getMarkdownField(entity, 'outcome', true),
-        // getMarkdownField(entity, 'indicator_summary', true),
+        getMarkdownField(entity, 'outcome', true),
+        getMarkdownField(entity, 'indicator_summary', true),
       ],
     });
     // indicators
