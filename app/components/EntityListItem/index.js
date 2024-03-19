@@ -99,7 +99,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
       isFocus,
       skipTargetId,
     } = this.props;
-
+    const { intl } = this.context;
     return (
       <Styled expanded={expandNo > 0}>
         { error && error.map((updateError, i) => (
@@ -121,9 +121,19 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
         <Item error={error}>
           <MainWrapper expandable={entity.get('expandable')}>
             <MainInnerWrapper isManager={isManager}>
-              {isManager
-                && <EntityListItemSelect checked={isSelected} onSelect={onSelect} />
-              }
+              {isManager && (
+                <EntityListItemSelect
+                  checked={isSelected}
+                  onSelect={onSelect}
+                  selectId={`select-${entity.get('id')}`}
+                  selectLabel={intl.formatMessage(
+                    messages.selectLabel,
+                    {
+                      entityTitle: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
+                    }
+                  )}
+                />
+              )}
               <EntityListItemMain
                 entity={entity}
                 taxonomies={taxonomies}

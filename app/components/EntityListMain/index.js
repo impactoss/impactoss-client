@@ -282,7 +282,16 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     errors={errors}
                     onDismissError={this.props.onDismissError}
                     entityGroups={entityGroups}
-                    taxonomies={taxonomies}
+                    groupTaxonomyTitle={groupSelectValue
+                      && taxonomies
+                      && taxonomies.get(groupSelectValue)
+                      && taxonomies.get(groupSelectValue).getIn(['attributes', 'title'])
+                    }
+                    subgroupTaxonomyTitle={subgroupSelectValue
+                      && taxonomies
+                      && taxonomies.get(subgroupSelectValue)
+                      && taxonomies.get(subgroupSelectValue).getIn(['attributes', 'title'])
+                    }
                     connections={connections}
                     entityIdsSelected={this.props.entityIdsSelected}
                     locationQuery={this.props.locationQuery}

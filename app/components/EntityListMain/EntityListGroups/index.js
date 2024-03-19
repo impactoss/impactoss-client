@@ -147,6 +147,8 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       locationQuery,
       groupSelectValue,
       subgroupSelectValue,
+      groupTaxonomyTitle,
+      subgroupTaxonomyTitle,
       entities,
       errors,
       entityGroups,
@@ -278,89 +280,88 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
               ))
             )).toList()
           }
-          {entityGroupsPaged.size > 0
-            && (
-              <div>
-                {
-                  entityGroupsPaged.map((entityGroup, index, list) => {
-                    let skipGroupTargetId = null;
-                    if (list.size > index + 1) {
-                      const nextGroup = list.get(index + 1);
-                      skipGroupTargetId = nextGroup
-                        ? `#list-group-${nextGroup.get('id')}`
-                        : null;
-                    }
-                    return (
-                      <ListEntitiesGroup key={index}>
-                        {groupSelectValue && entityGroup.get('label')
-                          && <EntityListGroupHeader group={entityGroup} level={1} />
-                        }
-                        {
-                          entityGroup.get('entityGroups')
-                          && entityGroup.get('entityGroups').toList().map((entitySubGroup, j) => (
-                            <ListEntitiesSubGroup key={j}>
-                              {subgroupSelectValue && entitySubGroup.get('label')
-                                && <EntityListGroupHeader group={entitySubGroup} level={2} />
-                              }
-                              <EntityListItems
-                                taxonomies={this.props.taxonomies}
-                                connections={this.props.connections}
-                                config={config}
-                                entities={entitySubGroup.get('entities')}
-                                errors={errors}
-                                entityIdsSelected={entityIdsSelected}
-                                entityIcon={entityIcon}
-                                onEntityClick={onEntityClick}
-                                isManager={isManager}
-                                isContributor={isContributor}
-                                onEntitySelect={onEntitySelect}
-                                expandNo={expandNo}
-                                onExpand={onExpand}
-                                onDismissError={this.props.onDismissError}
-                                skipGroupTargetId={skipGroupTargetId}
-                              />
-                            </ListEntitiesSubGroup>
-                          ))
-                        }
-                        {entityGroup.get('entities') && !entityGroup.get('entityGroups')
-                          && (
-                            <EntityListItems
-                              taxonomies={this.props.taxonomies}
-                              connections={this.props.connections}
-                              errors={errors}
-                              config={config}
-                              entities={entityGroup.get('entities')}
-                              entityIdsSelected={entityIdsSelected}
-                              entityIcon={entityIcon}
-                              onEntityClick={onEntityClick}
-                              isManager={isManager}
-                              isContributor={isContributor}
-                              onEntitySelect={onEntitySelect}
-                              expandNo={expandNo}
-                              onExpand={onExpand}
-                              onDismissError={this.props.onDismissError}
-                              skipGroupTargetId={skipGroupTargetId}
-                            />
-                          )
-                        }
-                      </ListEntitiesGroup>
-                    );
-                  })
+          {entityGroupsPaged.size > 0 && (
+            <div>
+              {entityGroupsPaged.map((entityGroup, index, list) => {
+                let skipGroupTargetId = null;
+                if (list.size > index + 1) {
+                  const nextGroup = list.get(index + 1);
+                  skipGroupTargetId = nextGroup
+                    ? `#list-group-${nextGroup.get('id')}`
+                    : null;
                 }
-              </div>
-            )
-          }
+                return (
+                  <ListEntitiesGroup key={index}>
+                    {groupSelectValue && entityGroup.get('label') && (
+                      <EntityListGroupHeader
+                        group={entityGroup}
+                        level={1}
+                        groupTypeTitle={groupTaxonomyTitle}
+                      />
+                    )}
+                    {entityGroup.get('entityGroups') && entityGroup.get('entityGroups').toList().map(
+                      (entitySubGroup, j) => (
+                        <ListEntitiesSubGroup key={j}>
+                          {subgroupSelectValue && entitySubGroup.get('label') && (
+                            <EntityListGroupHeader
+                              group={entitySubGroup}
+                              groupTypeTitle={subgroupTaxonomyTitle}
+                              level={2}
+                            />
+                          )}
+                          <EntityListItems
+                            taxonomies={this.props.taxonomies}
+                            connections={this.props.connections}
+                            config={config}
+                            entities={entitySubGroup.get('entities')}
+                            errors={errors}
+                            entityIdsSelected={entityIdsSelected}
+                            entityIcon={entityIcon}
+                            onEntityClick={onEntityClick}
+                            isManager={isManager}
+                            isContributor={isContributor}
+                            onEntitySelect={onEntitySelect}
+                            expandNo={expandNo}
+                            onExpand={onExpand}
+                            onDismissError={this.props.onDismissError}
+                            skipGroupTargetId={skipGroupTargetId}
+                          />
+                        </ListEntitiesSubGroup>
+                      )
+                    )}
+                    {entityGroup.get('entities') && !entityGroup.get('entityGroups') && (
+                      <EntityListItems
+                        taxonomies={this.props.taxonomies}
+                        connections={this.props.connections}
+                        errors={errors}
+                        config={config}
+                        entities={entityGroup.get('entities')}
+                        entityIdsSelected={entityIdsSelected}
+                        entityIcon={entityIcon}
+                        onEntityClick={onEntityClick}
+                        isManager={isManager}
+                        isContributor={isContributor}
+                        onEntitySelect={onEntitySelect}
+                        expandNo={expandNo}
+                        onExpand={onExpand}
+                        onDismissError={this.props.onDismissError}
+                        skipGroupTargetId={skipGroupTargetId}
+                      />
+                    )}
+                  </ListEntitiesGroup>
+                );
+              })}
+            </div>
+          )}
         </ListEntitiesMain>
-        {entityGroupsPaged.size > 0
-          && (
-            <EntityListFooter
-              pageSize={locationQuery.get('items') === 'all' ? 'all' : pageSize}
-              pager={pager}
-              onPageSelect={this.props.onPageSelect}
-              onPageItemsSelect={this.props.onPageItemsSelect}
-            />
-          )
-        }
+        {entityGroupsPaged.size > 0 && (
+          <EntityListFooter
+            pageSize={locationQuery.get('items') === 'all' ? 'all' : pageSize}
+            pager={pager}
+            onPageSelect={this.props.onPageSelect}
+            onPageItemsSelect={this.props.onPageItemsSelect}
+          />
+        )}
       </div>
     );
   }
@@ -391,6 +392,8 @@ EntityListGroups.propTypes = {
   onDismissError: PropTypes.func.isRequired,
   groupSelectValue: PropTypes.string,
   subgroupSelectValue: PropTypes.string,
+  groupTaxonomyTitle: PropTypes.string,
+  subgroupTaxonomyTitle: PropTypes.string,
 };
 
 EntityListGroups.contextTypes = {

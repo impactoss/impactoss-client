@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import PrintHide from 'components/styled/PrintHide';
-
+import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 const Select = styled(PrintHide)`
   display: table-cell;
   width: 20px;
@@ -24,17 +24,29 @@ const Input = styled.input`
   }
 `;
 
+const Label = styled.label``;
+
 export default class EntityListItemSelect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     checked: PropTypes.bool,
     onSelect: PropTypes.func,
+    selectId: PropTypes.string,
+    selectLabel: PropTypes.string,
   };
 
   render() {
-    const { checked, onSelect } = this.props;
+    const {
+      checked, onSelect, selectId, selectLabel,
+    } = this.props;
     return (
       <Select>
+        {selectLabel && (
+          <ScreenReaderOnly>
+            <Label htmlFor={selectId}>{selectLabel}</Label>
+          </ScreenReaderOnly>
+        )}
         <Input
+          id={selectId}
           type="checkbox"
           checked={checked}
           onChange={(evt) => onSelect(evt.target.checked)}

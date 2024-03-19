@@ -34,6 +34,14 @@ export default defineMessages({
     id: 'app.components.EntityListGroups.entityNoLongerPresent',
     defaultMessage: 'Item with database id \'{entityId}\' no longer exists.',
   },
+  groupHeaderTitle: {
+    id: 'app.components.EntityListGroups.groupHeaderTitle',
+    defaultMessage: 'Group {type}: {label}',
+  },
+  subgroupHeaderTitle: {
+    id: 'app.components.EntityListGroups.subgroupHeaderTitle',
+    defaultMessage: 'Subgroup {type}: {label}',
+  },
   nestedListEmpty: {
     reports: {
       id: 'app.components.EntityListGroups.nestedListEmpty.reports',
