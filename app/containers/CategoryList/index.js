@@ -18,6 +18,7 @@ import {
   selectFWTaxonomiesSorted,
   selectReady,
   selectIsUserManager,
+  selectIsUserAdmin,
   selectCurrentFrameworkId,
   selectActiveFrameworks,
 } from 'containers/App/selectors';
@@ -108,6 +109,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       userOnlyCategoryGroups,
       dataReady,
       isManager,
+      isAdmin,
       onPageLink,
       onTaxonomyLink,
       frameworks,
@@ -124,7 +126,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
-      if (isManager && typeof reference !== 'undefined') {
+      if (isAdmin && typeof reference !== 'undefined') {
         buttons.push({
           type: 'add',
           title: [
@@ -248,6 +250,7 @@ CategoryList.propTypes = {
   userOnlyCategoryGroups: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
+  isAdmin: PropTypes.bool,
   location: PropTypes.object,
   frameworks: PropTypes.object,
   frameworkId: PropTypes.string,
@@ -261,6 +264,7 @@ const mapStateToProps = (state, props) => ({
   frameworks: selectActiveFrameworks(state),
   frameworkId: selectCurrentFrameworkId(state),
   isManager: selectIsUserManager(state),
+  isAdmin: selectIsUserAdmin(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectFWTaxonomiesSorted(state),
   taxonomy: selectTaxonomy(state, { id: props.params.id }),

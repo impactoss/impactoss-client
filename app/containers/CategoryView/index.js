@@ -48,6 +48,7 @@ import EntityView from 'components/EntityView';
 import {
   selectReady,
   selectIsUserManager,
+  selectIsUserAdmin,
   selectMeasureConnections,
   selectRecommendationConnections,
   selectActiveFrameworks,
@@ -274,6 +275,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       viewEntity,
       dataReady,
       isManager,
+      isAdmin,
       recommendationsByFw,
       childRecommendationsByFw,
       measures,
@@ -294,7 +296,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
-      buttons = isManager
+      buttons = isAdmin
         ? buttons.concat([
           {
             type: 'edit',
@@ -395,6 +397,7 @@ CategoryView.propTypes = {
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   isManager: PropTypes.bool,
+  isAdmin: PropTypes.bool,
   parentTaxonomy: PropTypes.object,
   recommendationsByFw: PropTypes.object,
   childRecommendationsByFw: PropTypes.object,
@@ -413,6 +416,7 @@ CategoryView.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
+  isAdmin: selectIsUserAdmin(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   recommendationsByFw: selectRecommendations(state, props.params.id),
