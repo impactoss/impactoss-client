@@ -485,6 +485,7 @@ export const makeConnectionFilterOptions = (
                 const value = `${path}:${connectedId}`;
                 const reference = getEntityReference(connection);
                 const label = getEntityTitle(connection, option.labels, contextIntl);
+                const domain = entity.getIn(['attributes', 'domain']);
                 filterOptions.options[connectedId] = {
                   label,
                   reference,
@@ -495,6 +496,7 @@ export const makeConnectionFilterOptions = (
                   checked: optionChecked(locationQueryValue, value),
                   tags: connection.get('categories'),
                   draft: connection.getIn(['attributes', 'draft']),
+                  domain,
                 };
               }
             }

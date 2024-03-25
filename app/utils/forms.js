@@ -45,6 +45,7 @@ export const entityOptions = (entities, defaultToId = true, hasTags = true) => e
 export const userOption = (entity, activeUserId) => Map({
   value: entity.get('id'),
   label: entity.getIn(['attributes', 'name']),
+  domain: entity.getIn(['attributes', 'domain']),
   checked: activeUserId ? entity.get('id') === activeUserId.toString() : false,
 });
 

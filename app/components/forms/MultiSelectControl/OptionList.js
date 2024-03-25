@@ -30,11 +30,15 @@ const OptionWrapper = styled.div`
   width: 100%;
   line-height: 1.3;
   font-size: 0.8em;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+  & > div:last-child {
+    border-right: ${({ changedToChecked, changedToUnchecked }) => (changedToChecked || changedToUnchecked) ? '0.5em solid' : 'none'};
+    border-right-color: ${palette('buttonDefault', 1)};
+  }
+  @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
     font-size: 1em;
   }
   @media print {
-    font-size: ${(props) => props.theme.sizes.print.default};
+    font-size: ${({ theme }) => theme.sizes.print.default};
   }
 `;
 // background-color: ${(props) => {
@@ -72,14 +76,23 @@ const OptionLabel = styled.label`
   padding-left: 8px;
   padding-right: 8px;
   border-bottom: 1px solid ${palette('light', 1)};
-  border-right: ${(props) => (props.changedToChecked || props.changedToUnchecked)
-    ? '0.5em solid'
-    : 'none'
-};
-  border-right-color: ${palette('buttonDefault', 1)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-top: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
     padding-bottom: ${(props) => props.secondary ? OPTION_PADDING_SECONDARY : OPTION_PADDING};
+  }
+`;
+
+const OptionDomainLabel = styled.div`
+  display: table-cell;
+  color: ${palette('text', 1)};
+  font-size: 0.9em;
+  padding-top: ${OPTION_PADDING};
+  padding-bottom: ${OPTION_PADDING};
+  padding-right: 1em;
+  text-align: right;
+  border-bottom: 1px solid ${palette('light', 1)};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
   }
 `;
 
@@ -222,8 +235,6 @@ class OptionList extends React.PureComponent {
                       </CheckboxWrapper>
                       <OptionLabel
                         htmlFor={id}
-                        changedToChecked={option.get('changedToChecked')}
-                        changedToUnchecked={option.get('changedToUnchecked')}
                         secondary={this.props.secondary}
                       >
                         <Option
@@ -236,6 +247,13 @@ class OptionList extends React.PureComponent {
                           draft={option.get('draft')}
                         />
                       </OptionLabel>
+                      { option.get('domain')
+                        && (
+                          <OptionDomainLabel>
+                            {option.get('domain')}
+                          </OptionDomainLabel>
+                        )
+                      }
                       { option.get('showCount') && typeof option.get('count') !== 'undefined'
                         && (
                           <OptionCount secondary={this.props.secondary}>
