@@ -365,6 +365,16 @@ export const selectFWRecommendations = createSelector(
           frameworkId,
           rec.getIn(['attributes', 'framework_id']),
         )
+      ).map(
+        (rec) => {
+          if (
+            rec.getIn(['attributes', 'accepted']) === null
+            || typeof rec.getIn(['attributes', 'accepted']) === 'undefined'
+          ) {
+            return rec.setIn(['attributes', 'accepted'], 'n/a');
+          }
+          return rec;
+        }
       );
     }
     return entities;

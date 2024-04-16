@@ -1517,6 +1517,10 @@ export default defineMessages({
         id: 'app.containers.App.ui.acceptedStatuses.noted',
         defaultMessage: 'Not accepted',
       },
+      null: {
+        id: 'app.containers.App.ui.acceptedStatuses.null',
+        defaultMessage: 'Not applicable',
+      },
     },
     reportFrequencies: {
       monthly: {

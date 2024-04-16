@@ -424,6 +424,9 @@ function mapDispatchToProps(dispatch) {
           .setIn(['attributes', 'accepted'], null)
           .setIn(['attributes', 'response'], null);
       }
+      if (saveData.getIn(['attributes', 'accepted']) === 'null') {
+        saveData = saveData.setIn(['attributes', 'accepted'], null);
+      }
       if (!currentFramework.get('id')) {
         saveData = saveData.setIn(['attributes', 'framework_id'], DEFAULT_FRAMEWORK);
       }
