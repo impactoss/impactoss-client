@@ -371,7 +371,7 @@ export const selectFWRecommendations = createSelector(
             rec.getIn(['attributes', 'accepted']) === null
             || typeof rec.getIn(['attributes', 'accepted']) === 'undefined'
           ) {
-            return rec.setIn(['attributes', 'accepted'], 'n/a');
+            return rec.setIn(['attributes', 'accepted'], 'null');
           }
           return rec;
         }

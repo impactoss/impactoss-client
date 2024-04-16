@@ -22,7 +22,7 @@ export const FORM_INITIAL = fromJS({
     title: '',
     description: '',
     reference: '',
-    accepted: null,
+    accepted: 'null',
     response: '',
     draft: true,
     framework_id: '',
