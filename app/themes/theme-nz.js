@@ -142,10 +142,9 @@ theme.palette = {
     '#73018E', // 3: Recommending State
     '#BA4692', // 4: Human right
     '#9B2727', // 5: Affected persons
-    '#FDB980', // 6: Thematic cluster
-    '#EAEAEA', // 7: Organisation
-    '#BA5D03', // 8: SMART
-    '#73777B', // 9: Progress status
+    '#EAEAEA', // 6: Organisation
+    '#BA5D03', // 7: SMART
+    '#73777B', // 8: Progress status
     '#FFDDC1', // 10:
     '#1E1F1F',
   ],
@@ -156,10 +155,9 @@ theme.palette = {
     '#510064', // 3: Recommending State
     '#98226F', // 4: Human right
     '#6F0B0B', // 5: Affected persons
-    '#F09F5B', // 6: Thematic cluster
-    '#DBD8D8', // 7: Organisation
-    '#964B00', // 8: SMART
-    '#5F6367', // 9: Progress status
+    '#DBD8D8', // 6: Organisation
+    '#964B00', // 7: SMART
+    '#5F6367', // 8: Progress status
     '#F7BF8E',
     '#000000',
   ],
@@ -170,10 +168,9 @@ theme.palette = {
     primary[4], // 3: Recommending State
     primary[4], // 4: Human right
     primary[4], // 5: Affected persons
-    dark[0], // 6: Thematic cluster
-    dark[0], // 7: Organisation
-    primary[4], // 8: SMART
-    primary[4], // 9: Progress status
+    dark[0], // 6: Organisation
+    primary[4], // 7: SMART
+    primary[4], // 8: Progress status
     primary[4],
     primary[4],
   ],

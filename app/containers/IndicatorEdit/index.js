@@ -184,7 +184,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         },
       );
     }
-    if (recommendationsByFw) {
+    if (recommendationsByFw && recommendationsByFw.size > 0) {
       const recConnections = renderRecommendationsByFwControl(
         recommendationsByFw,
         connectedTaxonomies,
