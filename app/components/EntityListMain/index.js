@@ -279,6 +279,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 <ListWrapper ref={this.ScrollTarget}>
                   <EntityListGroups
                     entities={entities}
+                    taxonomies={taxonomies}
                     errors={errors}
                     onDismissError={this.props.onDismissError}
                     entityGroups={entityGroups}
