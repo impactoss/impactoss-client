@@ -693,7 +693,7 @@
   "app.containers.RecommendationEdit.metaDescription": "Edit objective page description",
   "app.containers.RecommendationEdit.notFound": "Sorry no objective found",
   "app.containers.RecommendationEdit.pageTitle": "Edit {type}",
-  "app.containers.RecommendationImport.filename": "objectives_template",
+  "app.containers.RecommendationImport.filename": "recommendations_template",
   "app.containers.RecommendationImport.header": "Import Objectives",
   "app.containers.RecommendationImport.metaDescription": "Import objectives page description",
   "app.containers.RecommendationImport.pageTitle": "Import objectives",
