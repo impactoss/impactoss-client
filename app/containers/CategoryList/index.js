@@ -18,10 +18,12 @@ import {
   selectFWTaxonomiesSorted,
   selectReady,
   selectIsUserManager,
+  selectHasUserRole,
   selectCurrentFrameworkId,
   selectActiveFrameworks,
 } from 'containers/App/selectors';
 import { ROUTES, CONTENT_LIST } from 'containers/App/constants';
+import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 // components
@@ -108,6 +110,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       userOnlyCategoryGroups,
       dataReady,
       isManager,
+      hasUserRole,
       onPageLink,
       onTaxonomyLink,
       frameworks,
@@ -124,7 +127,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
-      if (isManager && typeof reference !== 'undefined') {
+      if (hasUserRole[CATEGORY_ADMIN_MIN_ROLE] && typeof reference !== 'undefined') {
         buttons.push({
           type: 'add',
           title: [
@@ -248,6 +251,8 @@ CategoryList.propTypes = {
   userOnlyCategoryGroups: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
+  // isAdmin: PropTypes.bool,
+  hasUserRole: PropTypes.object,
   location: PropTypes.object,
   frameworks: PropTypes.object,
   frameworkId: PropTypes.string,
@@ -261,6 +266,7 @@ const mapStateToProps = (state, props) => ({
   frameworks: selectActiveFrameworks(state),
   frameworkId: selectCurrentFrameworkId(state),
   isManager: selectIsUserManager(state),
+  hasUserRole: selectHasUserRole(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectFWTaxonomiesSorted(state),
   taxonomy: selectTaxonomy(state, { id: props.params.id }),
