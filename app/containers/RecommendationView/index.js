@@ -115,12 +115,16 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     fields.push({
       fields: [
         getMarkdownField(entity, 'description', true, 'fullRecommendation'),
-        hasResponse && getStatusField(
+        hasResponse
+        && entity.getIn(['attributes', 'accepted']) !== null
+        && entity.getIn(['attributes', 'accepted']) !== 'null'
+        && typeof entity.getIn(['attributes', 'accepted']) !== 'undefined'
+        && getStatusField(
           entity,
           'accepted',
           ACCEPTED_STATUSES,
           appMessages.attributes.accepted,
-          false // defaultValue
+          'false' // defaultValue
         ),
         hasResponse && getMarkdownField(entity, 'response', true),
       ],

@@ -178,6 +178,7 @@ export const DOC_PUBLISH_STATUSES = [
 ];
 // Recommendation statuses
 export const ACCEPTED_STATUSES = [
+  { value: 'null', icon: '', message: 'ui.acceptedStatuses.null' },
   { value: true, icon: 'recommendationAccepted', message: 'ui.acceptedStatuses.accepted' },
   { value: false, icon: 'recommendationNoted', message: 'ui.acceptedStatuses.noted' },
 ];

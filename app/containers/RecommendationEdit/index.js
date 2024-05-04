@@ -446,8 +446,9 @@ function mapDispatchToProps(dispatch, props) {
         saveData = saveData
           .setIn(['attributes', 'accepted'], '')
           .setIn(['attributes', 'response'], '');
-      } else if (saveData.getIn(['attributes', 'accepted']) === '') {
-        saveData = saveData.setIn(['attributes', 'accepted'], 'true');
+      }
+      if (saveData.getIn(['attributes', 'accepted']) === 'null') {
+        saveData = saveData.setIn(['attributes', 'accepted'], null);
       }
       // check if attributes have changed
       if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {

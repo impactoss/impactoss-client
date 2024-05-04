@@ -548,7 +548,7 @@ function mapDispatchToProps(dispatch, props) {
         if (creates.size > 0) {
           // take the first
           // TODO multiselect should be run in single value mode and only return 1 value
-          const newValue = creates.first();
+          let newValue = creates.first();
           entities.forEach((entity) => {
             // not exactly sure what is happening here?
             if (errors && errors.size) {
@@ -559,6 +559,9 @@ function mapDispatchToProps(dispatch, props) {
               });
             }
           });
+          if (activeEditOption.optionId === 'accepted' && newValue === 'null') {
+            newValue = null;
+          }
           dispatch(saveMultiple(
             props.config.serverPath,
             entities.filter(
