@@ -19,6 +19,7 @@ export const DEPENDENCIES = [
   'taxonomies',
   'frameworks',
   'framework_taxonomies',
+  'indicators',
 ];
 
 export const FORM_INITIAL = fromJS({

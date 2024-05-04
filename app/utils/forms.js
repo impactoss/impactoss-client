@@ -10,6 +10,7 @@ import {
 } from 'utils/entities';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
+import validateAllowed from 'components/forms/validators/validate-allowed';
 import validateDateFormat from 'components/forms/validators/validate-date-format';
 import validateRequired from 'components/forms/validators/validate-required';
 import validateNumber from 'components/forms/validators/validate-number';
@@ -460,13 +461,19 @@ export const getTitleFormField = (formatMessage, controlType = 'title', attribut
   required: true,
 });
 
-export const getReferenceFormField = (formatMessage, required = false, isAutoReference = false) => getFormField({
+export const getReferenceFormField = (
+  formatMessage,
+  required = false,
+  isAutoReference = false,
+  prohibitedValues,
+) => getFormField({
   formatMessage,
   controlType: 'short',
   attribute: 'reference',
   required,
   label: required ? 'reference' : 'referenceOptional',
   hint: isAutoReference ? formatMessage(appMessages.hints.autoReference) : null,
+  prohibitedValues,
 });
 
 export const getShortTitleFormField = (formatMessage) => getFormField({
@@ -636,6 +643,7 @@ export const getFormField = ({
   onChange,
   type,
   model,
+  prohibitedValues,
 }) => {
   const field = {
     id: attribute,
@@ -654,6 +662,10 @@ export const getFormField = ({
   if (required) {
     field.validators.required = typeof required === 'function' ? required : validateRequired;
     field.errorMessages.required = formatMessage(appMessages.forms.fieldRequired);
+  }
+  if (prohibitedValues && Array.isArray(prohibitedValues)) {
+    field.validators.prohibited = (val) => validateAllowed(val, prohibitedValues);
+    field.errorMessages.prohibited = formatMessage(appMessages.forms.valueProhibited);
   }
   return field;
 };

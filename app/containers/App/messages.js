@@ -223,6 +223,10 @@ export default defineMessages({
       id: 'app.containers.App.forms.fieldRequired',
       defaultMessage: 'This field cannot be empty',
     },
+    valueProhibited: {
+      id: 'app.containers.App.forms.valueProhibited',
+      defaultMessage: 'This value is not allowed',
+    },
     dateFormatError: {
       id: 'app.containers.App.forms.dateFormatError',
       defaultMessage: 'Please enter the date in the required format: {format}',

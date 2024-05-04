@@ -355,6 +355,19 @@ export const selectActiveFrameworks = createSelector(
   }
 );
 
+export const selectRecommendationReferences = createSelector(
+  (state) => selectEntities(state, 'recommendations'),
+  (entities) => entities && entities.map((e) => e.getIn(['attributes', 'reference'])).toList().toArray()
+);
+export const selectMeasureReferences = createSelector(
+  (state) => selectEntities(state, 'measures'),
+  (entities) => entities && entities.map((e) => e.getIn(['attributes', 'reference'])).toList().toArray()
+);
+export const selectIndicatorReferences = createSelector(
+  (state) => selectEntities(state, 'indicators'),
+  (entities) => entities && entities.map((e) => e.getIn(['attributes', 'reference'])).toList().toArray()
+);
+
 export const selectFWRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendations'),
   selectCurrentFrameworkId,

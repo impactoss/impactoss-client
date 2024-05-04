@@ -62,6 +62,7 @@ import {
   selectReadyForAuthCheck,
   selectIsUserAdmin,
   selectSessionUserHighestRoleId,
+  selectIndicatorReferences,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -141,12 +142,12 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       : Map();
   }
 
-  getHeaderMainFields = () => {
+  getHeaderMainFields = (existingReferences) => {
     const { intl } = this.context;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getReferenceFormField(intl.formatMessage, false, true),
+          getReferenceFormField(intl.formatMessage, true, false, existingReferences),
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -259,6 +260,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       recommendationsByFw,
       users,
       onCreateOption,
+      existingReferences,
     } = this.props;
 
     const {
@@ -346,7 +348,11 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                 }}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
+                    main: this.getHeaderMainFields(
+                      existingReferences
+                        ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
+                        : null
+                    ),
                     aside: this.getHeaderAsideFields(viewEntity),
                   },
                   body: {
@@ -394,6 +400,7 @@ IndicatorEdit.propTypes = {
   onRepeatChange: PropTypes.func,
   onStartDateChange: PropTypes.func,
   onEndDateChange: PropTypes.func,
+  existingReferences: PropTypes.array,
 };
 
 IndicatorEdit.contextTypes = {
@@ -411,6 +418,7 @@ const mapStateToProps = (state, props) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   users: selectUsers(state),
   highestRole: selectSessionUserHighestRoleId(state),
+  existingReferences: selectIndicatorReferences(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

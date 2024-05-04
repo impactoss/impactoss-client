@@ -52,6 +52,7 @@ import {
   selectEntities,
   selectCurrentFrameworkId,
   selectActiveFrameworks,
+  selectRecommendationReferences,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -108,14 +109,14 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     ));
   }
 
-  getHeaderMainFields = (frameworkId, frameworks) => {
+  getHeaderMainFields = (frameworkId, frameworks, existingReferences) => {
     const { intl } = this.context;
     const hasFWOptions = frameworks && frameworks.size > 1 && frameworkId === 'all';
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
           hasFWOptions && getFrameworkFormField(intl.formatMessage, frameworks), // required
-          getReferenceFormField(intl.formatMessage, true), // required
+          getReferenceFormField(intl.formatMessage, true, false, existingReferences), // required
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -189,6 +190,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       indicators,
       frameworkId,
       frameworks,
+      existingReferences,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const fwSpecified = (frameworkId && frameworkId !== 'all');
@@ -272,7 +274,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                 handleUpdate={this.props.handleUpdate}
                 fields={{ // isManager, taxonomies,
                   header: {
-                    main: this.getHeaderMainFields(frameworkId, frameworks),
+                    main: this.getHeaderMainFields(frameworkId, frameworks, existingReferences),
                     aside: this.getHeaderAsideFields(),
                   },
                   body: {
@@ -320,6 +322,7 @@ RecommendationNew.propTypes = {
   onServerErrorDismiss: PropTypes.func.isRequired,
   frameworkId: PropTypes.string,
   frameworks: PropTypes.object,
+  existingReferences: PropTypes.array,
 };
 
 RecommendationNew.contextTypes = {
@@ -336,6 +339,7 @@ const mapStateToProps = (state) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworkId: selectCurrentFrameworkId(state),
   frameworks: selectActiveFrameworks(state),
+  existingReferences: selectRecommendationReferences(state),
 });
 
 function mapDispatchToProps(dispatch) {

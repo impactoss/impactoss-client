@@ -52,6 +52,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectMeasuresCategorised,
+  selectIndicatorReferences,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -95,12 +96,12 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     }
   }
 
-  getHeaderMainFields = () => {
+  getHeaderMainFields = (existingReferences) => {
     const { intl } = this.context;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getReferenceFormField(intl.formatMessage, false, true),
+          getReferenceFormField(intl.formatMessage, true, false, existingReferences),
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -212,6 +213,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       recommendationsByFw,
       users,
       onCreateOption,
+      existingReferences,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
@@ -284,7 +286,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                 }}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
+                    main: this.getHeaderMainFields(existingReferences),
                     aside: this.getHeaderAsideFields(),
                   },
                   body: {
@@ -324,6 +326,7 @@ IndicatorNew.propTypes = {
   onRepeatChange: PropTypes.func,
   onStartDateChange: PropTypes.func,
   onEndDateChange: PropTypes.func,
+  existingReferences: PropTypes.array,
 };
 
 IndicatorNew.contextTypes = {
@@ -340,6 +343,7 @@ const mapStateToProps = (state) => ({
   // all users, listing connection if any
   users: selectUsers(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
+  existingReferences: selectIndicatorReferences(state),
 });
 
 function mapDispatchToProps(dispatch) {
