@@ -333,7 +333,6 @@ class MultiSelect extends React.Component {
 
     options = this.filterOptions(options, this.props, this.state);
     const filteredOptionsSelected = options.filter((option) => option.get('checked') || this.isOptionIndeterminate(option));
-
     return (
       <div ref={this.setWrapperRef}>
         <Header
@@ -355,6 +354,8 @@ class MultiSelect extends React.Component {
                   filters={this.currentFilters(this.state.queryTags, this.props.tagFilterGroups)}
                   searchQuery={this.state.query || ''}
                   multiselect
+                  searchAttributes={this.props.searchAttributes}
+                  placeholderMessageId={this.props.placeholderMessageId}
                 />
               </Search>
             )
@@ -462,6 +463,8 @@ MultiSelect.propTypes = {
   threeState: PropTypes.bool,
   panelId: PropTypes.string,
   tagFilterGroups: PropTypes.array,
+  searchAttributes: PropTypes.array,
+  placeholderMessageId: PropTypes.string,
 };
 
 MultiSelect.defaultProps = {

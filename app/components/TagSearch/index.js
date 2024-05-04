@@ -168,12 +168,15 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       onClear,
       resultsId,
       searchAttributes,
+      placeholderMessageId,
     } = this.props;
     const { intl } = this.context;
     const searchHasFilters = (searchQuery || filters.length > 0);
     let inputPlaceholder;
     if (placeholder) {
       inputPlaceholder = placeholder;
+    } else if (placeholderMessageId && messages[placeholderMessageId]) {
+      inputPlaceholder = intl.formatMessage(messages[placeholderMessageId]);
     } else if (searchAttributes) {
       const attLength = searchAttributes.length;
       inputPlaceholder = intl.formatMessage(
@@ -350,6 +353,7 @@ TagSearch.propTypes = {
   searchAttributes: PropTypes.array,
   searchQuery: PropTypes.string,
   placeholder: PropTypes.string,
+  placeholderMessageId: PropTypes.string,
   resultsId: PropTypes.string,
   onSearch: PropTypes.func,
   onSkipToResults: PropTypes.func,

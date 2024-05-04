@@ -9,6 +9,10 @@ export default defineMessages({
     id: 'app.components.TagSearch.searchPlaceholderEntities',
     defaultMessage: 'Filter items by reference or title',
   },
+  searchPlaceholderUsers: {
+    id: 'app.components.TagSearch.searchPlaceholderUsers',
+    defaultMessage: 'Filter items by name or domain',
+  },
   searchPlaceholderEntitiesAttributes: {
     id: 'app.components.TagSearch.searchPlaceholderEntitiesAttributes',
     defaultMessage: 'Filter items by {attributes}',

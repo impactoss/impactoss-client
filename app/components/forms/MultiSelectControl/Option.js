@@ -33,6 +33,15 @@ const Id = styled.span`
     font-size: ${(props) => props.theme.sizes.print.small};
   }
 `;
+const Domain = styled.div`
+  color: ${palette('text', 1)};
+  font-size: 0.8em;
+  opacity: 0.6;
+  padding-top: 4px;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+  }
+`;
 const IdSpacer = styled.span`
   padding-left: 0.25em;
   padding-right: 0.25em;
@@ -43,7 +52,7 @@ class Option extends React.Component { // eslint-disable-line react/prefer-state
   render() {
     const { intl } = this.context;
     const {
-      draft, reference, message, label, messagePrefix, isNew,
+      draft, reference, message, label, messagePrefix, isNew, domain,
     } = this.props;
 
     let optionLabel;
@@ -58,23 +67,30 @@ class Option extends React.Component { // eslint-disable-line react/prefer-state
 
     return (
       <Label bold={false}>
-        {draft
-          && <ItemStatus draft top />
-        }
-        {reference
-          && <Id>{reference}</Id>
-        }
-        {reference
-          && <IdSpacer />
-        }
-        { optionLabel }
-        {isNew
-          && (
-            <New>
-              <FormattedMessage {...messages.new} />
-            </New>
-          )
-        }
+        <div>
+          {draft
+            && <ItemStatus draft top />
+          }
+          {reference
+            && <Id>{reference}</Id>
+          }
+          {reference
+            && <IdSpacer />
+          }
+          { optionLabel }
+          {isNew
+            && (
+              <New>
+                <FormattedMessage {...messages.new} />
+              </New>
+            )
+          }
+        </div>
+        {domain && (
+          <Domain>
+            <FormattedMessage {...messages.domain} values={{ domain }} />
+          </Domain>
+        )}
       </Label>
     );
   }
@@ -85,6 +101,7 @@ Option.propTypes = {
   message: PropTypes.string,
   messagePrefix: PropTypes.string,
   reference: PropTypes.string,
+  domain: PropTypes.string,
   draft: PropTypes.bool,
   isNew: PropTypes.bool,
 };
