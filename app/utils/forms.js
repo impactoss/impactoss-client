@@ -43,14 +43,22 @@ export const entityOptions = (entities, defaultToId = true, hasTags = true) => e
   )
   : List();
 
-export const userOption = (entity, activeUserId) => Map({
+export const userOption = (entity, activeUserId, searchAttributes) => Map({
   value: entity.get('id'),
   label: entity.getIn(['attributes', 'name']),
+  domain: entity.getIn(['attributes', 'domain']),
   checked: activeUserId ? entity.get('id') === activeUserId.toString() : false,
+  searchAttributes: searchAttributes
+    ? List([...searchAttributes, 'label'])
+    : null,
 });
 
-export const userOptions = (entities, activeUserId) => entities
-  ? entities.reduce((options, entity) => options.push(userOption(entity, activeUserId)), List())
+export const userOptions = (entities, activeUserId, searchAttributes) => entities
+  ? entities.reduce(
+    (options, entity) => options.push(
+      userOption(entity, activeUserId, searchAttributes)
+    ), List()
+  )
   : List();
 
 export const parentCategoryOption = (entity, activeParentId) => Map({
@@ -205,7 +213,11 @@ export const renderIndicatorControl = (entities, onCreateOption, contextIntl) =>
   }
   : null;
 
-export const renderUserControl = (entities, label, activeUserId) => entities
+export const renderUserControl = (
+  entities,
+  label,
+  activeUserId,
+) => entities
   ? {
     id: 'users',
     model: '.associatedUser',
@@ -213,7 +225,8 @@ export const renderUserControl = (entities, label, activeUserId) => entities
     label,
     controlType: 'multiselect',
     multiple: false,
-    options: userOptions(entities, activeUserId),
+    options: userOptions(entities, activeUserId, ['name', 'domain']),
+    placeholderMessageId: 'searchPlaceholderUsers',
   }
   : null;
 

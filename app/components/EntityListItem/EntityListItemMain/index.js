@@ -85,6 +85,15 @@ const EntityListItemMainTopWrap = styled.div`
 }px;
 `;
 
+const EntityListItemMainSubtitle = styled.div`
+  font-weight: normal;
+  opacity: 0.7;
+  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.nestedListItem};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.nestedListItem};
+  }
+`;
+
 class EntityListItemMain extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentDidMount() {
     if (this.props.isFocus) this.title.focus();
@@ -212,6 +221,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     return ({
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
+      subtitle: config.sublabel && entity.getIn(['attributes', config.sublabel]),
       reference: this.getReference(entity, config),
       draft: entity.getIn(['attributes', 'draft']),
       role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
@@ -255,6 +265,11 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             <EntityListItemMainTitle nested={nestLevel && nestLevel > 0}>
               {entity.title}
             </EntityListItemMainTitle>
+            {entity.subtitle && (
+              <EntityListItemMainSubtitle>
+                {entity.subtitle}
+              </EntityListItemMainSubtitle>
+            )}
           </EntityListItemMainTitleWrap>
           {skipTargetId && (
             <SkipContent

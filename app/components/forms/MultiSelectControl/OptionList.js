@@ -30,11 +30,11 @@ const OptionWrapper = styled.div`
   width: 100%;
   line-height: 1.3;
   font-size: 0.8em;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+  @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
     font-size: 1em;
   }
   @media print {
-    font-size: ${(props) => props.theme.sizes.print.default};
+    font-size: ${({ theme }) => theme.sizes.print.default};
   }
 `;
 // background-color: ${(props) => {
@@ -234,6 +234,7 @@ class OptionList extends React.PureComponent {
                           message={option.get('message')}
                           isNew={option.get('isNew')}
                           draft={option.get('draft')}
+                          sublabel={option.get('domain') || option.get('sublabel')}
                         />
                       </OptionLabel>
                       { option.get('showCount') && typeof option.get('count') !== 'undefined'

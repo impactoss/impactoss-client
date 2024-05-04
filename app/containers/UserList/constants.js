@@ -13,6 +13,7 @@ export const CONFIG = {
   clientPath: 'users',
   serverPath: 'users',
   search: ['name', 'domain'],
+  sublabel: 'domain',
   sorting: [
     {
       attribute: 'id', // proxy for created at

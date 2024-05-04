@@ -9,6 +9,10 @@ export default defineMessages({
     id: 'app.components.MultiSelectControl.new',
     defaultMessage: 'New',
   },
+  domain: {
+    id: 'app.components.MultiSelectControl.domain',
+    defaultMessage: '{domain} (domain from email)',
+  },
   empty: {
     id: 'app.components.MultiSelectControl.empty',
     defaultMessage: 'No options currently available',

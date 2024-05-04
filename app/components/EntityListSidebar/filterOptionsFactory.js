@@ -141,6 +141,9 @@ export const makeAttributeFilterOptions = (entities, config, activeOptionId, loc
           } else if (option.reference && !!entity.get(option.reference.key)) {
             filterOptions.options[value] = {
               label: entity.getIn([option.reference.key, 'attributes', option.reference.label]),
+              sublabel: option.reference.sublabel
+                ? entity.getIn([option.reference.key, 'attributes', option.reference.sublabel])
+                : null,
               showCount: true,
               value: queryValue,
               count: 1,
