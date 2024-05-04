@@ -39,16 +39,18 @@ import { qe } from 'utils/quasi-equals';
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
+
 import EntityView from 'components/EntityView';
 
 import {
   selectReady,
   selectIsUserManager,
-  selectIsUserAdmin,
+  selectHasUserRole,
   selectMeasureConnections,
   selectRecommendationConnections,
   selectActiveFrameworks,
@@ -275,7 +277,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       viewEntity,
       dataReady,
       isManager,
-      isAdmin,
+      hasUserRole,
       recommendationsByFw,
       childRecommendationsByFw,
       measures,
@@ -296,7 +298,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
-      buttons = isAdmin
+      buttons = hasUserRole[CATEGORY_ADMIN_MIN_ROLE]
         ? buttons.concat([
           {
             type: 'edit',
@@ -397,7 +399,7 @@ CategoryView.propTypes = {
   dataReady: PropTypes.bool,
   params: PropTypes.object,
   isManager: PropTypes.bool,
-  isAdmin: PropTypes.bool,
+  hasUserRole: PropTypes.object,
   parentTaxonomy: PropTypes.object,
   recommendationsByFw: PropTypes.object,
   childRecommendationsByFw: PropTypes.object,
@@ -416,7 +418,7 @@ CategoryView.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
-  isAdmin: selectIsUserAdmin(state),
+  hasUserRole: selectHasUserRole(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   recommendationsByFw: selectRecommendations(state, props.params.id),
