@@ -55,6 +55,7 @@ import {
   selectIsUserAdmin,
   selectSessionUserHighestRoleId,
   selectFrameworks,
+  selectRecommendationReferences,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -125,12 +126,12 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       : Map();
   };
 
-  getHeaderMainFields = () => {
+  getHeaderMainFields = (existingReferences) => {
     const { intl } = this.context;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getReferenceFormField(intl.formatMessage, true), // required
+          getReferenceFormField(intl.formatMessage, true, false, existingReferences), // required
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -210,6 +211,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       indicators,
       onCreateOption,
       frameworks,
+      existingReferences,
     } = this.props;
     const reference = this.props.params.id;
     const {
@@ -308,7 +310,11 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                 handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
+                    main: this.getHeaderMainFields(
+                      existingReferences
+                        ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
+                        : null
+                    ),
                     aside: this.getHeaderAsideFields(viewEntity),
                   },
                   body: {
@@ -361,6 +367,7 @@ RecommendationEdit.propTypes = {
   onServerErrorDismiss: PropTypes.func.isRequired,
   connectedTaxonomies: PropTypes.object,
   frameworks: PropTypes.object,
+  existingReferences: PropTypes.array,
 };
 
 RecommendationEdit.contextTypes = {
@@ -378,6 +385,7 @@ const mapStateToProps = (state, props) => ({
   indicators: selectIndicators(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectFrameworks(state),
+  existingReferences: selectRecommendationReferences(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

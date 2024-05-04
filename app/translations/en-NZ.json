@@ -416,6 +416,7 @@
   "app.containers.App.forms.emailFormatError": "Please enter a valid email address",
   "app.containers.App.forms.endDateBeforeStartDateError": "End date must be after start date",
   "app.containers.App.forms.fieldRequired": "This field cannot be empty",
+  "app.containers.App.forms.valueProhibited": "This value must be unique and already exists in the database",
   "app.containers.App.forms.numberError": "Please enter a number",
   "app.containers.App.forms.outdatedError": "Item outdated: This item had been updated on the server. Please review the latest server version below.",
   "app.containers.App.forms.passwordInvalidError": "Current password does not match password on file",
