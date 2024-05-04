@@ -34,7 +34,7 @@ import { hasNewError } from 'utils/entity-form';
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
 
@@ -397,7 +397,7 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
+      dispatch(redirectIfNotPermitted(CATEGORY_ADMIN_MIN_ROLE));
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
