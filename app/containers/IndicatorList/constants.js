@@ -89,6 +89,7 @@ export const CONFIG = {
         reference: {
           key: 'manager',
           label: 'name',
+          sublabel: 'domain',
           without: true,
         },
       },

@@ -234,7 +234,7 @@ class OptionList extends React.PureComponent {
                           message={option.get('message')}
                           isNew={option.get('isNew')}
                           draft={option.get('draft')}
-                          domain={option.get('domain')}
+                          sublabel={option.get('domain') || option.get('sublabel')}
                         />
                       </OptionLabel>
                       { option.get('showCount') && typeof option.get('count') !== 'undefined'

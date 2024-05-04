@@ -141,6 +141,9 @@ export const makeAttributeFilterOptions = (entities, config, activeOptionId, loc
           } else if (option.reference && !!entity.get(option.reference.key)) {
             filterOptions.options[value] = {
               label: entity.getIn([option.reference.key, 'attributes', option.reference.label]),
+              sublabel: option.reference.sublabel
+                ? entity.getIn([option.reference.key, 'attributes', option.reference.sublabel])
+                : null,
               showCount: true,
               value: queryValue,
               count: 1,
@@ -485,7 +488,6 @@ export const makeConnectionFilterOptions = (
                 const value = `${path}:${connectedId}`;
                 const reference = getEntityReference(connection);
                 const label = getEntityTitle(connection, option.labels, contextIntl);
-                const domain = entity.getIn(['attributes', 'domain']);
                 filterOptions.options[connectedId] = {
                   label,
                   reference,
@@ -496,7 +498,6 @@ export const makeConnectionFilterOptions = (
                   checked: optionChecked(locationQueryValue, value),
                   tags: connection.get('categories'),
                   draft: connection.getIn(['attributes', 'draft']),
-                  domain,
                 };
               }
             }

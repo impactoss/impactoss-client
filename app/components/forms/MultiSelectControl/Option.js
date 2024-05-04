@@ -33,7 +33,7 @@ const Id = styled.span`
     font-size: ${(props) => props.theme.sizes.print.small};
   }
 `;
-const Domain = styled.div`
+const Sublabel = styled.div`
   color: ${palette('text', 1)};
   font-size: 0.8em;
   opacity: 0.6;
@@ -52,7 +52,7 @@ class Option extends React.Component { // eslint-disable-line react/prefer-state
   render() {
     const { intl } = this.context;
     const {
-      draft, reference, message, label, messagePrefix, isNew, domain,
+      draft, reference, message, label, messagePrefix, isNew, sublabel,
     } = this.props;
 
     let optionLabel;
@@ -86,10 +86,8 @@ class Option extends React.Component { // eslint-disable-line react/prefer-state
             )
           }
         </div>
-        {domain && (
-          <Domain>
-            <FormattedMessage {...messages.domain} values={{ domain }} />
-          </Domain>
+        {sublabel && (
+          <Sublabel>{sublabel}</Sublabel>
         )}
       </Label>
     );
@@ -101,7 +99,7 @@ Option.propTypes = {
   message: PropTypes.string,
   messagePrefix: PropTypes.string,
   reference: PropTypes.string,
-  domain: PropTypes.string,
+  sublabel: PropTypes.string,
   draft: PropTypes.bool,
   isNew: PropTypes.bool,
 };
