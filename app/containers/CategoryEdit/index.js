@@ -43,7 +43,7 @@ import { canUserDeleteEntities } from 'utils/permissions';
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -69,7 +69,6 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
-import Footer from 'containers/Footer';
 
 import { getEntityTitle } from 'utils/entities';
 
@@ -405,7 +404,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           {(saveSending || deleteSending)
             && <Loading />
           }
-          <Footer />
         </Content>
       </div>
     );
@@ -465,7 +463,7 @@ function mapDispatchToProps(dispatch, props) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
-      dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
+      dispatch(redirectIfNotPermitted(CATEGORY_ADMIN_MIN_ROLE));
     },
     initialiseForm: (model, formData) => {
       dispatch(formActions.reset(model));

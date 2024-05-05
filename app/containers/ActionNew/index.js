@@ -48,6 +48,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectMeasureTaxonomies,
+  selectMeasureReferences,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -55,7 +56,6 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
-import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
 
@@ -93,12 +93,12 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     }
   }
 
-  getHeaderMainFields = () => {
+  getHeaderMainFields = (existingReferences) => {
     const { intl } = this.context;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getReferenceFormField(intl.formatMessage, false, true),
+          getReferenceFormField(intl.formatMessage, false, true, existingReferences),
           getTitleFormField(intl.formatMessage),
         ],
       },
@@ -184,7 +184,14 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   render() {
     const { intl } = this.context;
     const {
-      dataReady, viewDomain, connectedTaxonomies, recommendationsByFw, indicators, taxonomies, onCreateOption,
+      dataReady,
+      viewDomain,
+      connectedTaxonomies,
+      recommendationsByFw,
+      indicators,
+      taxonomies,
+      onCreateOption,
+      existingReferences,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     return (
@@ -248,7 +255,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                 handleUpdate={this.props.handleUpdate}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
+                    main: this.getHeaderMainFields(existingReferences),
                     aside: this.getHeaderAsideFields(),
                   },
                   body: {
@@ -271,7 +278,6 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           {saveSending
             && <Loading />
           }
-          <Footer />
         </Content>
       </div>
     );
@@ -297,6 +303,7 @@ ActionNew.propTypes = {
   connectedTaxonomies: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
+  existingReferences: PropTypes.array,
 };
 
 ActionNew.contextTypes = {
@@ -311,6 +318,7 @@ const mapStateToProps = (state) => ({
   indicators: selectEntities(state, 'indicators'),
   recommendationsByFw: selectRecommendationsByFw(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
+  existingReferences: selectMeasureReferences(state),
 });
 
 function mapDispatchToProps(dispatch) {

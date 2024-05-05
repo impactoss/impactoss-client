@@ -27,15 +27,15 @@ export const DEPENDENCIES = [
 export const FORM_INITIAL = fromJS({
   id: '',
   attributes: {
-    title: null,
-    description: null,
+    title: '',
+    description: '',
     draft: null,
     manager_id: null,
     frequency_months: REPORT_FREQUENCIES[0] ? REPORT_FREQUENCIES[0].value : null,
     start_date: null,
     repeat: false,
     end_date: null,
-    reference: null,
+    reference: '',
   },
   associatedMeasures: [],
   associatedRecommendationsByFw: {},

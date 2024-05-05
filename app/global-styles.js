@@ -77,9 +77,12 @@ const GlobalStyle = createGlobalStyle`
     font-size: 1em;
     margin: 0;
   }
-  :focus, :visited:focus {
-    outline: 5px auto rgb(77, 144, 254); /* TODO: improve focus styles and individualise for specific buttons and links */
+
+  *:focus-visible {
+    outline: 2px solid black;
+    outline-offset: 2px;
   }
+
   #app {
     background-color: #ffffff;
     min-height: 100%;
@@ -339,13 +342,7 @@ const GlobalStyle = createGlobalStyle`
 
   /* accessability styles */
 
-  *:focus-visible {
-  outline: 3px black dashed;
-  box-shadow: 0 0 2px 2px black;
-  }
-  *:focus {
-    outline: none;
-  }
+
 `;
 
 export default GlobalStyle;

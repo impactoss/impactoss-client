@@ -33,4 +33,12 @@ export default defineMessages({
     id: 'app.containers.Bookmarker.placeholder',
     defaultMessage: 'Please enter a title',
   },
+  editBookmark: {
+    id: 'app.containers.Bookmarker.editBookmark',
+    defaultMessage: 'Edit bookmark for current list view',
+  },
+  newBookmark: {
+    id: 'app.containers.Bookmarker.newBookmark',
+    defaultMessage: 'Bookmark current list view',
+  },
 });

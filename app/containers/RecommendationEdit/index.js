@@ -55,6 +55,7 @@ import {
   selectIsUserAdmin,
   selectSessionUserHighestRoleId,
   selectFrameworks,
+  selectRecommendationReferences,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -62,7 +63,6 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
-import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -126,12 +126,12 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       : Map();
   };
 
-  getHeaderMainFields = () => {
+  getHeaderMainFields = (existingReferences) => {
     const { intl } = this.context;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getReferenceFormField(intl.formatMessage, true), // required
+          getReferenceFormField(intl.formatMessage, true, false, existingReferences), // required
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -211,6 +211,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       indicators,
       onCreateOption,
       frameworks,
+      existingReferences,
     } = this.props;
     const reference = this.props.params.id;
     const {
@@ -309,7 +310,11 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                 handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
+                    main: this.getHeaderMainFields(
+                      existingReferences
+                        ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
+                        : null
+                    ),
                     aside: this.getHeaderAsideFields(viewEntity),
                   },
                   body: {
@@ -331,7 +336,6 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           { (saveSending || deleteSending)
             && <Loading />
           }
-          <Footer />
         </Content>
       </div>
     );
@@ -363,6 +367,7 @@ RecommendationEdit.propTypes = {
   onServerErrorDismiss: PropTypes.func.isRequired,
   connectedTaxonomies: PropTypes.object,
   frameworks: PropTypes.object,
+  existingReferences: PropTypes.array,
 };
 
 RecommendationEdit.contextTypes = {
@@ -380,6 +385,7 @@ const mapStateToProps = (state, props) => ({
   indicators: selectIndicators(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectFrameworks(state),
+  existingReferences: selectRecommendationReferences(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -448,8 +454,9 @@ function mapDispatchToProps(dispatch, props) {
         saveData = saveData
           .setIn(['attributes', 'accepted'], '')
           .setIn(['attributes', 'response'], '');
-      } else if (saveData.getIn(['attributes', 'accepted']) === '') {
-        saveData = saveData.setIn(['attributes', 'accepted'], 'true');
+      }
+      if (saveData.getIn(['attributes', 'accepted']) === 'null') {
+        saveData = saveData.setIn(['attributes', 'accepted'], null);
       }
       // check if attributes have changed
       if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {

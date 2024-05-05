@@ -253,13 +253,18 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                       onDismissAllErrors();
                     }}
                   />
+                  <SkipContent
+                    href="#filter-options"
+                    title={this.context.intl.formatMessage(appMessages.screenreader[
+                      isManager ? 'skipToListFilterEdit' : 'skipToListFilter'])}
+                  >
+                    <FormattedMessage
+                      {...appMessages.screenreader[
+                        isManager ? 'skipToListFilterEdit' : 'skipToListFilter'
+                      ]}
+                    />
+                  </SkipContent>
                 </EntityListSearch>
-                <SkipContent
-                  href="#filter-options"
-                  title={this.context.intl.formatMessage(appMessages.screenreader.skipToListFilter)}
-                >
-                  <FormattedMessage {...appMessages.screenreader.skipToListFilter} />
-                </SkipContent>
                 <EntityListOptions
                   groupOptions={getGroupOptions(taxonomies, intl)}
                   subgroupOptions={getGroupOptions(taxonomies, intl)}
@@ -274,10 +279,20 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 <ListWrapper ref={this.ScrollTarget}>
                   <EntityListGroups
                     entities={entities}
+                    taxonomies={taxonomies}
                     errors={errors}
                     onDismissError={this.props.onDismissError}
                     entityGroups={entityGroups}
-                    taxonomies={taxonomies}
+                    groupTaxonomyTitle={groupSelectValue
+                      && taxonomies
+                      && taxonomies.get(groupSelectValue)
+                      && taxonomies.get(groupSelectValue).getIn(['attributes', 'title'])
+                    }
+                    subgroupTaxonomyTitle={subgroupSelectValue
+                      && taxonomies
+                      && taxonomies.get(subgroupSelectValue)
+                      && taxonomies.get(subgroupSelectValue).getIn(['attributes', 'title'])
+                    }
                     connections={connections}
                     entityIdsSelected={this.props.entityIdsSelected}
                     locationQuery={this.props.locationQuery}

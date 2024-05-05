@@ -55,6 +55,7 @@ import {
   selectReadyForAuthCheck,
   selectIsUserAdmin,
   selectSessionUserHighestRoleId,
+  selectMeasureReferences,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -62,7 +63,6 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
-import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
 
@@ -135,13 +135,13 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       : Map();
   }
 
-  getHeaderMainFields = () => {
+  getHeaderMainFields = (existingReferences) => {
     const { intl } = this.context;
     return (
       [ // fieldGroups
         { // fieldGroup
           fields: [
-            getReferenceFormField(intl.formatMessage, false, true),
+            getReferenceFormField(intl.formatMessage, false, true, existingReferences),
             getTitleFormField(intl.formatMessage),
           ],
         },
@@ -242,6 +242,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       recommendationsByFw,
       indicators,
       onCreateOption,
+      existingReferences,
     } = this.props;
     const { intl } = this.context;
     const reference = this.props.params.id;
@@ -326,7 +327,11 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
+                    main: this.getHeaderMainFields(
+                      existingReferences
+                        ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
+                        : null
+                    ),
                     aside: this.getHeaderAsideFields(viewEntity),
                   },
                   body: {
@@ -349,7 +354,6 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           {(saveSending || deleteSending)
             && <Loading />
           }
-          <Footer />
         </Content>
       </div>
     );
@@ -380,6 +384,7 @@ ActionEdit.propTypes = {
   onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
+  existingReferences: PropTypes.array,
 };
 
 ActionEdit.contextTypes = {
@@ -397,6 +402,7 @@ const mapStateToProps = (state, props) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   indicators: selectIndicators(state, props.params.id),
   recommendationsByFw: selectRecommendationsByFw(state, props.params.id),
+  existingReferences: selectMeasureReferences(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

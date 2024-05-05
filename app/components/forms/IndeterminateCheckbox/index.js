@@ -12,6 +12,9 @@ export const STATES = {
 
 const Input = styled.input`
 accent-color: ${palette('checkbox', 0)};
+&:focus-visible {
+  outline: 1px solid ${palette('primary', 0)};
+}
 `;
 export default class IndeterminateCheckbox extends React.Component {
   static propTypes = {

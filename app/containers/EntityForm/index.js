@@ -53,7 +53,7 @@ import DateControl from 'components/forms/DateControl';
 import RadioControl from 'components/forms/RadioControl';
 import Required from 'components/forms/Required';
 import MultiSelectField from 'components/forms/MultiSelectField';
-
+import Footer from 'containers/Footer';
 import messages from './messages';
 
 const StyledForm = styled(Form)`
@@ -357,95 +357,98 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     const hasEntityNewModal = !!newEntityModal;
 
     return (
-      <FormWrapper withoutShadow={inModal} hasMarginBottom={!inModal}>
-        <StyledForm
-          model={model}
-          onSubmit={this.handleSubmit}
-          onSubmitFailed={handleSubmitFail}
-          validators={validators}
-        >
-          <FormBody>
-            { fields.header && (
-              <ViewPanel>
-                {fields.header.main && this.renderMain(
-                  fields.header.main,
-                  !!fields.header.aside,
-                  false,
-                  hasEntityNewModal,
-                  scrollContainer,
-                )}
-                {fields.header.aside && this.renderAside(
-                  fields.header.aside,
-                  false,
-                  hasEntityNewModal,
-                  scrollContainer,
-                )}
-              </ViewPanel>
-            )}
-            { fields.body
-              && (
+      <div>
+        <FormWrapper withoutShadow={inModal} hasMarginBottom={!inModal}>
+          <StyledForm
+            model={model}
+            onSubmit={this.handleSubmit}
+            onSubmitFailed={handleSubmitFail}
+            validators={validators}
+          >
+            <FormBody>
+              { fields.header && (
                 <ViewPanel>
-                  {fields.body.main && this.renderMain(
-                    fields.body.main,
-                    true,
-                    true,
+                  {fields.header.main && this.renderMain(
+                    fields.header.main,
+                    !!fields.header.aside,
+                    false,
                     hasEntityNewModal,
                     scrollContainer,
                   )}
-                  {fields.body.aside && this.renderAside(
-                    fields.body.aside,
-                    true,
+                  {fields.header.aside && this.renderAside(
+                    fields.header.aside,
+                    false,
                     hasEntityNewModal,
                     scrollContainer,
                   )}
                 </ViewPanel>
-              )
-            }
-          </FormBody>
-          <FormFooter>
-            {this.props.handleDelete && !this.state.deleteConfirmed
-              && (
-                <DeleteWrapper>
-                  <ButtonPreDelete type="button" onClick={this.preDelete}>
-                    <Icon name="trash" sizes={{ mobile: '1.8em' }} />
-                  </ButtonPreDelete>
-                </DeleteWrapper>
-              )
-            }
-            {this.props.handleDelete && this.state.deleteConfirmed
-              && (
-                <FormFooterButtons left>
-                  <DeleteConfirmText>
-                    <FormattedMessage {...messages.confirmDeleteQuestion} />
-                  </DeleteConfirmText>
-                  <ButtonCancel
-                    type="button"
-                    onClick={() => this.preDelete(false)}
-                  >
-                    <FormattedMessage {...messages.buttons.cancelDelete} />
-                  </ButtonCancel>
-                  <ButtonDelete type="button" onClick={this.props.handleDelete}>
-                    <FormattedMessage {...messages.buttons.confirmDelete} />
-                  </ButtonDelete>
-                </FormFooterButtons>
-              )
-            }
-            {!this.state.deleteConfirmed
-              && (
-                <FormFooterButtons>
-                  <ButtonCancel type="button" onClick={handleCancel}>
-                    <FormattedMessage {...appMessages.buttons.cancel} />
-                  </ButtonCancel>
-                  <ButtonSubmit type="submit" disabled={this.props.saving}>
-                    <FormattedMessage {...appMessages.buttons.save} />
-                  </ButtonSubmit>
-                </FormFooterButtons>
-              )
-            }
-            <Clear />
-          </FormFooter>
-        </StyledForm>
-      </FormWrapper>
+              )}
+              { fields.body
+                && (
+                  <ViewPanel>
+                    {fields.body.main && this.renderMain(
+                      fields.body.main,
+                      true,
+                      true,
+                      hasEntityNewModal,
+                      scrollContainer,
+                    )}
+                    {fields.body.aside && this.renderAside(
+                      fields.body.aside,
+                      true,
+                      hasEntityNewModal,
+                      scrollContainer,
+                    )}
+                  </ViewPanel>
+                )
+              }
+            </FormBody>
+            <FormFooter>
+              {this.props.handleDelete && !this.state.deleteConfirmed
+                && (
+                  <DeleteWrapper>
+                    <ButtonPreDelete type="button" onClick={this.preDelete}>
+                      <Icon name="trash" sizes={{ mobile: '1.8em' }} />
+                    </ButtonPreDelete>
+                  </DeleteWrapper>
+                )
+              }
+              {this.props.handleDelete && this.state.deleteConfirmed
+                && (
+                  <FormFooterButtons left>
+                    <DeleteConfirmText>
+                      <FormattedMessage {...messages.confirmDeleteQuestion} />
+                    </DeleteConfirmText>
+                    <ButtonCancel
+                      type="button"
+                      onClick={() => this.preDelete(false)}
+                    >
+                      <FormattedMessage {...messages.buttons.cancelDelete} />
+                    </ButtonCancel>
+                    <ButtonDelete type="button" onClick={this.props.handleDelete}>
+                      <FormattedMessage {...messages.buttons.confirmDelete} />
+                    </ButtonDelete>
+                  </FormFooterButtons>
+                )
+              }
+              {!this.state.deleteConfirmed
+                && (
+                  <FormFooterButtons>
+                    <ButtonCancel type="button" onClick={handleCancel}>
+                      <FormattedMessage {...appMessages.buttons.cancel} />
+                    </ButtonCancel>
+                    <ButtonSubmit type="submit" disabled={this.props.saving}>
+                      <FormattedMessage {...appMessages.buttons.save} />
+                    </ButtonSubmit>
+                  </FormFooterButtons>
+                )
+              }
+              <Clear />
+            </FormFooter>
+          </StyledForm>
+        </FormWrapper>
+        {!inModal && (<Footer fill />)}
+      </div>
     );
   }
 }

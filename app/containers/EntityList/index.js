@@ -179,7 +179,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             return ({
               ...action,
               onClick: () => this.onDownloadClick(),
-              title: 'Download CSV',
+              title: intl.formatMessage(messages.downloadCSV),
               icon: 'download',
             });
           }
@@ -213,36 +213,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               hasUserRole={this.props.hasUserRole}
             />
           </ReactModal>
-        )}
-        {!this.props.dataReady && <EntityListSidebarLoading />}
-        {this.props.dataReady && this.props.showSidebar && !printing && (
-          <EntityListSidebar
-            listUpdating={progress !== null && progress >= 0 && progress < 100}
-            entities={entities}
-            taxonomies={this.props.taxonomies}
-            frameworks={this.props.frameworks}
-            connections={this.props.connections}
-            connectedTaxonomies={this.props.connectedTaxonomies}
-            entityIdsSelected={
-              entityIdsSelected.size === entityIdsSelectedFiltered.size
-                ? entityIdsSelected
-                : entityIdsSelectedFiltered
-            }
-            config={this.props.config}
-            locationQuery={this.props.locationQuery}
-            canEdit={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
-            hasUserRole={this.props.hasUserRole}
-            activePanel={this.props.activePanel}
-            onPanelSelect={this.props.onPanelSelect}
-            onCreateOption={this.props.onCreateOption}
-            onUpdate={
-              (associations, activeEditOption) => this.props.handleEditSubmit(
-                associations,
-                activeEditOption,
-                this.props.entityIdsSelected,
-                viewDomain.get('errors'),
-              )}
-          />
         )}
         <EntityListMain
           listUpdating={progress !== null && progress >= 0 && progress < 100}
@@ -578,7 +548,7 @@ function mapDispatchToProps(dispatch, props) {
         if (creates.size > 0) {
           // take the first
           // TODO multiselect should be run in single value mode and only return 1 value
-          const newValue = creates.first();
+          let newValue = creates.first();
           entities.forEach((entity) => {
             // not exactly sure what is happening here?
             if (errors && errors.size) {
@@ -589,6 +559,9 @@ function mapDispatchToProps(dispatch, props) {
               });
             }
           });
+          if (activeEditOption.optionId === 'accepted' && newValue === 'null') {
+            newValue = null;
+          }
           dispatch(saveMultiple(
             props.config.serverPath,
             entities.filter(

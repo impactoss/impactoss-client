@@ -8,7 +8,7 @@ import { palette } from 'styled-theme';
 const A = styled.a`
   color: ${(props) => props.isOnLightBackground ? palette('link', 1) : palette('link', 0)};
 
-  &:hover {
+  &:hover, &:focus-visible {
     color: ${(props) => props.isOnLightBackground ? palette('linkHover', 1) : palette('linkHover', 0)};
   }
 `;

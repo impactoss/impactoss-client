@@ -7,6 +7,7 @@ import { getRedirects } from 'utils/redirects';
 
 import { ROUTES } from 'containers/App/constants';
 import {
+  CATEGORY_ADMIN_MIN_ROLE,
   USER_ROLES,
   PAGE_ADMIN_MIN_ROLE,
   USER_ADMIN_MIN_ROLE,
@@ -643,7 +644,7 @@ export default function createRoutes(store) {
     }, {
       path: `${ROUTES.TAXONOMIES}${ROUTES.ID}${ROUTES.NEW}`, // the taxonomy id
       name: 'categoryNew',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
+      onEnter: redirectIfNotPermitted(CATEGORY_ADMIN_MIN_ROLE),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/CategoryNew/reducer'),
@@ -680,7 +681,7 @@ export default function createRoutes(store) {
     }, {
       path: `${ROUTES.CATEGORIES}${ROUTES.EDIT}${ROUTES.ID}`,
       name: 'categoryEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
+      onEnter: redirectIfNotPermitted(CATEGORY_ADMIN_MIN_ROLE),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/CategoryEdit/reducer'),

@@ -18,16 +18,19 @@ import {
   selectFWTaxonomiesSorted,
   selectReady,
   selectIsUserManager,
+  selectHasUserRole,
   selectCurrentFrameworkId,
   selectActiveFrameworks,
 } from 'containers/App/selectors';
 import { ROUTES, CONTENT_LIST } from 'containers/App/constants';
+import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 // components
 import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
 import Container from 'components/styled/Container';
 import Content from 'components/styled/Content';
+import SkipContent from 'components/styled/SkipContent';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
@@ -107,6 +110,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       userOnlyCategoryGroups,
       dataReady,
       isManager,
+      hasUserRole,
       onPageLink,
       onTaxonomyLink,
       frameworks,
@@ -120,10 +124,10 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       buttons.push({
         type: 'icon',
         onClick: () => window.print(),
-        title: 'Print',
+        title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
-      if (isManager && typeof reference !== 'undefined') {
+      if (hasUserRole[CATEGORY_ADMIN_MIN_ROLE] && typeof reference !== 'undefined') {
         buttons.push({
           type: 'add',
           title: [
@@ -151,20 +155,6 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        {!dataReady
-          && <EntityListSidebarLoading responsiveSmall />
-        }
-        {taxonomies && frameworks && typeof reference !== 'undefined'
-          && (
-            <TaxonomySidebar
-              taxonomies={taxonomies}
-              active={reference}
-              frameworkId={frameworkId}
-              frameworks={frameworks}
-              onTaxonomyLink={onTaxonomyLink}
-            />
-          )
-        }
         <ContainerWithSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
@@ -175,9 +165,17 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 title={contentTitle}
                 buttons={buttons}
               />
-              {contentDescription
-                && <Description>{contentDescription}</Description>
-              }
+              <div style={{ position: 'relative' }}>
+                {contentDescription
+                  && <Description>{contentDescription}</Description>
+                }
+                <SkipContent
+                  href="#sidebar-taxonomy-options"
+                  title={this.context.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
+                >
+                  <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
+                </SkipContent>
+              </div>
               {!dataReady
                 && <Loading />
               }
@@ -253,6 +251,8 @@ CategoryList.propTypes = {
   userOnlyCategoryGroups: PropTypes.object,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
+  // isAdmin: PropTypes.bool,
+  hasUserRole: PropTypes.object,
   location: PropTypes.object,
   frameworks: PropTypes.object,
   frameworkId: PropTypes.string,
@@ -266,6 +266,7 @@ const mapStateToProps = (state, props) => ({
   frameworks: selectActiveFrameworks(state),
   frameworkId: selectCurrentFrameworkId(state),
   isManager: selectIsUserManager(state),
+  hasUserRole: selectHasUserRole(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectFWTaxonomiesSorted(state),
   taxonomy: selectTaxonomy(state, { id: props.params.id }),

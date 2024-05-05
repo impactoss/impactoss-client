@@ -52,6 +52,7 @@ import {
   selectEntities,
   selectCurrentFrameworkId,
   selectActiveFrameworks,
+  selectRecommendationReferences,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -59,7 +60,6 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
-import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -109,14 +109,14 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     ));
   }
 
-  getHeaderMainFields = (frameworkId, frameworks) => {
+  getHeaderMainFields = (frameworkId, frameworks, existingReferences) => {
     const { intl } = this.context;
     const hasFWOptions = frameworks && frameworks.size > 1 && frameworkId === 'all';
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
           hasFWOptions && getFrameworkFormField(intl.formatMessage, frameworks), // required
-          getReferenceFormField(intl.formatMessage, true), // required
+          getReferenceFormField(intl.formatMessage, true, false, existingReferences), // required
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -190,6 +190,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       indicators,
       frameworkId,
       frameworks,
+      existingReferences,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const fwSpecified = (frameworkId && frameworkId !== 'all');
@@ -273,7 +274,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                 handleUpdate={this.props.handleUpdate}
                 fields={{ // isManager, taxonomies,
                   header: {
-                    main: this.getHeaderMainFields(frameworkId, frameworks),
+                    main: this.getHeaderMainFields(frameworkId, frameworks, existingReferences),
                     aside: this.getHeaderAsideFields(),
                   },
                   body: {
@@ -294,7 +295,6 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
           { saveSending
             && <Loading />
           }
-          <Footer fill />
         </Content>
       </div>
     );
@@ -322,6 +322,7 @@ RecommendationNew.propTypes = {
   onServerErrorDismiss: PropTypes.func.isRequired,
   frameworkId: PropTypes.string,
   frameworks: PropTypes.object,
+  existingReferences: PropTypes.array,
 };
 
 RecommendationNew.contextTypes = {
@@ -338,6 +339,7 @@ const mapStateToProps = (state) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworkId: selectCurrentFrameworkId(state),
   frameworks: selectActiveFrameworks(state),
+  existingReferences: selectRecommendationReferences(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -425,6 +427,9 @@ function mapDispatchToProps(dispatch) {
         saveData = saveData
           .setIn(['attributes', 'accepted'], null)
           .setIn(['attributes', 'response'], null);
+      }
+      if (saveData.getIn(['attributes', 'accepted']) === 'null') {
+        saveData = saveData.setIn(['attributes', 'accepted'], null);
       }
       if (!currentFramework.get('id')) {
         saveData = saveData.setIn(['attributes', 'framework_id'], DEFAULT_FRAMEWORK);

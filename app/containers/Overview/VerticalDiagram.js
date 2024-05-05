@@ -71,7 +71,7 @@ const DiagramButtonWrap = styled.div`
   }
 `;
 
-const DiagramButton = styled(Button)`
+const DiagramButton = styled((p) => <Button {...p} />)`
   background-color: ${(props) => palette(props.paletteDefault, 0)};
   color: white;
   padding: ${({ draft }) => draft ? '0.4em 0.5em 0.75em' : '0.6em 0.5em'};
@@ -392,6 +392,10 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
         }}
         draft={draftCount > 0}
         multiple={multiple}
+        title={intl.formatMessage(
+          messages.buttons.title,
+          { label: `${count || 0} ${intl.formatMessage(appMessages.entities[type][count !== 1 ? 'plural' : 'single'])}` },
+        )}
       >
         <DiagramButtonIcon>
           <Icon

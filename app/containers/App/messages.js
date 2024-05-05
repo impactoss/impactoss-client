@@ -183,6 +183,14 @@ export default defineMessages({
       id: 'app.containers.App.buttons.import',
       defaultMessage: 'Import',
     },
+    importTitle: {
+      id: 'app.containers.App.buttons.importTitle',
+      defaultMessage: 'Import multiple {type}',
+    },
+    printTitle: {
+      id: 'app.containers.App.buttons.printTitle',
+      defaultMessage: 'Print current view or save as PDF',
+    },
   },
   labels: {
     perPage: {
@@ -214,6 +222,10 @@ export default defineMessages({
     fieldRequired: {
       id: 'app.containers.App.forms.fieldRequired',
       defaultMessage: 'This field cannot be empty',
+    },
+    valueProhibited: {
+      id: 'app.containers.App.forms.valueProhibited',
+      defaultMessage: 'This value is not allowed',
     },
     dateFormatError: {
       id: 'app.containers.App.forms.dateFormatError',
@@ -1509,6 +1521,10 @@ export default defineMessages({
         id: 'app.containers.App.ui.acceptedStatuses.noted',
         defaultMessage: 'Not accepted',
       },
+      null: {
+        id: 'app.containers.App.ui.acceptedStatuses.null',
+        defaultMessage: 'Not applicable',
+      },
     },
     reportFrequencies: {
       monthly: {
@@ -1565,6 +1581,14 @@ export default defineMessages({
     skipToListFilter: {
       id: 'app.containers.App.screenreader.skipToListFilter',
       defaultMessage: 'Skip to list filter options',
+    },
+    skipToListFilterEdit: {
+      id: 'app.containers.App.screenreader.skipToListFilterEdit',
+      defaultMessage: 'Skip to list filter and batch edit options',
+    },
+    skipToCategorySelect: {
+      id: 'app.containers.App.screenreader.skipToCategorySelect',
+      defaultMessage: 'Skip to category group options',
     },
   },
 });

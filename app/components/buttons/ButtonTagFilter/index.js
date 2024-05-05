@@ -3,22 +3,27 @@ import { palette } from 'styled-theme';
 
 import Button from '../Button';
 
+function getTextColor(pIndex) {
+  if (pIndex === 6 || pIndex === 7) {
+    return palette('dark', 0);
+  }
+  return palette('text', 2);
+}
 const ButtonTagFilter = styled(Button)`
-  color: ${({ pIndex }) => {
-    if (pIndex === 0 || pIndex === 6 || pIndex === 7) {
-      return palette('dark', 0);
-    }
-    return palette('text', 2);
-  }};
+  color: ${({ pIndex }) => getTextColor(pIndex)};
   background-color: ${(props) => palette(props.palette, props.pIndex || 0)};
   padding: 1px 6px;
-  margin-right: 2px;
+  margin: 1px;
   border-radius: 3px;
   font-size: 0.85em;
   border: 1px solid ${(props) => palette(props.palette, props.pIndex || 0)};
-  &:hover {
-    color: ${palette('text', 2)};
-    background-color: ${(props) => palette(props.disabled ? props.paletteHover : props.palette, props.pIndex || 0)};
+
+  &:hover, &:focus-visible {
+    color: ${({ pIndex }) => getTextColor(pIndex)};
+    background-color: ${(props) => palette(props.disabled ? props.palette : props.paletteHover, props.pIndex || 0)};
+  }
+  &:focus-visible {
+    outline: 1px solid ${(props) => palette(props.disabled ? props.palette : props.paletteHover, props.pIndex || 0)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 1px 6px;

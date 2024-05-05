@@ -11,6 +11,7 @@ import asArray from 'utils/as-array';
 
 import FieldGroup from 'components/fields/FieldGroup';
 
+import Footer from 'containers/Footer';
 import Main from './Main';
 import Aside from './Aside';
 import ViewWrapper from './ViewWrapper';
@@ -67,42 +68,45 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
         )
       );
     return (
-      <ViewWrapper seamless={seamless}>
-        {fields.header && (
-          <ViewPanel>
-            <ViewPanelInside>
-              {fields.header.main
-                && this.renderMain(
-                  fields.header.main,
-                  !!fields.header.aside,
-                  false,
-                  seamless,
-                )
-              }
-              {fields.header.aside
-                && this.renderAside(fields.header.aside, false)
-              }
-            </ViewPanelInside>
-          </ViewPanel>
-        )}
-        {hasBodyFields && (
-          <ViewPanel>
-            <ViewPanelInside>
-              {fields.body.main
-                && this.renderMain(
-                  fields.body.main,
-                  !!fields.body.aside,
-                  true,
-                  seamless,
-                )
-              }
-              {fields.body.aside
-                && this.renderAside(fields.body.aside, true)
-              }
-            </ViewPanelInside>
-          </ViewPanel>
-        )}
-      </ViewWrapper>
+      <div>
+        <ViewWrapper seamless={seamless}>
+          {fields.header && (
+            <ViewPanel>
+              <ViewPanelInside>
+                {fields.header.main
+                  && this.renderMain(
+                    fields.header.main,
+                    !!fields.header.aside,
+                    false,
+                    seamless,
+                  )
+                }
+                {fields.header.aside
+                  && this.renderAside(fields.header.aside, false)
+                }
+              </ViewPanelInside>
+            </ViewPanel>
+          )}
+          {hasBodyFields && (
+            <ViewPanel>
+              <ViewPanelInside>
+                {fields.body.main
+                  && this.renderMain(
+                    fields.body.main,
+                    !!fields.body.aside,
+                    true,
+                    seamless,
+                  )
+                }
+                {fields.body.aside
+                  && this.renderAside(fields.body.aside, true)
+                }
+              </ViewPanelInside>
+            </ViewPanel>
+          )}
+        </ViewWrapper>
+        <Footer fill />
+      </div>
     );
   }
 }

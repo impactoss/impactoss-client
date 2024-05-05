@@ -115,12 +115,16 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     fields.push({
       fields: [
         getMarkdownField(entity, 'description', true, 'fullRecommendation'),
-        hasResponse && getStatusField(
+        hasResponse
+        && entity.getIn(['attributes', 'accepted']) !== null
+        && entity.getIn(['attributes', 'accepted']) !== 'null'
+        && typeof entity.getIn(['attributes', 'accepted']) !== 'undefined'
+        && getStatusField(
           entity,
           'accepted',
           ACCEPTED_STATUSES,
           appMessages.attributes.accepted,
-          false // defaultValue
+          'false' // defaultValue
         ),
         hasResponse && getMarkdownField(entity, 'response', true),
       ],
@@ -208,7 +212,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       buttons.push({
         type: 'icon',
         onClick: () => window.print(),
-        title: 'Print',
+        title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
       buttons = isManager

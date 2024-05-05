@@ -58,8 +58,12 @@ const EntityListItemMainTitleWrap = styled.a`
   padding: 6px 15px 8px 0;
   margin-top: 15px;
   color: ${palette('mainListItem', 0)};
-  &:hover {
+  &:hover, &:focus-visible {
     color: ${palette('mainListItemHover', 0)};
+  }
+  &:focus-visible {
+    outline: none;
+    text-decoration: underline;
   }
   @media print {
     padding: 1px 15px 5px 0;
@@ -79,6 +83,15 @@ const EntityListItemMainTopWrap = styled.div`
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal
 }px;
+`;
+
+const EntityListItemMainSubtitle = styled.div`
+  font-weight: normal;
+  opacity: 0.7;
+  font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.nestedListItem};
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.nestedListItem};
+  }
 `;
 
 class EntityListItemMain extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -208,6 +221,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     return ({
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
+      subtitle: config.sublabel && entity.getIn(['attributes', config.sublabel]),
       reference: this.getReference(entity, config),
       draft: entity.getIn(['attributes', 'draft']),
       role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
@@ -251,6 +265,11 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             <EntityListItemMainTitle nested={nestLevel && nestLevel > 0}>
               {entity.title}
             </EntityListItemMainTitle>
+            {entity.subtitle && (
+              <EntityListItemMainSubtitle>
+                {entity.subtitle}
+              </EntityListItemMainSubtitle>
+            )}
           </EntityListItemMainTitleWrap>
           {skipTargetId && (
             <SkipContent

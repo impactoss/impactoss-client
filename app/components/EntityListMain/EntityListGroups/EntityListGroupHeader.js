@@ -4,8 +4,12 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import ScreenReaderHide from 'components/styled/ScreenReaderHide';
+
 import Link from 'containers/Link';
 import { ROUTES } from 'containers/App/constants';
+
+import messages from './messages';
 
 const ListEntitiesGroupHeaderWrapper = styled.div`
 padding: ${({ separated }) => separated ? '5px 0 10px' : '0'};
@@ -14,14 +18,16 @@ margin-top: 10px;
   margin-top: 20px;
   margin-bottom: 20px;
   page-break-inside: avoid;
-  border-top: 1px solid ${palette('light', 1)};
 }
 `;
 
 const ListEntitiesGroupHeaderLink = styled(Link)`
   color: ${palette('link', 2)};
-  &:hover {
+  &:hover, &:focus-visible {
     color: ${palette('linkHover', 2)};
+  }
+  &:focus-visible {
+    text-decoration: underline;
   }
 `;
 
@@ -42,10 +48,19 @@ const ListEntitiesSubgroupHeader = styled.h5`
     margin-bottom: 8px;
   }
 `;
-
+const Divider = styled.div`
+  width: 100%;
+  border-bottom: 1px solid ${palette('light', 3)};
+  @media print {
+    display: none;
+  }
+`;
 export class EntityListGroupHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { group, level } = this.props;
+    const { intl } = this.context;
+    const {
+      group, level, expanded, groupTypeTitle,
+    } = this.props;
 
     if (group.get('id') === 'without') {
       return level === 1
@@ -65,19 +80,34 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
         <ListEntitiesGroupHeaderLink
           id={`list-group-${group.get('id')}`}
           to={`${ROUTES.CATEGORIES}/${group.get('id')}`}
+          title={intl.formatMessage(
+            messages.groupHeaderTitle,
+            { label: group.get('label'), type: groupTypeTitle }
+          )}
         >
-          <ListEntitiesGroupHeader>
-            {group.get('label')}
-          </ListEntitiesGroupHeader>
+          <ScreenReaderHide>
+            <ListEntitiesGroupHeader>
+              {group.get('label')}
+            </ListEntitiesGroupHeader>
+          </ScreenReaderHide>
         </ListEntitiesGroupHeaderLink>
       )
       : (
         <ListEntitiesGroupHeaderWrapper>
-          <ListEntitiesGroupHeaderLink to={`${ROUTES.CATEGORIES}/${group.get('id')}`}>
-            <ListEntitiesSubgroupHeader>
-              {group.get('label')}
-            </ListEntitiesSubgroupHeader>
+          <ListEntitiesGroupHeaderLink
+            to={`${ROUTES.CATEGORIES}/${group.get('id')}`}
+            title={intl.formatMessage(
+              messages.subgroupHeaderTitle,
+              { label: group.get('label'), type: groupTypeTitle }
+            )}
+          >
+            <ScreenReaderHide>
+              <ListEntitiesSubgroupHeader>
+                {group.get('label')}
+              </ListEntitiesSubgroupHeader>
+            </ScreenReaderHide>
           </ListEntitiesGroupHeaderLink>
+          {expanded && <Divider />}
         </ListEntitiesGroupHeaderWrapper>
       );
   }
@@ -85,5 +115,10 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
 EntityListGroupHeader.propTypes = {
   group: PropTypes.object,
   level: PropTypes.number,
+  expanded: PropTypes.bool,
+  groupTypeTitle: PropTypes.string,
+};
+EntityListGroupHeader.contextTypes = {
+  intl: PropTypes.object.isRequired,
 };
 export default EntityListGroupHeader;

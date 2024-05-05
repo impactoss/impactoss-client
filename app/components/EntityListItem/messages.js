@@ -22,4 +22,8 @@ export default defineMessages({
     id: 'app.components.EntityListItem.associationAlreadyPresent',
     defaultMessage: 'Association already created.',
   },
+  selectLabel: {
+    id: 'app.components.EntityListItem.selectLabel',
+    defaultMessage: 'Click to select {entityTitle}',
+  },
 });

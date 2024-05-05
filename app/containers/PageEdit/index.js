@@ -54,7 +54,6 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
-import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -231,7 +230,6 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           { (saveSending || deleteSending)
             && <Loading />
           }
-          <Footer />
         </Content>
       </div>
     );
@@ -299,7 +297,7 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmit: (formData, viewEntity) => {
       let saveData = formData;
       // check if attributes have changed
-      if (!saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+      if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
         saveData = saveData.set('skipAttributes', true);
       }
       dispatch(save(saveData.toJS()));

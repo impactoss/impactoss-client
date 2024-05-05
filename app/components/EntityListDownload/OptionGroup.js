@@ -28,7 +28,7 @@ const TextInput = styled(DebounceInput)`
   font-size: 0.85em;
   width: 200px;
   border-radius: 0.5em;
-  &:focus {
+  &:focus-visible {
     outline: none;
   }
 
@@ -45,6 +45,9 @@ const Group = styled((p) => (
 
 const StyledInput = styled.input`
   accent-color: ${({ theme }) => theme.global.colors.highlight};
+  &:focus-visible {
+    outline: 1px solid ${palette('primary', 0)};
+  }
 `;
 
 const OptionLabel = styled((p) => <Text as="label" {...p} />)`

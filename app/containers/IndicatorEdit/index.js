@@ -62,6 +62,7 @@ import {
   selectReadyForAuthCheck,
   selectIsUserAdmin,
   selectSessionUserHighestRoleId,
+  selectIndicatorReferences,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -69,7 +70,6 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
-import Footer from 'containers/Footer';
 
 import {
   selectDomain,
@@ -142,12 +142,12 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       : Map();
   }
 
-  getHeaderMainFields = () => {
+  getHeaderMainFields = (existingReferences) => {
     const { intl } = this.context;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getReferenceFormField(intl.formatMessage, false, true),
+          getReferenceFormField(intl.formatMessage, true, false, existingReferences),
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -185,7 +185,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         },
       );
     }
-    if (recommendationsByFw) {
+    if (recommendationsByFw && recommendationsByFw.size > 0) {
       const recConnections = renderRecommendationsByFwControl(
         recommendationsByFw,
         connectedTaxonomies,
@@ -260,6 +260,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       recommendationsByFw,
       users,
       onCreateOption,
+      existingReferences,
     } = this.props;
 
     const {
@@ -347,7 +348,11 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                 }}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
+                    main: this.getHeaderMainFields(
+                      existingReferences
+                        ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
+                        : null
+                    ),
                     aside: this.getHeaderAsideFields(viewEntity),
                   },
                   body: {
@@ -362,7 +367,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           { (saveSending || deleteSending)
             && <Loading />
           }
-          <Footer />
         </Content>
       </div>
     );
@@ -396,6 +400,7 @@ IndicatorEdit.propTypes = {
   onRepeatChange: PropTypes.func,
   onStartDateChange: PropTypes.func,
   onEndDateChange: PropTypes.func,
+  existingReferences: PropTypes.array,
 };
 
 IndicatorEdit.contextTypes = {
@@ -413,6 +418,7 @@ const mapStateToProps = (state, props) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   users: selectUsers(state),
   highestRole: selectSessionUserHighestRoleId(state),
+  existingReferences: selectIndicatorReferences(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

@@ -8,13 +8,16 @@ export default styled(Link)`
   vertical-align: top;
   color: ${({ active }) => active ? palette('text', 2) : palette('dark', 3)};
   background:  ${({ active }) => active ? palette('primary', 0) : 'transparent'};
-  &:hover {
+  &:hover, &:focus-visible {
     color:${({ active }) => active ? palette('text', 2) : palette('headerNavMainItemHover', 0)};
+  }
+  &:focus-visible {
+    background:  ${({ active }) => active ? palette('primary', 1) : 'inherit'};
   }
   font-size: 0.8em;
   padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
   height: ${(props) => props.theme.sizes.header.nav.heightMobile - 1}px;
-  border-left: 1px solid;
+  border-left: 1px solid ${palette('dark', 3)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     min-width: 120px;
     font-size: 0.9em;

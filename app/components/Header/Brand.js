@@ -10,7 +10,7 @@ export default styled.a`
 
   &:hover {
     color: ${palette('headerBrandHover', 0)};
-    opacity: 0.95;
+    opacity: 0.75;
   }
 
   z-index: 110;
