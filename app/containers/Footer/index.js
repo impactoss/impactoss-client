@@ -24,11 +24,13 @@ import messages from './messages';
 
 const FooterMain = styled.div`
   margin-top: 80px;
-  background-color: transparent;
+  background-color: ${palette('mainBackground', 0)};
   color: ${palette('dark', 1)};
-  padding: 0;
+  padding: 0 0 40px;
   @media print {
     color: ${palette('text', 0)};
+    background-color: transparent;
+    border: 1px solid;
   }
 `;
 
@@ -67,7 +69,7 @@ const Wrapper = styled((p) => <Box margin={{ bottom: 'large' }} {...p} />)`
   @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
     width: 100%;
     font-size: 0.9em;
-    padding: ${({ fill }) => fill ? 0 : '0px 30px'};
+    padding: 0;
   }
   @media (min-width: ${({ theme }) => theme.breakpoints.large}) {
     font-size: 1em;
@@ -87,6 +89,7 @@ const Footer = ({
   onPageLink,
   pages,
   fill,
+  hasBorder,
 }) => {
   const size = useContext(ResponsiveContext);
   const isMobile = isMaxSize(size, 'small');
@@ -97,7 +100,7 @@ const Footer = ({
           <Box
             direction={isMobile ? 'column' : 'row'}
             justify="between"
-            border="top"
+            border={hasBorder ? 'top' : false}
             align="start"
             pad={{ vertical: 'ms', bottom: 'medium' }}
           >
@@ -222,6 +225,7 @@ Footer.propTypes = {
   onPageLink: PropTypes.func.isRequired,
   pages: PropTypes.object,
   fill: PropTypes.bool,
+  hasBorder: PropTypes.bool,
   intl: intlShape,
 };
 
