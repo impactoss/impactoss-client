@@ -80,7 +80,7 @@ const Wrapper = styled((p) => <Box margin={{ bottom: 'large' }} {...p} />)`
   }
 `;
 
-const FooterNote = styled((p) => <Text size="xsmall" {...p} />)``;
+const FooterNote = styled((p) => <Text size="xxxsmall" {...p} />)``;
 const FooterVersion = styled((p) => <Text size="xxxsmall" {...p} />)``;
 
 const Footer = ({
@@ -102,7 +102,7 @@ const Footer = ({
             justify="between"
             border={hasBorder ? 'top' : false}
             align="start"
-            pad={{ vertical: 'ms', bottom: 'medium' }}
+            pad={{ vertical: 'ml', bottom: 'medium' }}
           >
             <Box
               gap="small"
@@ -116,7 +116,7 @@ const Footer = ({
               <Box>
                 <Box
                   direction="row"
-                  gap="xsmall"
+                  gap="medium"
                   wrap
                 >
                   {theme.media.agencyLogos.map((src, i) => (
