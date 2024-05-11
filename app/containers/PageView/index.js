@@ -133,7 +133,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <Styled className={`content-${CONTENT_PAGE}`} ref={this.scrollContainerRef}>
-          <ViewContainer>
+          <ViewContainer isNarrow={!isManager}>
             <ContentHeader
               title={page ? page.getIn(['attributes', 'title']) : ''}
               supTitle={page ? page.getIn(['attributes', 'menu_title']) : ''}
