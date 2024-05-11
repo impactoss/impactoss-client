@@ -21,7 +21,7 @@ import { CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import Button from 'components/buttons/Button';
-import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
+import ContainerWrapperSidebar from 'components/styled/Container/ContainerWrapperSidebar';
 import Container from 'components/styled/Container';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
@@ -275,7 +275,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
             </PrintHide>
           )
         }
-        <ContainerWithSidebar sidebarResponsiveSmall>
+        <ContainerWrapperSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
               <ContentHeader
@@ -350,9 +350,9 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                 </div>
               )}
             </Content>
-            <Footer />
           </Container>
-        </ContainerWithSidebar>
+          <Footer hasBorder />
+        </ContainerWrapperSidebar>
       </div>
     );
   }

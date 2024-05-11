@@ -318,8 +318,8 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                 </div>
               )}
             </Content>
-            <Footer fill />
           </Container>
+          <Footer fill hasBorder />
         </ContainerWrapper>
       </div>
     );

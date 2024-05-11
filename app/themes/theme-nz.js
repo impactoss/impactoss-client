@@ -1,25 +1,28 @@
 import coolorsToHex from 'coolors-to-hex';
 
-import headerLogo from 'themes/media/headerLogo.png';
-// import headerLogo2x from 'themes/media/headerLogo.png';
+import headerLogo from 'themes/media/header-logo.png';
+import headerLogo2x from 'themes/media/header-logo@2x.png';
 
 import footerLogo1 from 'themes/media/footer-logo-nzgov.png';
+import footerLogo1_2x from 'themes/media/footer-logo-nzgov@2x.png';
 import footerLogo2 from 'themes/media/footer-logo-nzjustice.png';
+import footerLogo2_2x from 'themes/media/footer-logo-nzjustice@2x.png';
 
-import graphicHome from 'themes/media/homeGraphic.png';
+import graphicHome from 'themes/media/home-graphic.png';
+import graphicHome2x from 'themes/media/home-graphic@2x.png';
 
-import impactossLogo from 'themes/media/impactossLogo.png';
-// import impactossLogo2x from 'themes/media/impactoss@2x.png';
+import impactossLogo from 'themes/media/impactoss-logo.png';
+import impactossLogo2x from 'themes/media/impactoss-logo@2x.png';
 const theme = {};
 
 // image files
 // pass array for retina images: [normalSrc, retinaSrc],
 // or single image: src
 theme.media = {
-  headerLogo: [headerLogo],
-  graphicHome: [graphicHome],
+  headerLogo: [headerLogo, headerLogo2x],
+  graphicHome: [graphicHome, graphicHome2x],
+  impactossLogo: [impactossLogo, impactossLogo2x],
   // titleHome: [titleHome, titleHome2x],
-  impactossLogo: [impactossLogo],
   // up to 6 partner logos,
   // link text and title to be set in translations/[lang].js > app.components.Footer.partners.[]
   // partnerLogos: [
@@ -29,8 +32,8 @@ theme.media = {
   //   [partner4, partner4x2x],
   // ],
   agencyLogos: [
-    [footerLogo1],
-    [footerLogo2],
+    [footerLogo1, footerLogo1_2x],
+    [footerLogo2, footerLogo2_2x],
   ],
 };
 

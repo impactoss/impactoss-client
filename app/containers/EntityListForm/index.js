@@ -10,7 +10,7 @@ import { palette } from 'styled-theme';
 import { lowerCase } from 'utils/string';
 import appMessage from 'utils/app-message';
 
-import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
+import ContainerWrapperSidebar from 'components/styled/Container/ContainerWrapperSidebar';
 import MultiSelectControl from 'components/forms/MultiSelectControl';
 
 import {
@@ -20,7 +20,7 @@ import {
   setFilter,
 } from './actions';
 
-const Styled = styled(ContainerWithSidebar)`
+const Styled = styled(ContainerWrapperSidebar)`
   z-index: ${(props) => props.sidebarResponsiveLarge ? 99 : 101};
   background-color: rgba(0,0,0,0.2);
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {

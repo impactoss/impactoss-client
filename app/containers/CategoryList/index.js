@@ -27,7 +27,7 @@ import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 // components
-import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
+import ContainerWrapperSidebar from 'components/styled/Container/ContainerWrapperSidebar';
 import Container from 'components/styled/Container';
 import Content from 'components/styled/Content';
 import SkipContent from 'components/styled/SkipContent';
@@ -155,7 +155,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <ContainerWithSidebar sidebarResponsiveSmall>
+        <ContainerWrapperSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
               <ContentHeader
@@ -218,9 +218,9 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 )
               }
             </Content>
-            <Footer />
           </Container>
-        </ContainerWithSidebar>
+          <Footer hasBorder />
+        </ContainerWrapperSidebar>
         {!dataReady && <EntityListSidebarLoading responsiveSmall />}
         {taxonomies
           && frameworks

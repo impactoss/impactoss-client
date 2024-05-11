@@ -25,6 +25,7 @@ import Container from 'components/styled/Container';
 import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
 import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
+import Footer from 'containers/Footer';
 
 import {
   selectReady,
@@ -39,6 +40,8 @@ import {
 } from 'utils/fields';
 
 import { scrollToTop } from 'utils/scroll-to-component';
+
+
 import appMessages from 'containers/App/messages';
 import messages from './messages';
 import { selectViewEntity } from './selectors';
@@ -49,7 +52,7 @@ const Styled = styled(ContainerWrapper)`
 `;
 
 const ViewContainer = styled(Container)`
-  min-height: 100vH;
+  min-height: 66vH;
   @media print {
     min-height: 50vH;
   }
@@ -156,6 +159,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
               )
             }
           </ViewContainer>
+          <Footer fill />
         </Styled>
       </div>
     );

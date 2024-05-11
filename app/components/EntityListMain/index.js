@@ -13,7 +13,7 @@ import { jumpToComponent } from 'utils/scroll-to-component';
 import { lowerCase } from 'utils/string';
 import { qe } from 'utils/quasi-equals';
 
-import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
+import ContainerWrapperSidebar from 'components/styled/Container/ContainerWrapperSidebar';
 import Container from 'components/styled/Container';
 import Content from 'components/styled/Content';
 import SkipContent from 'components/styled/SkipContent';
@@ -211,8 +211,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       }
     }
     return (
-      <ContainerWithSidebar ref={this.ScrollContainer}>
-        <Container ref={this.ScrollReference}>
+      <ContainerWrapperSidebar ref={this.ScrollContainer}>
+        <Container ref={this.ScrollReference} noPaddingBottom>
           <StyledContent>
             <ContentHeader
               type={CONTENT_LIST}
@@ -323,9 +323,9 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
               </ListEntities>
             )}
           </StyledContent>
-          <Footer />
         </Container>
-      </ContainerWithSidebar>
+        <Footer hasBorder />
+      </ContainerWrapperSidebar>
     );
   }
 }
