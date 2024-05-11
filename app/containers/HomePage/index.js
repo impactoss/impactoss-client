@@ -85,23 +85,6 @@ const HomeActions = styled.div`
     padding-top: 2em;
   }
 `;
-const Title = styled.h1`
-  color:${palette('headerBrand', 0)};
-  font-family: ${(props) => props.theme.fonts.title};
-  font-size: ${(props) => props.theme.sizes.home.text.titleMobile};
-  text-transform: uppercase;
-  margin-top: 0.5em;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    font-size: ${(props) => props.theme.sizes.home.text.title};
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    margin-top: 1em;
-  }
-  @media print {
-    font-size: ${(props) => props.theme.sizes.home.print.title};
-    color: ${palette('primary', 0)}
-  }
-`;
 
 const Claim = styled.h2`
   color: ${palette('headerBrand', 0)};
@@ -206,9 +189,6 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <Container noPaddingBottom>
-          <Title>
-            <FormattedMessage {...appMessages.app.title} />
-          </Title>
           <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
             <SectionWrapper hasBrand={SHOW_BRAND_ON_HOME}>
               <GraphicHomeWrapper
