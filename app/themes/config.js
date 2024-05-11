@@ -61,7 +61,7 @@ export const SHOW_SIDEBAR_HEADER_PATTERN = false;
 // - app.containers.App.app.claim
 export const SHOW_HOME_TITLE = true;
 
-export const SHOW_BRAND_ON_HOME = false;
+export const SHOW_BRAND_ON_HOME = true;
 export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
 
 // show footer logo section

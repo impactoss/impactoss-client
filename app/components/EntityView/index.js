@@ -11,7 +11,6 @@ import asArray from 'utils/as-array';
 
 import FieldGroup from 'components/fields/FieldGroup';
 
-import Footer from 'containers/Footer';
 import Main from './Main';
 import Aside from './Aside';
 import ViewWrapper from './ViewWrapper';
@@ -105,7 +104,6 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
             </ViewPanel>
           )}
         </ViewWrapper>
-        <Footer fill />
       </div>
     );
   }

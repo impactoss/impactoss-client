@@ -48,20 +48,20 @@ import { ROUTES, DEPENDENCIES } from './constants';
 import messages from './messages';
 
 const Main = styled.div`
-  position: ${(props) => props.isHome ? 'relative' : 'absolute'};
+  position: absolute;
   top: ${(props) => props.isHome
-    ? 0
+    ? props.theme.sizes.header.banner.heightMobile
     : props.theme.sizes.header.banner.heightMobile + props.theme.sizes.header.nav.heightMobile
 }px;
   left: 0;
   right: 0;
   bottom:0;
   background-color: ${(props) => props.isHome ? 'transparent' : palette('mainBackground', 0)};
-  overflow: hidden;
+  overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
 
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     top: ${(props) => props.isHome
-    ? 0
+    ? props.theme.sizes.header.banner.height
     : props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height
 }px;
   }
@@ -70,7 +70,6 @@ const Main = styled.div`
     position: static;
   }
 `;
-// overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   UNSAFE_componentWillMount() {
@@ -205,6 +204,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     } = this.props;
     const { intl } = this.context;
     const title = intl.formatMessage(messages.app.title);
+    const isHome = location.pathname === ROUTES.INTRO || location.pathname === `${ROUTES.INTRO}/`;
     return (
       <div>
         <SkipContent
@@ -232,7 +232,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             icon: 'search',
           }}
           onPageLink={onPageLink}
-          isHome={location.pathname === ROUTES.INTRO}
+          isHome={isHome}
           onSelectFramework={onSelectFramework}
           frameworkOptions={frameworks && frameworks.size > 1
             ? this.prepareFrameworkOptions(
@@ -243,7 +243,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           currentPath={location.pathname}
           brandPath={ROUTES.OVERVIEW}
         />
-        <Main isHome={location.pathname === ROUTES.INTRO} role="main" id="main-content">
+        <Main isHome={isHome} role="main" id="main-content">
           {React.Children.toArray(children)}
         </Main>
         {newEntityModal

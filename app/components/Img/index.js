@@ -18,6 +18,7 @@ function Img(props) {
       src={props.src}
       alt={props.alt}
       forceOriginalDimensions={props.forceOriginalDimensions}
+      checkIfRetinaImgExists={props.checkIfRetinaImgExists}
     />
   );
 }
@@ -31,9 +32,11 @@ Img.propTypes = {
   alt: PropTypes.string.isRequired,
   className: PropTypes.string,
   forceOriginalDimensions: PropTypes.bool,
+  checkIfRetinaImgExists: PropTypes.bool,
 };
 
 Img.defaultProps = {
+  checkIfRetinaImgExists: true,
   forceOriginalDimensions: false,
 };
 

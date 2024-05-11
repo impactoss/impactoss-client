@@ -53,7 +53,6 @@ import DateControl from 'components/forms/DateControl';
 import RadioControl from 'components/forms/RadioControl';
 import Required from 'components/forms/Required';
 import MultiSelectField from 'components/forms/MultiSelectField';
-import Footer from 'containers/Footer';
 import messages from './messages';
 
 const StyledForm = styled(Form)`
@@ -447,7 +446,6 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             </FormFooter>
           </StyledForm>
         </FormWrapper>
-        {!inModal && (<Footer fill />)}
       </div>
     );
   }

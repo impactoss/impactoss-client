@@ -22,8 +22,9 @@ import {
 import { CONTENT_LIST } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
+import Footer from 'containers/Footer';
 // components
-import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
+import ContainerWrapperSidebar from 'components/styled/Container/ContainerWrapperSidebar';
 import Container from 'components/styled/Container';
 import Loading from 'components/Loading';
 
@@ -32,7 +33,6 @@ import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 import SkipContent from 'components/styled/SkipContent';
 
-import Footer from '../Footer';
 
 // relative
 import VerticalDiagram from './VerticalDiagram';
@@ -48,14 +48,8 @@ import {
   selectMeasureDraftCount,
 } from './selectors';
 
-const Content = styled.div`
-  min-height: 80vH;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: 0 1em;
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding: 0 2em;
-  }
+const ViewContainer = styled(Container)`
+  min-height: 66vH;
 `;
 const Description = styled.p`
   margin-bottom: 1.5em;
@@ -151,57 +145,55 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <ContainerWithSidebar sidebarResponsiveSmall>
-          <Container>
-            <Content>
-              <ContentHeader
-                type={CONTENT_LIST}
-                supTitle={intl.formatMessage(messages.supTitle)}
-                title={intl.formatMessage(messages.title)}
+        <ContainerWrapperSidebar sidebarResponsiveSmall>
+          <ViewContainer>
+            <ContentHeader
+              type={CONTENT_LIST}
+              supTitle={intl.formatMessage(messages.supTitle)}
+              title={intl.formatMessage(messages.title)}
+            />
+            <div style={{ position: 'relative' }}>
+              <Description>
+                <FormattedMessage {...messages.description} />
+              </Description>
+              <SkipContent
+                href="#sidebar-taxonomy-options"
+                title={this.context.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
+              >
+                <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
+              </SkipContent>
+            </div>
+            {!dataReady && <Loading />}
+            {dataReady && frameworks.size > 1 && (
+              <VerticalDiagram
+                frameworks={frameworks}
+                onPageLink={this.props.onPageLink}
+                recommendationCountByFw={this.props.recommendationCountByFw}
+                recommendationDraftCountByFw={this.props.recommendationDraftCountByFw}
+                measureCount={this.props.measureCount}
+                measureDraftCount={this.props.measureDraftCount}
+                indicatorCount={this.props.indicatorCount}
+                indicatorDraftCount={this.props.indicatorDraftCount}
               />
-              <div style={{ position: 'relative' }}>
-                <Description>
-                  <FormattedMessage {...messages.description} />
-                </Description>
-                <SkipContent
-                  href="#sidebar-taxonomy-options"
-                  title={this.context.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
-                >
-                  <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
-                </SkipContent>
-              </div>
-              {!dataReady && <Loading />}
-              {dataReady && frameworks.size > 1 && (
-                <VerticalDiagram
-                  frameworks={frameworks}
-                  onPageLink={this.props.onPageLink}
-                  recommendationCountByFw={this.props.recommendationCountByFw}
-                  recommendationDraftCountByFw={this.props.recommendationDraftCountByFw}
-                  measureCount={this.props.measureCount}
-                  measureDraftCount={this.props.measureDraftCount}
-                  indicatorCount={this.props.indicatorCount}
-                  indicatorDraftCount={this.props.indicatorDraftCount}
-                />
-              )}
-              {dataReady && frameworks.size === 1 && (
-                <HorizontalDiagram
-                  onPageLink={this.props.onPageLink}
-                  onTaxonomyIconMouseOver={this.onTaxonomyIconMouseOver}
-                  measureCount={this.props.measureCount}
-                  measureDraftCount={this.props.measureDraftCount}
-                  indicatorCount={this.props.indicatorCount}
-                  indicatorDraftCount={this.props.indicatorDraftCount}
-                  taxonomies={taxonomies}
-                  recommendationCount={recommendationCount}
-                  recommendationDraftCount={recommendationDraftCount}
-                  frameworkId={frameworks.first().get('id')}
-                  mouseOverTaxonomy={this.state.mouseOverTaxonomy}
-                />
-              )}
-            </Content>
-            <Footer fill />
-          </Container>
-        </ContainerWithSidebar>
+            )}
+            {dataReady && frameworks.size === 1 && (
+              <HorizontalDiagram
+                onPageLink={this.props.onPageLink}
+                onTaxonomyIconMouseOver={this.onTaxonomyIconMouseOver}
+                measureCount={this.props.measureCount}
+                measureDraftCount={this.props.measureDraftCount}
+                indicatorCount={this.props.indicatorCount}
+                indicatorDraftCount={this.props.indicatorDraftCount}
+                taxonomies={taxonomies}
+                recommendationCount={recommendationCount}
+                recommendationDraftCount={recommendationDraftCount}
+                frameworkId={frameworks.first().get('id')}
+                mouseOverTaxonomy={this.state.mouseOverTaxonomy}
+              />
+            )}
+          </ViewContainer>
+          <Footer hasBorder />
+        </ContainerWrapperSidebar>
         {!dataReady && <EntityListSidebarLoading responsiveSmall />}
         {dataReady && (
           <TaxonomySidebar

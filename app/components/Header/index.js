@@ -66,7 +66,7 @@ const Styled = styled.div`
   }}px;
   }
   background-color: ${(props) => props.hasBackground ? palette('header', 0) : 'transparent'};
-  box-shadow: ${(props) => props.hasShadow ? '0px 0px 15px 0px rgba(0,0,0,0.5)' : 'none'};
+  box-shadow: ${(props) => props.hasShadow ? '0px 0px 7px 0px rgba(0, 0, 0, 0.3)' : 'none'};
   z-index: 101;
   @media print {
     display: ${({ isHome }) => isHome ? 'none' : 'block'};
@@ -400,7 +400,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         fixed={isHome}
         sticky={!isHome}
         hasBackground={!isHome}
-        hasShadow={!isHome}
+        hasShadow
         hasNav={!isHome}
         hasBrand={SHOW_BRAND_ON_HOME || !isHome}
       >
