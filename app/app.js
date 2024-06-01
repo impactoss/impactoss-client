@@ -10,7 +10,7 @@ import '@babel/polyfill';
 
 // Import all the third party stuff
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
@@ -70,9 +70,10 @@ const rootRoute = {
   childRoutes: createRoutes(store),
 };
 
-// console.log(this.props.location)
+const container = document.getElementById('app');
+const root = createRoot(container);
 const render = (messages) => {
-  ReactDOM.render(
+  root.render(
     <Provider store={store}>
       <LanguageProvider messages={messages}>
         <Grommet theme={theme}>
@@ -82,8 +83,7 @@ const render = (messages) => {
           />
         </Grommet>
       </LanguageProvider>
-    </Provider>,
-    document.getElementById('app'),
+    </Provider>
   );
 };
 
@@ -97,6 +97,7 @@ if (module.hot) {
 }
 
 // Chunked polyfill for browsers without Intl support
+/* eslint-disable import/extensions */
 if (!window.Intl) {
   new Promise((resolve) => {
     resolve(import('intl'));
