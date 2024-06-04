@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import FileReaderInput from 'react-file-reader-input';
-import Baby from 'babyparse';
+import Papa from 'papaparse';
 
 import Icon from 'components/Icon';
 import ButtonSubmit from 'components/buttons/ButtonSubmit';
@@ -87,7 +87,7 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
     results.forEach((result) => {
       const [evt, file] = result;
       try {
-        const parsed = Baby.parse(evt.target.result, { header: true, skipEmptyLines: true, delimiter: ',' });
+        const parsed = Papa.parse(evt.target.result, { header: true, skipEmptyLines: true, delimiter: ',' });
         if (parsed && parsed.errors && parsed.errors.length > 0) {
           this.setState(
             (prevState) => ({
