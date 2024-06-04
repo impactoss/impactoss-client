@@ -67,7 +67,7 @@
     "babel-core": "7.0.0-bridge.0"
   },
   "dependencies": {
-    "chalk": "^2.4.2",
+    "chalk": "4.1.0",
     "compression": "1.7.4",
     "coolors-to-hex": "^1.0.3",
     "core-js": "^3.37.1",
