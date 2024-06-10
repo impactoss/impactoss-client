@@ -7,8 +7,8 @@
     "url": "git://github.com/impactoss/impactoss.git"
   },
   "engines": {
-    "npm": ">=6.0.0",
-    "node": ">=14.0.0"
+    "npm": ">=10.7.0",
+    "node": ">=18.20.3"
   },
   "author": "tmfrnz",
   "license": "MIT",
