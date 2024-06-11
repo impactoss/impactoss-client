@@ -17,7 +17,7 @@ import {
   getTitleFormField,
   getReferenceFormField,
   getStatusField,
-  getMarkdownField,
+  getMarkdownFormField,
   renderIndicatorControl,
   renderRecommendationsByFwControl,
   getDateField,
@@ -98,7 +98,11 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getReferenceFormField(intl.formatMessage, false, true, existingReferences),
+          getReferenceFormField({
+            formatMessage: intl.formatMessage,
+            required: true,
+            prohibitedValues: existingReferences,
+          }),
           getTitleFormField(intl.formatMessage),
         ],
       },
@@ -127,9 +131,18 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     groups.push(
       {
         fields: [
-          getMarkdownField(intl.formatMessage),
-          getMarkdownField(intl.formatMessage, 'outcome'),
-          getMarkdownField(intl.formatMessage, 'indicator_summary'),
+          getMarkdownFormField({
+            formatMessage: intl.formatMessage,
+            attribute: 'description',
+            label: 'fullMeasure',
+            required: true,
+          }),
+          getMarkdownFormField({
+            formatMessage: intl.formatMessage,
+            attribute: 'outcome',
+            label: 'comment',
+          }),
+          // getMarkdownFormField(intl.formatMessage, 'indicator_summary'),
         ],
       },
     );

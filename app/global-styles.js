@@ -98,12 +98,8 @@ const GlobalStyle = createGlobalStyle`
     background: transparent;
     border: none;
     text-align: left;
-    color: #0077d8;
+    color: #ba5d03;
     text-decoration: none;
-
-    &:hover {
-      color: #d66149;
-    }
   }
   h1, h2, h3, h4, h5, h6 {
     line-height: 1.25;
@@ -192,6 +188,13 @@ const GlobalStyle = createGlobalStyle`
     }
     h6 {
       font-size: 1em;
+    }
+    a {
+      color: #BA5D03;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 

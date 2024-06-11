@@ -356,6 +356,14 @@ export default defineMessages({
       id: 'app.containers.App.importFields.fullRecommendation',
       defaultMessage: 'Full recommendation text',
     },
+    comment: {
+      id: 'app.containers.App.importFields.comment',
+      defaultMessage: 'Comment',
+    },
+    fullMeasure: {
+      id: 'app.containers.App.importFields.fullMeasure',
+      defaultMessage: 'Full action text',
+    },
     accepted: {
       id: 'app.containers.App.importFields.accepted',
       defaultMessage: 'Accepted',
@@ -483,6 +491,14 @@ export default defineMessages({
     fullRecommendation: {
       id: 'app.containers.App.attributes.fullRecommendation',
       defaultMessage: 'Full recommendation text',
+    },
+    fullMeasure: {
+      id: 'app.containers.App.attributes.fullMeasure',
+      defaultMessage: 'Full action text',
+    },
+    comment: {
+      id: 'app.containers.App.attributes.comment',
+      defaultMessage: 'Comment',
     },
     content: {
       id: 'app.containers.App.attributes.content',

@@ -25,7 +25,7 @@ import {
   getReferenceFormField,
   getAcceptedField,
   getStatusField,
-  getMarkdownField,
+  getMarkdownFormField,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -131,7 +131,11 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getReferenceFormField(intl.formatMessage, true, false, existingReferences), // required
+          getReferenceFormField({
+            formatMessage: intl.formatMessage,
+            required: true,
+            prohibitedValues: existingReferences,
+          }),
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -162,9 +166,19 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     const groups = [];
     groups.push({
       fields: [
-        getMarkdownField(intl.formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
+        getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'description',
+          label: 'fullRecommendation',
+          placeholder: 'fullRecommendation',
+          hint: 'fullRecommendation',
+          required: true,
+        }),
         hasResponse && getAcceptedField(intl.formatMessage, entity),
-        hasResponse && getMarkdownField(intl.formatMessage, 'response'),
+        hasResponse && getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'response',
+        }),
       ],
     });
     if (measures) {

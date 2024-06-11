@@ -19,7 +19,7 @@ import {
   getReferenceFormField,
   getAcceptedField,
   getStatusField,
-  getMarkdownField,
+  getMarkdownFormField,
   renderIndicatorControl,
   getFrameworkFormField,
 } from 'utils/forms';
@@ -116,7 +116,11 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       { // fieldGroup
         fields: [
           hasFWOptions && getFrameworkFormField(intl.formatMessage, frameworks), // required
-          getReferenceFormField(intl.formatMessage, true, false, existingReferences), // required
+          getReferenceFormField({
+            formatMessage: intl.formatMessage,
+            required: true,
+            prohibitedValues: existingReferences,
+          }),
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -141,9 +145,19 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     const groups = [];
     groups.push({
       fields: [
-        getMarkdownField(intl.formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
+        getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'description',
+          label: 'fullRecommendation',
+          placeholder: 'fullRecommendation',
+          hint: 'fullRecommendation',
+          required: true,
+        }),
         hasResponse && getAcceptedField(intl.formatMessage),
-        hasResponse && getMarkdownField(intl.formatMessage, 'response'),
+        hasResponse && getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'response',
+        }),
       ],
     });
     if (measures) {
