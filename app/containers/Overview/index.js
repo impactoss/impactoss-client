@@ -7,6 +7,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
+import ReactMarkdown from 'react-markdown';
 import { FormattedMessage } from 'react-intl';
 
 import styled, { withTheme } from 'styled-components';
@@ -51,13 +52,20 @@ import {
 const ViewContainer = styled(Container)`
   min-height: 66vH;
 `;
-const Description = styled.p`
+const Description = styled.div`
   margin-bottom: 1.5em;
   font-size: 1em;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     margin-bottom: 2em;
     font-size: 1.1em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
+`;
+const TextBelow = styled.div`
+  margin-top: 1.5em;
+  font-size: 0.9em;
   @media print {
     font-size: ${(props) => props.theme.sizes.print.default};
   }
@@ -154,7 +162,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             />
             <div style={{ position: 'relative' }}>
               <Description>
-                <FormattedMessage {...messages.description} />
+                <ReactMarkdown source={intl.formatMessage(messages.description)} />
               </Description>
               <SkipContent
                 href="#sidebar-taxonomy-options"
@@ -190,6 +198,15 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 frameworkId={frameworks.first().get('id')}
                 mouseOverTaxonomy={this.state.mouseOverTaxonomy}
               />
+            )}
+            {dataReady && messages.textBelow && intl.formatMessage(messages.textBelow) !== '' && (
+              <TextBelow>
+                <ReactMarkdown
+                  source={intl.formatMessage(messages.textBelow)}
+                  linkTarget="_blank"
+                  className="react-markdown"
+                />
+              </TextBelow>
             )}
           </ViewContainer>
           <Footer hasBorder />

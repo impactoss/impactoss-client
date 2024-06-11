@@ -5,8 +5,8 @@ import headerLogo2x from 'themes/media/header-logo@2x.png';
 
 import footerLogo1 from 'themes/media/footer-logo-nzgov.png';
 import footerLogo1_2x from 'themes/media/footer-logo-nzgov@2x.png';
-import footerLogo2 from 'themes/media/footer-logo-nzjustice.png';
-import footerLogo2_2x from 'themes/media/footer-logo-nzjustice@2x.png';
+// import footerLogo2 from 'themes/media/footer-logo-nzjustice.png';
+// import footerLogo2_2x from 'themes/media/footer-logo-nzjustice@2x.png';
 
 import graphicHome from 'themes/media/home-graphic.png';
 import graphicHome2x from 'themes/media/home-graphic@2x.png';
@@ -33,7 +33,6 @@ theme.media = {
   // ],
   agencyLogos: [
     [footerLogo1, footerLogo1_2x],
-    [footerLogo2, footerLogo2_2x],
   ],
 };
 
