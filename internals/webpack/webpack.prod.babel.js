@@ -7,8 +7,6 @@ const TerserPlugin = require('terser-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const { GitRevisionPlugin } = require('git-revision-webpack-plugin');
-var webpack = require('webpack');
-var gitRevisionPlugin = new GitRevisionPlugin()
 
 module.exports = require('./webpack.base.babel')({
   mode: 'production',
@@ -28,23 +26,25 @@ module.exports = require('./webpack.base.babel')({
   optimization: {
     minimize: true,
     minimizer: [
-      new TerserPlugin({
-        terserOptions: {
-          warnings: false,
-          compress: {
-            comparisons: false,
+      (compiler) => {
+        const TerserPlugin = require('terser-webpack-plugin');
+        new TerserPlugin({
+          terserOptions: {
+            warnings: false,
+            compress: {
+              comparisons: false,
+            },
+            parse: {},
+            mangle: true,
+            output: {
+              comments: false,
+              ascii_only: true,
+            },
+            sourceMap: true,
           },
-          parse: {},
-          mangle: true,
-          output: {
-            comments: false,
-            ascii_only: true,
-          },
-        },
         parallel: true,
-        cache: true,
-        sourceMap: true,
-      }),
+        }).apply(compiler);
+      },
     ],
     nodeEnv: 'production',
     sideEffects: true,
@@ -70,11 +70,6 @@ module.exports = require('./webpack.base.babel')({
   },
 
   plugins: [
-    new webpack.DefinePlugin({
-      'VERSION': JSON.stringify(gitRevisionPlugin.version()),
-      'COMMITHASH': JSON.stringify(gitRevisionPlugin.commithash()),
-    }),
-
     // Minify and optimize the index.html
     new HtmlWebpackPlugin({
       template: 'app/index.html',
@@ -91,6 +86,10 @@ module.exports = require('./webpack.base.babel')({
         minifyURLs: true,
       },
       inject: true,
+    }),
+
+    new GitRevisionPlugin({
+      commithashCommand: 'rev-parse --short HEAD',
     }),
 
     new CompressionPlugin({
@@ -111,6 +110,7 @@ module.exports = require('./webpack.base.babel')({
     }),
     new CopyPlugin({ patterns: [{ from: 'app/robots.txt', to: 'robots.txt' }] }),
 
+    /*
     // Put it in the end to capture all the HtmlWebpackPlugin's
     // assets manipulations and do leak its manipulations to HtmlWebpackPlugin
     new OfflinePlugin({
@@ -132,16 +132,15 @@ module.exports = require('./webpack.base.babel')({
       },
 
       // Removes warning for about `additional` section usage
-      //safeToUseOptionalCaches: true,
+      safeToUseOptionalCaches: true,
       // changing config according to https://github.com/react-boilerplate/react-boilerplate/issues/2750#issuecomment-536215256
       ServiceWorker: {
         events: true,
       },
       responseStrategy: 'network-first',
-    }),
+    }),*/
   ],
   performance: {
     assetFilter: (assetFilename) => !/(\.map$)|(^(main\.|favicon\.))/.test(assetFilename),
   },
-  stats: 'verbose',
 });
