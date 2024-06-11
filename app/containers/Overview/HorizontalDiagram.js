@@ -238,7 +238,7 @@ const DiagramButtonMainInside = styled.span`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: inline-block;
     vertical-align: middle;
-    margin-top: -30px;
+    margin-top: -10px;
   }
 `;
 const DiagramButtonIcon = styled.div`
@@ -258,10 +258,12 @@ const DraftEntities = styled.div`
 `;
 
 const DiagramButtonMainTop = styled.div`
-  padding-bottom: 0.2px;
-  font-weight: bold;
+  padding-top: 2px;
+  padding-bottom: 2px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 1.3em;
+    font-weight: bold;
+    padding-top: 5px;
     padding-bottom: 5px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
@@ -269,13 +271,12 @@ const DiagramButtonMainTop = styled.div`
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     font-size: 1.3em;
-    padding-bottom: 5px;
   }
 `;
 // font-size: ${(props) => props.theme.sizes.text.aaLarge};
-const DiagramButtonMainBottom = styled.div`
-  font-weight: normal;
-`;
+// const DiagramButtonMainBottom = styled.div`
+//   font-weight: normal;
+// `;
 
 const DiagramSvgWrapper = styled.div`
   position: absolute;
@@ -650,8 +651,8 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
       iconSize = '4em';
     }
     const taxonomiesByTagging = taxonomies && this.getTaxonomiesByTagging(taxonomies, 'tags_measures');
-    const header = intl.formatMessage(messages.buttons.measuresTitle);
-    const label = intl.formatMessage(messages.buttons.measuresAdditional, { count: measureCount || '0' });
+    // const label = intl.formatMessage(messages.buttons.measuresAdditional, { count: measureCount || '0' });
+    const label = `${measureCount || 0} ${intl.formatMessage(appMessages.entities.measures[measureCount !== 1 ? 'plural' : 'single'])}`;
     const labelDraft = measureDraftCount > 0
       ? intl.formatMessage(messages.buttons.draft, { count: measureDraftCount })
       : null;
@@ -673,9 +674,10 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
               <DiagramButtonIcon>
                 <Icon name="measures" size={iconSize} />
               </DiagramButtonIcon>
-              <DiagramButtonMainTop>{header}</DiagramButtonMainTop>
-              <DiagramButtonMainBottom>{label}</DiagramButtonMainBottom>
-              {labelDraft && (
+              <DiagramButtonMainTop>
+                {label}
+              </DiagramButtonMainTop>
+              {measureDraftCount > 0 && (
                 <DraftEntities>{labelDraft}</DraftEntities>
               )}
             </DiagramButtonMainInside>
