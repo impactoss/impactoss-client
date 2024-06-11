@@ -4,6 +4,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 
 module.exports = (options) => ({
   mode: options.mode,
@@ -107,25 +108,28 @@ module.exports = (options) => ({
       },
     ],
   },
-  plugins: options.plugins.concat([
-    // Always expose NODE_ENV to webpack, in order to use `process.env.NODE_ENV`
-    // inside your code for any environment checks; Terser will automatically
-    // drop any unreachable code.
+  plugins: [
+    ...options.plugins,
     new webpack.EnvironmentPlugin({
-      NODE_ENV: 'development',
-      SERVER: 'development',
+      NODE_ENV: options.mode,
+      SERVER: options.mode,
     }),
-  ]),
+    new NodePolyfillPlugin(),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
+  ],
   resolve: {
     modules: ['node_modules', 'app'],
     extensions: ['.js', '.jsx', '.react.js'],
     mainFields: ['browser', 'jsnext:main', 'main'],
+    fallback: {
+      fs: false,
+      child_process: false,
+      process: require.resolve('process/browser'),
+    },
   },
   devtool: options.devtool,
   target: 'web', // Make web variables accessible to webpack, e.g. window
   performance: options.performance || {},
-  node: {
-    fs: 'empty',
-    child_process: 'empty',
-  },
 });

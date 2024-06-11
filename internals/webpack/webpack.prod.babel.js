@@ -3,11 +3,12 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const OfflinePlugin = require('offline-plugin');
-const { HashedModuleIdsPlugin } = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
-const WebpackGitHash = require('webpack-git-hash');
 const CopyPlugin = require('copy-webpack-plugin');
+const { GitRevisionPlugin } = require('git-revision-webpack-plugin');
+var webpack = require('webpack');
+var gitRevisionPlugin = new GitRevisionPlugin()
 
 module.exports = require('./webpack.base.babel')({
   mode: 'production',
@@ -20,8 +21,8 @@ module.exports = require('./webpack.base.babel')({
 
   // Utilize long-term caching by adding content hashes (not compilation hashes) to compiled assets
   output: {
-    filename: '[name].[chunkhash].[githash].js',
-    chunkFilename: '[name].[chunkhash].[githash].chunk.js',
+    filename: '[name].[git-revision-hash].js',
+    chunkFilename: '[name].[git-revision-hash].chunk.js',
   },
 
   optimization: {
@@ -65,10 +66,14 @@ module.exports = require('./webpack.base.babel')({
         },
       },
     },
+    moduleIds: 'deterministic',
   },
 
   plugins: [
-    new WebpackGitHash(),
+    new webpack.DefinePlugin({
+      'VERSION': JSON.stringify(gitRevisionPlugin.version()),
+      'COMMITHASH': JSON.stringify(gitRevisionPlugin.commithash()),
+    }),
 
     // Minify and optimize the index.html
     new HtmlWebpackPlugin({
@@ -87,6 +92,24 @@ module.exports = require('./webpack.base.babel')({
       },
       inject: true,
     }),
+
+    new CompressionPlugin({
+      algorithm: 'gzip',
+      test: /\.js$|\.css$|\.html$/,
+      threshold: 10240,
+      minRatio: 0.8,
+    }),
+
+    new WebpackPwaManifest({
+      name: 'IMPACT OSS - NZ',
+      short_name: 'IMPACT OSS - NZ',
+      description: 'IMPACT OSS - NZ',
+      background_color: '#ffffff',
+      theme_color: '#ffffff',
+      inject: true,
+      ios: true,
+    }),
+    new CopyPlugin({ patterns: [{ from: 'app/robots.txt', to: 'robots.txt' }] }),
 
     // Put it in the end to capture all the HtmlWebpackPlugin's
     // assets manipulations and do leak its manipulations to HtmlWebpackPlugin
@@ -109,54 +132,16 @@ module.exports = require('./webpack.base.babel')({
       },
 
       // Removes warning for about `additional` section usage
-      safeToUseOptionalCaches: true,
+      //safeToUseOptionalCaches: true,
       // changing config according to https://github.com/react-boilerplate/react-boilerplate/issues/2750#issuecomment-536215256
       ServiceWorker: {
         events: true,
       },
       responseStrategy: 'network-first',
     }),
-
-    new CompressionPlugin({
-      algorithm: 'gzip',
-      test: /\.js$|\.css$|\.html$/,
-      threshold: 10240,
-      minRatio: 0.8,
-    }),
-
-    new WebpackPwaManifest({
-      name: 'IMPACT OSS - NZ',
-      short_name: 'IMPACT OSS - NZ',
-      description: 'IMPACT OSS - NZ',
-      background_color: '#ffffff',
-      theme_color: '#ffffff',
-      inject: true,
-      ios: true,
-      // icons: [
-      //   {
-      //     src: path.resolve('app/images/icon-512x512.png'),
-      //     sizes: [72, 96, 128, 144, 192, 384, 512],
-      //   },
-      //   {
-      //     src: path.resolve('app/images/icon-512x512.png'),
-      //     sizes: [120, 152, 167, 180],
-      //     ios: true,
-      //   },
-      // ],
-    }),
-
-    new HashedModuleIdsPlugin({
-      hashFunction: 'sha256',
-      hashDigest: 'hex',
-      hashDigestLength: 20,
-    }),
-
-    new CopyPlugin([
-      { from: 'app/robots.txt', to: 'robots.txt' },
-    ]),
   ],
-
   performance: {
     assetFilter: (assetFilename) => !/(\.map$)|(^(main\.|favicon\.))/.test(assetFilename),
   },
+  stats: 'verbose',
 });
