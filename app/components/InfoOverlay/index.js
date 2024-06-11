@@ -1,9 +1,9 @@
+/* eslint-disable react/no-children-prop */
 /*
  *
  * InfoOverlay
  *
  */
-
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
@@ -98,7 +98,10 @@ function InfoOverlay({
           <DropContent dropBackground={dropBackground}>
             {markdown && (
               <div>
-                <Markdown source={content} className="react-markdown" linkTarget="_blank" />
+                <Markdown
+                  children={content}
+                  className="react-markdown"
+                />
               </div>
             )}
             {!markdown && content}

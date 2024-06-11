@@ -36,6 +36,8 @@ import { DEPENDENCIES } from './constants';
 
 import messages from './messages';
 
+/* eslint-disable react/no-children-prop */
+
 const StyledRow = styled(Row)`
   display: flex;
 `;
@@ -231,7 +233,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
               <StyledRow>
                 <GridSpace />
                 <StyledBox>
-                  <Intro source={intl.formatMessage(messages.intro)} />
+                  <Intro children={intl.formatMessage(messages.intro)} />
                 </StyledBox>
               </StyledRow>
               <HomeActions>

@@ -1,9 +1,9 @@
+/* eslint-disable react/no-children-prop */
 /*
  *
  * Overlay
  *
  */
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
@@ -65,7 +65,7 @@ function Overlay({
         <LayerContent flex={{ grow: 1 }}>
           <div>
             {markdown && (
-              <Markdown source={content} className="react-markdown" linkTarget="_blank" />
+              <Markdown children={content} className="react-markdown" />
             )}
             {!markdown && content}
           </div>

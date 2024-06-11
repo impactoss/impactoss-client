@@ -1,3 +1,4 @@
+/* eslint-disable react/no-children-prop */
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -44,8 +45,7 @@ function MarkdownField({ field }) {
         )
       }
       <Markdown
-        source={field.value}
-        linkTarget="_blank"
+        children={field.value}
         className="react-markdown"
       />
     </FieldWrap>
