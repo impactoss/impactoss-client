@@ -19,7 +19,7 @@ import {
   getConnectionUpdatesFromFormData,
   getTitleFormField,
   getStatusField,
-  getMarkdownField,
+  getMarkdownFormField,
   renderIndicatorControl,
   renderRecommendationsByFwControl,
   getDateField,
@@ -141,7 +141,11 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       [ // fieldGroups
         { // fieldGroup
           fields: [
-            getReferenceFormField(intl.formatMessage, false, true, existingReferences),
+            getReferenceFormField({
+              formatMessage: intl.formatMessage,
+              required: true,
+              prohibitedValues: existingReferences,
+            }),
             getTitleFormField(intl.formatMessage),
           ],
         },
@@ -172,9 +176,18 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     groups.push(
       {
         fields: [
-          getMarkdownField(intl.formatMessage),
-          getMarkdownField(intl.formatMessage, 'outcome'),
-          getMarkdownField(intl.formatMessage, 'indicator_summary'),
+          getMarkdownFormField({
+            formatMessage: intl.formatMessage,
+            attribute: 'description',
+            label: 'fullMeasure',
+            required: true,
+          }),
+          getMarkdownFormField({
+            formatMessage: intl.formatMessage,
+            attribute: 'outcome',
+            label: 'comment',
+          }),
+          // getMarkdownFormField(intl.formatMessage, 'indicator_summary'),
         ],
       },
     );

@@ -23,7 +23,7 @@ import {
   getTitleFormField,
   getReferenceFormField,
   getShortTitleFormField,
-  getMarkdownField,
+  getMarkdownFormField,
   getFormField,
   getConnectionUpdatesFromFormData,
   getCheckboxField,
@@ -145,7 +145,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     const groups = [];
     groups.push({ // fieldGroup
       fields: [
-        getReferenceFormField(intl.formatMessage),
+        getReferenceFormField({ formatMessage: intl.formatMessage }),
         getTitleFormField(intl.formatMessage),
         getShortTitleFormField(intl.formatMessage),
       ],
@@ -198,7 +198,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     const { intl } = this.context;
     const fields = [];
     fields.push({
-      fields: [getMarkdownField(intl.formatMessage)],
+      fields: [getMarkdownFormField({ formatMessage: intl.formatMessage })],
     });
     if (!userOnly) {
       if (entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures) {

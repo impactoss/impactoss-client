@@ -106,6 +106,7 @@ export class IndicatorImport extends React.PureComponent { // eslint-disable-lin
                     attribute: 'reference',
                     type: 'text',
                     import: true,
+                    required: true,
                   },
                   {
                     attribute: 'title',
@@ -117,6 +118,7 @@ export class IndicatorImport extends React.PureComponent { // eslint-disable-lin
                     attribute: 'description',
                     type: 'markdown',
                     import: true,
+                    required: true,
                   },
                 ],
               }, intl.formatMessage),
