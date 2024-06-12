@@ -18,9 +18,9 @@ export default defineMessages({
     id: 'app.containers.Overview.description',
     defaultMessage: 'Start exploring by selecting a category group from the sidebar or one of the subjects from the diagram below.',
   },
-  textBelow: {
-    id: 'app.containers.Overview.textBelow',
-    defaultMessage: 'Start exploring by selecting a category group from the sidebar or one of the subjects from the diagram below.',
+  moreLink: {
+    id: 'app.containers.Overview.moreLink',
+    defaultMessage: 'See About page.',
   },
   buttons: {
     draft: {

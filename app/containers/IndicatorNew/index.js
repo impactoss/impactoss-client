@@ -132,10 +132,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     const { intl } = this.context;
     const groups = [];
     groups.push({
-      fields: [getMarkdownFormField({
-        formatMessage: intl.formatMessage,
-        required: true,
-      })],
+      fields: [getMarkdownFormField({ formatMessage: intl.formatMessage })],
     });
     if (measures) {
       groups.push({

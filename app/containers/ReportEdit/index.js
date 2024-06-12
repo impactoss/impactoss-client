@@ -173,7 +173,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     return ([
       {
         fields: [
-          getMarkdownFormField({ formatMessage: intl.formatMessage, required: true }),
+          getMarkdownFormField({ formatMessage: intl.formatMessage }),
           getUploadField(intl.formatMessage),
           getDocumentStatusField(intl.formatMessage),
         ],

@@ -49,6 +49,7 @@ import {
   selectReadyForAuthCheck,
   selectMeasureTaxonomies,
   selectMeasureReferences,
+  selectCanUserAdministerCategories,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -135,7 +136,6 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
             formatMessage: intl.formatMessage,
             attribute: 'description',
             label: 'fullMeasure',
-            required: true,
           }),
           getMarkdownFormField({
             formatMessage: intl.formatMessage,
@@ -177,7 +177,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => {
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
     const { intl } = this.context;
     return ([ // fieldGroups
       { // fieldGroup
@@ -189,7 +189,11 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
-        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+        fields: renderTaxonomyControl({
+          taxonomies,
+          onCreateOption: canCreateCategories ? onCreateOption : null,
+          contextIntl: intl,
+        }),
       },
     ]);
   }
@@ -205,6 +209,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
       taxonomies,
       onCreateOption,
       existingReferences,
+      canUserAdministerCategories,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     return (
@@ -281,6 +286,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                     aside: this.getBodyAsideFields(
                       taxonomies,
                       onCreateOption,
+                      canUserAdministerCategories,
                     ),
                   },
                 }}
@@ -317,6 +323,7 @@ ActionNew.propTypes = {
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   existingReferences: PropTypes.array,
+  canUserAdministerCategories: PropTypes.bool,
 };
 
 ActionNew.contextTypes = {
@@ -332,6 +339,7 @@ const mapStateToProps = (state) => ({
   recommendationsByFw: selectRecommendationsByFw(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
   existingReferences: selectMeasureReferences(state),
+  canUserAdministerCategories: selectCanUserAdministerCategories(state),
 });
 
 function mapDispatchToProps(dispatch) {

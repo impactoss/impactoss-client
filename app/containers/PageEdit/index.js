@@ -139,7 +139,6 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
       fields: [getMarkdownFormField({
         formatMessage: intl.formatMessage,
         attribute: 'content',
-        required: true,
       })],
     }]);
   };

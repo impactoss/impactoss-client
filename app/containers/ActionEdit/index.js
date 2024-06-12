@@ -55,6 +55,7 @@ import {
   selectReadyForAuthCheck,
   selectIsUserAdmin,
   selectSessionUserHighestRoleId,
+  selectCanUserAdministerCategories,
   selectMeasureReferences,
 } from 'containers/App/selectors';
 
@@ -180,7 +181,6 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
             formatMessage: intl.formatMessage,
             attribute: 'description',
             label: 'fullMeasure',
-            required: true,
           }),
           getMarkdownFormField({
             formatMessage: intl.formatMessage,
@@ -222,7 +222,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => {
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
     const { intl } = this.context;
     return ([ // fieldGroups
       { // fieldGroup
@@ -240,7 +240,11 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
-        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+        fields: renderTaxonomyControl({
+          taxonomies,
+          onCreateOption: canCreateCategories ? onCreateOption : null,
+          contextIntl: intl,
+        }),
       },
     ]);
   };
@@ -256,6 +260,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       indicators,
       onCreateOption,
       existingReferences,
+      canUserAdministerCategories,
     } = this.props;
     const { intl } = this.context;
     const reference = this.props.params.id;
@@ -357,6 +362,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                     aside: this.getBodyAsideFields(
                       taxonomies,
                       onCreateOption,
+                      canUserAdministerCategories,
                     ),
                   },
                 }}
@@ -393,6 +399,7 @@ ActionEdit.propTypes = {
   highestRole: PropTypes.number,
   connectedTaxonomies: PropTypes.object,
   recommendationsByFw: PropTypes.object,
+  canUserAdministerCategories: PropTypes.bool,
   indicators: PropTypes.object,
   onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
@@ -408,6 +415,7 @@ const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   isUserAdmin: selectIsUserAdmin(state),
   highestRole: selectSessionUserHighestRoleId(state),
+  canUserAdministerCategories: selectCanUserAdministerCategories(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),

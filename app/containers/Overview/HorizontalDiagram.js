@@ -28,7 +28,7 @@ const Diagram = styled.div`
   position: relative;
   width: 100%;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    margin-bottom: 100px;
+    margin-bottom: 180px;
   }
 `;
 const DiagramSectionHorizontalHalf = styled.div`

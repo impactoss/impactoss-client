@@ -116,7 +116,6 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
                   {
                     attribute: 'description',
                     type: 'markdown',
-                    required: true,
                     import: true,
                   },
                   {

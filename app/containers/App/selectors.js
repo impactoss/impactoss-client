@@ -16,7 +16,7 @@ import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
 import { sortEntities } from 'utils/sort';
 
-import { USER_ROLES, DB_TABLES } from 'themes/config';
+import { USER_ROLES, DB_TABLES, CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
 
 import {
   filterEntitiesByAttributes,
@@ -121,6 +121,11 @@ export const selectHasUserRole = createSelector(
     [USER_ROLES.MANAGER.value]: isManager,
     [USER_ROLES.CONTRIBUTOR.value]: isContributor,
   })
+);
+
+export const selectCanUserAdministerCategories = createSelector(
+  selectHasUserRole,
+  (hasUserRole) => hasUserRole[CATEGORY_ADMIN_MIN_ROLE],
 );
 
 export const selectSessionUserHighestRoleId = createSelector(
