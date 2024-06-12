@@ -99,7 +99,6 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
       fields: [getMarkdownFormField({
         formatMessage: intl.formatMessage,
         attribute: 'content',
-        required: true,
       })],
     }]);
   };

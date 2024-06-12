@@ -753,7 +753,7 @@ const getIndicatorFields = ({ existingReferences }, formatMessage) => ({
   },
   body: {
     main: [{
-      fields: [getMarkdownFormField({ formatMessage, required: true })],
+      fields: [getMarkdownFormField({ formatMessage })],
     }],
   },
 });
@@ -786,7 +786,6 @@ const getRecommendationFields = ({ frameworks, hasResponse, existingReferences }
           label: 'fullRecommendation',
           placeholder: 'fullRecommendation',
           hint: 'fullRecommendation',
-          required: true,
         }),
         hasResponse && getAcceptedField(formatMessage),
         hasResponse && getMarkdownFormField({
@@ -819,7 +818,7 @@ const getMeasureFields = ({ existingReferences }, formatMessage) => ({
   body: {
     main: [{
       fields: [
-        getMarkdownFormField({ formatMessage, required: true }),
+        getMarkdownFormField({ formatMessage }),
       ],
     }],
     aside: [{ // fieldGroup

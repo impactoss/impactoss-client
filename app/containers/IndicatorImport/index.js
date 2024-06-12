@@ -118,7 +118,6 @@ export class IndicatorImport extends React.PureComponent { // eslint-disable-lin
                     attribute: 'description',
                     type: 'markdown',
                     import: true,
-                    required: true,
                   },
                 ],
               }, intl.formatMessage),

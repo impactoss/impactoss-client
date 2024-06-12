@@ -172,7 +172,6 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           label: 'fullRecommendation',
           placeholder: 'fullRecommendation',
           hint: 'fullRecommendation',
-          required: true,
         }),
         hasResponse && getAcceptedField(intl.formatMessage, entity),
         hasResponse && getMarkdownFormField({

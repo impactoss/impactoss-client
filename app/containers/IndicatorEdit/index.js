@@ -175,10 +175,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     const groups = [];
     groups.push(
       {
-        fields: [getMarkdownFormField({
-          formatMessage: intl.formatMessage,
-          required: true,
-        })],
+        fields: [getMarkdownFormField({ formatMessage: intl.formatMessage })],
       },
     );
     if (measures) {

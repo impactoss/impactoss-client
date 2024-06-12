@@ -154,7 +154,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     return ([
       {
         fields: [
-          getMarkdownFormField({ formatMessage: intl.formatMessage, required: true }),
+          getMarkdownFormField({ formatMessage: intl.formatMessage }),
           getUploadField(intl.formatMessage),
           getDocumentStatusField(intl.formatMessage),
         ],

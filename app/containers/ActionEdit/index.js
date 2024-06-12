@@ -180,7 +180,6 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
             formatMessage: intl.formatMessage,
             attribute: 'description',
             label: 'fullMeasure',
-            required: true,
           }),
           getMarkdownFormField({
             formatMessage: intl.formatMessage,

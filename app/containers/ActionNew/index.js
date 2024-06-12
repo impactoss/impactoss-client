@@ -135,7 +135,6 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
             formatMessage: intl.formatMessage,
             attribute: 'description',
             label: 'fullMeasure',
-            required: true,
           }),
           getMarkdownFormField({
             formatMessage: intl.formatMessage,

@@ -151,7 +151,6 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
           label: 'fullRecommendation',
           placeholder: 'fullRecommendation',
           hint: 'fullRecommendation',
-          required: true,
         }),
         hasResponse && getAcceptedField(intl.formatMessage),
         hasResponse && getMarkdownFormField({
