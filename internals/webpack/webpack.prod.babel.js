@@ -19,8 +19,8 @@ module.exports = require('./webpack.base.babel')({
 
   // Utilize long-term caching by adding content hashes (not compilation hashes) to compiled assets
   output: {
-    filename: '[name].[git-revision-hash].js',
-    chunkFilename: '[name].[git-revision-hash].chunk.js',
+    filename: '[name].[chunkhash].[git-revision-hash].js',
+    chunkFilename: '[name].[chunkhash].[git-revision-hash].chunk.js',
   },
 
   optimization: {
