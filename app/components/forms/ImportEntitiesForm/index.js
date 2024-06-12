@@ -90,7 +90,11 @@ const CsvDownload = styled.span`
   display: inline-block;
 `;
 const NoteLink = styled(A)`
-  font-weight: bold;
+  color: #BA5D03;
+  &:hover {
+    color: #BA5D03;
+    text-decoration: underline;
+  }
 `;
 const RowErrors = styled.div`
   margin-top: 2em;
@@ -169,13 +173,6 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                       </li>
                       <li>
                         <FormattedMessage {...messages.formatHint} />
-                        { messages.formatHintLink && messages.formatHintLink !== ''
-                          && (
-                            <A href={intl.formatMessage(messages.formatHintLink)} target="_blank">
-                              {intl.formatMessage(messages.formatHintLinkAnchor)}
-                            </A>
-                          )
-                        }
                       </li>
                     </HintList>
                   </Hint>

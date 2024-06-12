@@ -105,7 +105,7 @@
   "app.components.ImportEntitiesForm.done": "Back to list",
   "app.components.ImportEntitiesForm.errorHintText": "When using the import feature again to add the failed rows, please make sure to remove the successfully imported rows from your CSV file. Failure to do so will lead to duplicate entries. Alternatively you can add each failed row individually by manually creating a new entry.",
   "app.components.ImportEntitiesForm.errorHintTitle": "Important",
-  "app.components.ImportEntitiesForm.formatHint": "IMPORTANT: when saving from Excel (Office 2016 or later) chose file type \"CSV UTF-8 (Comma delimited)\". For previous versions of Excel (Office 2013 and earlier) please refer to the ",
+  "app.components.ImportEntitiesForm.formatHint": "IMPORTANT: when saving from Excel (Office 2016 or later) chose file type \"CSV UTF-8 (Comma delimited)\".",
   "app.components.ImportEntitiesForm.formatHintLink": "https://user-manual.impactoss.org/managers/import.html",
   "app.components.ImportEntitiesForm.formatHintLinkAnchor": "user manual",
   "app.components.ImportEntitiesForm.hintLabel": "Please note:",
