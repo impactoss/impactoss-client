@@ -1,92 +1,106 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { toLower } from 'lodash/string';
-import { format, parse } from 'date-fns';
+// import { useIntl } from 'react-intl';
+
+import {
+  isValid, format, parse, startOfToday, getYear, getMonth,
+} from 'date-fns';
 
 import validateDateFormat from 'components/forms/validators/validate-date-format';
-import DayPickerInput from 'react-day-picker/DayPickerInput';
+import { DayPicker } from 'react-day-picker';
+
 import { DATE_FORMAT, DB_DATE_FORMAT } from 'themes/config';
 
 import InputComponent from './InputComponent';
-
-// Import DayPicker styles
 import DatePickerStyle from './styles';
 
-class DatePicker extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  render() {
-    const { intl } = this.context;
+const DatePicker = ({ value, onChange }) => {
+  // const intl = useIntl();
+  const inputRef = useRef(null);
+  const [showDayPicker, setShowDayPicker] = useState(false);
 
-    // format from db format to input format if valid
-    const formattedDay = this.props.value
-      && validateDateFormat(this.props.value, DB_DATE_FORMAT)
-      ? format(
-        parse(this.props.value, DB_DATE_FORMAT, new Date()),
-        DATE_FORMAT,
-      )
-      : this.props.value;
+  const handleDateChange = (valueDate) => {
+    if (valueDate) {
+      const formattedDB = format(valueDate, DB_DATE_FORMAT);
+      if (formattedDB) {
+        setShowDayPicker(false);
+        return onChange(formattedDB);
+      }
+    }
+    return null;
+  };
 
-    return (
-      <React.Fragment>
-        <DayPickerInput
-          parseDate={(value) => {
-            if (
-              value.trim() !== ''
-              && validateDateFormat(value, DATE_FORMAT)
-            ) {
-              return parse(value, DATE_FORMAT, new Date());
-            }
-            return null;
-          }}
-          value={formattedDay}
-          onDayChange={(valueDate) => {
-            // format to DB format
-            if (valueDate) {
-              const formattedDB = valueDate && format(valueDate, DB_DATE_FORMAT);
-              return formattedDB && this.props.onChange(formattedDB);
-            }
-            return null;
-          }}
-          inputProps={{
-            onChange: ({ target }) => {
-              const { value } = target;
-              // format string to db format if in valid input format
-              if (
-                value.trim() !== ''
-                && validateDateFormat(value, DATE_FORMAT)
-              ) {
-                // parse from input format to db format
-                const formattedDB = format(
-                  parse(value, DATE_FORMAT, new Date()),
-                  DB_DATE_FORMAT,
-                );
-                this.props.onChange(formattedDB);
-              } else {
-                this.props.onChange(value);
-              }
-            },
-          }}
-          component={InputComponent}
+  const handleInputChange = ({ target }) => {
+    const inputValue = target.value;
+    // if it's the right format, store as db format
+    if (inputValue !== '' && validateDateFormat(inputValue, DATE_FORMAT)) {
+      // parse from input format to db format
+      const formattedDB = format(
+        parse(inputValue, DATE_FORMAT, new Date()),
+        DB_DATE_FORMAT,
+      );
+      onChange(formattedDB);
+    } else {
+      // wrong format but store value for input field
+      onChange(inputValue);
+    }
+  };
+
+  const formattedDay = value
+    && validateDateFormat(value, DB_DATE_FORMAT)
+    ? format(parse(value, DB_DATE_FORMAT, new Date()), DATE_FORMAT)
+    : value;
+
+  const selected = validateDateFormat(value, DB_DATE_FORMAT) ? parse(value, DB_DATE_FORMAT, new Date()) : null;
+
+  const handleInputFocus = () => {
+    setShowDayPicker(true);
+  };
+
+  const handleInputBlur = (event) => {
+    // on click outside, close day picker
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      setShowDayPicker(false);
+    }
+  };
+  const getDefaultMonth = (selectedDate) => {
+    const defaultDate = isValid(selectedDate) ? selectedDate : startOfToday();
+    const year = getYear(defaultDate);
+    const month = getMonth(defaultDate);
+    return new Date(year, month);
+  };
+
+  return (
+    <div onBlur={handleInputBlur} style={{ position: 'relative' }}>
+      <InputComponent
+        ref={inputRef}
+        value={formattedDay}
+        onChange={handleInputChange}
+        onFocus={handleInputFocus}
+        placeholder={toLower(DATE_FORMAT)}
+      />
+      {showDayPicker && (
+        <DayPicker
+          mode="single"
+          defaultMonth={getDefaultMonth(selected)}
+          selected={selected}
+          onSelect={handleDateChange}
           placeholder={toLower(DATE_FORMAT)}
-          dayPickerProps={{
-            locale: intl.locale,
-            firstDayOfWeek: 1, // moment.localeData(intl.locale).firstDayOfWeek(),
-            fixedWeeks: true,
-            // todayButton: 'Go to Today',
-          }}
+          // locale={'us-EN'}
+          weekStartsOn={1}
+          fixedWeeks
+          showOutsideDays
         />
-        <DatePickerStyle />
-      </React.Fragment>
-    );
-  }
-}
+      )}
+      <DatePickerStyle />
+    </div>
+  );
+};
 
 DatePicker.propTypes = {
   value: PropTypes.string,
-  onChange: PropTypes.func,
-};
-
-DatePicker.contextTypes = {
-  intl: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default DatePicker;
