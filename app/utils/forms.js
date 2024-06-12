@@ -172,11 +172,11 @@ export const renderRecommendationsByFwControl = (
   : null;
 
 // taxonomies with categories "embedded"
-export const renderTaxonomyControl = (
+export const renderTaxonomyControl = ({
   taxonomies,
   onCreateOption,
   contextIntl,
-) => taxonomies
+}) => taxonomies
   ? sortEntities(taxonomies, 'asc', 'priority').reduce(
     (controls, taxonomy) => controls.concat({
       id: taxonomy.get('id'),

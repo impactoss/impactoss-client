@@ -28,6 +28,7 @@ import {
   selectHasUserRole,
   selectCurrentPathname,
   selectAllTaxonomiesWithCategories,
+  selectCanUserAdministerCategories,
 } from 'containers/App/selectors';
 
 import {
@@ -275,6 +276,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             activePanel={this.props.activePanel}
             onPanelSelect={this.props.onPanelSelect}
             onCreateOption={this.props.onCreateOption}
+            canCreateCategories={this.props.canUserAdministerCategories}
             onUpdate={
               (associations, activeEditOption) => this.props.handleEditSubmit(
                 associations,
@@ -415,6 +417,7 @@ EntityList.propTypes = {
   onDismissAllErrors: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
   showSidebar: PropTypes.bool,
+  canUserAdministerCategories: PropTypes.bool,
 };
 
 EntityList.contextTypes = {
@@ -430,6 +433,7 @@ const mapStateToProps = (state) => ({
   progressTypes: selectProgressTypes(state),
   currentPath: selectCurrentPathname(state),
   allTaxonomies: selectAllTaxonomiesWithCategories(state),
+  canUserAdministerCategories: selectCanUserAdministerCategories(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

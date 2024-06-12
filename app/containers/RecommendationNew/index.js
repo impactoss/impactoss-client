@@ -53,6 +53,7 @@ import {
   selectCurrentFrameworkId,
   selectActiveFrameworks,
   selectRecommendationReferences,
+  selectCanUserAdministerCategories,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -180,13 +181,17 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     return groups;
   }
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => {
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
     const { intl } = this.context;
     return ([ // fieldGroup
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
-        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+        fields: renderTaxonomyControl({
+          taxonomies,
+          onCreateOption: canCreateCategories ? onCreateOption : null,
+          contextIntl: intl,
+        }),
       },
     ]);
   };
@@ -204,6 +209,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       frameworkId,
       frameworks,
       existingReferences,
+      canUserAdministerCategories,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const fwSpecified = (frameworkId && frameworkId !== 'all');
@@ -298,7 +304,11 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                       onCreateOption,
                       hasResponse,
                     ),
-                    aside: this.getBodyAsideFields(fwTaxonomies, onCreateOption),
+                    aside: this.getBodyAsideFields(
+                      fwTaxonomies,
+                      onCreateOption,
+                      canUserAdministerCategories,
+                    ),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -336,6 +346,7 @@ RecommendationNew.propTypes = {
   frameworkId: PropTypes.string,
   frameworks: PropTypes.object,
   existingReferences: PropTypes.array,
+  canUserAdministerCategories: PropTypes.bool,
 };
 
 RecommendationNew.contextTypes = {
@@ -353,6 +364,7 @@ const mapStateToProps = (state) => ({
   frameworkId: selectCurrentFrameworkId(state),
   frameworks: selectActiveFrameworks(state),
   existingReferences: selectRecommendationReferences(state),
+  canUserAdministerCategories: selectCanUserAdministerCategories(state),
 });
 
 function mapDispatchToProps(dispatch) {

@@ -56,6 +56,7 @@ import {
   selectSessionUserHighestRoleId,
   selectFrameworks,
   selectRecommendationReferences,
+  selectCanUserAdministerCategories,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -201,13 +202,17 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     return groups;
   }
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => {
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
     const { intl } = this.context;
     return ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
-        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+        fields: renderTaxonomyControl({
+          taxonomies,
+          onCreateOption: canCreateCategories ? onCreateOption : null,
+          contextIntl: intl,
+        }),
       },
     ]);
   };
@@ -225,6 +230,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       onCreateOption,
       frameworks,
       existingReferences,
+      canUserAdministerCategories,
     } = this.props;
     const reference = this.props.params.id;
     const {
@@ -339,7 +345,11 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                       onCreateOption,
                       hasResponse,
                     ),
-                    aside: this.getBodyAsideFields(fwTaxonomies, onCreateOption),
+                    aside: this.getBodyAsideFields(
+                      fwTaxonomies,
+                      onCreateOption,
+                      canUserAdministerCategories,
+                    ),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -381,6 +391,7 @@ RecommendationEdit.propTypes = {
   connectedTaxonomies: PropTypes.object,
   frameworks: PropTypes.object,
   existingReferences: PropTypes.array,
+  canUserAdministerCategories: PropTypes.bool,
 };
 
 RecommendationEdit.contextTypes = {
@@ -399,6 +410,7 @@ const mapStateToProps = (state, props) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectFrameworks(state),
   existingReferences: selectRecommendationReferences(state),
+  canUserAdministerCategories: selectCanUserAdministerCategories(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
