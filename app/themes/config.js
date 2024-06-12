@@ -73,6 +73,8 @@ export const FOOTER = {
   ],
 };
 
+export const ABOUT_PAGE_ID = 4;
+
 // entitylists items-per-page options
 // export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100, 'all'];
 export const PAGE_ITEM_OPTIONS = [

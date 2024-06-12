@@ -7,7 +7,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import ReactMarkdown from 'react-markdown';
 import { FormattedMessage } from 'react-intl';
 
 import styled, { withTheme } from 'styled-components';
@@ -20,7 +19,8 @@ import {
   selectActiveFrameworks,
   selectCurrentFrameworkId,
 } from 'containers/App/selectors';
-import { CONTENT_LIST } from 'containers/App/constants';
+import { ABOUT_PAGE_ID } from 'themes/config';
+import { ROUTES, CONTENT_LIST } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import Footer from 'containers/Footer';
@@ -33,7 +33,7 @@ import ContentHeader from 'components/ContentHeader';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 import SkipContent from 'components/styled/SkipContent';
-
+import A from 'components/styled/A';
 
 // relative
 import VerticalDiagram from './VerticalDiagram';
@@ -52,7 +52,7 @@ import {
 const ViewContainer = styled(Container)`
   min-height: 66vH;
 `;
-const Description = styled.div`
+const Description = styled.p`
   margin-bottom: 1.5em;
   font-size: 1em;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
@@ -63,11 +63,12 @@ const Description = styled.div`
     font-size: ${(props) => props.theme.sizes.print.default};
   }
 `;
-const TextBelow = styled.div`
-  margin-top: 1.5em;
-  font-size: 0.9em;
-  @media print {
-    font-size: ${(props) => props.theme.sizes.print.default};
+
+const AboutLink = styled(A)`
+  color: #ba5d03;
+  &:hover {
+    color: #ba5d03;
+    text-decoration: underline;
   }
 `;
 
@@ -137,6 +138,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       taxonomies,
       frameworks,
       frameworkId,
+      onPageLink,
     } = this.props;
     let recommendationCount = 1;
     let recommendationDraftCount = 0;
@@ -162,7 +164,22 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             />
             <div style={{ position: 'relative' }}>
               <Description>
-                <ReactMarkdown source={intl.formatMessage(messages.description)} />
+                <FormattedMessage
+                  {...messages.description}
+                  values={{
+                    moreLink: (
+                      <AboutLink
+                        href={`${ROUTES.PAGES}/${ABOUT_PAGE_ID}`}
+                        onClick={(evt) => {
+                          if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                          onPageLink(`${ROUTES.PAGES}/${ABOUT_PAGE_ID}`);
+                        }}
+                      >
+                        <FormattedMessage {...messages.moreLink} />
+                      </AboutLink>
+                    ),
+                  }}
+                />
               </Description>
               <SkipContent
                 href="#sidebar-taxonomy-options"
@@ -175,7 +192,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             {dataReady && frameworks.size > 1 && (
               <VerticalDiagram
                 frameworks={frameworks}
-                onPageLink={this.props.onPageLink}
+                onPageLink={onPageLink}
                 recommendationCountByFw={this.props.recommendationCountByFw}
                 recommendationDraftCountByFw={this.props.recommendationDraftCountByFw}
                 measureCount={this.props.measureCount}
@@ -186,7 +203,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             )}
             {dataReady && frameworks.size === 1 && (
               <HorizontalDiagram
-                onPageLink={this.props.onPageLink}
+                onPageLink={onPageLink}
                 onTaxonomyIconMouseOver={this.onTaxonomyIconMouseOver}
                 measureCount={this.props.measureCount}
                 measureDraftCount={this.props.measureDraftCount}
@@ -198,15 +215,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 frameworkId={frameworks.first().get('id')}
                 mouseOverTaxonomy={this.state.mouseOverTaxonomy}
               />
-            )}
-            {dataReady && messages.textBelow && intl.formatMessage(messages.textBelow) !== '' && (
-              <TextBelow>
-                <ReactMarkdown
-                  source={intl.formatMessage(messages.textBelow)}
-                  linkTarget="_blank"
-                  className="react-markdown"
-                />
-              </TextBelow>
             )}
           </ViewContainer>
           <Footer hasBorder />
