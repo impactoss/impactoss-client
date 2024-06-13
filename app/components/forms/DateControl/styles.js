@@ -44,13 +44,21 @@ const DatePickerStyle = createGlobalStyle`
   }
 
   .rdp-caption {
-    display: inline;
     height: 1.5rem;
     text-align: center;
   }
-  .rdp-day_selected{
+  .rdp-caption_label {
+    display: inline;
+  }
+
+  .rdp-day_today {
+    color: ${palette('secondary', 0)};
+    font-weight: bold;
+  }
+  .rdp-day_selected {
     background: ${palette('primary', 0)};
-    color: white;
+    color: white !important;
+    font-weight: normal !important;
   }
 
   .rdp-nav_icon {
