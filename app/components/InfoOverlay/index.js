@@ -7,6 +7,7 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
+import rehypeExternalLinks from 'rehype-external-links';
 
 import styled from 'styled-components';
 import {
@@ -101,6 +102,7 @@ function InfoOverlay({
                 <Markdown
                   children={content}
                   className="react-markdown"
+                  rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
                 />
               </div>
             )}

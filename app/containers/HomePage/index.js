@@ -9,6 +9,8 @@ import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import ReactMarkdown from 'react-markdown';
+import rehypeExternalLinks from 'rehype-external-links';
+
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { Box } from 'grommet';
@@ -233,7 +235,10 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
               <StyledRow>
                 <GridSpace />
                 <StyledBox>
-                  <Intro children={intl.formatMessage(messages.intro)} />
+                  <Intro
+                    children={intl.formatMessage(messages.intro)}
+                    rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
+                  />
                 </StyledBox>
               </StyledRow>
               <HomeActions>

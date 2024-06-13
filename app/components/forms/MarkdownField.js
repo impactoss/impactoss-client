@@ -3,6 +3,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import ReactMarkdown from 'react-markdown';
+import rehypeExternalLinks from 'rehype-external-links';
+
 import { FormattedMessage } from 'react-intl';
 
 import FieldWrap from 'components/fields/FieldWrap';
@@ -46,6 +48,7 @@ function MarkdownField({ field }) {
       <Markdown
         children={field.value}
         className="react-markdown"
+        rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
       />
     </FieldWrap>
   );
