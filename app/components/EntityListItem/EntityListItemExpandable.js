@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { injectIntl } from 'react-intl';
 
 import Component from 'components/styled/Component';
 import Icon from 'components/Icon';
@@ -57,9 +58,9 @@ class EntityListItemExpandable extends React.PureComponent { // eslint-disable-l
       dates,
       colWidth,
       column,
+      intl,
     } = this.props;
     const { type, icon } = column;
-    const { intl } = this.context;
     const info = [];
     if (dates) {
       if (dates.due) {
@@ -94,13 +95,11 @@ EntityListItemExpandable.propTypes = {
   onClick: PropTypes.func,
   colWidth: PropTypes.number,
   dates: PropTypes.object,
+  intl: PropTypes.object.isRequired,
 };
 
 EntityListItemExpandable.defaultProps = {
   count: 0,
 };
-EntityListItemExpandable.contextTypes = {
-  intl: PropTypes.object,
-};
 
-export default EntityListItemExpandable;
+export default injectIntl(EntityListItemExpandable);

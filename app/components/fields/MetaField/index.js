@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -10,8 +10,7 @@ import Meta from 'components/fields/Meta';
 
 class MetaField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { field } = this.props;
-    const { intl } = this.context;
+    const { field, intl } = this.props;
     return (
       <FieldWrap>
         <Label>
@@ -40,9 +39,7 @@ class MetaField extends React.PureComponent { // eslint-disable-line react/prefe
 
 MetaField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-MetaField.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default MetaField;
+export default injectIntl(MetaField);

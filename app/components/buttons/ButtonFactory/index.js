@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, intlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
 
 import Icon from 'components/Icon';
 import ScreenReaderHide from 'components/styled/ScreenReaderHide';
@@ -15,7 +15,8 @@ import ButtonDefaultIconOnly from '../ButtonDefaultIconOnly';
 import ButtonFlatIconOnly from '../ButtonFlatIconOnly';
 import Bookmarker from '../../../containers/Bookmarker';
 
-const ButtonFactory = ({ button, intl }) => {
+const ButtonFactory = ({ button }) => {
+  const intl = useIntl();
   let { title } = button;
   switch (button.type) {
     case 'primary':
@@ -172,7 +173,6 @@ const ButtonFactory = ({ button, intl }) => {
 
 ButtonFactory.propTypes = {
   button: PropTypes.object.isRequired,
-  intl: intlShape.isRequired,
 };
 
-export default injectIntl(ButtonFactory);
+export default ButtonFactory;

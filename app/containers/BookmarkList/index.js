@@ -11,7 +11,7 @@ import HelmetCanonical from 'components/HelmetCanonical';
 import { List, fromJS } from 'immutable';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { qe } from 'utils/quasi-equals';
 
@@ -178,7 +178,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
   };
 
   renderBookmarkTypes = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return (
       <div>
         <Group>
@@ -231,7 +231,6 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
   }
 
   render() {
-    const { intl } = this.context;
     const {
       dataReady,
       location,
@@ -243,6 +242,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
       onSortBy,
       activeType,
       allBookmarks,
+      intl,
     } = this.props;
     const filtered = activeType && activeType !== '';
     const bookmarksFiltered = bookmarksForSearch.filter((e) => !filtered || qe(activeType, e.getIn(['attributes', 'view', 'type'])));
@@ -372,9 +372,6 @@ BookmarkList.propTypes = {
   allBookmarks: PropTypes.object.isRequired,
   onTypeSelect: PropTypes.func.isRequired,
   activeType: PropTypes.string,
-};
-
-BookmarkList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -426,4 +423,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default withTheme(connect(mapStateToProps, mapDispatchToProps)(BookmarkList));
+export default injectIntl(withTheme(connect(mapStateToProps, mapDispatchToProps)(BookmarkList)));

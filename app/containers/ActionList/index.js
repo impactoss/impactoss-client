@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { List, Map, fromJS } from 'immutable';
+import { injectIntl } from 'react-intl';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
@@ -51,8 +52,8 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
       location,
       isManager,
       isUserSignedIn,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     const headerOptions = {
       supTitle: intl.formatMessage(messages.pageTitle),
       icon: 'measures',
@@ -138,9 +139,6 @@ ActionList.propTypes = {
   connections: PropTypes.instanceOf(Map),
   connectedTaxonomies: PropTypes.instanceOf(Map),
   isUserSignedIn: PropTypes.bool,
-};
-
-ActionList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -168,4 +166,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionList);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(ActionList));

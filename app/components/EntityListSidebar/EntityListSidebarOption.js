@@ -6,6 +6,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -85,9 +86,8 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
 
   render() {
     const {
-      option, onShowForm, groupId, groupType, formOptions,
+      option, onShowForm, groupId, groupType, formOptions, intl,
     } = this.props;
-    const { intl } = this.context;
     return (
       <div>
         <Styled
@@ -144,11 +144,8 @@ EntityListSidebarOption.propTypes = {
   groupType: PropTypes.string,
   onShowForm: PropTypes.func.isRequired,
   formOptions: PropTypes.node,
-};
-
-
-EntityListSidebarOption.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default EntityListSidebarOption;
+
+export default injectIntl(EntityListSidebarOption);

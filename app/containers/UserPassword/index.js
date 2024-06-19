@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
 import {
   getPasswordCurrentField,
@@ -36,7 +37,7 @@ export class UserPassword extends React.PureComponent { // eslint-disable-line r
   }
 
   render() {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const { passwordSending, passwordError } = this.props.userPassword.get('page').toJS();
     const reference = this.props.params.id;
 
@@ -89,9 +90,6 @@ UserPassword.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   params: PropTypes.object,
   initialiseForm: PropTypes.func,
-};
-
-UserPassword.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -117,4 +115,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserPassword);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserPassword));

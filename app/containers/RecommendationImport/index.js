@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
 import { fromJS } from 'immutable';
 
@@ -65,7 +66,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
   }
 
   render() {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return (
       <div>
         <HelmetCanonical
@@ -154,11 +155,9 @@ RecommendationImport.propTypes = {
   progress: PropTypes.number,
   errors: PropTypes.object,
   success: PropTypes.object,
-};
-
-RecommendationImport.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
+
 
 const mapStateToProps = (state) => ({
   formData: selectFormData(state),
@@ -215,4 +214,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RecommendationImport);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(RecommendationImport));

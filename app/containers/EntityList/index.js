@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -140,7 +140,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
   filterByError = (entities, errors) => entities.filter((entity) => errors.has(entity.get('id')));
 
   render() {
-    const { intl } = this.context;
     // make sure selected entities are still actually on page
     const {
       entityIdsSelected,
@@ -150,6 +149,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       onDismissAllErrors,
       allTaxonomies,
       config,
+      intl,
     } = this.props;
 
     const sending = viewDomain.get('sending');
@@ -415,9 +415,6 @@ EntityList.propTypes = {
   onDismissAllErrors: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
   showSidebar: PropTypes.bool,
-};
-
-EntityList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -685,4 +682,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EntityList);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(EntityList));

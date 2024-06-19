@@ -2,11 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import appMessage from 'utils/app-message';
+import { injectIntl } from 'react-intl';
 
 import Label from 'components/styled/Label';
 import { find } from 'lodash/collection';
 
 import { USER_ROLES } from 'themes/config';
+
 
 const Role = styled(Label)`
   float: right;
@@ -19,7 +21,7 @@ const Role = styled(Label)`
 
 class ItemRole extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const role = this.props.role && parseInt(this.props.role, 10) !== USER_ROLES.DEFAULT.value
       && find(USER_ROLES, { value: parseInt(this.props.role, 10) });
 
@@ -38,6 +40,7 @@ class ItemRole extends React.PureComponent { // eslint-disable-line react/prefer
 
 ItemRole.propTypes = {
   role: PropTypes.number,
+  intl: PropTypes.object.isRequired,
 };
 
-export default ItemRole;
+export default injectIntl(ItemRole);

@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { PathLine } from 'react-svg-pathline';
 import { palette } from 'styled-theme';
 
@@ -192,7 +192,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
         ? (boundingRect.bottom - boundingRectReference.top)
         : (boundingRect.top - boundingRectReference.top),
     });
-  }
+  };
 
   getConnectionPath = (start, end) => [
     { x: start.x, y: start.y + 5 },
@@ -214,7 +214,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
       { x: end.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
       { x: end.x, y: end.y - 5 },
     ];
-  }
+  };
 
   getConnectionPathArrow = (connectionPath, direction = 'bottom') => {
     const point = connectionPath[connectionPath.length - 1];
@@ -232,7 +232,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
       { x: point.x + 5, y: point.y - 5 },
       point,
     ];
-  }
+  };
 
   connectRecommendationsMeasures = (fwId) => this.getCurvedConnectionPath(
     'vertical',
@@ -364,7 +364,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
         )}
       </DiagramSvgWrapper>
     );
-  }
+  };
 
   renderButton = ({
     path,
@@ -379,7 +379,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
     multiple,
     onPageLink,
   }) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return (
       <DiagramButton
         onClick={() => onPageLink(path, query)}
@@ -531,10 +531,7 @@ VerticalDiagram.propTypes = {
   measureDraftCount: PropTypes.number,
   indicatorDraftCount: PropTypes.number,
   theme: PropTypes.object,
-};
-
-VerticalDiagram.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default withTheme(VerticalDiagram);
+export default injectIntl(withTheme(VerticalDiagram));

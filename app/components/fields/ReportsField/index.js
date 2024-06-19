@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import appMessages from 'containers/App/messages';
@@ -33,7 +33,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   getReportReference = (report) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     if (report.dueDate) {
       return intl.formatDate(report.dueDate);
     }
@@ -41,7 +41,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
     return report.createdAt
       ? `${unscheduledShort} (${intl.formatDate(new Date(report.createdAt))})`
       : unscheduledShort;
-  }
+  };
 
   render() {
     const { field } = this.props;
@@ -115,10 +115,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
 
 ReportsField.propTypes = {
   field: PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
-ReportsField.contextTypes = {
-  intl: PropTypes.object,
-};
-
-export default ReportsField;
+export default injectIntl(ReportsField);

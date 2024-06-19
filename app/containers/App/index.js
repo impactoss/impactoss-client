@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import ReactModal from 'react-modal';
 import GlobalStyle from 'global-styles';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -98,7 +98,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     .toArray();
 
   prepareFrameworkOptions = (frameworks, activeId) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const options = Object.values(frameworks.toJS()).map((fw) => ({
       value: fw.id,
       label: intl.formatMessage(messages.frameworks[fw.id]),
@@ -118,7 +118,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     currentFrameworkId,
     viewRecommendationFramework,
   ) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     let navItems = [
       {
         path: ROUTES.OVERVIEW,
@@ -201,15 +201,15 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       viewRecommendationFramework,
       user,
       children,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     const title = intl.formatMessage(messages.app.title);
     const isHome = location.pathname === ROUTES.INTRO || location.pathname === `${ROUTES.INTRO}/`;
     return (
       <div>
         <SkipContent
           href="#main-content"
-          title={this.context.intl.formatMessage(messages.screenreader.skipToContent)}
+          title={intl.formatMessage(messages.screenreader.skipToContent)}
         >
           <FormattedMessage {...messages.screenreader.skipToContent} />
         </SkipContent>
@@ -290,8 +290,6 @@ App.propTypes = {
   currentFrameworkId: PropTypes.string,
   viewRecommendationFramework: PropTypes.string,
   frameworks: PropTypes.object,
-};
-App.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -337,4 +335,4 @@ export function mapDispatchToProps(dispatch) {
 }
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(App));

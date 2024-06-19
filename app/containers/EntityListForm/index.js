@@ -6,6 +6,7 @@ import { isEqual } from 'lodash/lang';
 import { Form, actions as formActions } from 'react-redux-form/immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { injectIntl } from 'react-intl';
 
 import { lowerCase } from 'utils/string';
 import appMessage from 'utils/app-message';
@@ -68,9 +69,8 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
   }
 
   render() {
-    const { intl } = this.context;
     const {
-      model, onSubmit, onCancel, buttons, formOptions, activeOptionId, showCancelButton,
+      model, onSubmit, onCancel, buttons, formOptions, activeOptionId, showCancelButton, intl,
     } = this.props;
     let formTitle;
     if (formOptions.message) {
@@ -136,14 +136,11 @@ EntityListForm.propTypes = {
   buttons: PropTypes.array,
   activeOptionId: PropTypes.string,
   showCancelButton: PropTypes.bool,
+  intl: PropTypes.object.isRequired,
 };
 
 EntityListForm.defaultProps = {
   showCancelButton: true,
-};
-
-EntityListForm.contextTypes = {
-  intl: PropTypes.object.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({
@@ -160,4 +157,4 @@ const mapDispatchToProps = (dispatch) => ({
   },
 });
 
-export default connect(null, mapDispatchToProps)(EntityListForm);
+export default injectIntl(connect(null, mapDispatchToProps)(EntityListForm));

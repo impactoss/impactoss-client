@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { intlShape, injectIntl, FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { palette } from 'styled-theme';
 import DebounceInput from 'react-debounce-input';
 import { snakeCase } from 'lodash/string';
@@ -107,12 +107,12 @@ export function EntityListDownload({
   taxonomies,
   connections,
   onClose,
-  intl,
   hasUserRole,
   searchQuery,
   entityIdsSelected,
   entityTitle,
 }) {
+  const intl = useIntl();
   const [typeTitle, setTypeTitle] = useState('entities');
   const [csvFilename, setCSVFilename] = useState('csv');
   const [csvSuffix, setCSVSuffix] = useState(true);
@@ -480,7 +480,6 @@ EntityListDownload.propTypes = {
   entityIdsSelected: PropTypes.object,
   hasUserRole: PropTypes.object,
   entityTitle: PropTypes.object,
-  intl: intlShape,
 };
 
-export default injectIntl(EntityListDownload);
+export default EntityListDownload;

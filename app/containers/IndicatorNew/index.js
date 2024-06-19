@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
 import { Map, List, fromJS } from 'immutable';
 
@@ -97,7 +98,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   }
 
   getHeaderMainFields = (existingReferences) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -109,7 +110,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   };
 
   getHeaderAsideFields = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([
       {
         fields: [
@@ -125,7 +126,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     recommendationsByFw,
     onCreateOption,
   ) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const groups = [];
     groups.push({
       fields: [getMarkdownField(intl.formatMessage)],
@@ -161,7 +162,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   };
 
   getBodyAsideFields = (users, repeat) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.schedule),
@@ -204,7 +205,6 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
   };
 
   render() {
-    const { intl } = this.context;
     const {
       dataReady,
       viewDomain,
@@ -214,6 +214,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       users,
       onCreateOption,
       existingReferences,
+      intl,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
@@ -327,9 +328,6 @@ IndicatorNew.propTypes = {
   onStartDateChange: PropTypes.func,
   onEndDateChange: PropTypes.func,
   existingReferences: PropTypes.array,
-};
-
-IndicatorNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -513,4 +511,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(IndicatorNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(IndicatorNew));

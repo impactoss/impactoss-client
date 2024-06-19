@@ -8,7 +8,7 @@ import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
@@ -100,13 +100,11 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
         ? this.getBodyAsideFields(entity)
         : null,
     },
-  })
-
+  });
 
   render() {
-    const { intl } = this.context;
     const {
-      page, dataReady, isAdmin, isManager,
+      page, dataReady, isAdmin, isManager, intl,
     } = this.props;
     const buttons = [];
     if (dataReady) {
@@ -175,12 +173,8 @@ PageView.propTypes = {
   isAdmin: PropTypes.bool,
   isManager: PropTypes.bool,
   params: PropTypes.object,
-};
-
-PageView.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
-
 
 const mapStateToProps = (state, props) => ({
   isAdmin: selectIsUserAdmin(state),
@@ -200,4 +194,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PageView);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(PageView));

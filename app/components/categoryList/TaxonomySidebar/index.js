@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
+
 import styled, { withTheme } from 'styled-components';
 
 import { map } from 'lodash/collection';
@@ -114,6 +115,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
       onTaxonomyOver,
       frameworkId,
       frameworks,
+      intl,
     } = this.props;
     const taxonomyGroups = frameworks && taxonomies && prepareTaxonomyGroups(
       taxonomies,
@@ -122,7 +124,6 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
       frameworkId,
       frameworks,
     );
-    const { intl } = this.context;
     return (
       <PrintHide id="sidebar-taxonomy-options">
         { (!this.state.visible && this.state.viewport < VIEWPORTS.SMALL)
@@ -196,7 +197,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
               </Scrollable>
               <SkipContent
                 href="#main-content"
-                title={this.context.intl.formatMessage(appMessages.screenreader.skipBackToContent)}
+                title={intl.formatMessage(appMessages.screenreader.skipBackToContent)}
                 onClick={this.onHideSidebar}
               >
                 <FormattedMessage {...appMessages.screenreader.skipBackToContent} />
@@ -217,8 +218,7 @@ TaxonomySidebar.propTypes = {
   onTaxonomyOver: PropTypes.func,
   active: PropTypes.string,
   theme: PropTypes.object,
-};
-TaxonomySidebar.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
-export default withTheme(TaxonomySidebar);
+
+export default injectIntl(withTheme(TaxonomySidebar));

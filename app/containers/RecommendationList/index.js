@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { Map, List, fromJS } from 'immutable';
+import { injectIntl } from 'react-intl';
 
 import { getAcceptanceStatus } from 'utils/entities';
 
@@ -62,12 +63,12 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
   //     || !isEqual(this.state, nextState);
   // }
   render() {
-    const { intl } = this.context;
     const {
       dataReady,
       frameworks,
       isManager,
       isUserSignedIn,
+      intl,
     } = this.props;
     // console.log('RecList:render')
     const currentFramework = frameworks && frameworks.size === 1 && frameworks.first();
@@ -170,9 +171,6 @@ RecommendationList.propTypes = {
   connections: PropTypes.instanceOf(Map),
   location: PropTypes.object,
   isUserSignedIn: PropTypes.bool,
-};
-
-RecommendationList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -201,4 +199,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RecommendationList);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(RecommendationList));

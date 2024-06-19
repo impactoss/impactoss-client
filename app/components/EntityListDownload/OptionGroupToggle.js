@@ -6,7 +6,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, intlShape } from 'react-intl';
+import { useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { Button, Box, Text } from 'grommet';
@@ -35,8 +35,9 @@ const Count = styled((p) => <Box {...p} />)`
 `;
 
 export function OptionGroupToggle({
-  label, onToggle, expanded, activeCount, optionCount, intl,
+  label, onToggle, expanded, activeCount, optionCount,
 }) {
+  const intl = useIntl();
   return (
     <Box>
       <Styled
@@ -73,7 +74,6 @@ OptionGroupToggle.propTypes = {
   expanded: PropTypes.bool,
   activeCount: PropTypes.number,
   optionCount: PropTypes.number,
-  intl: intlShape,
 };
 
-export default injectIntl(OptionGroupToggle);
+export default OptionGroupToggle;

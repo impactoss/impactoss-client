@@ -6,6 +6,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -53,9 +54,9 @@ const GroupIcon = styled.div`
 class EntityListSidebarGroupLabel extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const {
-      label, icon, onToggle, expanded,
+      label, icon, onToggle, expanded, intl,
     } = this.props;
-    const { intl } = this.context;
+
     return (
       <Styled
         onClick={onToggle}
@@ -75,10 +76,8 @@ EntityListSidebarGroupLabel.propTypes = {
   icon: PropTypes.string,
   onToggle: PropTypes.func,
   expanded: PropTypes.bool,
-};
-
-EntityListSidebarGroupLabel.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default EntityListSidebarGroupLabel;
+
+export default injectIntl(EntityListSidebarGroupLabel);

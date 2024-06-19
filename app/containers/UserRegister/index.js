@@ -6,7 +6,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import styled from 'styled-components';
@@ -48,7 +48,7 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
   }
 
   render() {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const { registerError, registerSending } = this.props.viewDomain.get('page').toJS();
 
     return (
@@ -139,9 +139,6 @@ UserRegister.propTypes = {
   initialiseForm: PropTypes.func,
   onDismissQueryMessages: PropTypes.func,
   queryMessages: PropTypes.object,
-};
-
-UserRegister.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -170,4 +167,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserRegister);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserRegister));

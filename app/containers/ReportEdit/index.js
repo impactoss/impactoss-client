@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map } from 'immutable';
@@ -141,10 +141,10 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         ),
       })
       : Map();
-  }
+  };
 
   getHeaderMainFields = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -155,7 +155,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   };
 
   getHeaderAsideFields = (entity, canUserPublish) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([
       {
         fields: [
@@ -169,7 +169,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   };
 
   getBodyMainFields = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([
       {
         fields: [
@@ -182,7 +182,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   };
 
   getBodyAsideFields = (entity) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.single),
@@ -204,8 +204,9 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   };
 
   render() {
-    const { intl } = this.context;
-    const { viewEntity, dataReady, viewDomain } = this.props;
+    const {
+      viewEntity, dataReady, viewDomain, intl,
+    } = this.props;
     const reference = this.props.params.id;
     const {
       saveSending, saveError, deleteSending, deleteError, submitValid,
@@ -335,11 +336,8 @@ ReportEdit.propTypes = {
   params: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
-  // userId: PropTypes.string, // used in nextProps
-};
-
-ReportEdit.contextTypes = {
   intl: PropTypes.object.isRequired,
+  // userId: PropTypes.string, // used in nextProps
 };
 
 const mapStateToProps = (state, props) => ({
@@ -417,4 +415,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ReportEdit);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(ReportEdit));

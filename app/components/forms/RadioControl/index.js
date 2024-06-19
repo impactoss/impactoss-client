@@ -64,8 +64,5 @@ RadioControl.propTypes = {
   options: PropTypes.array.isRequired,
   hints: PropTypes.object,
 };
-// DateControl.contextTypes = {
-//   intl: PropTypes.object.isRequired,
-// };
 
 export default RadioControl;

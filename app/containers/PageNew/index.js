@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
 import {
   getTitleFormField,
@@ -74,7 +75,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
   }
 
   getHeaderMainFields = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -84,25 +85,24 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
         ],
       },
     ]);
-  }
+  };
 
   getHeaderAsideFields = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([{
       fields: [getStatusField(intl.formatMessage)],
     }]);
   };
 
   getBodyMainFields = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([{
       fields: [getMarkdownField(intl.formatMessage, 'content')],
     }]);
   };
 
   render() {
-    const { intl } = this.context;
-    const { viewDomain, dataReady } = this.props;
+    const { viewDomain, dataReady, intl } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
     return (
@@ -200,9 +200,6 @@ PageNew.propTypes = {
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
   initialiseForm: PropTypes.func,
-};
-
-PageNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -248,4 +245,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PageNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(PageNew));

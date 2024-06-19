@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import {
   getReferenceField,
@@ -181,7 +181,6 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   };
 
   render() {
-    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -194,6 +193,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       recConnections,
       indicatorConnections,
       frameworks,
+      intl,
     } = this.props;
     const isManager = hasUserRole[USER_ROLES.MANAGER.value];
     let buttons = [];
@@ -301,12 +301,8 @@ ActionView.propTypes = {
   indicatorConnections: PropTypes.object,
   params: PropTypes.object,
   frameworks: PropTypes.object,
-};
-
-ActionView.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
-
 
 const mapStateToProps = (state, props) => ({
   hasUserRole: selectHasUserRole(state),
@@ -338,4 +334,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionView);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(ActionView));

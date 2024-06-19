@@ -391,8 +391,4 @@ CategoryListItem.propTypes = {
   frameworkId: PropTypes.string,
 };
 
-CategoryListItem.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
-
 export default CategoryListItem;

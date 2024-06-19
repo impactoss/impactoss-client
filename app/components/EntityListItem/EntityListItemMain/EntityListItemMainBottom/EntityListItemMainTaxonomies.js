@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Map } from 'immutable';
+import { injectIntl } from 'react-intl';
+
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
@@ -62,7 +64,7 @@ class EntityListItemMainTaxonomies extends React.PureComponent { // eslint-disab
   };
 
   getSmartTitle = (title, isSmart) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return intl
       ? `${title}: ${intl.formatMessage(isSmart ? appMessages.labels.smart.met : appMessages.labels.smart.notMet)}`
       : title;
@@ -144,10 +146,7 @@ EntityListItemMainTaxonomies.propTypes = {
   categories: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
   taxonomies: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
   onEntityClick: PropTypes.func,
+  intl: PropTypes.object.isRequired,
 };
 
-EntityListItemMainTaxonomies.contextTypes = {
-  intl: PropTypes.object,
-};
-
-export default EntityListItemMainTaxonomies;
+export default injectIntl(EntityListItemMainTaxonomies);

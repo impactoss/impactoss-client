@@ -70,8 +70,4 @@ EntityListSidebarGroups.propTypes = {
   onToggleGroup: PropTypes.func.isRequired,
 };
 
-EntityListSidebarGroups.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
-
 export default EntityListSidebarGroups;

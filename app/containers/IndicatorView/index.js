@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import {
   getReferenceField,
@@ -109,7 +109,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     frameworks,
     canCreateReports,
   }) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const fields = [];
     // own attributes
     fields.push({
@@ -185,7 +185,6 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   ]);
 
   render() {
-    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -203,6 +202,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       frameworks,
       userId,
       highestRole,
+      intl,
     } = this.props;
     let buttons = [];
 
@@ -351,12 +351,8 @@ IndicatorView.propTypes = {
   frameworks: PropTypes.object,
   highestRole: PropTypes.number,
   userId: PropTypes.string,
-};
-
-IndicatorView.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
-
 
 const mapStateToProps = (state, props) => ({
   isContributor: selectIsUserContributor(state),
@@ -401,4 +397,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(IndicatorView);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(IndicatorView));

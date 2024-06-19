@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { injectIntl } from 'react-intl';
 
 import messages from 'components/EntityListMain/EntityListGroups/messages';
 
@@ -21,8 +22,7 @@ const Styled = styled.span`
 
 class EntityListNestedNoItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { type, nestLevel } = this.props;
-    const { intl } = this.context;
+    const { type, nestLevel, intl } = this.props;
     return (
       <Styled nestLevel={nestLevel}>
         {intl && intl.formatMessage(messages.nestedListEmpty[type])}
@@ -35,10 +35,7 @@ class EntityListNestedNoItem extends React.PureComponent { // eslint-disable-lin
 EntityListNestedNoItem.propTypes = {
   type: PropTypes.string,
   nestLevel: PropTypes.number,
+  intl: PropTypes.object.isRequired,
 };
 
-EntityListNestedNoItem.contextTypes = {
-  intl: PropTypes.object,
-};
-
-export default EntityListNestedNoItem;
+export default injectIntl(EntityListNestedNoItem);

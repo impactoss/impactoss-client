@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import FileReaderInput from 'react-file-reader-input';
@@ -80,7 +80,7 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
   onDismissErrors = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ errors: [] });
-  }
+  };
 
   handleChange = (e, results) => {
     // todo: limit to 1 file?
@@ -109,16 +109,16 @@ class SelectFile extends React.PureComponent { // eslint-disable-line react/pref
         );
       }
     });
-  }
+  };
 
   handleRemove = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.props.onChange(null);
-  }
+  };
 
   render() {
     // console.log(this.props.value)
-    const { intl } = this.context;
+    const { intl } = this.props;
     return (
       <Styled>
         { (this.state.errors.length > 0)
@@ -173,9 +173,7 @@ SelectFile.propTypes = {
   value: PropTypes.object,
   as: PropTypes.string,
   accept: PropTypes.string,
-};
-SelectFile.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default SelectFile;
+export default injectIntl(SelectFile);

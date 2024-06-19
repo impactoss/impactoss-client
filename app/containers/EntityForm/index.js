@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { Control, Form, Errors } from 'react-redux-form/immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -135,7 +135,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       default:
         return omit(field, NON_CONTROL_PROPS);
     }
-  }
+  };
 
   // REGULAR COMPONENT
   getFieldComponent = (field) => {
@@ -145,11 +145,11 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       return controls[field.controlType];
     }
     return controls.input; // Default to input type if not specified
-  }
+  };
 
   preDelete = (confirm = true) => {
     this.setState({ deleteConfirmed: confirm });
-  }
+  };
 
   handleSubmit = (formData) => !this.props.saving && this.props.handleSubmit(formData);
 
@@ -161,10 +161,10 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       closeOnClickOutside={!hasEntityNewModal}
       handleUpdate={(fieldData) => this.props.handleUpdate(formData.setIn(field.dataPath, fieldData))}
     />
-  )
+  );
 
   renderFieldChildren = (field) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     // handle known cases here
     switch (field.controlType) {
       case 'select':
@@ -181,7 +181,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       default:
         return field.children || null; // enables passing children component, or null
     }
-  }
+  };
 
   renderComponent = (field) => {
     const { id, model, ...props } = this.getControlProps(field);
@@ -195,7 +195,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         {this.renderFieldChildren(field)}
       </FieldComponent>
     );
-  }
+  };
 
   renderCombo = (field) => (
     <FieldWrap>
@@ -253,7 +253,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         { field.controlType !== 'checkbox' && formField }
       </FormFieldWrap>
     );
-  }
+  };
 
   renderGroup = (group, hasEntityNewModal, scrollContainer) => (
     <FieldGroupWrapper>
@@ -301,7 +301,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
           : null)
       }
     </FieldGroupWrapper>
-  )
+  );
 
   renderMain = (
     fieldGroups,
@@ -469,13 +469,10 @@ EntityForm.propTypes = {
   newEntityModal: PropTypes.object,
   validators: PropTypes.object,
   scrollContainer: PropTypes.object,
+  intl: PropTypes.object.isRequired,
 };
 EntityForm.defaultProps = {
   saving: false,
 };
 
-EntityForm.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
-
-export default connect(mapStateToProps)(EntityForm);
+export default injectIntl(connect(mapStateToProps)(EntityForm));

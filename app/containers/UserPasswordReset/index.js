@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
 import {
   getPasswordField,
@@ -34,7 +35,7 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
   }
 
   render() {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const { resetSending, resetError } = this.props.viewDomain.get('page').toJS();
 
     return (
@@ -84,9 +85,6 @@ UserPasswordReset.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   initialiseForm: PropTypes.func,
-};
-
-UserPasswordReset.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -108,4 +106,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserPasswordReset);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserPasswordReset));

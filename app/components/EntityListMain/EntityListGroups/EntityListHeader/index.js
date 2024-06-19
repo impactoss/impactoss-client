@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { injectIntl } from 'react-intl';
+
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+
 import { getSortOption } from 'utils/sort';
 import appMessage from 'utils/app-message';
 
@@ -23,7 +26,7 @@ const Styled = styled.div`
 
 class EntityListHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   getListHeaderLabel = (entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     if (selectedTotal > 0) {
       if (allSelected) {
         // return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected. `;
@@ -57,7 +60,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
       entitiesTotal,
       type: (entitiesTotal === 1) ? entityTitle.single : entityTitle.plural,
     });
-  }
+  };
 
   getSelectedState = (selectedTotal, allSelected) => {
     if (selectedTotal === 0) {
@@ -67,7 +70,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
       return CHECKBOX_STATES.CHECKED;
     }
     return CHECKBOX_STATES.INDETERMINATE;
-  }
+  };
 
   getFirstColumnWidth = (expandableColumns, expandNo) => {
     // TODO figure out a betterway to determine column widths.
@@ -81,7 +84,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
       return COLUMN_WIDTHS.MAIN;
     }
     return COLUMN_WIDTHS.HALF;
-  }
+  };
 
   // TODO figure out a betterway to determine column widths
   getExpandableColumnWidth = (i, total, expandNo) => {
@@ -105,7 +108,6 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
   };
 
   render() {
-    const { intl } = this.context;
     const {
       selectedTotal,
       pageTotal,
@@ -120,6 +122,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
       onSelect,
       onSelectAll,
       sortOptions,
+      intl,
     } = this.props;
 
     const firstColumnWidth = this.getFirstColumnWidth(expandableColumns, expandNo);
@@ -181,10 +184,7 @@ EntityListHeader.propTypes = {
   onSelectAll: PropTypes.func,
   onSortBy: PropTypes.func,
   onSortOrder: PropTypes.func,
-};
-
-EntityListHeader.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default EntityListHeader;
+export default injectIntl(EntityListHeader);

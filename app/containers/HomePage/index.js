@@ -7,7 +7,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import ReactMarkdown from 'react-markdown';
 import rehypeExternalLinks from 'rehype-external-links';
 
@@ -198,9 +198,8 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
-    const { intl } = this.context;
     const {
-      theme, frameworks, onSelectFramework, onPageLink, signingIn, dataReady,
+      theme, frameworks, onSelectFramework, onPageLink, signingIn, dataReady, intl,
     } = this.props;
     const appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
     return (
@@ -329,9 +328,6 @@ HomePage.propTypes = {
   frameworks: PropTypes.object,
   signingIn: PropTypes.bool,
   dataReady: PropTypes.bool,
-};
-
-HomePage.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -366,4 +362,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 // Wrap the component to inject dispatch and state into it
-export default connect(mapStateToProps, mapDispatchToProps)(withTheme(HomePage));
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(withTheme(HomePage)));

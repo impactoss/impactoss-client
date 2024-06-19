@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { Map, List } from 'immutable';
 
@@ -120,10 +120,10 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedRole: getHighestUserRoleId(roles),
     });
-  }
+  };
 
   getHeaderMainFields = (entity, isManager) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     if (!ENABLE_AZURE) {
       return ([{ // fieldGroup
         fields: [getTitleFormField(intl.formatMessage, 'title', 'name')],
@@ -135,7 +135,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   };
 
   getHeaderAsideFields = (entity, roles, userId, highestRole) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     let fields = [];
     const canSeeRole = canUserManageUsers(highestRole)
       || qe(entity.get('id'), userId);
@@ -156,7 +156,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   };
 
   getBodyMainFields = (entity) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     if (!ENABLE_AZURE) {
       return ([{
         fields: [getEmailFormField(intl.formatMessage)],
@@ -168,7 +168,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   };
 
   getBodyAsideFields = (taxonomies, onCreateOption) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
@@ -188,10 +188,9 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           || (sessionUserHighestRoleId < userHighestRoleId && sessionUserHighestRoleId < parseInt(role.get('id'), 10)));
     }
     return Map();
-  }
+  };
 
   render() {
-    const { intl } = this.context;
     const {
       sessionUserId,
       viewEntity,
@@ -201,6 +200,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       roles,
       sessionUserHighestRoleId,
       onCreateOption,
+      intl,
     } = this.props;
     const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
     const isAdmin = sessionUserHighestRoleId <= USER_ROLES.ADMIN.value;
@@ -327,9 +327,6 @@ UserEdit.propTypes = {
   onRedirectNotPermitted: PropTypes.func,
   // authReady: PropTypes.bool,
   sessionUserId: PropTypes.string, // used in nextProps
-};
-
-UserEdit.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -423,4 +420,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserEdit);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserEdit));

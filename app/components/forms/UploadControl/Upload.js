@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import ReactS3Uploader from 'react-s3-uploader';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -85,27 +85,27 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
   state = {
     progress: null,
     error: null,
-  }
+  };
 
   onUploadFinish = ({ signedUrl }) => {
     const fileURL = getPathFromUrl(signedUrl);
     this.props.onChange(fileURL);
-  }
+  };
 
   onUploadProgress = (progress) => {
     this.setState({
       progress,
     });
-  }
+  };
 
   // do not output signed url
-  onSignedUrl = () => null
+  onSignedUrl = () => null;
 
   onUploadError = (error) => {
     this.setState({
       error,
     });
-  }
+  };
 
   handleRemove = (e) => {
     e.preventDefault();
@@ -113,23 +113,23 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
     this.setState({
       progress: null,
     });
-  }
+  };
 
   modifyFileType = (file, next) => {
     // This is to enable files to download by default, instead of potentially opening in browser
     const newFile = new File([file.slice()], file.name, { type: 'application/octet-stream' });
     next(newFile);
-  }
+  };
 
   reset = () => {
     this.setState({
       progress: null,
       error: null,
     });
-  }
+  };
 
   render() {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return (
       <Styled>
         {
@@ -200,8 +200,7 @@ class Upload extends React.Component { // eslint-disable-line react/prefer-state
 Upload.propTypes = {
   onChange: PropTypes.func,
   value: PropTypes.string,
-};
-Upload.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
-export default Upload;
+
+export default injectIntl(Upload);

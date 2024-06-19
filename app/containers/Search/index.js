@@ -11,7 +11,7 @@ import HelmetCanonical from 'components/HelmetCanonical';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { fromJS } from 'immutable';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { startsWith } from 'utils/string';
 
@@ -114,7 +114,6 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
   };
 
   render() {
-    const { intl } = this.context;
     const {
       dataReady,
       location,
@@ -123,6 +122,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       entities,
       onEntityClick,
       activeTargetPath,
+      intl,
     } = this.props;
     const hasQuery = !!location.query.search;
     const countResults = dataReady && hasQuery && entities && entities.reduce(
@@ -253,7 +253,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                         const hasTargetResults = target.get('results') && target.get('results').size > 0;
                                         if (hasTargetResults) {
                                           const count = target.get('results').size;
-                                          const title = this.getTargetTitle(target, count === 1, this.context.intl);
+                                          const title = this.getTargetTitle(target, count === 1, this.props.intl);
                                           const otherTargets = countTargets > 1;
                                           const active = qe(target.get('path'), activeTargetPath) || !otherTargets;
                                           return (
@@ -339,9 +339,6 @@ Search.propTypes = {
   onSortBy: PropTypes.func.isRequired,
   activeTargetPath: PropTypes.string,
   theme: PropTypes.object,
-};
-
-Search.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -390,4 +387,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default withTheme(connect(mapStateToProps, mapDispatchToProps)(Search));
+export default injectIntl(withTheme(connect(mapStateToProps, mapDispatchToProps)(Search)));

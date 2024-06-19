@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { find } from 'lodash/collection';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import appMessage from 'utils/app-message';
 import appMessages from 'containers/App/messages';
@@ -14,8 +14,7 @@ import Status from 'components/fields/Status';
 
 class StatusField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { intl } = this.context;
-    const { field } = this.props;
+    const { field, intl } = this.props;
     const status = find(field.options || PUBLISH_STATUSES, { value: field.value });
 
     return (
@@ -36,9 +35,7 @@ class StatusField extends React.PureComponent { // eslint-disable-line react/pre
 
 StatusField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-StatusField.contextTypes = {
-  intl: PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired.isRequired,
 };
 
-export default StatusField;
+export default injectIntl(StatusField);

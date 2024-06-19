@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
 import { Map, List, fromJS } from 'immutable';
 
@@ -94,7 +95,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   }
 
   getHeaderMainFields = (existingReferences) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -106,7 +107,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   };
 
   getHeaderAsideFields = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([
       {
         fields: [
@@ -114,7 +115,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
         ],
       },
     ]);
-  }
+  };
 
   getBodyMainFields = (
     connectedTaxonomies,
@@ -122,7 +123,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     recommendationsByFw,
     onCreateOption,
   ) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const groups = [];
     groups.push(
       {
@@ -165,7 +166,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   };
 
   getBodyAsideFields = (taxonomies, onCreateOption) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -179,10 +180,9 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
         fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
       },
     ]);
-  }
+  };
 
   render() {
-    const { intl } = this.context;
     const {
       dataReady,
       viewDomain,
@@ -192,6 +192,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
       taxonomies,
       onCreateOption,
       existingReferences,
+      intl,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     return (
@@ -304,9 +305,6 @@ ActionNew.propTypes = {
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   existingReferences: PropTypes.array,
-};
-
-ActionNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -413,4 +411,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(ActionNew));

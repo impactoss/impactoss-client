@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List, fromJS } from 'immutable';
@@ -138,10 +138,10 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       // TODO allow single value for singleSelect
       })
       : Map();
-  }
+  };
 
   getHeaderMainFields = (entity, parentOptions, parentTaxonomy) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const groups = [];
     groups.push({ // fieldGroup
       fields: [
@@ -166,7 +166,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 
 
   getHeaderAsideFields = (entity) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const fields = []; // fieldGroups
     fields.push({
       fields: [
@@ -185,7 +185,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       });
     }
     return fields;
-  }
+  };
 
   getBodyMainFields = (
     entity,
@@ -195,7 +195,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     onCreateOption,
     userOnly,
   ) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const fields = [];
     fields.push({
       fields: [getMarkdownField(intl.formatMessage)],
@@ -237,7 +237,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   };
 
   getBodyAsideFields = (entity, users, isAdmin) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const fields = []; // fieldGroups
     if (isAdmin && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
       fields.push({
@@ -265,12 +265,11 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       ],
     });
     return fields;
-  }
+  };
 
-  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+  getTaxTitle = (id) => this.props.intl.formatMessage(appMessages.entities.taxonomies[id].single);
 
   render() {
-    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -284,6 +283,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       onCreateOption,
       parentOptions,
       parentTaxonomy,
+      intl,
     } = this.props;
     const reference = this.props.params.id;
     const {
@@ -436,9 +436,6 @@ CategoryEdit.propTypes = {
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func,
-};
-
-CategoryEdit.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -568,4 +565,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoryEdit);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(CategoryEdit));

@@ -2,6 +2,8 @@ import React from 'react';
 import Link from 'containers/Link';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
+import { injectIntl } from 'react-intl';
+
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
@@ -15,6 +17,7 @@ import CategoryListItem from 'components/categoryList/CategoryListItem';
 import { SORT_ORDER_OPTIONS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 import messages from '../messages';
+
 const Styled = styled.div`
   position: relative;
 `;
@@ -58,7 +61,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     );
 
   getColumnKeys = (taxonomy, frameworks) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     // figure out if tagged directly or via child category
     const tagsRecs = this.getTagsTax(taxonomy, 'tags_recommendations');
     return tagsRecs && frameworks && taxonomy.get('frameworkIds').toArray().reduce(
@@ -88,7 +91,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
   };
 
   getHeaderAttributes = (taxonomy, frameworkId, frameworks) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     // figure out if tagged directly or via child category
     const tagsRecs = this.getTagsTax(taxonomy, 'tags_recommendations');
     const tagsMeasures = this.getTagsTax(taxonomy, 'tags_measures');
@@ -133,7 +136,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       });
     }
     return attributes;
-  }
+  };
 
   getListHeaderColumns = ({
     taxonomy,
@@ -146,7 +149,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     isGrouped,
     frameworks,
   }) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const sortOptionActive = getSortOption(sortOptions, sortBy, 'query');
     const titleColumnSortOption = sortOptions.find((option) => option.query === 'title');
     const titleColumnActive = titleColumnSortOption.query === sortOptionActive.query;
@@ -284,7 +287,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       });
     }
     return attributes;
-  }
+  };
 
   getListColumns = ({
     taxonomy,
@@ -393,10 +396,7 @@ CategoryListItems.propTypes = {
   sortOrder: PropTypes.string,
   userOnly: PropTypes.bool,
   frameworkId: PropTypes.string,
-};
-
-CategoryListItems.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default CategoryListItems;
+export default injectIntl(CategoryListItems);

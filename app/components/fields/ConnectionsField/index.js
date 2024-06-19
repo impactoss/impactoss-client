@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import appMessages from 'containers/App/messages';
@@ -37,7 +37,7 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
   getItemIdAt = (items, index) => {
     const itemsSliced = items.slice(index - 1, index);
     return itemsSliced ? itemsSliced.first().get('id') : null;
-  }
+  };
 
   toggleAllItems = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -47,11 +47,11 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
         focusItem: !prevState.showAllConnections ? CONNECTIONMAX + 1 : null,
       }),
     );
-  }
+  };
 
   render() {
-    const { field } = this.props;
-    const { intl } = this.context;
+    const { field, intl } = this.props;
+
     const label = `${field.values.size} ${intl.formatMessage(
       field.values.size === 1
         ? appMessages.entities[field.entityType].single
@@ -121,9 +121,7 @@ class ConnectionsField extends React.PureComponent { // eslint-disable-line reac
 
 ConnectionsField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-ConnectionsField.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default ConnectionsField;
+export default injectIntl(ConnectionsField);

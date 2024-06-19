@@ -2,7 +2,7 @@ import React, {
   useRef, useState, useEffect,
 } from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, intlShape, FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { palette } from 'styled-theme';
 import styled, { withTheme } from 'styled-components';
 import { Box, Text, Button } from 'grommet';
@@ -95,7 +95,8 @@ const MDButtonText = styled((p) => (
 `;
 
 function TextareaMarkdownWrapper(props) {
-  const { value, intl, theme } = props;
+  const { value, theme } = props;
+  const intl = useIntl();
   const textareaRef = useRef(null);
   const [view, setView] = useState('write');
   // const [hasFocus, setHasFocus] = useState(false);
@@ -304,8 +305,7 @@ function TextareaMarkdownWrapper(props) {
 TextareaMarkdownWrapper.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
-  intl: intlShape,
   theme: PropTypes.object,
 };
 
-export default injectIntl(withTheme(TextareaMarkdownWrapper));
+export default withTheme(TextareaMarkdownWrapper);

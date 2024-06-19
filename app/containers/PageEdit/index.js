@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map } from 'immutable';
@@ -106,10 +106,10 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
         ),
       })
       : Map();
-  }
+  };
 
   getHeaderMainFields = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -122,7 +122,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
   };
 
   getHeaderAsideFields = (entity) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([
       {
         fields: [
@@ -134,15 +134,16 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
   };
 
   getBodyMainFields = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([{
       fields: [getMarkdownField(intl.formatMessage, 'content')],
     }]);
   };
 
   render() {
-    const { intl } = this.context;
-    const { viewEntity, dataReady, viewDomain } = this.props;
+    const {
+      viewEntity, dataReady, viewDomain, intl,
+    } = this.props;
     const reference = this.props.params.id;
     const {
       saveSending, saveError, deleteSending, deleteError, submitValid,
@@ -255,9 +256,6 @@ PageEdit.propTypes = {
   highestRole: PropTypes.number,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
-};
-
-PageEdit.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -317,4 +315,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PageEdit);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(PageEdit));

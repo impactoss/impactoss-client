@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
 import { List, fromJS } from 'immutable';
 
@@ -103,7 +104,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   }
 
   getHeaderMainFields = (parentOptions, parentTaxonomy) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const groups = [];
     groups.push({ // fieldGroup
       fields: [
@@ -126,7 +127,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   };
 
   getHeaderAsideFields = (taxonomy) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const fields = []; // fieldGroups
     fields.push({
       fields: [
@@ -144,7 +145,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       });
     }
     return fields;
-  }
+  };
 
   getBodyMainFields = (
     taxonomy,
@@ -154,7 +155,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     onCreateOption,
     userOnly,
   ) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const groups = [];
     groups.push({
       fields: [getMarkdownField(intl.formatMessage)],
@@ -194,7 +195,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   };
 
   getBodyAsideFields = (users, isAdmin, taxonomy) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const fields = []; // fieldGroups
     fields.push({
       fields: [
@@ -221,14 +222,13 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       });
     }
     return fields;
-  }
+  };
 
   /* eslint-disable react/destructuring-assignment */
-  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+  getTaxTitle = (id) => this.props.intl.formatMessage(appMessages.entities.taxonomies[id].single);
   /* eslint-enable react/destructuring-assignment */
 
   render() {
-    const { intl } = this.context;
     const {
       taxonomy,
       dataReady,
@@ -241,6 +241,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       onCreateOption,
       parentOptions,
       parentTaxonomy,
+      intl,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const taxonomyReference = this.props.params.id;
@@ -367,9 +368,6 @@ CategoryNew.propTypes = {
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func,
-};
-
-CategoryNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -480,4 +478,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoryNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(CategoryNew));

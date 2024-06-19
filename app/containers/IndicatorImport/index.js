@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
 import { fromJS } from 'immutable';
 
@@ -65,7 +66,7 @@ export class IndicatorImport extends React.PureComponent { // eslint-disable-lin
   }
 
   render() {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return (
       <div>
         <HelmetCanonical
@@ -142,9 +143,6 @@ IndicatorImport.propTypes = {
   progress: PropTypes.number,
   errors: PropTypes.object,
   success: PropTypes.object,
-};
-
-IndicatorImport.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -199,4 +197,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(IndicatorImport);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(IndicatorImport));

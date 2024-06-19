@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { lowerCase } from 'utils/string';
@@ -169,13 +169,13 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
           : null,
       })
     );
-  }
+  };
 
   onCloseMultiselect = () => {
     this.setState({
       multiselectOpen: null,
     });
-  }
+  };
 
   onMultiSelectItemRemove = (option) => this.props.handleUpdate && this.props.handleUpdate(
     this.props.fieldData.map((d) => option.get('value') === d.get('value')
@@ -190,7 +190,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
     }
     // until then use initial options
     return this.sortOptions(field.options.filter((o) => o.get('checked')));
-  }
+  };
 
   getOptionSortValueMapper = (option) => {
     if (option.get('order')) {
@@ -200,12 +200,12 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
       return option.get('reference');
     }
     return option.get('label');
-  }
+  };
 
   sortOptions = (options) => options.sortBy(
     (option) => this.getOptionSortValueMapper(option),
     (a, b) => getEntitySortComparator(a, b, 'asc')
-  )
+  );
 
   renderMultiselectActiveOption = (option, field, i) => (
     <MultiselectActiveOptionListItem key={i}>
@@ -227,11 +227,10 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
         <Icon name="removeSmall" />
       </MultiselectActiveOptionRemove>
     </MultiselectActiveOptionListItem>
-  )
+  );
 
   render() {
-    const { field, fieldData } = this.props;
-    const { intl } = this.context;
+    const { field, fieldData, intl } = this.props;
     const { id, model, ...controlProps } = omit(field, NON_CONTROL_PROPS);
 
     const options = this.getMultiSelectActiveOptions(field, fieldData);
@@ -323,10 +322,7 @@ MultiSelectField.propTypes = {
   handleUpdate: PropTypes.func,
   closeOnClickOutside: PropTypes.bool,
   scrollContainer: PropTypes.object,
-};
-
-MultiSelectField.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default MultiSelectField;
+export default injectIntl(MultiSelectField);

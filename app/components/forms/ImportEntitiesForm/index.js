@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { Form } from 'react-redux-form/immutable';
 
 import CsvDownloader from 'react-csv-downloader';
@@ -126,8 +126,8 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
       progress,
       errors,
       success,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     const field = {
       id: 'file',
       model: `.${fieldModel}`,
@@ -318,10 +318,7 @@ ImportEntitiesForm.propTypes = {
   errors: PropTypes.object,
   success: PropTypes.object,
   template: PropTypes.object,
-};
-
-ImportEntitiesForm.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default ImportEntitiesForm;
+export default injectIntl(ImportEntitiesForm);

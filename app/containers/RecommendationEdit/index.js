@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map } from 'immutable';
@@ -127,7 +127,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   };
 
   getHeaderMainFields = (existingReferences) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -139,7 +139,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   };
 
   getHeaderAsideFields = (entity) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([
       {
         fields: [
@@ -158,7 +158,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     onCreateOption,
     hasResponse,
   ) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const groups = [];
     groups.push({
       fields: [
@@ -186,10 +186,10 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       });
     }
     return groups;
-  }
+  };
 
   getBodyAsideFields = (taxonomies, onCreateOption) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
@@ -200,7 +200,6 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   };
 
   render() {
-    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -212,6 +211,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       onCreateOption,
       frameworks,
       existingReferences,
+      intl,
     } = this.props;
     const reference = this.props.params.id;
     const {
@@ -368,11 +368,9 @@ RecommendationEdit.propTypes = {
   connectedTaxonomies: PropTypes.object,
   frameworks: PropTypes.object,
   existingReferences: PropTypes.array,
-};
-
-RecommendationEdit.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
+
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   isUserAdmin: selectIsUserAdmin(state),
@@ -482,4 +480,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RecommendationEdit);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(RecommendationEdit));

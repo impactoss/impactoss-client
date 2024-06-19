@@ -14,6 +14,7 @@ import { getEntityAttributeFields } from 'utils/forms';
 import { qe } from 'utils/quasi-equals';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import { injectIntl } from 'react-intl';
 
 import {
   newEntity,
@@ -73,14 +74,13 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
         ? frameworkId
         : DEFAULT_FRAMEWORK,
     ));
-  }
+  };
 
   /* eslint-disable react/destructuring-assignment */
-  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+  getTaxTitle = (id) => this.props.intl.formatMessage(appMessages.entities.taxonomies[id].single);
   /* eslint-enable react/destructuring-assignment */
 
   render() {
-    const { intl } = this.context;
     const {
       viewDomain,
       path,
@@ -92,6 +92,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
       frameworks,
       framework,
       frameworkId,
+      intl,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
@@ -233,9 +234,6 @@ EntityNew.propTypes = {
   framework: PropTypes.object,
   frameworks: PropTypes.object,
   frameworkId: PropTypes.string,
-};
-
-EntityNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -305,4 +303,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EntityNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(EntityNew));

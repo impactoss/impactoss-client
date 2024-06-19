@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { Map, fromJS } from 'immutable';
 
@@ -133,10 +133,10 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
         associatedIndicators: entityOptions(indicators, true),
       })
       : Map();
-  }
+  };
 
   getHeaderMainFields = (existingReferences) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return (
       [ // fieldGroups
         { // fieldGroup
@@ -150,7 +150,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   };
 
   getHeaderAsideFields = (entity) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([
       {
         fields: [
@@ -167,7 +167,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     recommendationsByFw,
     onCreateOption,
   ) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const groups = [];
     groups.push(
       {
@@ -210,7 +210,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   };
 
   getBodyAsideFields = (taxonomies, onCreateOption) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -243,8 +243,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       indicators,
       onCreateOption,
       existingReferences,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     const reference = this.props.params.id;
     const {
       saveSending, saveError, deleteSending, deleteError, submitValid,
@@ -385,9 +385,6 @@ ActionEdit.propTypes = {
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   existingReferences: PropTypes.array,
-};
-
-ActionEdit.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -504,4 +501,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionEdit);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(ActionEdit));

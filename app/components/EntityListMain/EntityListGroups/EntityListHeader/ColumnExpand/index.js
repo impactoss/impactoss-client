@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { injectIntl } from 'react-intl';
 
 import Icon from 'components/Icon';
 import ColumnHeader from 'components/styled/ColumnHeader';
@@ -51,9 +52,8 @@ const ExpandButton = styled(ButtonFlatIconOnly)`
 class ColumnExpand extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const {
-      isExpand, label, width, onExpand,
+      isExpand, label, width, onExpand, intl,
     } = this.props;
-    const { intl } = this.context;
     return (
       <Styled colWidth={width * 100}>
         <Wrapper>
@@ -80,12 +80,10 @@ ColumnExpand.propTypes = {
   onExpand: PropTypes.func,
   label: PropTypes.string,
   width: PropTypes.number,
+  intl: PropTypes.object.isRequired,
 };
 ColumnExpand.defaultProps = {
   label: 'label',
 };
-ColumnExpand.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
 
-export default ColumnExpand;
+export default injectIntl(ColumnExpand);

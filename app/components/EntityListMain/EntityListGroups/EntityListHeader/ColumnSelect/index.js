@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import IndeterminateCheckbox from 'components/forms/IndeterminateCheckbox';
 import SelectReset from 'components/SelectReset';
@@ -65,9 +65,8 @@ const SelectAll = styled(A)`
 class ColumnSelect extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const {
-      isSelect, isSelected, onSelect, width, label, hasSelectAll, onSelectAll, entitiesTotal,
+      isSelect, isSelected, onSelect, width, label, hasSelectAll, onSelectAll, entitiesTotal, intl,
     } = this.props;
-    const { intl } = this.context;
     const sortOptions = this.props.sortOptions && this.props.sortOptions.map((option) => ({
       value: option.attribute,
       label: intl.formatMessage(messages.sortAttributes[option.attribute]),
@@ -172,12 +171,10 @@ ColumnSelect.propTypes = {
   label: PropTypes.string,
   entitiesTotal: PropTypes.number,
   width: PropTypes.number,
+  intl: PropTypes.object.isRequired,
 };
 ColumnSelect.defaultProps = {
   label: 'label',
 };
-ColumnSelect.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
 
-export default ColumnSelect;
+export default injectIntl(ColumnSelect);

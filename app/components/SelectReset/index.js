@@ -6,6 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { find } from 'lodash/collection';
+import { injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -83,8 +84,8 @@ export class SelectReset extends React.PureComponent { // eslint-disable-line re
       index,
       hidePrint,
       labelScreenreaderOnly,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     const optionActive = find(options, (option) => option.value === value);
     return (
       <Styled hidePrint={hidePrint}>
@@ -143,10 +144,7 @@ SelectReset.propTypes = {
   onChange: PropTypes.func,
   isReset: PropTypes.bool,
   hidePrint: PropTypes.bool,
-};
-
-SelectReset.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default SelectReset;
+export default injectIntl(SelectReset);

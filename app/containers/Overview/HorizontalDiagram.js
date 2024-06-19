@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { PathLine } from 'react-svg-pathline';
 import { palette } from 'styled-theme';
 
@@ -462,9 +462,9 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
           onMouseOut={() => onTaxonomyIconMouseOver(tax.get('id'), false)}
           onBlur={() => onTaxonomyIconMouseOver(tax.get('id'), false)}
           active={activeTaxonomyId === tax.get('id')}
-          title={this.context.intl.formatMessage(
+          title={this.props.intl.formatMessage(
             messages.buttons.titleCategoryIcon,
-            { label: this.context.intl.formatMessage(appMessages.entities.taxonomies[tax.get('id')].plural) },
+            { label: this.props.intl.formatMessage(appMessages.entities.taxonomies[tax.get('id')].plural) },
           )}
         >
           <Icon
@@ -542,7 +542,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
     stateButton,
     onPageLink,
   }) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const label = `${count || 0} ${intl.formatMessage(appMessages.entities[type][count !== 1 ? 'plural' : 'single'])}`;
     const labelDraft = draftCount > 0
       ? intl.formatMessage(messages.buttons.draft, { count: draftCount })
@@ -641,7 +641,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
     onTaxonomyIconMouseOver,
     mouseOverTaxonomy,
   ) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     let iconSize = '5em';
     if (this.state.viewport === VIEWPORTS.MOBILE) {
       iconSize = null;
@@ -938,10 +938,7 @@ HorizontalDiagram.propTypes = {
   frameworkId: PropTypes.string,
   mouseOverTaxonomy: PropTypes.string,
   theme: PropTypes.object,
-};
-
-HorizontalDiagram.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default withTheme(HorizontalDiagram);
+export default injectIntl(withTheme(HorizontalDiagram));

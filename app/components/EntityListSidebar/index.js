@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { Map, List, fromJS } from 'immutable';
@@ -191,7 +191,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         activeOption: null,
       });
     });
-  }
+  };
 
   hideForm = () => {
     this.setState({ activeOption: null });
@@ -202,7 +202,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   };
 
   getSidebarButtons = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([
       {
         label: intl.formatMessage(messages.header.filterButton),
@@ -215,10 +215,10 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         icon: 'edit',
       },
     ]);
-  }
+  };
 
   getFormButtons = (activeOption) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const { onCreateOption } = this.props;
     return [
       activeOption.create
@@ -276,8 +276,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       connections,
       entityIdsSelected,
       frameworks,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     const { activeOption } = this.state;
 
     const hasSelected = entityIdsSelected && entityIdsSelected.size > 0;
@@ -302,7 +302,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           attributes: intl.formatMessage(messages.filterGroupLabel.attributes),
           taxonomyGroup: intl.formatMessage(messages.filterGroupLabel.taxonomies),
           taxonomyGroupByFw:
-            (fw) => this.context.intl.formatMessage(
+            (fw) => intl.formatMessage(
               messages.filterGroupLabel.taxonomiesByFw,
               {
                 fw: intl.formatMessage(appMessages.frameworks_short[fw]),
@@ -311,7 +311,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           frameworksGroup: intl.formatMessage(messages.filterGroupLabel.frameworks),
           connections: intl.formatMessage(messages.filterGroupLabel.connections),
           connectedTaxonomies: intl.formatMessage(messages.filterGroupLabel.connectedTaxonomies),
-          taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
+          taxonomies: (taxId) => intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
           frameworks: intl.formatMessage(appMessages.frameworks.plural),
         },
         frameworks,
@@ -326,7 +326,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           attributes: intl.formatMessage(messages.editGroupLabel.attributes),
           taxonomyGroup: intl.formatMessage(messages.editGroupLabel.taxonomies),
           connections: intl.formatMessage(messages.editGroupLabel.connections),
-          taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
+          taxonomies: (taxId) => intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
         },
         frameworks,
         // selectedFrameworkIds
@@ -468,7 +468,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         }
         <SkipContent
           href="#main-content"
-          title={this.context.intl.formatMessage(appMessages.screenreader.skipBackToContent)}
+          title={intl.formatMessage(appMessages.screenreader.skipBackToContent)}
           onClick={() => {
             if (activePanel === EDIT_PANEL) {
               this.setState({ activeOption: null });
@@ -502,10 +502,7 @@ EntityListSidebar.propTypes = {
   onCreateOption: PropTypes.func.isRequired,
   listUpdating: PropTypes.bool,
   theme: PropTypes.object,
-};
-
-EntityListSidebar.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default withTheme(EntityListSidebar);
+export default injectIntl(withTheme(EntityListSidebar));

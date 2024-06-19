@@ -140,10 +140,10 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       // TODO allow single value for singleSelect
       })
       : Map();
-  }
+  };
 
   getHeaderMainFields = (existingReferences) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -155,7 +155,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   };
 
   getHeaderAsideFields = (entity) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([
       {
         fields: [
@@ -167,7 +167,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   };
 
   getBodyMainFields = (connectedTaxonomies, measures, recommendationsByFw, onCreateOption) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const groups = [];
     groups.push(
       {
@@ -206,7 +206,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   };
 
   getBodyAsideFields = (entity, users, repeat) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.schedule),
@@ -250,7 +250,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   };
 
   render() {
-    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -261,6 +260,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       users,
       onCreateOption,
       existingReferences,
+      intl,
     } = this.props;
 
     const {
@@ -401,9 +401,6 @@ IndicatorEdit.propTypes = {
   onStartDateChange: PropTypes.func,
   onEndDateChange: PropTypes.func,
   existingReferences: PropTypes.array,
-};
-
-IndicatorEdit.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 

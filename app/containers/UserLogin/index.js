@@ -6,7 +6,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import styled from 'styled-components';
@@ -53,7 +53,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
   }
 
   render() {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const { authError, authSending } = this.props.viewDomain.get('page').toJS();
 
     const {
@@ -179,9 +179,6 @@ UserLogin.propTypes = {
   initialiseForm: PropTypes.func,
   onDismissQueryMessages: PropTypes.func,
   queryMessages: PropTypes.object,
-};
-
-UserLogin.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -214,4 +211,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserLogin);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserLogin));

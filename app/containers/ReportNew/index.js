@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
 import { Map } from 'immutable';
 
@@ -117,7 +118,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   }
 
   getHeaderMainFields = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -136,10 +137,10 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
         ? getDueDateDateOptions(indicator.get('dates'))[0].value
         : '0'
     ));
-  }
+  };
 
   getHeaderAsideFields = (canUserPublish) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([{
       fields: [
         canUserPublish
@@ -150,7 +151,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   };
 
   getBodyMainFields = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([
       {
         fields: [
@@ -163,7 +164,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   };
 
   getBodyAsideFields = (indicator) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.single),
@@ -184,12 +185,11 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   dismissDraftNote = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ draftNoteDismissed: true });
-  }
+  };
 
   render() {
-    const { intl } = this.context;
     const {
-      dataReady, indicator, viewDomain, highestRole,
+      dataReady, indicator, viewDomain, highestRole, intl,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const indicatorReference = this.props.params.id;
@@ -316,9 +316,6 @@ ReportNew.propTypes = {
   highestRole: PropTypes.number,
   // userId: PropTypes.string, // used in nextProps
   // dataAndAuthReady: PropTypes.bool, // used in nextProps
-};
-
-ReportNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -382,4 +379,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ReportNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(ReportNew));

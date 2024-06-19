@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import {
   getTitleField,
@@ -86,8 +86,8 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     handleClose,
     handleEditPassword,
     dataReady,
+    intl,
   }) => {
-    const { intl } = this.context;
     const userId = user.get('id') || user.getIn(['attributes', 'id']);
     let buttons = [];
     if (dataReady) {
@@ -174,9 +174,8 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     USER_ROLES.DEFAULT.value);
 
   render() {
-    const { intl } = this.context;
     const {
-      user, dataReady, sessionUserHighestRoleId, taxonomies, sessionUserId,
+      user, dataReady, sessionUserHighestRoleId, taxonomies, sessionUserId, intl,
     } = this.props;
     const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
 
@@ -249,9 +248,6 @@ UserView.propTypes = {
   sessionUserHighestRoleId: PropTypes.number,
   params: PropTypes.object,
   sessionUserId: PropTypes.string,
-};
-
-UserView.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -285,4 +281,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserView);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserView));

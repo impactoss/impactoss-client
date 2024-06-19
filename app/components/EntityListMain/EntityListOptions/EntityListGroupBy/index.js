@@ -5,6 +5,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 
@@ -25,8 +26,7 @@ const Styled = styled.div`
 
 export class EntityListGroupBy extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { intl } = this.context;
-    const { onChange, isSubgroup } = this.props;
+    const { onChange, isSubgroup, intl } = this.props;
     const value = this.props.value || PARAMS.GROUP_RESET;
     const options = value !== PARAMS.GROUP_RESET
       ? this.props.options
@@ -63,14 +63,11 @@ EntityListGroupBy.propTypes = {
   options: PropTypes.array,
   onChange: PropTypes.func,
   isSubgroup: PropTypes.bool,
+  intl: PropTypes.object.isRequired,
 };
 
 EntityListGroupBy.defaultProps = {
   value: PARAMS.GROUP_RESET,
 };
 
-EntityListGroupBy.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
-
-export default EntityListGroupBy;
+export default injectIntl(EntityListGroupBy);

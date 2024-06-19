@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
 import { Map, List } from 'immutable';
 
@@ -107,10 +108,10 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
         ? frameworkId
         : DEFAULT_FRAMEWORK,
     ));
-  }
+  };
 
   getHeaderMainFields = (frameworkId, frameworks, existingReferences) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const hasFWOptions = frameworks && frameworks.size > 1 && frameworkId === 'all';
     return ([ // fieldGroups
       { // fieldGroup
@@ -124,11 +125,11 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
   };
 
   getHeaderAsideFields = () => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([{
       fields: [getStatusField(intl.formatMessage)],
     }]);
-  }
+  };
 
   getBodyMainFields = (
     connectedTaxonomies,
@@ -137,7 +138,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     onCreateOption,
     hasResponse,
   ) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const groups = [];
     groups.push({
       fields: [
@@ -165,10 +166,10 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       });
     }
     return groups;
-  }
+  };
 
   getBodyAsideFields = (taxonomies, onCreateOption) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return ([ // fieldGroup
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
@@ -179,7 +180,6 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
   };
 
   render() {
-    const { intl } = this.context;
     const {
       dataReady,
       viewDomain,
@@ -191,6 +191,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       frameworkId,
       frameworks,
       existingReferences,
+      intl,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const fwSpecified = (frameworkId && frameworkId !== 'all');
@@ -323,9 +324,6 @@ RecommendationNew.propTypes = {
   frameworkId: PropTypes.string,
   frameworks: PropTypes.object,
   existingReferences: PropTypes.array,
-};
-
-RecommendationNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -449,4 +447,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(RecommendationNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(RecommendationNew));
