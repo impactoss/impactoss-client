@@ -22,6 +22,7 @@ const compat = new FlatCompat({
 export default [
     ...compat.extends("airbnb"),
     {
+        ignores: [".gitignore"],
         plugins: {
             "redux-saga": reduxSaga,
             react,
@@ -67,13 +68,13 @@ export default [
         rules: {
             "arrow-parens": ["error", "always"],
             "arrow-body-style": [2, "as-needed"],
-            camelcase: 0,
+            "camelcase": 0,
             "comma-dangle": ["error", {
-                arrays: 'always-multiline',
-                objects: 'always-multiline',
-                imports: 'always-multiline',
-                exports: 'always-multiline',
-                functions: 'only-multiline',
+                "arrays": "always-multiline",
+                "objects": "always-multiline",
+                "imports": "always-multiline",
+                "exports": "always-multiline",
+                "functions": "only-multiline",
             }],
             "import/imports-first": 0,
             "import/newline-after-import": 0,
@@ -83,8 +84,8 @@ export default [
             "import/no-unresolved": 2,
             "import/prefer-default-export": 0,
 
-            indent: [2, 2, {
-                SwitchCase: 1,
+            "indent": [2, 2, {
+                "SwitchCase": 1,
             }],
 
             "jsx-a11y/aria-props": 2,
@@ -121,5 +122,16 @@ export default [
             "redux-saga/yield-effects": 2,
             "require-yield": 0,
             "import/no-webpack-loader-syntax": 0,
+
+            //from airbnb extends disabled configs - WIP
+            "function-paren-newline": 0,
+            "import/no-named-as-default-member": 0,
+            "import/named": 0,
+            "no-multiple-empty-lines": 0,
+            "default-param-last": 0,
+            "react/jsx-props-no-spreading": 0,
+            "react/jsx-curly-newline": 0,
+            "react/prop-types": 0,
+
         },
     }];
