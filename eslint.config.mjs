@@ -2,16 +2,19 @@ import reduxSaga from "eslint-plugin-redux-saga";
 import react from "eslint-plugin-react";
 import jsxA11Y from "eslint-plugin-jsx-a11y";
 import importPlugin from "eslint-plugin-import";
-//import { fixupPluginRules } from "@eslint/compat";
 import globals from "globals";
 import babelParser from "@babel/eslint-parser";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
+import { includeIgnoreFile } from "@eslint/compat";
+
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const gitignorePath = path.resolve(__dirname, ".gitignore");
 
 const compat = new FlatCompat({
     baseDirectory: __dirname,
@@ -21,8 +24,8 @@ const compat = new FlatCompat({
 
 export default [
     ...compat.extends("airbnb"),
+    includeIgnoreFile(gitignorePath),
     {
-        ignores: [".gitignore"],
         plugins: {
             "redux-saga": reduxSaga,
             react,
