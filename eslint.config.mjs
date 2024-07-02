@@ -23,7 +23,7 @@ const compat = new FlatCompat({
 });
 
 export default [
-    ...compat.extends("airbnb"),
+    js.configs.recommended,
     includeIgnoreFile(gitignorePath),
     {
         plugins: {
@@ -125,16 +125,6 @@ export default [
             "redux-saga/yield-effects": 2,
             "require-yield": 0,
             "import/no-webpack-loader-syntax": 0,
-
-            //from airbnb extends disabled configs - WIP
-            "function-paren-newline": 0,
-            "import/no-named-as-default-member": 0,
-            "import/named": 0,
-            "no-multiple-empty-lines": 0,
-            "default-param-last": 0,
-            "react/jsx-props-no-spreading": 0,
-            "react/jsx-curly-newline": 0,
-            "react/prop-types": 0,
 
         },
     }];
