@@ -17,7 +17,7 @@ import {
   getTitleFormField,
   getDueDateOptionsField,
   getStatusField,
-  getMarkdownField,
+  getMarkdownFormField,
   getUploadField,
   getDocumentStatusField,
   getDueDateDateOptions,
@@ -173,7 +173,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     return ([
       {
         fields: [
-          getMarkdownField(intl.formatMessage),
+          getMarkdownFormField({ formatMessage: intl.formatMessage }),
           getUploadField(intl.formatMessage),
           getDocumentStatusField(intl.formatMessage),
         ],

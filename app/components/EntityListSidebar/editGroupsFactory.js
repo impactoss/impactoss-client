@@ -1,7 +1,7 @@
 import { reduce } from 'lodash/collection';
 import { sortEntities } from 'utils/sort';
 import { qe } from 'utils/quasi-equals';
-
+import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
 export const makeEditGroups = (
   config,
   taxonomies,
@@ -52,6 +52,7 @@ export const makeEditGroups = (
   }
   // taxonomy option group
   if (config.taxonomies && taxonomies) {
+    const canCreateCategories = hasUserRole[CATEGORY_ADMIN_MIN_ROLE];
     // first prepare taxonomy options
     editGroups.taxonomies = {
       id: 'taxonomies', // filterGroupId
@@ -84,10 +85,12 @@ export const makeEditGroups = (
                   key: config.taxonomies.key,
                   ownKey: config.taxonomies.ownKey,
                   active: !!activeEditOption && activeEditOption.optionId === taxonomy.get('id'),
-                  create: {
-                    path: 'categories',
-                    attributes: { taxonomy_id: taxonomy.get('id') },
-                  },
+                  create: canCreateCategories
+                    ? {
+                      path: 'categories',
+                      attributes: { taxonomy_id: taxonomy.get('id') },
+                    }
+                    : null,
                 },
               ])
               : memo,

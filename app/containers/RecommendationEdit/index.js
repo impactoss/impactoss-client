@@ -25,7 +25,7 @@ import {
   getReferenceFormField,
   getAcceptedField,
   getStatusField,
-  getMarkdownField,
+  getMarkdownFormField,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -56,6 +56,7 @@ import {
   selectSessionUserHighestRoleId,
   selectFrameworks,
   selectRecommendationReferences,
+  selectCanUserAdministerCategories,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -131,7 +132,11 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getReferenceFormField(intl.formatMessage, true, false, existingReferences), // required
+          getReferenceFormField({
+            formatMessage: intl.formatMessage,
+            required: true,
+            prohibitedValues: existingReferences,
+          }),
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -162,9 +167,18 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     const groups = [];
     groups.push({
       fields: [
-        getMarkdownField(intl.formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
+        getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'description',
+          label: 'fullRecommendation',
+          placeholder: 'fullRecommendation',
+          hint: 'fullRecommendation',
+        }),
         hasResponse && getAcceptedField(intl.formatMessage, entity),
-        hasResponse && getMarkdownField(intl.formatMessage, 'response'),
+        hasResponse && getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'response',
+        }),
       ],
     });
     if (measures) {
@@ -188,13 +202,17 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => {
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
     const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
-        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+        fields: renderTaxonomyControl({
+          taxonomies,
+          onCreateOption: canCreateCategories ? onCreateOption : null,
+          contextIntl: intl,
+        }),
       },
     ]);
   };
@@ -211,6 +229,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       onCreateOption,
       frameworks,
       existingReferences,
+      canUserAdministerCategories,
       intl,
     } = this.props;
     const reference = this.props.params.id;
@@ -326,7 +345,11 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                       onCreateOption,
                       hasResponse,
                     ),
-                    aside: this.getBodyAsideFields(fwTaxonomies, onCreateOption),
+                    aside: this.getBodyAsideFields(
+                      fwTaxonomies,
+                      onCreateOption,
+                      canUserAdministerCategories,
+                    ),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -368,6 +391,7 @@ RecommendationEdit.propTypes = {
   connectedTaxonomies: PropTypes.object,
   frameworks: PropTypes.object,
   existingReferences: PropTypes.array,
+  canUserAdministerCategories: PropTypes.bool,
   intl: PropTypes.object.isRequired,
 };
 
@@ -384,6 +408,7 @@ const mapStateToProps = (state, props) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectFrameworks(state),
   existingReferences: selectRecommendationReferences(state),
+  canUserAdministerCategories: selectCanUserAdministerCategories(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

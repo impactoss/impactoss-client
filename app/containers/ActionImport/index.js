@@ -105,6 +105,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
                   {
                     attribute: 'reference',
                     type: 'text',
+                    required: true,
                     import: true,
                   },
                   {
@@ -119,9 +120,9 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
                     import: true,
                   },
                   {
-                    disabled: true,
                     attribute: 'outcome',
                     type: 'markdown',
+                    label: 'comment',
                     import: true,
                   },
                   {

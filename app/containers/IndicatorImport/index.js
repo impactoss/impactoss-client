@@ -107,6 +107,7 @@ export class IndicatorImport extends React.PureComponent { // eslint-disable-lin
                     attribute: 'reference',
                     type: 'text',
                     import: true,
+                    required: true,
                   },
                   {
                     attribute: 'title',

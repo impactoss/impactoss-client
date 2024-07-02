@@ -26,6 +26,9 @@ import {
   selectEntity,
   selectCurrentFrameworkId,
   selectActiveFrameworks,
+  selectRecommendationReferences,
+  selectMeasureReferences,
+  selectIndicatorReferences,
 } from 'containers/App/selectors';
 import { selectParentOptions, selectParentTaxonomy } from 'containers/CategoryNew/selectors';
 
@@ -92,6 +95,9 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
       frameworks,
       framework,
       frameworkId,
+      recommendationReferences,
+      measureReferences,
+      indicatorReferences,
       intl,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
@@ -201,6 +207,13 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
                 recommendations: {
                   frameworks: !fwSpecified ? frameworks : null,
                   hasResponse,
+                  existingReferences: recommendationReferences,
+                },
+                measures: {
+                  existingReferences: measureReferences,
+                },
+                indicators: {
+                  existingReferences: indicatorReferences,
                 },
               },
               intl,
@@ -234,6 +247,9 @@ EntityNew.propTypes = {
   framework: PropTypes.object,
   frameworks: PropTypes.object,
   frameworkId: PropTypes.string,
+  recommendationReferences: PropTypes.array,
+  measureReferences: PropTypes.array,
+  indicatorReferences: PropTypes.array,
   intl: PropTypes.object.isRequired,
 };
 
@@ -257,6 +273,9 @@ const mapStateToProps = (state, { path, attributes }) => ({
   framework: path === 'recommendations' && attributes && attributes.get('framework_id')
     ? selectEntity(state, { path: 'frameworks', id: attributes.get('framework_id') })
     : null,
+  recommendationReferences: selectRecommendationReferences(state),
+  measureReferences: selectMeasureReferences(state),
+  indicatorReferences: selectIndicatorReferences(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

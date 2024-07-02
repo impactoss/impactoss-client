@@ -20,7 +20,7 @@ import {
   getReferenceFormField,
   getAcceptedField,
   getStatusField,
-  getMarkdownField,
+  getMarkdownFormField,
   renderIndicatorControl,
   getFrameworkFormField,
 } from 'utils/forms';
@@ -54,6 +54,7 @@ import {
   selectCurrentFrameworkId,
   selectActiveFrameworks,
   selectRecommendationReferences,
+  selectCanUserAdministerCategories,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -117,7 +118,11 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       { // fieldGroup
         fields: [
           hasFWOptions && getFrameworkFormField(intl.formatMessage, frameworks), // required
-          getReferenceFormField(intl.formatMessage, true, false, existingReferences), // required
+          getReferenceFormField({
+            formatMessage: intl.formatMessage,
+            required: true,
+            prohibitedValues: existingReferences,
+          }),
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -142,9 +147,18 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     const groups = [];
     groups.push({
       fields: [
-        getMarkdownField(intl.formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
+        getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'description',
+          label: 'fullRecommendation',
+          placeholder: 'fullRecommendation',
+          hint: 'fullRecommendation',
+        }),
         hasResponse && getAcceptedField(intl.formatMessage),
-        hasResponse && getMarkdownField(intl.formatMessage, 'response'),
+        hasResponse && getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'response',
+        }),
       ],
     });
     if (measures) {
@@ -168,13 +182,17 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => {
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
     const { intl } = this.props;
     return ([ // fieldGroup
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
-        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+        fields: renderTaxonomyControl({
+          taxonomies,
+          onCreateOption: canCreateCategories ? onCreateOption : null,
+          contextIntl: intl,
+        }),
       },
     ]);
   };
@@ -191,6 +209,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       frameworkId,
       frameworks,
       existingReferences,
+      canUserAdministerCategories,
       intl,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
@@ -286,7 +305,11 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                       onCreateOption,
                       hasResponse,
                     ),
-                    aside: this.getBodyAsideFields(fwTaxonomies, onCreateOption),
+                    aside: this.getBodyAsideFields(
+                      fwTaxonomies,
+                      onCreateOption,
+                      canUserAdministerCategories,
+                    ),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -324,6 +347,7 @@ RecommendationNew.propTypes = {
   frameworkId: PropTypes.string,
   frameworks: PropTypes.object,
   existingReferences: PropTypes.array,
+  canUserAdministerCategories: PropTypes.bool,
   intl: PropTypes.object.isRequired,
 };
 
@@ -338,6 +362,7 @@ const mapStateToProps = (state) => ({
   frameworkId: selectCurrentFrameworkId(state),
   frameworks: selectActiveFrameworks(state),
   existingReferences: selectRecommendationReferences(state),
+  canUserAdministerCategories: selectCanUserAdministerCategories(state),
 });
 
 function mapDispatchToProps(dispatch) {

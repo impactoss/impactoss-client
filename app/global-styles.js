@@ -192,6 +192,13 @@ const GlobalStyle = createGlobalStyle`
     h6 {
       font-size: 1em;
     }
+    a {
+      color: #BA5D03;
+      font-weight: 500;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 
   .content-page {

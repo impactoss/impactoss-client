@@ -23,7 +23,7 @@ import {
   getTitleFormField,
   getReferenceFormField,
   getStatusField,
-  getMarkdownField,
+  getMarkdownFormField,
   getDateField,
   getFrequencyField,
   getCheckboxField,
@@ -147,7 +147,11 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getReferenceFormField(intl.formatMessage, true, false, existingReferences),
+          getReferenceFormField({
+            formatMessage: intl.formatMessage,
+            required: true,
+            prohibitedValues: existingReferences,
+          }),
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -171,7 +175,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     const groups = [];
     groups.push(
       {
-        fields: [getMarkdownField(intl.formatMessage)],
+        fields: [getMarkdownFormField({ formatMessage: intl.formatMessage })],
       },
     );
     if (measures) {

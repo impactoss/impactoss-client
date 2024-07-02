@@ -49,6 +49,7 @@ import {
   selectSessionUserHighestRoleId,
   selectReadyForAuthCheck,
   selectSessionUserId,
+  selectCanUserAdministerCategories,
 } from 'containers/App/selectors';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
@@ -167,11 +168,15 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     }]);
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => {
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
     const { intl } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
-        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+        fields: renderTaxonomyControl({
+          taxonomies,
+          onCreateOption: canCreateCategories ? onCreateOption : null,
+          contextIntl: intl,
+        }),
       },
     ]);
   };
@@ -200,6 +205,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       roles,
       sessionUserHighestRoleId,
       onCreateOption,
+      canUserAdministerCategories,
       intl,
     } = this.props;
     const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
@@ -290,7 +296,11 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                   },
                   body: {
                     main: this.getBodyMainFields(viewEntity),
-                    aside: isAdmin && this.getBodyAsideFields(taxonomies, onCreateOption),
+                    aside: isAdmin && this.getBodyAsideFields(
+                      taxonomies,
+                      onCreateOption,
+                      canUserAdministerCategories,
+                    ),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -327,6 +337,7 @@ UserEdit.propTypes = {
   onRedirectNotPermitted: PropTypes.func,
   // authReady: PropTypes.bool,
   sessionUserId: PropTypes.string, // used in nextProps
+  canUserAdministerCategories: PropTypes.bool,
   intl: PropTypes.object.isRequired,
 };
 
@@ -339,6 +350,7 @@ const mapStateToProps = (state, props) => ({
   taxonomies: selectTaxonomies(state, props.params.id),
   roles: selectRoles(state, props.params.id),
   sessionUserId: selectSessionUserId(state),
+  canUserAdministerCategories: selectCanUserAdministerCategories(state),
 });
 
 function mapDispatchToProps(dispatch) {

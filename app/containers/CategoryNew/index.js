@@ -21,7 +21,7 @@ import {
   getTitleFormField,
   getReferenceFormField,
   getShortTitleFormField,
-  getMarkdownField,
+  getMarkdownFormField,
   getFormField,
   getConnectionUpdatesFromFormData,
   getCheckboxField,
@@ -108,7 +108,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     const groups = [];
     groups.push({ // fieldGroup
       fields: [
-        getReferenceFormField(intl.formatMessage),
+        getReferenceFormField({ formatMessage: intl.formatMessage }),
         getTitleFormField(intl.formatMessage),
         getShortTitleFormField(intl.formatMessage),
       ],
@@ -158,7 +158,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     const { intl } = this.props;
     const groups = [];
     groups.push({
-      fields: [getMarkdownField(intl.formatMessage)],
+      fields: [getMarkdownFormField({ formatMessage: intl.formatMessage })],
     });
     if (!userOnly) {
       if (taxonomy.getIn(['attributes', 'tags_measures']) && measures) {

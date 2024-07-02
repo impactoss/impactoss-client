@@ -172,11 +172,11 @@ export const renderRecommendationsByFwControl = (
   : null;
 
 // taxonomies with categories "embedded"
-export const renderTaxonomyControl = (
+export const renderTaxonomyControl = ({
   taxonomies,
   onCreateOption,
   contextIntl,
-) => taxonomies
+}) => taxonomies
   ? sortEntities(taxonomies, 'asc', 'priority').reduce(
     (controls, taxonomy) => controls.concat({
       id: taxonomy.get('id'),
@@ -474,12 +474,12 @@ export const getTitleFormField = (formatMessage, controlType = 'title', attribut
   required: true,
 });
 
-export const getReferenceFormField = (
+export const getReferenceFormField = ({
   formatMessage,
   required = false,
   isAutoReference = false,
   prohibitedValues,
-) => getFormField({
+}) => getFormField({
   formatMessage,
   controlType: 'short',
   attribute: 'reference',
@@ -513,12 +513,20 @@ export const getMenuOrderFormField = (formatMessage) => {
   return field;
 };
 
-export const getMarkdownField = (formatMessage, attribute = 'description', label, placeholder, hint) => getFormField({
+export const getMarkdownFormField = ({
+  formatMessage,
+  attribute = 'description',
+  label,
+  required,
+  placeholder,
+  hint,
+}) => getFormField({
   formatMessage,
   controlType: 'markdown',
   attribute,
   label: label || attribute,
   placeholder: placeholder || attribute,
+  required,
   hint: hint
     ? (appMessages.hints[hint] && formatMessage(appMessages.hints[hint]))
     : (appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute])),
@@ -687,7 +695,7 @@ const getCategoryFields = (args, formatMessage) => ({
   header: {
     main: [{ // fieldGroup
       fields: [
-        getReferenceFormField(formatMessage),
+        getReferenceFormField({ formatMessage }),
         getTitleFormField(formatMessage),
         getShortTitleFormField(formatMessage),
       ],
@@ -705,7 +713,7 @@ const getCategoryFields = (args, formatMessage) => ({
   },
   body: {
     main: [{
-      fields: [getMarkdownField(formatMessage)],
+      fields: [getMarkdownFormField({ formatMessage })],
     }],
     aside: [{
       fields: [
@@ -725,11 +733,15 @@ const getCategoryFields = (args, formatMessage) => ({
   },
 });
 
-const getIndicatorFields = (formatMessage) => ({
+const getIndicatorFields = ({ existingReferences }, formatMessage) => ({
   header: {
     main: [{ // fieldGroup
       fields: [
-        getReferenceFormField(formatMessage, false, true),
+        getReferenceFormField({
+          formatMessage,
+          required: true,
+          prohibitedValues: existingReferences,
+        }),
         getTitleFormField(formatMessage, 'titleText'),
       ],
     }],
@@ -741,17 +753,21 @@ const getIndicatorFields = (formatMessage) => ({
   },
   body: {
     main: [{
-      fields: [getMarkdownField(formatMessage)],
+      fields: [getMarkdownFormField({ formatMessage })],
     }],
   },
 });
 
-const getRecommendationFields = ({ frameworks, hasResponse }, formatMessage) => ({
+const getRecommendationFields = ({ frameworks, hasResponse, existingReferences }, formatMessage) => ({
   header: {
     main: [{ // fieldGroup
       fields: [
         frameworks && getFrameworkFormField(formatMessage, frameworks),
-        getReferenceFormField(formatMessage, true), // required
+        getReferenceFormField({
+          formatMessage,
+          required: true,
+          prohibitedValues: existingReferences,
+        }),
         getTitleFormField(formatMessage),
       ],
     }],
@@ -764,18 +780,32 @@ const getRecommendationFields = ({ frameworks, hasResponse }, formatMessage) => 
   body: {
     main: [{
       fields: [
-        getMarkdownField(formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
+        getMarkdownFormField({
+          formatMessage,
+          attribute: 'description',
+          label: 'fullRecommendation',
+          placeholder: 'fullRecommendation',
+          hint: 'fullRecommendation',
+        }),
         hasResponse && getAcceptedField(formatMessage),
-        hasResponse && getMarkdownField(formatMessage, 'response'),
+        hasResponse && getMarkdownFormField({
+          formatMessage,
+          attribute: 'response',
+        }),
       ],
     }],
   },
 });
 
-const getMeasureFields = (formatMessage) => ({
+const getMeasureFields = ({ existingReferences }, formatMessage) => ({
   header: {
     main: [{ // fieldGroup
       fields: [
+        getReferenceFormField({
+          formatMessage,
+          required: true,
+          prohibitedValues: existingReferences,
+        }),
         getTitleFormField(formatMessage),
       ],
     }],
@@ -788,7 +818,7 @@ const getMeasureFields = (formatMessage) => ({
   body: {
     main: [{
       fields: [
-        getMarkdownField(formatMessage),
+        getMarkdownFormField({ formatMessage }),
       ],
     }],
     aside: [{ // fieldGroup
@@ -805,9 +835,9 @@ export const getEntityAttributeFields = (path, args, contextIntl) => {
     case 'categories':
       return getCategoryFields(args.categories, contextIntl.formatMessage);
     case 'measures':
-      return getMeasureFields(contextIntl.formatMessage);
+      return getMeasureFields(args.measures, contextIntl.formatMessage);
     case 'indicators':
-      return getIndicatorFields(contextIntl.formatMessage);
+      return getIndicatorFields(args.indicators, contextIntl.formatMessage);
     case 'recommendations':
       return getRecommendationFields(args.recommendations, contextIntl.formatMessage);
     default:
