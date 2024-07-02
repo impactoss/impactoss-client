@@ -12,7 +12,7 @@ const GlobalStyle = createGlobalStyle`
   /* roboto - 400 - latin */
   @font-face {
     font-display: swap;
-    font-family: 'Roboto';
+    font-family: Roboto;
     font-style: normal;
     font-weight: 400;
     src: url(${Roboto400TTF}) format('truetype');
@@ -20,7 +20,7 @@ const GlobalStyle = createGlobalStyle`
   /* roboto - 400 - italic - latin */
   @font-face {
     font-display: swap;
-    font-family: 'Roboto';
+    font-family: Roboto;
     font-style: italic;
     font-weight: 400;
     src: url(${Roboto400iTTF}) format('truetype');
@@ -28,7 +28,7 @@ const GlobalStyle = createGlobalStyle`
   /* roboto - 500 - latin */
   @font-face {
     font-display: swap;
-    font-family: 'Roboto';
+    font-family: Roboto;
     font-style: normal;
     font-weight: 500;
     src: url(${Roboto500TTF}) format('truetype');
@@ -36,7 +36,7 @@ const GlobalStyle = createGlobalStyle`
   /* roboto - 500 - italic - latin */
   @font-face {
     font-display: swap;
-    font-family: 'Roboto';
+    font-family: Roboto;
     font-style: italic;
     font-weight: 500;
     src: url(${Roboto500iTTF}) format('truetype');
@@ -44,7 +44,7 @@ const GlobalStyle = createGlobalStyle`
   /* roboto - 700 - latin */
   @font-face {
     font-display: swap;
-    font-family: 'Roboto';
+    font-family: Roboto;
     font-style: normal;
     font-weight: 700;
     src: url(${Roboto700TTF}) format('truetype');
@@ -52,7 +52,7 @@ const GlobalStyle = createGlobalStyle`
   /* roboto - 700 - italic - latin */
   @font-face {
     font-display: swap;
-    font-family: 'Roboto';
+    font-family: Roboto;
     font-style: italic;
     font-weight: 700;
     src: url(${Roboto700iTTF}) format('truetype');
@@ -64,13 +64,13 @@ const GlobalStyle = createGlobalStyle`
     width: 100%;
   }
   body {
-    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 1.428571429;
     color: #1c2121;;
   }
   button, input, select, textarea {
-    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     background-color: transparent;
     border-style: none;
     color: inherit;
@@ -100,7 +100,6 @@ const GlobalStyle = createGlobalStyle`
     text-align: left;
     color: #0077d8;
     text-decoration: none;
-
     &:hover {
       color: #d66149;
     }
@@ -278,7 +277,7 @@ const GlobalStyle = createGlobalStyle`
   }
   @media print {
     @page {
-      margin: 1.5cm 1.2cm 1.5cm;
+      margin: 1.5cm 1.2cm;
     }
     body {
       font-size: 10pt;

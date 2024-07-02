@@ -51,6 +51,7 @@ const ButtonTagCategoryInverse = styled(Button)`
     : palette('taxonomiesHover', props.taxId || 0)
 };
     }
+  }
 `;
 
 export default ButtonTagCategoryInverse;

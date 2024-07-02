@@ -223,7 +223,7 @@ const DiagramButtonMain = styled(DiagramButton)`
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0.4em 0.75em 1em;
-    &:before {
+    &::before {
       content: '';
       display: inline-block;
       vertical-align: middle;

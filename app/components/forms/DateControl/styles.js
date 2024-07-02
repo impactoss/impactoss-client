@@ -78,7 +78,6 @@ const DatePickerStyle = createGlobalStyle`
   }
 
   .rdp-cell {
-    //border: 1px solid #eaecec;
     text-align: center;
     cursor: pointer;
     vertical-align: middle;

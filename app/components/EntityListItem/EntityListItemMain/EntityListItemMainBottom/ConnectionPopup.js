@@ -93,7 +93,7 @@ const TriangleBottom = styled.div`
   }}%;
    margin-left: -10px;
 
-   &:after {
+   &::after {
       content: "";
       position: absolute;
       width: 20px;

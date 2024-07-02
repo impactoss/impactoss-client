@@ -43,7 +43,6 @@ const Select = styled.select`
   }
   @media print {
     appearance: none;
-    text-overflow: '';
     text-indent: 0.01px; /* Removes default arrow from firefox */
     text-overflow: "";  /* Removes default arrow from firefox */
     font-size: ${(props) => props.theme.sizes.print.small};

@@ -50,7 +50,7 @@ const Square = styled.div`
     position: relative;
     overflow: hidden;
     z-index: 0;
-    &:before {
+    &::before {
       content: '';
       display: block;
       position: absolute;

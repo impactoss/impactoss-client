@@ -29,7 +29,7 @@ const getColor = (props, isHover = false) => {
 
 // eslint-disable no-nested-ternary
 const ButtonTagCategory = styled(Button)`
-  color: ${(props) => getFontColor(props)}};
+  color: ${(props) => getFontColor(props)};
   background-color: ${(props) => getColor(props)};
   margin-right: 2px;
   border-radius: ${(props) => props.isSmartTag ? 9999 : 3}px;

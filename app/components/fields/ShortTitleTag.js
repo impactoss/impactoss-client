@@ -10,7 +10,7 @@ const getFontColor = ({ pIndex }) => {
 
 const ShortTitleTag = styled.span`
   display: inline-block;
-  color: ${(props) => getFontColor(props)}};
+  color: ${(props) => getFontColor(props)};
   background-color: ${({ pIndex }) => palette('taxonomies', pIndex || 0)};
   padding: 1px 6px;
   margin-right: 2px;

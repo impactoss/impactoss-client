@@ -23,6 +23,6 @@ const SkipContent = styled.a`
     outline: 1px solid ${palette('primary', 0)};
     outline-offset: 0px;
   }
-}`;
+`;
 
 export default SkipContent;

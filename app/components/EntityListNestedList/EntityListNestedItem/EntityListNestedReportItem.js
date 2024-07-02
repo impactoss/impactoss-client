@@ -71,12 +71,13 @@ const EntityListItemMainTopWrap = styled.div`
   right: 0;
   padding-top: 4px;
   padding-right: 6px;
-  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}){
     padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
     padding-right: ${(props) => (!props.theme.sizes)
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal
 }px;
+  }
 `;
 
 const Reference = styled(Label)`
