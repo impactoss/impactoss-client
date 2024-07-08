@@ -218,14 +218,20 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     taxonomies,
   }) => {
     const { intl } = this.context;
+    let path = '';
+    if (entityPath) {
+      path = entityPath;
+    } else if (config && (config.expandableColumns || config.clientPath)) {
+      path = nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath;
+    }
     return ({
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
-      subtitle: config.sublabel && entity.getIn(['attributes', config.sublabel]),
-      reference: this.getReference(entity, config),
+      subtitle: config && config.sublabel && entity.getIn(['attributes', config.sublabel]),
+      reference: this.getReference(entity),
       draft: entity.getIn(['attributes', 'draft']),
       role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
-      path: entityPath || (nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath),
+      path,
       entityIcon: entityIcon && entityIcon(entity),
       categories: taxonomies && this.getWithoutProgressCategories(taxonomies, entity.get('categories')),
       connectedCounts: config && config.connections
