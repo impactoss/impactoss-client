@@ -4,16 +4,18 @@
  */
 import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
-import { LOCATION_CHANGE } from 'react-router-redux';
-import { browserHistory } from 'react-router';
+import { createBrowserHistory } from 'history';
 
+import { LOCATION_CHANGE } from 'react-router-dom';
 import { LOGOUT_SUCCESS } from 'containers/App/constants';
+
 import globalReducer from 'containers/App/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import entityNewReducer from 'containers/EntityNew/reducer';
 import entityListReducer from 'containers/EntityList/reducer';
 import entityListFormReducer from 'containers/EntityListForm/reducer';
 
+const history = createBrowserHistory();
 /*
  * routeReducer
  *
@@ -22,18 +24,28 @@ import entityListFormReducer from 'containers/EntityListForm/reducer';
  *
  */
 // Initial routing state
-const routeInitialState = fromJS({
-  locationBeforeTransitions: Object.assign(browserHistory.getCurrentLocation(), {
-    pathnamePrevious: '',
-  }),
-});
+const routeInitialState = () => {
+  //console.log(history);
+  const locationQuery = history.location.search === "" ? {} : Object.fromEntries(new URLSearchParams(history.location.search));
+  return fromJS({
+    locationBeforeTransitions:
+      Object.assign(
+        {},
+        history.location,
+        {
+          pathnamePrevious: '',
+          action: history.action,
+          query: locationQuery,
+        }
+      ),
+  });
+};
 
 /**
  * Merge route into the global application state and remember previous route
- */
-function routeReducer(state = routeInitialState, action) {
+ * */
+const routeReducer = () => (state = routeInitialState(), action) => {
   switch (action.type) {
-    /* istanbul ignore next */
     case LOGOUT_SUCCESS:
       return routeInitialState;
     case LOCATION_CHANGE: {
@@ -47,14 +59,15 @@ function routeReducer(state = routeInitialState, action) {
     default:
       return state;
   }
-}
-
+};
 /**
  * Creates the main reducer with the asynchronously loaded ones
  */
-export default function createReducer(asyncReducers) {
+export default function createReducer(asyncReducers = {}) {
+  //history-first-redux
+  //router: routerReducer,
   return combineReducers({
-    route: routeReducer,
+    route: routeReducer(),
     global: globalReducer,
     language: languageProviderReducer,
     entityNew: entityNewReducer,

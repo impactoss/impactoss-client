@@ -47,6 +47,12 @@ module.exports = (options) => ({
         use: 'file-loader',
       },
       {
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false
+        }
+      },
+      {
         test: /\.svg$/,
         use: [
           {

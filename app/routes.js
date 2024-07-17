@@ -2,11 +2,16 @@
 // They are all wrapped in the App component, which should contain the navbar etc
 // See http://blog.mxstbr.com/2016/01/react-apps-with-pages for more information
 // about the code splitting business
+import React, { useMemo } from 'react';
 import { getAsyncInjectors } from 'utils/asyncInjectors';
-import { getRedirects } from 'utils/redirects';
+//import { getRedirects } from 'utils/redirects';
+
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+import App from 'containers/App';
 
 import { ROUTES } from 'containers/App/constants';
-import {
+/*import {
   CATEGORY_ADMIN_MIN_ROLE,
   USER_ROLES,
   PAGE_ADMIN_MIN_ROLE,
@@ -14,15 +19,16 @@ import {
   CONTRIBUTOR_MIN_ROLE_ASSIGNED,
 } from 'themes/config';
 
+
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
 };
 
 const loadModule = (cb) => (componentModule) => {
   cb(null, componentModule.default);
-};
+};*/
 
-export default function createRoutes(store) {
+/*export function createRoutes(store) {
   // Create reusable async injectors using getAsyncInjectors factory
   const { injectReducer, injectSagas } = getAsyncInjectors(store); // eslint-disable-line no-unused-vars
   const {
@@ -32,7 +38,50 @@ export default function createRoutes(store) {
     redirectIfNotPermitted,
   } = getRedirects(store);
 
-  return [
+  return createBrowserRouter([
+    {
+      path: "/",
+      element: <App />,
+      children: [
+        {
+          path: ROUTES.INTRO,
+          lazy: async () => {
+            let HomePage = await import('containers/HomePage');
+            return { Component: HomePage.default };
+          },
+        }]
+    }
+  ]);
+
+  /*  [{
+        path: ROUTES.LOGIN,
+        name: 'login',
+        render(props) {
+          const [Component, setComponent] = useState(null);
+          const importModules = Promise.all([
+            import('containers/UserLogin/reducer'),
+            import('containers/UserLogin/sagas'),
+            //import('containers/UserLogin'),
+          ]);
+
+          // const renderRoute = loadModule(cb);
+          lazy(() => import('containers/UserLogin'))
+            .then(([component]) => {
+              console.log(component);
+              setComponent(() => component);
+            }).
+            then(importModules.then(([reducer, sagas]) => {
+              injectReducer('userLogin', reducer.default);
+              injectSagas(sagas.default);
+              //renderRoute(component);
+              //setComponent(() => component);
+            }));
+
+          importModules.catch(errorLoading);
+
+          return <Component {...props} />;
+        }
+      },
     {
       path: ROUTES.INTRO,
       name: 'home',
@@ -49,7 +98,8 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
-    }, {
+    }, 
+        {
       path: ROUTES.OVERVIEW,
       name: 'overview',
       getComponent(nextState, cb) {
@@ -81,7 +131,8 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
-    }, {
+      },
+    {
       path: ROUTES.LOGIN,
       name: 'userLogin',
       onEnter: redirectIfSignedIn(),
@@ -102,7 +153,8 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
-    }, {
+    }, 
+      {
       path: ROUTES.LOGIN_OAUTH_SUCCESS,
       name: 'userLoginOAuthSuccess',
       onEnter: redirectIfSignedIn(),
@@ -809,5 +861,72 @@ export default function createRoutes(store) {
           .catch(errorLoading);
       },
     },
-  ];
+      ]
+    }
+  ]);*/
+//};
+
+
+/*{
+  path: ROUTES.INTRO,
+  name: 'home',
+  getComponent(nextState, cb) {
+    const importModules = Promise.all([
+      import('containers/HomePage'),
+    ]);
+
+    const renderRoute = loadModule(cb);
+
+    importModules.then(([component]) => {
+      renderRoute(component);
+    });
+
+    importModules.catch(errorLoading);
+  },
+},
+*/
+
+export function Routes({ store }) {
+  const { injectReducer, injectSagas } = getAsyncInjectors(store); // eslint-disable-line no-unused-vars
+  /*const {
+    redirectIfSignedIn,
+    redirectIfAzureEnabled,
+    redirectIfNotSignedIn,
+    redirectIfNotPermitted,
+  } = getRedirects(store);*/
+
+  const routes = useMemo(() =>
+    createBrowserRouter([
+      {
+        path: '/',
+        key: 'app',
+        element: <App />,
+        children: [
+          {
+            path: ROUTES.INTRO,
+            key: 'homePage',
+            lazy: async () => {
+              const module = await import('containers/HomePage');
+              return { Component: module.default };
+            },
+          },
+          {
+            path: ROUTES.LOGIN,
+            key: 'login',
+            lazy: async () => {
+
+              const [reducer, sagas, component] = await Promise.all([
+                import('containers/UserLogin/reducer'),
+                import('containers/UserLogin/sagas'),
+                import('containers/UserLogin'),
+              ]);
+              injectReducer('userLogin', reducer.default);
+              injectSagas(sagas.default);
+              return { Component: component.default };
+            },
+          },
+        ],
+      }]), [store]);
+
+  return <RouterProvider router={routes} />;
 }

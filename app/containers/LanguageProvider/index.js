@@ -9,7 +9,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
+import { createSelector } from '@reduxjs/toolkit';
 import { IntlProvider } from 'react-intl';
 
 import { DEFAULT_LOCALE } from 'themes/config';

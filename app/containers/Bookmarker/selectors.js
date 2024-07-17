@@ -1,4 +1,4 @@
-import { createSelector } from 'reselect';
+import { createSelector } from '@reduxjs/toolkit';
 import { selectEntities, selectLocation } from 'containers/App/selectors';
 import { getBookmarkForLocation } from 'utils/bookmark';
 

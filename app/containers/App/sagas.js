@@ -5,10 +5,9 @@
 import {
   call, put, select, takeLatest, takeEvery, race, take, all,
 } from 'redux-saga/effects';
-import { push, replace, goBack } from 'react-router-redux';
+import { push, replace, back as goBack } from 'redux-first-history';
 import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
-
 import asArray from 'utils/as-array';
 import {
   hasRoleRequired,
@@ -700,7 +699,8 @@ export function* dismissQueryMessagesSaga() {
   ));
 }
 
-export function* updatePathSaga({ path, args }) {
+export function* updatePathSaga({ history }, { args, path }) {
+  //console.log(history);
   const relativePath = path.startsWith('/') ? path : `/${path}`;
   const location = yield select(selectLocation);
   let queryNext = {};
@@ -713,15 +713,16 @@ export function* updatePathSaga({ path, args }) {
     }
   } else {
     // always keep "framework filter"
-    queryNext = location.get('query').filter((val, key) => key === 'fw').toJS();
+    queryNext = location.get('query').filter((val, key) => key === 'fw').toJS(); 
   }
   // convert to string
   const queryNextString = getNextQueryString(queryNext);
   const nextPath = `${relativePath}?${queryNextString}`;
   if (args && args.replace) {
-    yield put(replace(nextPath));
+    yield history.replace(nextPath);
   } else {
-    yield put(push(nextPath));
+    // yield history.push(nextPath);
+    yield call(history.push, nextPath)
   }
 }
 
@@ -741,7 +742,7 @@ export function* closeEntitySaga({ path }) {
 /**
  * Root saga manages watcher lifecycle
  */
-export default function* rootSaga() {
+export default function* rootSaga(context) {
   // console.log('calling rootSaga');)
   yield takeLatest(VALIDATE_TOKEN, validateTokenSaga);
 
@@ -763,7 +764,7 @@ export default function* rootSaga() {
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);
   yield takeLatest(REDIRECT_NOT_PERMITTED, redirectNotPermittedSaga);
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
-  yield takeEvery(UPDATE_PATH, updatePathSaga);
+  yield takeEvery(UPDATE_PATH, updatePathSaga, context);
   yield takeEvery(SET_FRAMEWORK, setFrameworkSaga);
   yield takeEvery(OPEN_BOOKMARK, openBookmarkSaga);
   yield takeEvery(DISMISS_QUERY_MESSAGES, dismissQueryMessagesSaga);

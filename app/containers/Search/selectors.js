@@ -1,4 +1,4 @@
-import { createSelector } from 'reselect';
+import { createSelector } from '@reduxjs/toolkit';
 import { Map, List, fromJS } from 'immutable';
 // import { reduce } from 'lodash/collection';
 

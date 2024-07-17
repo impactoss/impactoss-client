@@ -13,15 +13,9 @@ import 'regenerator-runtime/runtime';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { Router, browserHistory } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux';
+import { createBrowserHistory } from 'history';
+
 import 'sanitize.css/sanitize.css';
-
-// Import root app
-import App from 'containers/App';
-
-// Import selector for `syncHistoryWithStore`
-import { makeSelectLocationState } from 'containers/App/selectors';
 
 // Import Language Provider
 import LanguageProvider from 'containers/LanguageProvider';
@@ -43,45 +37,44 @@ import '!file-loader?name=[name].[ext]!./safari-pinned-tab.svg';
 import 'file-loader?name=[name].[ext]!./.htaccess';
 /* eslint-enable import/no-unresolved, import/extensions */
 
-import configureStore from './store';
+import createStore from './store';
 
 // Import i18n messages
 import { translationMessages } from './i18n';
 
 // Import root routes
-import createRoutes from './routes';
-
-// Create redux store with history
-// this uses the singleton browserHistory provided by react-router
-// Optionally, this could be changed to leverage a created history
-// e.g. `const browserHistory = useRouterHistory(createBrowserHistory)();`
-const initialState = {};
-const store = configureStore(initialState, browserHistory);
-
-// Sync history and store, as the react-router-redux reducer
-// is under the non-default key ("routing"), selectLocationState
-// must be provided for resolving how to retrieve the "route" in the state
-const history = syncHistoryWithStore(browserHistory, store, {
-  selectLocationState: makeSelectLocationState(),
-});
-
-// Set up the router, wrapping all Routes in the App component
-const rootRoute = {
-  component: App,
-  childRoutes: createRoutes(store),
-};
+import { Routes } from './routes';
 
 const container = document.getElementById('app');
 const root = createRoot(container);
+
+/*
+history-first-redux
+
+import { HistoryRouter as Router } from "redux-first-history/rr6";
+import { createBrowserHistory } from 'history';
+import { createReduxHistoryContext } from "redux-first-history";
+
+
+export const {
+  routerReducer,
+  routerMiddleware,
+  createReduxHistory
+} = createReduxHistoryContext({ history: browserHistory, selectRouterState: state => state.get("router") });
+
+const history = createReduxHistory(store);
+
+<Router history={history}></Router>
+*/
+const browserHistory = createBrowserHistory();
+const store = createStore(browserHistory);
+
 const render = (messages) => {
-  root.render(
+  root.render(       
     <Provider store={store}>
       <LanguageProvider messages={messages}>
         <Grommet theme={theme}>
-          <Router
-            history={history}
-            routes={rootRoute}
-          />
+          <Routes store={store} />
         </Grommet>
       </LanguageProvider>
     </Provider>

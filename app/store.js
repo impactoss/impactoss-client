@@ -1,49 +1,36 @@
 /**
  * Create the store with asynchronously loaded reducers
  */
-
-import { createStore, applyMiddleware, compose } from 'redux';
+import { configureStore } from '@reduxjs/toolkit';
 import { fromJS } from 'immutable';
-import { routerMiddleware } from 'react-router-redux';
 import createSagaMiddleware from 'redux-saga';
+
 import appSaga from 'containers/App/sagas';
 import entityListSaga from 'containers/EntityList/sagas';
 import entityListFormSaga from 'containers/EntityListForm/sagas';
 import createReducer from './reducers';
 
-const sagaMiddleware = createSagaMiddleware();
-
-export default function configureStore(initialState = {}, history) {
+export default function createStore(browserHistory) {
   // Create the store with two middlewares
   // 1. sagaMiddleware: Makes redux-sagas work
   // 2. routerMiddleware: Syncs the location/URL path to the state
-  const middlewares = [
-    sagaMiddleware,
-    routerMiddleware(history),
-  ];
-
-  const enhancers = [
-    applyMiddleware(...middlewares),
-  ];
-
-  // If Redux DevTools Extension is installed use it, otherwise use Redux compose
-  /* eslint-disable no-underscore-dangle */
-  const composeEnhancers = process.env.NODE_ENV !== 'production'
-    && typeof window === 'object'
-    && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : compose;
-  /* eslint-enable */
-
-  const store = createStore(
-    createReducer(),
-    fromJS(initialState),
-    composeEnhancers(...enhancers)
-  );
+  const sagaMiddleware = createSagaMiddleware();
+  const store = configureStore({
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({ thunk: false, serializableCheck: false })
+        .concat(sagaMiddleware),
+    //.concat(sagaMiddleware,routeReducer)
+    //reducer: createReducer(browserHistory),
+    reducer: createReducer(),
+    preloadedState: fromJS({}),
+    devTools: process.env.NODE_ENV !== 'production',
+  });
 
   // Extensions
-
   // Load app level sagas ( https://github.com/mxstbr/react-boilerplate/issues/1077 )
-  sagaMiddleware.run(appSaga);
+
+  sagaMiddleware.run(appSaga, { history: browserHistory });
+  //sagaMiddleware.run(appSaga);
   sagaMiddleware.run(entityListSaga);
   sagaMiddleware.run(entityListFormSaga);
 

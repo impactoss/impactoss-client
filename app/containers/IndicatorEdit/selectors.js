@@ -1,4 +1,4 @@
-import { createSelector } from 'reselect';
+import { createSelector } from '@reduxjs/toolkit';
 
 import { CONTRIBUTOR_MIN_ROLE_ASSIGNED } from 'themes/config';
 

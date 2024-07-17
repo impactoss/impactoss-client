@@ -11,6 +11,7 @@ import HelmetCanonical from 'components/HelmetCanonical';
 import ReactModal from 'react-modal';
 import GlobalStyle from 'global-styles';
 import { FormattedMessage, injectIntl } from 'react-intl';
+import { Outlet } from 'react-router-dom';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -20,6 +21,7 @@ import EntityNew from 'containers/EntityNew';
 
 import { sortEntities } from 'utils/sort';
 import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
+import withRouter from './withRouter';
 
 import { FOOTER } from 'themes/config';
 
@@ -200,7 +202,6 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       onSelectFramework,
       viewRecommendationFramework,
       user,
-      children,
       intl,
     } = this.props;
     const title = intl.formatMessage(messages.app.title);
@@ -244,7 +245,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           brandPath={ROUTES.OVERVIEW}
         />
         <Main isHome={isHome} role="main" id="main-content">
-          {React.Children.toArray(children)}
+          <Outlet />
         </Main>
         {newEntityModal
           && (
@@ -275,7 +276,6 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
 }
 
 App.propTypes = {
-  children: PropTypes.node,
   isUserSignedIn: PropTypes.bool,
   highestRole: PropTypes.number,
   user: PropTypes.object,
@@ -335,4 +335,4 @@ export function mapDispatchToProps(dispatch) {
 }
 
 
-export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(App));
+export default injectIntl(withRouter(connect(mapStateToProps, mapDispatchToProps)(App)));

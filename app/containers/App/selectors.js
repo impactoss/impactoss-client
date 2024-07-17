@@ -8,7 +8,7 @@
  * https://github.com/react-boilerplate/react-boilerplate/pull/1205#issuecomment-274319934
  *
  */
-import { createSelector } from 'reselect';
+import { createSelector } from '@reduxjs/toolkit';
 import { reduce } from 'lodash/collection';
 import { Map, List } from 'immutable';
 
