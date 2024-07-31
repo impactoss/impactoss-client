@@ -8,19 +8,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
 import { injectIntl } from 'react-intl';
 
 import {
   getPasswordField,
   getPasswordConfirmationField,
-} from 'utils/forms';
+} from 'utils/formik';
 
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
-import AuthForm from 'components/forms/AuthForm';
+import AuthForm from 'components/formik/AuthForm';
 
 import { updatePath } from 'containers/App/actions';
 
@@ -29,13 +28,11 @@ import messages from './messages';
 import { reset } from './actions';
 import { selectDomain } from './selectors';
 
-export class UserPasswordReset extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  UNSAFE_componentWillMount() {
-    this.props.initialiseForm();
-  }
+import { FORM_INITIAL } from './constants';
 
+export class UserPasswordReset extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { intl } = this.props;
+    const { intl, handleCancel, handleSubmit } = this.props;
     const { resetSending, resetError } = this.props.viewDomain.get('page').toJS();
 
     return (
@@ -59,21 +56,18 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
           {resetSending
             && <Loading />
           }
-          { this.props.viewDomain.get('form')
-            && (
-              <AuthForm
-                model="userPasswordReset.form.data"
-                sending={resetSending}
-                handleSubmit={(formData) => this.props.handleSubmit(formData)}
-                handleCancel={this.props.handleCancel}
-                labels={{ submit: intl.formatMessage(messages.submit) }}
-                fields={[
-                  getPasswordField(intl.formatMessage, '.password'),
-                  getPasswordConfirmationField(intl.formatMessage, '.passwordConfirmation'),
-                ]}
-              />
-            )
-          }
+          <AuthForm
+            model="userPasswordReset.form.data"
+            sending={resetSending}
+            handleSubmit={handleSubmit}
+            handleCancel={handleCancel}
+            initialValues={FORM_INITIAL}
+            labels={{ submit: intl.formatMessage(messages.submit) }}
+            fields={[
+              getPasswordField(intl.formatMessage),
+              getPasswordConfirmationField(intl.formatMessage),
+            ]}
+          />
         </ContentNarrow>
       </div>
     );
@@ -84,7 +78,6 @@ UserPasswordReset.propTypes = {
   viewDomain: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  initialiseForm: PropTypes.func,
   intl: PropTypes.object.isRequired,
 };
 
@@ -94,11 +87,8 @@ const mapStateToProps = (state) => ({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('userPasswordReset.form.data'));
-    },
     handleSubmit: (formData) => {
-      dispatch(reset(formData.toJS()));
+      dispatch(reset(formData));
     },
     handleCancel: () => {
       dispatch(updatePath('/'));

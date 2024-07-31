@@ -10,21 +10,21 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import styled from 'styled-components';
-import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
   getEmailFormField,
-} from 'utils/forms';
+} from 'utils/formik';
 
 import Icon from 'components/Icon';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
-import AuthForm from 'components/forms/AuthForm';
+import AuthForm from 'components/formik/AuthForm';
 import A from 'components/styled/A';
 
 import { ROUTES } from 'containers/App/constants';
+import { FORM_INITIAL } from './constants';
 
 import { updatePath } from 'containers/App/actions';
 
@@ -38,12 +38,8 @@ const BottomLinks = styled.div`
 `;
 
 export class UserPasswordRecover extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  UNSAFE_componentWillMount() {
-    this.props.initialiseForm();
-  }
-
   render() {
-    const { intl } = this.props;
+    const { intl, handleCancel, handleSubmit } = this.props;
     const { error, sending } = this.props.viewDomain.get('page').toJS();
 
     return (
@@ -67,20 +63,16 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
           {sending
             && <Loading />
           }
-          { this.props.viewDomain.get('form')
-            && (
-              <AuthForm
-                model="userPasswordRecover.form.data"
-                sending={sending}
-                handleSubmit={(formData) => this.props.handleSubmit(formData)}
-                handleCancel={this.props.handleCancel}
-                labels={{ submit: intl.formatMessage(messages.submit) }}
-                fields={[
-                  getEmailFormField(intl.formatMessage, '.email'),
-                ]}
-              />
-            )
-          }
+          <AuthForm
+            sending={sending}
+            handleSubmit={handleSubmit}
+            handleCancel={handleCancel}
+            initialValues={FORM_INITIAL}
+            labels={{ submit: intl.formatMessage(messages.submit) }}
+            fields={[
+              getEmailFormField(intl.formatMessage),
+            ]}
+          />
           <BottomLinks>
             <p>
               <A
@@ -106,7 +98,6 @@ UserPasswordRecover.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
-  initialiseForm: PropTypes.func,
   intl: PropTypes.object.isRequired,
 };
 
@@ -116,11 +107,8 @@ const mapStateToProps = (state) => ({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('userPasswordRecover.form.data'));
-    },
     handleSubmit: (formData) => {
-      dispatch(recover(formData.toJS()));
+      dispatch(recover(formData));
     },
     handleCancel: () => {
       dispatch(updatePath('/'));

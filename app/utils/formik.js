@@ -578,46 +578,43 @@ export const getUploadField = (formatMessage) => getFormField({
   placeholder: 'url',
 });
 
-export const getEmailFormField = (formatMessage, model = '.attributes.email') => {
+export const getEmailFormField = (formatMessage) => {
   const field = getFormField({
     formatMessage,
     controlType: 'email',
     attribute: 'email',
     type: 'email',
     required: true,
-    model,
   });
   field.validators.email = validateEmailFormat;
   field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
   return field;
 };
 
-export const getNameField = (formatMessage, model = '.attributes.name') => {
+export const getNameField = (formatMessage) => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
     attribute: 'name',
     required: true,
-    model,
   });
   return field;
 };
 
-export const getPasswordField = (formatMessage, model = '.attributes.password') => {
+export const getPasswordField = (formatMessage) => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
     attribute: 'password',
     type: 'password',
     required: true,
-    model,
   });
   field.validators.passwordLength = (val) => validateLength(val, 6);
   field.errorMessages.passwordLength = formatMessage(appMessages.forms.passwordShortError);
   return field;
 };
 
-export const getPasswordCurrentField = (formatMessage, model = '.attributes.password') => {
+export const getPasswordCurrentField = (formatMessage) => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
@@ -625,38 +622,29 @@ export const getPasswordCurrentField = (formatMessage, model = '.attributes.pass
     placeholder: 'passwordCurrent',
     type: 'password',
     required: true,
-    model,
   });
-  // field.validators.email = validateEmailFormat;
-  // field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
   return field;
 };
 
-export const getPasswordNewField = (formatMessage, model = '.attributes.passwordNew') => {
+export const getPasswordNewField = (formatMessage) => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
     attribute: 'passwordNew',
     type: 'password',
     required: true,
-    model,
   });
-  // field.validators.email = validateEmailFormat;
-  // field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
   return field;
 };
 
-export const getPasswordConfirmationField = (formatMessage, model = '.attributes.passwordConfirmation') => {
+export const getPasswordConfirmationField = (formatMessage) => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
     attribute: 'passwordConfirmation',
     type: 'password',
     required: true,
-    model,
   });
-  // field.validators.email = validateEmailFormat;
-  // field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
   return field;
 };
 
@@ -670,14 +658,12 @@ export const getFormField = ({
   hint,
   onChange,
   type,
-  model,
   prohibitedValues,
 }) => {
   const field = {
     id: attribute,
     controlType,
     type,
-    model: model || `.attributes.${attribute}`,
     placeholder: appMessages.placeholders[placeholder || attribute] && formatMessage(appMessages.placeholders[placeholder || attribute]),
     label: appMessages.attributes[label || attribute] && formatMessage(appMessages.attributes[label || attribute]),
     validators: {},
@@ -850,4 +836,14 @@ export const getEntityAttributeFields = (path, args, contextIntl) => {
     default:
       return {};
   }
+};
+
+export const validateField = (value, field) => {
+  //find the first validator that fails and return the corresponding error msg
+  const { validators, errorMessages } = field;
+  const firstErrorKey =
+    validators &&
+    Object.keys(validators).length > 0 &&
+    Object.keys(validators).find((validator) => !validators[validator](value));
+  return firstErrorKey ? errorMessages[firstErrorKey] : null;
 };

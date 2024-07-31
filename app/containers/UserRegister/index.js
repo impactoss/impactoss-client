@@ -10,21 +10,20 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import styled from 'styled-components';
-import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
   getNameField,
   getEmailFormField,
   getPasswordField,
   getPasswordConfirmationField,
-} from 'utils/forms';
+} from 'utils/formik';
 
 import Icon from 'components/Icon';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
-import AuthForm from 'components/forms/AuthForm';
+import AuthForm from 'components/formik/AuthForm';
 import A from 'components/styled/A';
 
 import { selectQueryMessages } from 'containers/App/selectors';
@@ -32,6 +31,7 @@ import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
 import { ROUTES } from 'containers/App/constants';
 import { IS_PROD, SERVER } from 'themes/config';
+import { FORM_INITIAL } from './constants';
 
 import messages from './messages';
 
@@ -43,12 +43,8 @@ const BottomLinks = styled.div`
 `;
 
 export class UserRegister extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  UNSAFE_componentWillMount() {
-    this.props.initialiseForm();
-  }
-
   render() {
-    const { intl } = this.props;
+    const { intl, handleCancel, handleSubmit } = this.props;
     const { registerError, registerSending } = this.props.viewDomain.get('page').toJS();
 
     return (
@@ -93,23 +89,19 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
           {registerSending
             && <Loading />
           }
-          { this.props.viewDomain.get('form')
-            && (
-              <AuthForm
-                model="userRegister.form.data"
-                sending={registerSending}
-                handleSubmit={(formData) => this.props.handleSubmit(formData)}
-                handleCancel={this.props.handleCancel}
-                labels={{ submit: intl.formatMessage(messages.submit) }}
-                fields={[
-                  getNameField(intl.formatMessage),
-                  getEmailFormField(intl.formatMessage),
-                  getPasswordField(intl.formatMessage),
-                  getPasswordConfirmationField(intl.formatMessage),
-                ]}
-              />
-            )
-          }
+          <AuthForm
+            sending={registerSending}
+            handleSubmit={handleSubmit}
+            handleCancel={handleCancel}
+            labels={{ submit: intl.formatMessage(messages.submit) }}
+            initialValues={FORM_INITIAL}
+            fields={[
+              getNameField(intl.formatMessage),
+              getEmailFormField(intl.formatMessage),
+              getPasswordField(intl.formatMessage),
+              getPasswordConfirmationField(intl.formatMessage),
+            ]}
+          />
           <BottomLinks>
             <p>
               <FormattedMessage {...messages.loginLinkBefore} />
@@ -136,7 +128,6 @@ UserRegister.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
-  initialiseForm: PropTypes.func,
   onDismissQueryMessages: PropTypes.func,
   queryMessages: PropTypes.object,
   intl: PropTypes.object.isRequired,
@@ -145,15 +136,12 @@ UserRegister.propTypes = {
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   queryMessages: selectQueryMessages(state),
-});
+})
 
 export function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('userRegister.form.data'));
-    },
     handleSubmit: (formData) => {
-      dispatch(register(formData.toJS()));
+      dispatch(register(formData));
     },
     handleCancel: () => {
       dispatch(updatePath('/'));
