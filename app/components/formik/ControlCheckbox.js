@@ -1,8 +1,8 @@
-import { Control } from 'react-redux-form/immutable';
+import React from 'react';
 import styled from 'styled-components';
 
-const ControlCheckbox = styled(Control.checkbox)`
+const ControlCheckbox = styled.input`
   margin-right: 5px;
 `;
 
-export default ControlCheckbox;
+export default <ControlCheckbox type='checkbox' />;

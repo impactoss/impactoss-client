@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+
 import { lowerCase } from 'utils/string';
 import { getEntitySortComparator } from 'utils/sort';
 
@@ -231,8 +232,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
 
   render() {
     const { field, fieldData, intl } = this.props;
-    const { id, model, ...controlProps } = omit(field, NON_CONTROL_PROPS);
-
+    const { id, ...controlProps } = omit(field, NON_CONTROL_PROPS);
     const options = this.getMultiSelectActiveOptions(field, fieldData);
 
     return (
@@ -289,7 +289,6 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
             >
               <MultiSelectControl
                 id={id}
-                model={model || `.${id}`}
                 title={intl.formatMessage(messages.update, { type: lowerCase(field.label) })}
                 onCancel={this.onCloseMultiselect}
                 closeOnClickOutside={this.props.closeOnClickOutside}
@@ -306,6 +305,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
                     onClick: this.onCloseMultiselect,
                   },
                 ]}
+                onChange={this.props.onChange}
                 {...controlProps}
               />
             </MultiSelectWrapper>
@@ -319,7 +319,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
 MultiSelectField.propTypes = {
   field: PropTypes.object,
   fieldData: PropTypes.object,
-  handleUpdate: PropTypes.func,
+  onChange: PropTypes.func,
   closeOnClickOutside: PropTypes.bool,
   scrollContainer: PropTypes.object,
   intl: PropTypes.object.isRequired,

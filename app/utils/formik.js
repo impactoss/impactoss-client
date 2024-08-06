@@ -105,7 +105,7 @@ export const makeTagFilterGroups = (taxonomies, contextIntl) => taxonomies && so
 export const renderMeasureControl = (entities, taxonomies, onCreateOption, contextIntl) => entities
   ? {
     id: 'actions',
-    model: '.associatedMeasures',
+    name: 'associatedMeasures',
     dataPath: ['associatedMeasures'],
     label: contextIntl.formatMessage(appMessages.entities.measures.plural),
     controlType: 'multiselect',
@@ -129,7 +129,7 @@ export const renderRecommendationControl = (
   entities
     ? {
       id: `recommendations.${fwId}`,
-      model: `.associatedRecommendationsByFw.${fwId}`,
+      nam: `associatedRecommendationsByFw.${fwId}`,
       dataPath: ['associatedRecommendationsByFw', fwId],
       label: contextIntl.formatMessage(appMessages.entities[`recommendations_${fwId}`].plural),
       controlType: 'multiselect',
@@ -154,7 +154,7 @@ export const renderRecommendationsByFwControl = (
     ? entitiesByFw.reduce(
       (controls, entities, fwid) => controls.concat({
         id: `recommendations.${fwid}`,
-        model: `.associatedRecommendationsByFw.${fwid}`,
+        name: `associatedRecommendationsByFw.${fwid}`,
         dataPath: ['associatedRecommendationsByFw', fwid],
         label: contextIntl.formatMessage(appMessages.entities[`recommendations_${fwid}`].plural),
         controlType: 'multiselect',
@@ -183,7 +183,7 @@ export const renderTaxonomyControl = ({
     ? sortEntities(taxonomies, 'asc', 'priority').reduce(
       (controls, taxonomy) => controls.concat({
         id: taxonomy.get('id'),
-        model: `.associatedTaxonomies.${taxonomy.get('id')}`,
+        name: `associatedTaxonomies.${taxonomy.get('id')}`,
         dataPath: ['associatedTaxonomies', taxonomy.get('id')],
         label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
         controlType: 'multiselect',
@@ -204,7 +204,7 @@ export const renderIndicatorControl = (entities, onCreateOption, contextIntl) =>
   entities ?
     {
       id: 'indicators',
-      model: '.associatedIndicators',
+      name: 'associatedIndicators',
       dataPath: ['associatedIndicators'],
       label: contextIntl.formatMessage(appMessages.entities.indicators.plural),
       controlType: 'multiselect',
@@ -225,7 +225,7 @@ export const renderUserControl = (
   entities ?
     {
       id: 'users',
-      model: '.associatedUser',
+      name: 'associatedUser',
       dataPath: ['associatedUser'],
       label,
       controlType: 'multiselect',
@@ -239,7 +239,7 @@ export const renderParentCategoryControl = (entities, label, activeParentId) =>
   entities ?
     {
       id: 'associatedCategory',
-      model: '.associatedCategory',
+      name: 'associatedCategory',
       dataPath: ['associatedCategory'],
       label,
       controlType: 'multiselect',
@@ -372,7 +372,7 @@ export const getHighestUserRoleId = (roles) =>
 export const getRoleFormField = (formatMessage, roleOptions) => ({
   id: 'role',
   controlType: 'select',
-  model: '.associatedRole',
+  name: 'associatedRole',
   label: formatMessage(appMessages.entities.roles.single),
   options: Object.values(filter(USER_ROLES, (userRole) => roleOptions.map((roleOption) => parseInt(roleOption.get('id'), 10)).includes(userRole.value)
     || userRole.value === USER_ROLES.DEFAULT.value)),
@@ -381,7 +381,7 @@ export const getRoleFormField = (formatMessage, roleOptions) => ({
 export const getAcceptedField = (formatMessage) => ({
   id: 'accepted',
   controlType: 'select',
-  model: '.attributes.accepted',
+  name: 'attributes.accepted',
   label: formatMessage(appMessages.attributes.accepted),
   options: ACCEPTED_STATUSES,
 });
@@ -389,7 +389,7 @@ export const getAcceptedField = (formatMessage) => ({
 export const getFrequencyField = (formatMessage) => ({
   id: 'frequency_months',
   controlType: 'select',
-  model: '.attributes.frequency_months',
+  name: 'attributes.frequency_months',
   label: formatMessage(appMessages.attributes.frequency_months),
   options: REPORT_FREQUENCIES,
 });
@@ -397,7 +397,7 @@ export const getFrequencyField = (formatMessage) => ({
 export const getDocumentStatusField = (formatMessage) => ({
   id: 'document_public',
   controlType: 'select',
-  model: '.attributes.document_public',
+  name: 'attributes.document_public',
   label: formatMessage(appMessages.attributes.document_public),
   options: DOC_PUBLISH_STATUSES,
 });
@@ -405,14 +405,14 @@ export const getDocumentStatusField = (formatMessage) => ({
 export const getStatusField = (formatMessage) => ({
   id: 'status',
   controlType: 'select',
-  model: '.attributes.draft',
+  name: 'attributes.draft',
   label: formatMessage(appMessages.attributes.draft),
   options: PUBLISH_STATUSES,
 });
 export const getFrameworkFormField = (formatMessage, fwOptions) => ({
   id: 'framework',
   controlType: 'select',
-  model: '.attributes.framework_id',
+  name: 'attributes.framework_id',
   label: formatMessage(appMessages.attributes.framework_id),
   options: Object.values(fwOptions.toJS()).map((fw) => ({
     value: fw.id,
@@ -467,7 +467,7 @@ export const getDueDateDateOptions = (dates, formatMessage, formatDate, activeDa
 export const getDueDateOptionsField = (formatMessage, dateOptions) => ({
   id: 'due_date_id',
   controlType: 'radio',
-  model: '.attributes.due_date_id',
+  name: 'attributes.due_date_id',
   options: dateOptions,
   hints: {
     1: formatMessage(appMessages.entities.due_dates.empty),
@@ -564,7 +564,7 @@ export const getCheckboxField = (formatMessage, attribute, onChange) => (
   {
     id: attribute,
     controlType: 'checkbox',
-    model: `.attributes.${attribute}`,
+    name: `attributes.${attribute}`,
     label: appMessages.attributes[attribute] && formatMessage(appMessages.attributes[attribute]),
     // value: entity && entity.getIn(['attributes', attribute]) ? entity.getIn(['attributes', attribute]) : false,
     changeAction: onChange,
@@ -652,6 +652,7 @@ export const getFormField = ({
   formatMessage,
   controlType,
   attribute,
+  name,
   required,
   label,
   placeholder,
@@ -662,6 +663,7 @@ export const getFormField = ({
 }) => {
   const field = {
     id: attribute,
+    name: name || `attributes.${attribute}`,
     controlType,
     type,
     placeholder: appMessages.placeholders[placeholder || attribute] && formatMessage(appMessages.placeholders[placeholder || attribute]),
