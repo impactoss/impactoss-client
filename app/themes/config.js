@@ -184,6 +184,15 @@ export const ACCEPTED_STATUSES = [
   { value: true, icon: 'recommendationAccepted', message: 'ui.acceptedStatuses.accepted' },
   { value: false, icon: 'recommendationNoted', message: 'ui.acceptedStatuses.noted' },
 ];
+// "current" statuses
+export const IS_CURRENT_STATUSES = [
+  { value: true, message: 'ui.currentStatuses.current' },
+  { value: false, message: 'ui.currentStatuses.notCurrent' },
+];
+export const IS_ARCHIVE_STATUSES = [
+  { value: true, message: 'ui.archiveStatuses.archived' },
+  { value: false, message: 'ui.archiveStatuses.notArchived' },
+];
 // Report frequencies
 export const REPORT_FREQUENCIES = [
   { value: 1, message: 'ui.reportFrequencies.monthly' },

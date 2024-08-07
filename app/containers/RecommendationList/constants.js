@@ -1,4 +1,10 @@
-import { USER_ROLES, PUBLISH_STATUSES, ACCEPTED_STATUSES } from 'themes/config';
+import {
+  USER_ROLES,
+  PUBLISH_STATUSES,
+  ACCEPTED_STATUSES,
+  IS_CURRENT_STATUSES,
+  IS_ARCHIVE_STATUSES,
+} from 'themes/config';
 
 export const DEPENDENCIES = [
   'user_roles',
@@ -95,6 +101,21 @@ export const CONFIG = {
         message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
+        role: USER_ROLES.CONTRIBUTOR.value,
+      },
+      {
+        search: false,
+        message: 'attributes.is_archive',
+        attribute: 'is_archive',
+        options: IS_ARCHIVE_STATUSES,
+        role: USER_ROLES.CONTRIBUTOR.value,
+      },
+      {
+        search: false,
+        edit: false,
+        message: 'attributes.is_current',
+        attribute: 'is_current',
+        options: IS_CURRENT_STATUSES,
         role: USER_ROLES.CONTRIBUTOR.value,
       },
     ],

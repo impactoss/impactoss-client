@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import Label from 'components/styled/Label';
+import qe from 'utils/quasi-equals';
+import appMessage from 'utils/app-message';
 
 import messages from './messages';
 
@@ -21,15 +23,32 @@ const Status = styled(Label)`
 
 class ItemStatus extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { draft, top, float } = this.props;
+    const {
+      draft, // deprecated
+      top,
+      float,
+      entity,
+      attribute,
+      options,
+    } = this.props;
     const { intl } = this.context;
-    return draft
-      ? (
+    if (draft) {
+      return (
         <Status top={top} float={float}>
           {intl && intl.formatMessage(messages.draft)}
         </Status>
-      )
-      : null;
+      );
+    }
+    const value = entity[attribute];
+    const option = options.find((o) => qe(o.value, value));
+    return (
+      <Status top={top} float={float}>
+        {option
+          && option.message
+          && intl
+          && appMessage(intl, option.message)}
+      </Status>
+    );
   }
 }
 
@@ -37,6 +56,9 @@ ItemStatus.propTypes = {
   draft: PropTypes.bool,
   top: PropTypes.bool,
   float: PropTypes.string,
+  attribute: PropTypes.string,
+  entity: PropTypes.object,
+  options: PropTypes.array,
 };
 
 ItemStatus.contextTypes = {
