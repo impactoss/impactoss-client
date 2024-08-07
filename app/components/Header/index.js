@@ -384,6 +384,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       onSelectFramework,
       search,
       brandPath,
+      showSettings,
     } = this.props;
     const { intl } = this.context;
     const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
@@ -509,6 +510,14 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 }
               </Search>
             )}
+            {showSettings && (
+              <LinkMain
+                as="button"
+                onClick={() => showSettings()}
+              >
+                Config
+              </LinkMain>
+            )}
           </NavMain>
         )}
       </Styled>
@@ -528,6 +537,7 @@ Header.propTypes = {
   navItems: PropTypes.array,
   onPageLink: PropTypes.func.isRequired,
   onSelectFramework: PropTypes.func.isRequired,
+  showSettings: PropTypes.func.isRequired,
   isHome: PropTypes.bool, // not shown on home page
   theme: PropTypes.object.isRequired,
   search: PropTypes.object,

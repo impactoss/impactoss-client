@@ -17,6 +17,7 @@ import { palette } from 'styled-theme';
 import Header from 'components/Header';
 import SkipContent from 'components/styled/SkipContent';
 import EntityNew from 'containers/EntityNew';
+import GlobalSettings from 'containers/GlobalSettings';
 
 import { sortEntities } from 'utils/sort';
 import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
@@ -72,6 +73,13 @@ const Main = styled.div`
 `;
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.state = {
+      showSettings: false,
+    };
+  }
+
   UNSAFE_componentWillMount() {
     this.props.validateToken();
     this.props.loadEntitiesIfNeeded();
@@ -82,6 +90,12 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
+  }
+
+  onShowSettings = (showSettings) => {
+    this.setState({
+      showSettings,
+    });
   }
 
   preparePageMenuPages = (pages) => sortEntities(
@@ -242,6 +256,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             : null}
           currentPath={location.pathname}
           brandPath={ROUTES.OVERVIEW}
+          showSettings={() => this.onShowSettings(true)}
         />
         <Main isHome={isHome} role="main" id="main-content">
           {React.Children.toArray(children)}
@@ -268,6 +283,20 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             </ReactModal>
           )
         }
+        {this.state.showSettings && (
+          <ReactModal
+            isOpen
+            contentLabel="Settings"
+            onRequestClose={() => this.onShowSettings(false)}
+            className="global-settings-modal"
+            overlayClassName="global-settings-modal-overlay"
+            style={{
+              overlay: { zIndex: 99999999 },
+            }}
+          >
+            <GlobalSettings />
+          </ReactModal>
+        )}
         <GlobalStyle />
       </div>
     );

@@ -71,6 +71,8 @@ import {
   DISMISS_QUERY_MESSAGES,
   SET_FRAMEWORK,
   OPEN_BOOKMARK,
+  SET_LOAD_ARCHIVED,
+  SET_LOAD_NONCURRENT,
 } from './constants';
 
 export function submitInvalid(valid) {
@@ -514,6 +516,18 @@ export function setFramework(framework) {
   return {
     type: SET_FRAMEWORK,
     framework,
+  };
+}
+export function setLoadArchived(loadArchived) {
+  return {
+    type: SET_LOAD_ARCHIVED,
+    loadArchived,
+  };
+}
+export function setLoadNonCurrent(loadNonCurrent) {
+  return {
+    type: SET_LOAD_NONCURRENT,
+    loadNonCurrent,
   };
 }
 export function openBookmark(bookmark) {

@@ -314,6 +314,15 @@ export const selectFrameworkQuery = createSelector(
     : 'all'
 );
 
+export const selectLoadArchivedQuery = createSelector(
+  selectLocationQuery,
+  (query) => ((query && query.get('loadArchived') === 'true') || false)
+);
+export const selectLoadNonCurrentQuery = createSelector(
+  selectLocationQuery,
+  (query) => ((query && query.get('loadNonCurrent') === 'true') || false)
+);
+
 const selectEntitiesAll = (state) => state.getIn(['global', 'entities']);
 
 export const selectEntities = createSelector(

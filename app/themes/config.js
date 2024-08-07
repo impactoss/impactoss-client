@@ -238,6 +238,19 @@ export const DB_TABLES = [
   'framework_taxonomies',
   'recommendation_indicators',
 ];
+export const DB_TABLES_CURRENT = [
+  'indicators',
+  'measures',
+  'recommendations',
+];
+export const DB_TABLES_ARCHIVED = [
+  'users',
+  'pages',
+  'categories',
+  'indicators',
+  'measures',
+  'recommendations',
+];
 
 export const COLUMN_WIDTHS = {
   FULL: 1,

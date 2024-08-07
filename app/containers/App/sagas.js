@@ -43,6 +43,8 @@ import {
   ROUTES,
   PARAMS,
   SET_FRAMEWORK,
+  SET_LOAD_ARCHIVED,
+  SET_LOAD_NONCURRENT,
   OPEN_BOOKMARK,
 } from 'containers/App/constants';
 
@@ -50,6 +52,8 @@ import {
   ENDPOINTS,
   KEYS,
   DB_TABLES,
+  DB_TABLES_CURRENT,
+  DB_TABLES_ARCHIVED,
   ENABLE_AZURE,
 } from 'themes/config';
 
@@ -88,6 +92,8 @@ import {
   selectLocation,
   selectSessionUserRoles,
   selectIsAuthenticating,
+  selectLoadArchivedQuery,
+  selectLoadNonCurrentQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -119,8 +125,34 @@ export function* checkEntitiesSaga(payload) {
           yield put(entitiesLoaded({}, payload.path, Date.now()));
         } else {
           // Call the API, cancel on invalidate
+          let query = {};
+          // if (payload.includeArchive) {
+          const includeArchive = yield select(selectLoadArchivedQuery);
+          const includeNonCurrent = yield select(selectLoadNonCurrentQuery);
+          // only apply to relevant tables
+          if (!includeArchive && DB_TABLES_ARCHIVED.indexOf(payload.path) > -1) {
+            query = {
+              ...query,
+              include_archive: 'false',
+            };
+          }
+          if (!includeNonCurrent && DB_TABLES_CURRENT.indexOf(payload.path) > -1) {
+            query = {
+              ...query,
+              current_only: 'true',
+            };
+          }
           const { response } = yield race({
-            response: call(apiRequest, 'get', payload.path),
+            response: call(
+              apiRequest,
+              'get',
+              payload.path,
+              query,
+              // {
+              //   // include_archive: 'false',
+              //   // current_only: 'true',
+              // },
+            ),
             cancel: take(INVALIDATE_ENTITIES), // will also reset entities requested
           });
           if (response) {
@@ -675,6 +707,42 @@ export function* setFrameworkSaga({ framework }) {
 
   yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
+export function* setLoadArchivedSaga({ loadArchived }) {
+  const location = yield select(selectLocation);
+
+  yield put(updatePath(
+    location.get('pathname'),
+    {
+      query: [
+        {
+          arg: 'loadArchived',
+          value: loadArchived || null,
+          remove: !loadArchived,
+        },
+      ],
+      extend: true,
+    },
+  ));
+  yield put(invalidateEntities()); // important invalidate to allow for reloading of entities
+}
+export function* setLoadNonCurrentSaga({ loadNonCurrent }) {
+  const location = yield select(selectLocation);
+
+  yield put(updatePath(
+    location.get('pathname'),
+    {
+      query: [
+        {
+          arg: 'loadNonCurrent',
+          value: loadNonCurrent || null,
+          remove: !loadNonCurrent,
+        },
+      ],
+      extend: true,
+    },
+  ));
+  yield put(invalidateEntities()); // important invalidate to allow for reloading of entities
+}
 
 export function* openBookmarkSaga({ bookmark }) {
   const path = bookmark.getIn(['attributes', 'view', 'path']);
@@ -765,6 +833,8 @@ export default function* rootSaga() {
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
   yield takeEvery(UPDATE_PATH, updatePathSaga);
   yield takeEvery(SET_FRAMEWORK, setFrameworkSaga);
+  yield takeEvery(SET_LOAD_ARCHIVED, setLoadArchivedSaga);
+  yield takeEvery(SET_LOAD_NONCURRENT, setLoadNonCurrentSaga);
   yield takeEvery(OPEN_BOOKMARK, openBookmarkSaga);
   yield takeEvery(DISMISS_QUERY_MESSAGES, dismissQueryMessagesSaga);
 
