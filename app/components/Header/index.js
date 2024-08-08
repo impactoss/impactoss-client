@@ -165,8 +165,22 @@ const Search = styled(LinkMain)`
     display: inline-block;
     min-width: auto;
     padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px 0;
-    position: absolute;
-    right: 0;
+    float: right;
+    border-left: none;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+`;
+const Config = styled(LinkMain)`
+  display: none;
+  padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: inline-block;
+    min-width: auto;
+    padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px 0;
+    float: right;
     border-left: none;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
@@ -498,6 +512,14 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 </LinkTitle>
               </LinkMain>
             ))}
+            {showSettings && (
+              <Config
+                as="button"
+                onClick={() => showSettings()}
+              >
+                Settings
+              </Config>
+            )}
             {search && (
               <Search
                 href={search.path}
@@ -509,14 +531,6 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                   && <Icon title={search.title} name={search.icon} text textRight size="1em" />
                 }
               </Search>
-            )}
-            {showSettings && (
-              <LinkMain
-                as="button"
-                onClick={() => showSettings()}
-              >
-                Config
-              </LinkMain>
             )}
           </NavMain>
         )}

@@ -1,9 +1,10 @@
 import {
-  USER_ROLES,
   PUBLISH_STATUSES,
   ACCEPTED_STATUSES,
   IS_CURRENT_STATUSES,
   IS_ARCHIVE_STATUSES,
+  ARCHIVE_MIN_ROLE,
+  SEE_DRAFT_MIN_ROLE,
 } from 'themes/config';
 
 export const DEPENDENCIES = [
@@ -64,8 +65,6 @@ export const CONFIG = {
     // TODO better store in database join table framework_taxonomies
     defaultGroupsByFramework: {
       1: { 1: '1', 2: '2' }, // framework 1 recs are grouped by taxonomies 1 & 2
-      2: { 1: '9', 2: '10' }, // framework 2 SDS are grouped by taxonomies 9 & 10
-      3: { 1: '7' }, // framework 3 SDGs are grouped by taxonomy 7
     },
     groupBy: 'framework_id',
     editForFrameworks: true,
@@ -101,14 +100,18 @@ export const CONFIG = {
         message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
-        role: USER_ROLES.CONTRIBUTOR.value,
+        role: SEE_DRAFT_MIN_ROLE,
       },
       {
         search: false,
         message: 'attributes.is_archive',
         attribute: 'is_archive',
         options: IS_ARCHIVE_STATUSES,
-        role: USER_ROLES.CONTRIBUTOR.value,
+        editRole: ARCHIVE_MIN_ROLE,
+        forGlobalSettings: [{
+          arg: 'loadArchived',
+          value: true,
+        }],
       },
       {
         search: false,
@@ -116,7 +119,10 @@ export const CONFIG = {
         message: 'attributes.is_current',
         attribute: 'is_current',
         options: IS_CURRENT_STATUSES,
-        role: USER_ROLES.CONTRIBUTOR.value,
+        forGlobalSettings: [{
+          arg: 'loadNonCurrent',
+          value: true,
+        }],
       },
     ],
   },

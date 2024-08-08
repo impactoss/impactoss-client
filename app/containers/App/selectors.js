@@ -323,6 +323,15 @@ export const selectLoadNonCurrentQuery = createSelector(
   (query) => ((query && query.get('loadNonCurrent') === 'true') || false)
 );
 
+export const selectGlobalSettings = createSelector(
+  selectLoadArchivedQuery,
+  selectLoadNonCurrentQuery,
+  (loadArchived, loadNonCurrent) => ({
+    loadArchived,
+    loadNonCurrent,
+  })
+);
+
 const selectEntitiesAll = (state) => state.getIn(['global', 'entities']);
 
 export const selectEntities = createSelector(

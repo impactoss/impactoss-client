@@ -1,11 +1,12 @@
 import { reduce } from 'lodash/collection';
 import { sortEntities } from 'utils/sort';
 import { qe } from 'utils/quasi-equals';
+import asArray from 'utils/as-array';
 
 const checkFramework = (frameworks, attribute) => frameworks.some((fw) => fw.getIn(['attributes', attribute]));
 
 // figure out filter groups for filter panel
-export const makeFilterGroups = (
+export const makeFilterGroups = ({
   config,
   taxonomies,
   connectedTaxonomies,
@@ -13,7 +14,8 @@ export const makeFilterGroups = (
   hasUserRole,
   messages,
   frameworks,
-) => {
+  globalSettings,
+}) => {
   const filterGroups = {};
 
   // taxonomy option group
@@ -41,23 +43,40 @@ export const makeFilterGroups = (
       show: true,
       options: reduce(
         config.attributes.options,
-        (options, option) => (
-          (
-            typeof option.role === 'undefined'
-            || (hasUserRole && hasUserRole[option.role])
+        (options, option) => {
+          const passSettings = option.forGlobalSettings === 'undefined'
+            || asArray(option.forGlobalSettings).reduce(
+              (memo, setting) => {
+                if (!setting) return memo;
+                const { arg, value } = setting;
+                if (typeof globalSettings[arg] !== 'undefined' && !qe(globalSettings[arg], value)) {
+                  return false;
+                }
+                return memo;
+              },
+              true,
+            );
+          return (
+            // check for role
+            (
+              typeof option.role === 'undefined'
+              || (hasUserRole && hasUserRole[option.role])
+            )
+            // check for frameworks
+            && (
+              typeof option.frameworkFilter === 'undefined'
+              || checkFramework(frameworks, option.frameworkFilter)
+            )
+            && passSettings
           )
-          && (
-            typeof option.frameworkFilter === 'undefined'
-            || checkFramework(frameworks, option.frameworkFilter)
-          )
-        )
-          ? options.concat([{
-            id: option.attribute, // filterOptionId
-            label: option.label,
-            message: option.message,
-            active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
-          }])
-          : options,
+            ? options.concat([{
+              id: option.attribute, // filterOptionId
+              label: option.label,
+              message: option.message,
+              active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
+            }])
+            : options;
+        },
         [],
       ),
     };
