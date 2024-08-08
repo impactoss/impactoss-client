@@ -9,7 +9,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List, fromJS } from 'immutable';
 
@@ -27,7 +26,7 @@ import {
   getDateField,
   getFrequencyField,
   getCheckboxField,
-} from 'utils/forms';
+} from 'utils/formik';
 
 import {
   getMetaField,
@@ -38,9 +37,9 @@ import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
-import validateDateAfterDate from 'components/forms/validators/validate-date-after-date';
-import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
-import validateRequired from 'components/forms/validators/validate-required';
+//import validateDateAfterDate from 'components/forms/validators/validate-date-after-date';
+//import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
+//import validateRequired from 'components/forms/validators/validate-required';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
@@ -50,7 +49,6 @@ import {
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   deleteEntity,
   openNewEntityModal,
   submitInvalid,
@@ -89,23 +87,17 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.viewEntity) {
-      this.props.initialiseForm('indicatorEdit.form.data', this.getInitialFormData());
-    }
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
-    }
-    // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.initialiseForm('indicatorEdit.form.data', this.getInitialFormData(nextProps));
     }
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
@@ -115,12 +107,11 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     }
   }
 
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const {
-      measures, viewEntity, users, recommendationsByFw,
-    } = props;
+  getInitialFormData = ({ measures, viewEntity, users, recommendationsByFw }) => {
     let attributes = viewEntity.get('attributes');
     if (!attributes.get('reference')) {
       attributes = attributes.set('reference', viewEntity.get('id'));
@@ -210,7 +201,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   };
 
   getBodyAsideFields = (entity, users, repeat) => {
-    const { intl } = this.props;
+    const { intl, viewEntity } = this.props;
     return ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.schedule),
@@ -222,14 +213,14 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             repeat,
             repeat ? 'start_date' : 'start_date_only',
             (model, value) => this.props.onStartDateChange(
-              model, value, this.props.viewDomain.getIn(['form', 'data']), intl.formatMessage,
+              model, value, viewEntity, intl.formatMessage,
             )
           ),
           getCheckboxField(
             intl.formatMessage,
             'repeat',
             (model, value) => this.props.onRepeatChange(
-              model, value, this.props.viewDomain.getIn(['form', 'data']), intl.formatMessage,
+              model, value, viewEntity, intl.formatMessage,
             )
           ),
           repeat ? getFrequencyField(intl.formatMessage, entity) : null,
@@ -239,7 +230,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             repeat,
             'end_date',
             (model, value) => this.props.onEndDateChange(
-              model, value, this.props.viewDomain.getIn(['form', 'data']), intl.formatMessage,
+              model, value, viewEntity, intl.formatMessage,
             )
           )
             : null,
@@ -291,7 +282,11 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('indicatorEdit.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }] : null
             }
           />
@@ -329,27 +324,26 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           {viewEntity && dataReady && !deleteSending
             && (
               <EntityForm
-                model="indicatorEdit.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   measures,
                   recommendationsByFw,
                   viewEntity,
                 )}
-                handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, intl.formatMessage)}
+                handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
-                handleUpdate={this.props.handleUpdate}
                 handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
-                validators={{
+                /*validators={{
                   '': {
                   // Form-level validator
                     endDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'end_date'])),
                     startDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'start_date'])),
                     endDateAfterStartDate: (vals) => vals.getIn(['attributes', 'repeat']) ? validateDateAfterDate(vals.getIn(['attributes', 'end_date']), vals.getIn(['attributes', 'start_date'])) : true,
                   },
-                }}
+                }}*/
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(
@@ -361,7 +355,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                   },
                   body: {
                     main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption),
-                    aside: this.getBodyAsideFields(viewEntity, users, viewDomain.getIn(['form', 'data', 'attributes', 'repeat'])),
+                    aside: this.getBodyAsideFields(viewEntity, users, viewEntity.getIn(['attributes', 'repeat'])),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -380,12 +374,9 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 IndicatorEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  initialiseForm: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
@@ -430,12 +421,9 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    initialiseForm: (model, formData) => {
-      // console.log('initialiseForm', formData)
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
-    onRepeatChange: (repeatModel, repeat, formData, formatMessage) => {
+    /*
+   TODO: bring back 2 field dependent validators 
+   onRepeatChange: (repeatModel, repeat, formData, formatMessage) => {
       // reset repeat erros when repeat turned off
       if (!repeat) {
         dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
@@ -494,33 +482,18 @@ function mapDispatchToProps(dispatch, props) {
       }
       dispatch(formActions.change(dateModel, dateValue));
     },
+    */
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
     },
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
     },
-    handleSubmitFail: (formData, formatMessage) => {
-      if (formData.$form.errors.endDatePresent) {
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
-          required: true,
-        }));
-      }
-      if (formData.$form.errors.startDatePresent) {
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
-          required: true,
-        }));
-      }
-      if (formData.$form.validity.endDatePresent && formData.$form.validity.startDatePresent && formData.$form.errors.endDateAfterStartDate) {
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', formatMessage(appMessages.forms.startDateAfterEndDateError)));
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', formatMessage(appMessages.forms.endDateBeforeStartDateError)));
-      }
+    handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, measures, recommendationsByFw, viewEntity) => {
+    handleSubmit: (formValues, measures, recommendationsByFw, viewEntity) => {
+      const formData = fromJS(formValues);
       let saveData = formData
         .set(
           'measureIndicators',
@@ -586,9 +559,6 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleCancel: () => {
       dispatch(updatePath(`${ROUTES.INDICATORS}/${props.params.id}`, { replace: true }));
-    },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
     },
     handleDelete: () => {
       dispatch(deleteEntity({

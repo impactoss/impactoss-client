@@ -9,9 +9,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { actions as formActions } from 'react-redux-form/immutable';
 
-import { Map } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 import {
   getTitleFormField,
@@ -21,7 +20,7 @@ import {
   getUploadField,
   getDocumentStatusField,
   getDueDateDateOptions,
-} from 'utils/forms';
+} from 'utils/formik';
 
 import {
   getMetaField,
@@ -39,7 +38,6 @@ import {
 
 import qe from 'utils/quasi-equals';
 
-
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { CONTRIBUTOR_MIN_ROLE_ASSIGNED } from 'themes/config';
 import appMessages from 'containers/App/messages';
@@ -49,7 +47,6 @@ import {
   redirectNotPermitted,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   deleteEntity,
   submitInvalid,
   saveErrorDismiss,
@@ -81,24 +78,17 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-
-    if (this.props.dataReady && this.props.viewEntity) {
-      this.props.initialiseForm('reportEdit.form.data', this.getInitialFormData());
-    }
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
-    }
-
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.initialiseForm('reportEdit.form.data', this.getInitialFormData(nextProps));
     }
     if (nextProps.authReady) {
       this.props.onRedirectIfNotPermitted();
@@ -125,9 +115,11 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const { viewEntity } = props;
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getInitialFormData = ({ viewEntity }) => {
     let attributes = viewEntity.get('attributes');
     attributes = attributes.set('due_date_id', attributes.get('due_date_id')
       ? attributes.get('due_date_id').toString()
@@ -239,7 +231,11 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('reportEdit.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }] : null
             }
           />
@@ -277,16 +273,15 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           {viewEntity && dataReady && !deleteSending
             && (
               <EntityForm
-                model="reportEdit.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   viewEntity
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
-                handleUpdate={this.props.handleUpdate}
                 handleDelete={canUserDeleteEntities(this.props.highestRole)
                   ? () => this.props.handleDelete(viewEntity.getIn(['attributes', 'indicator_id']))
                   : null
@@ -321,12 +316,8 @@ ReportEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onRedirectIfNotPermitted: PropTypes.func,
   onRedirectNotPermitted: PropTypes.func,
-  initialiseForm: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
-  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
@@ -363,9 +354,6 @@ function mapDispatchToProps(dispatch, props) {
     onRedirectNotPermitted: () => {
       dispatch(redirectNotPermitted());
     },
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, formData));
-    },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
     },
@@ -375,10 +363,8 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, viewEntity) => {
+    handleSubmit: (formValues, viewEntity) => {
+      const formData = fromJS(formValues)
       let saveData = formData;
       const previousDateAssigned = viewEntity.getIn(['attributes', 'due_date_id']);
       const dateAssigned = formData.getIn(['attributes', 'due_date_id']);
@@ -401,9 +387,6 @@ function mapDispatchToProps(dispatch, props) {
     },
     handleCancel: (reference) => {
       dispatch(updatePath(`${ROUTES.PROGRESS_REPORTS}/${reference}`, { replace: true }));
-    },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
     },
     handleDelete: (indicatorId) => {
       dispatch(deleteEntity({

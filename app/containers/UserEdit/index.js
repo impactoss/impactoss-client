@@ -9,8 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { actions as formActions } from 'react-redux-form/immutable';
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import {
   taxonomyOptions,
@@ -20,7 +19,7 @@ import {
   getEmailFormField,
   getHighestUserRoleId,
   getRoleFormField,
-} from 'utils/forms';
+} from 'utils/formik';
 
 import {
   getMetaField,
@@ -37,7 +36,6 @@ import qe from 'utils/quasi-equals';
 import {
   loadEntitiesIfNeeded,
   updatePath,
-  updateEntityForm,
   submitInvalid,
   saveErrorDismiss,
   openNewEntityModal,
@@ -79,22 +77,17 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.viewEntity) {
-      this.props.initialiseForm('userEdit.form.data', this.getInitialFormData());
-    }
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
-    }
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.initialiseForm('userEdit.form.data', this.getInitialFormData(nextProps));
     }
     if (nextProps.dataReady && nextProps.authReady && nextProps.viewEntity) {
       const canEdit = canUserManageUsers(nextProps.sessionUserHighestRoleId)
@@ -108,11 +101,12 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     }
   }
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const { taxonomies, roles, viewEntity } = props;
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
 
-    return Map({
+  getInitialFormData = ({ taxonomies, roles, viewEntity }) => 
+    Map({
       id: viewEntity.get('id'),
       attributes: viewEntity.get('attributes').mergeWith(
         (oldVal, newVal) => oldVal === null ? newVal : oldVal,
@@ -121,7 +115,6 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedRole: getHighestUserRoleId(roles),
     });
-  };
 
   getHeaderMainFields = (entity, isManager) => {
     const { intl } = this.props;
@@ -237,7 +230,11 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('userEdit.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }]
             }
           />
@@ -272,9 +269,9 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           {viewEntity && dataReady
             && (
               <EntityForm
-                model="userEdit.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   taxonomies,
@@ -283,7 +280,6 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
-                handleUpdate={this.props.handleUpdate}
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(viewEntity, isManager),
@@ -318,12 +314,9 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
 
 UserEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  initialiseForm: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   roles: PropTypes.object,
@@ -358,10 +351,6 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     onRedirectNotPermitted: () => {
       dispatch(redirectNotPermitted());
     },
@@ -374,10 +363,8 @@ function mapDispatchToProps(dispatch) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, taxonomies, roles, viewEntity) => {
+    handleSubmit: (formValues, taxonomies, roles, viewEntity) => {
+      const formData = fromJS(formValues)
       let saveData = formData
         .set(
           'userCategories',
@@ -422,9 +409,6 @@ function mapDispatchToProps(dispatch) {
     },
     handleCancel: (reference) => {
       dispatch(updatePath(`${ROUTES.USERS}/${reference}`, { replace: true }));
-    },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
     },
     onCreateOption: (args) => {
       dispatch(openNewEntityModal(args));

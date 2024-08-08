@@ -8,12 +8,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
 import { injectIntl } from 'react-intl';
 
-import { List, fromJS } from 'immutable';
+import { List, Map, fromJS } from 'immutable';
 
 import {
+  userOptions,
+  entityOptions,
+  parentCategoryOptions,
   renderUserControl,
   renderMeasureControl,
   renderRecommendationsByFwControl,
@@ -27,7 +29,7 @@ import {
   getCheckboxField,
   getStatusField,
   getDateField,
-} from 'utils/forms';
+} from 'utils/formik';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
@@ -43,7 +45,6 @@ import {
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   submitInvalid,
   saveErrorDismiss,
   openNewEntityModal,
@@ -83,11 +84,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('categoryNew.form.data', FORM_INITIAL);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -102,6 +103,20 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       scrollToTop(this.scrollContainer.current);
     }
   }
+
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getInitialFormData = ({ users, measures, recommendationsByFw, parentOptions,
+  }) => FORM_INITIAL
+    .set('associatedMeasures', measures && entityOptions(measures, true))
+    .set('associatedCategory', parentOptions && parentCategoryOptions(parentOptions, null))
+    .set('associatedRecommendationsByFw', recommendationsByFw
+      ? recommendationsByFw.map((recs) => entityOptions(recs, true))
+      : Map())
+    .set('associatedUser', users && userOptions(users, null));
+
 
   getHeaderMainFields = (parentOptions, parentTaxonomy) => {
     const { intl } = this.props;
@@ -277,7 +292,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('categoryNew.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }] : null
             }
           />
@@ -305,9 +324,9 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
           {dataReady
             && (
               <EntityForm
-                model="categoryNew.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   measures,
@@ -316,7 +335,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(taxonomyReference)}
-                handleUpdate={this.props.handleUpdate}
                 fields={{ // isManager, taxonomies,
                   header: {
                     main: this.getHeaderMainFields(parentOptions, parentTaxonomy),
@@ -329,7 +347,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                       recommendationsByFw,
                       measures,
                       onCreateOption,
-                      viewDomain.getIn(['form', 'data', 'attributes', 'user_only'])
+                      FORM_INITIAL.getIn(['attributes', 'user_only'])
                     ),
                     aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
                   },
@@ -347,11 +365,9 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 CategoryNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
@@ -364,7 +380,6 @@ CategoryNew.propTypes = {
   measures: PropTypes.object,
   recommendationsByFw: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
-  initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func,
@@ -387,10 +402,6 @@ const mapStateToProps = (state, props) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData));
-    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
@@ -406,10 +417,8 @@ function mapDispatchToProps(dispatch) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, measures, recommendationsByFw, taxonomy) => {
+    handleSubmit: (formValues, measures, recommendationsByFw, taxonomy) => {
+      const formData = fromJS(formValues);
       let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomy.get('id'));
       if (!formData.getIn(['attributes', 'user_only'])) {
         if (taxonomy.getIn(['attributes', 'tags_measures'])) {
@@ -468,9 +477,6 @@ function mapDispatchToProps(dispatch) {
     },
     handleCancel: (taxonomyReference) => {
       dispatch(updatePath(`${ROUTES.TAXONOMIES}/${taxonomyReference}`, { replace: true }));
-    },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
     },
     onCreateOption: (args) => {
       dispatch(openNewEntityModal(args));

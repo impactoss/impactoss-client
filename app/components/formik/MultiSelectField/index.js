@@ -305,7 +305,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
                     onClick: this.onCloseMultiselect,
                   },
                 ]}
-                onChange={this.props.onChange}
+                onChange={this.props.handleUpdate}
                 {...controlProps}
               />
             </MultiSelectWrapper>
@@ -319,7 +319,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
 MultiSelectField.propTypes = {
   field: PropTypes.object,
   fieldData: PropTypes.object,
-  onChange: PropTypes.func,
+  handleUpdate: PropTypes.func,
   closeOnClickOutside: PropTypes.bool,
   scrollContainer: PropTypes.object,
   intl: PropTypes.object.isRequired,

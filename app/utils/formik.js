@@ -9,13 +9,13 @@ import {
   getCategoryShortTitle,
 } from 'utils/entities';
 
-import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
-import validateAllowed from 'components/forms/validators/validate-allowed';
-import validateDateFormat from 'components/forms/validators/validate-date-format';
-import validateRequired from 'components/forms/validators/validate-required';
-import validateNumber from 'components/forms/validators/validate-number';
-import validateEmailFormat from 'components/forms/validators/validate-email-format';
-import validateLength from 'components/forms/validators/validate-length';
+import { getCheckedValuesFromOptions } from 'components/formik/MultiSelectControl';
+import validateAllowed from 'components/formik/validators/validate-allowed';
+import validateDateFormat from 'components/formik/validators/validate-date-format';
+import validateRequired from 'components/formik/validators/validate-required';
+import validateNumber from 'components/formik/validators/validate-number';
+import validateEmailFormat from 'components/formik/validators/validate-email-format';
+import validateLength from 'components/formik/validators/validate-length';
 
 import {
   REPORT_FREQUENCIES,

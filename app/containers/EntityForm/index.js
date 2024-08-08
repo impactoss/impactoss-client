@@ -2,15 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { Control, Form, Errors } from 'react-redux-form/immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import { fromJS, List } from 'immutable';
 import { omit } from 'lodash/object';
 
 import asArray from 'utils/as-array';
 import appMessage from 'utils/app-message';
+import { validateField } from 'utils/formik';
 
+import { ErrorMessage, Formik, Form, Field as FormikField, FieldArray as FormikFieldArray } from 'formik';
 import { selectNewEntityModal } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -31,29 +33,31 @@ import GroupLabel from 'components/fields/GroupLabel';
 import Clear from 'components/styled/Clear';
 import ViewPanel from 'components/EntityView/ViewPanel';
 
-import FieldLabel from 'components/forms/Label';
-import ErrorWrapper from 'components/forms/ErrorWrapper';
-import UploadControl from 'components/forms/UploadControl';
-import FormFooter from 'components/forms/FormFooter';
-import FormFooterButtons from 'components/forms/FormFooterButtons';
-import FormBody from 'components/forms/FormBody';
-import FormWrapper from 'components/forms/FormWrapper';
+import FieldLabel from 'components/formik/Label';
+import ErrorWrapper from 'components/formik/ErrorWrapper';
+import UploadControl from 'components/formik/UploadControl';
+import FormFooter from 'components/formik/FormFooter';
+import FormFooterButtons from 'components/formik/FormFooterButtons';
+import FormBody from 'components/formik/FormBody';
+import FormWrapper from 'components/formik/FormWrapper';
 import Aside from 'components/EntityView/Aside';
 import Main from 'components/EntityView/Main';
-import FormFieldWrap from 'components/forms/FormFieldWrap';
-import ControlTitle from 'components/forms/ControlTitle';
-import ControlTitleText from 'components/forms/ControlTitleText';
-import ControlShort from 'components/forms/ControlShort';
-import ControlInput from 'components/forms/ControlInput';
-import ControlCheckbox from 'components/forms/ControlCheckbox';
-import ControlTextArea from 'components/forms/ControlTextArea';
-import ControlSelect from 'components/forms/ControlSelect';
-import MarkdownControl from 'components/forms/MarkdownControl';
-import DateControl from 'components/forms/DateControl';
-import RadioControl from 'components/forms/RadioControl';
-import Required from 'components/forms/Required';
-import MultiSelectField from 'components/forms/MultiSelectField';
+import FormFieldWrap from 'components/formik/FormFieldWrap';
+import ControlTitle from 'components/formik/ControlTitle';
+import ControlTitleText from 'components/formik/ControlTitleText';
+import ControlShort from 'components/formik/ControlShort';
+import ControlInput from 'components/formik/ControlInput';
+import ControlCheckbox from 'components/formik/ControlCheckbox';
+import ControlTextArea from 'components/formik/ControlTextArea';
+import ControlSelect from 'components/formik/ControlSelect';
+import MarkdownControl from 'components/formik/MarkdownControl';
+import DateControl from 'components/formik/DateControl';
+import RadioControl from 'components/formik/RadioControl';
+import Required from 'components/formik/Required';
+import MultiSelectField from 'components/formik/MultiSelectField';
 import messages from './messages';
+
+import SubmitFailedHandler from './SubmitFailedHandler';
 
 const StyledForm = styled(Form)`
   display: table;
@@ -111,7 +115,7 @@ const controls = {
   select: ControlSelect,
   radio: RadioControl,
   checkbox: ControlCheckbox,
-  button: Control.button,
+  button: Button,
   file: UploadControl,
   uploader: UploadControl,
 };
@@ -153,13 +157,13 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
 
   handleSubmit = (formData) => !this.props.saving && this.props.handleSubmit(formData);
 
-  renderMultiSelect = (field, formData, hasEntityNewModal, scrollContainer) => (
+  renderMultiSelect = (field, formData, hasEntityNewModal, scrollContainer, formikActions) => (
     <MultiSelectField
       field={field}
       scrollContainer={scrollContainer}
       fieldData={formData.getIn(field.dataPath)}
       closeOnClickOutside={!hasEntityNewModal}
-      handleUpdate={(fieldData) => this.props.handleUpdate(formData.setIn(field.dataPath, fieldData))}
+      handleUpdate={(fieldData) => formikActions.form.setFieldValue(field.name, fieldData.toJS())}
     />
   );
 
@@ -184,14 +188,11 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   };
 
   renderComponent = (field) => {
-    const { id, model, ...props } = this.getControlProps(field);
+    const { id, ...props } = this.getControlProps(field);
     const FieldComponent = this.getFieldComponent(field);
+
     return (
-      <FieldComponent
-        id={id}
-        model={model || `.${id}`}
-        {...props}
-      >
+      <FieldComponent id={id} {...props}>
         {this.renderFieldChildren(field)}
       </FieldComponent>
     );
@@ -209,8 +210,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     </FieldWrap>
   );
 
-  renderFormField = (field, nested, hasEntityNewModal, scrollContainer) => {
-    // field.controlType === 'date' && console.log('field', field)
+  renderFormField = (field, nested, hasEntityNewModal, scrollContainer, formikActions) => {
     let formField;
     if (!field.controlType) {
       formField = this.renderComponent(field);
@@ -225,9 +225,10 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         case 'multiselect':
           formField = this.renderMultiSelect(
             field,
-            this.props.formData,
+            field.formData,
             hasEntityNewModal,
             scrollContainer,
+            formikActions
           );
           break;
         default:
@@ -257,7 +258,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
 
   renderGroup = (group, hasEntityNewModal, scrollContainer) => (
     <FieldGroupWrapper>
-      { group.label
+      {group.label
         && (
           <FieldGroupLabel>
             <GroupLabel>
@@ -268,37 +269,85 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
               <GroupIcon>
                 <Icon name={group.icon} />
               </GroupIcon>
-            )
-            }
+            )}
           </FieldGroupLabel>
         )
       }
-      {
-        group.fields.map((field, i) => field
-          ? (
-            <Field labelledGroup={!!group.label} key={i}>
-              {this.renderFormField(
-                field,
-                false,
-                hasEntityNewModal,
-                scrollContainer,
-              )}
-              {
-                field.errorMessages
-                && (
-                  <ErrorWrapper>
-                    <Errors
-                      className="errors"
-                      model={field.model}
-                      show={(fieldValue) => fieldValue.touched || !fieldValue.pristine}
-                      messages={field.errorMessages}
-                    />
-                  </ErrorWrapper>
-                )
-              }
-            </Field>
-          )
-          : null)
+      {group.fields.map((field, i) => {
+        if (!field) return null;
+        if (field.controlType !== 'info') {
+          let fieldProps;
+          if (field.controlType === 'multiselect') {
+            return (
+              <FormikFieldArray key={i} name={field.name}>
+                {(arrayHelpers) => {
+                  const values = fromJS(arrayHelpers.form.values);
+                  const formData = fromJS(this.props.formData);
+                  fieldProps = {
+                    ...field,
+                    formData: values,
+                    values: values.getIn(field.dataPath),
+                    options: formData.getIn(field.dataPath) || List(),
+                  };
+                  return this.renderFormField(
+                    fieldProps,
+                    false,
+                    hasEntityNewModal,
+                    scrollContainer,
+                    arrayHelpers
+                  );
+                }}
+              </FormikFieldArray>
+            );
+          } else {
+            return (
+              <FormikField
+                key={i}
+                name={field.name}
+                validate={(value) => validateField(value, field)}
+              >
+                {({ field: formikField, form, meta }) => {
+                  fieldProps = { ...field, onChange: formikField.onChange, value: formikField.value };
+                  return (
+                    <Field id={field.id} labelledGroup={!!field.label}>
+                      {this.renderFormField(
+                        fieldProps,
+                        false,
+                        hasEntityNewModal,
+                        scrollContainer,
+                        form
+                      )}
+                      {meta.touched && meta.error && (
+                        <ErrorWrapper>
+                          <ErrorMessage
+                            className="errors"
+                            name={formikField.name}
+                            show={(fieldValue) => fieldValue.touched || !fieldValue.pristine}
+                          />
+                        </ErrorWrapper>
+                      )}
+                    </Field>
+                  );
+                }
+                }
+              </FormikField>
+            );
+          }
+        }
+        return (
+          <Field
+            key={field.controlType}
+            labelledGroup={!!field.label}
+          >
+            {this.renderFormField(
+              field,
+              false,
+              hasEntityNewModal,
+              scrollContainer,
+            )}
+          </Field>
+        );
+      })
       }
     </FieldGroupWrapper>
   );
@@ -345,106 +394,117 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   render() {
     const {
       fields,
-      model,
+      handleSubmit,
+      bindHandleSubmit,
       handleCancel,
       handleSubmitFail,
       inModal,
-      validators,
       newEntityModal,
       scrollContainer,
+      formData,
     } = this.props;
     const hasEntityNewModal = !!newEntityModal;
-
     return (
       <div>
         <FormWrapper withoutShadow={inModal} hasMarginBottom={!inModal}>
-          <StyledForm
-            model={model}
-            onSubmit={this.handleSubmit}
-            onSubmitFailed={handleSubmitFail}
-            validators={validators}
+          <Formik
+            initialValues={formData}
+            onSubmit={(values) => handleSubmit(values)}
           >
-            <FormBody>
-              { fields.header && (
-                <ViewPanel>
-                  {fields.header.main && this.renderMain(
-                    fields.header.main,
-                    !!fields.header.aside,
-                    false,
-                    hasEntityNewModal,
-                    scrollContainer,
-                  )}
-                  {fields.header.aside && this.renderAside(
-                    fields.header.aside,
-                    false,
-                    hasEntityNewModal,
-                    scrollContainer,
-                  )}
-                </ViewPanel>
-              )}
-              { fields.body
-                && (
-                  <ViewPanel>
-                    {fields.body.main && this.renderMain(
-                      fields.body.main,
-                      true,
-                      true,
-                      hasEntityNewModal,
-                      scrollContainer,
+            {({ submitForm, isValid, isValidating, isSubmitting }) => {
+              bindHandleSubmit && bindHandleSubmit(submitForm);
+              return (
+                <StyledForm>
+                  <SubmitFailedHandler
+                    isValid={isValid}
+                    isValidating={isValidating}
+                    isSubmitting={isSubmitting}
+                    handleSubmitFail={() => handleSubmitFail()}
+                  />
+                  <FormBody>
+                    {fields.header && (
+                      <ViewPanel>
+                        {fields.header.main && this.renderMain(
+                          fields.header.main,
+                          !!fields.header.aside,
+                          false,
+                          hasEntityNewModal,
+                          scrollContainer,
+                        )}
+                        {fields.header.aside && this.renderAside(
+                          fields.header.aside,
+                          false,
+                          hasEntityNewModal,
+                          scrollContainer,
+                        )}
+                      </ViewPanel>
                     )}
-                    {fields.body.aside && this.renderAside(
-                      fields.body.aside,
-                      true,
-                      hasEntityNewModal,
-                      scrollContainer,
-                    )}
-                  </ViewPanel>
-                )
-              }
-            </FormBody>
-            <FormFooter>
-              {this.props.handleDelete && !this.state.deleteConfirmed
-                && (
-                  <DeleteWrapper>
-                    <ButtonPreDelete type="button" onClick={this.preDelete}>
-                      <Icon name="trash" sizes={{ mobile: '1.8em' }} />
-                    </ButtonPreDelete>
-                  </DeleteWrapper>
-                )
-              }
-              {this.props.handleDelete && this.state.deleteConfirmed
-                && (
-                  <FormFooterButtons left>
-                    <DeleteConfirmText>
-                      <FormattedMessage {...messages.confirmDeleteQuestion} />
-                    </DeleteConfirmText>
-                    <ButtonCancel
-                      type="button"
-                      onClick={() => this.preDelete(false)}
-                    >
-                      <FormattedMessage {...messages.buttons.cancelDelete} />
-                    </ButtonCancel>
-                    <ButtonDelete type="button" onClick={this.props.handleDelete}>
-                      <FormattedMessage {...messages.buttons.confirmDelete} />
-                    </ButtonDelete>
-                  </FormFooterButtons>
-                )
-              }
-              {!this.state.deleteConfirmed
-                && (
-                  <FormFooterButtons>
-                    <ButtonCancel type="button" onClick={handleCancel}>
-                      <FormattedMessage {...appMessages.buttons.cancel} />
-                    </ButtonCancel>
-                    <ButtonSubmit type="submit" disabled={this.props.saving}>
-                      <FormattedMessage {...appMessages.buttons.save} />
-                    </ButtonSubmit>
-                  </FormFooterButtons>
-                )
-              }
-              <Clear />
-            </FormFooter>
-          </StyledForm>
+                    {fields.body
+                      && (
+                        <ViewPanel>
+                          {fields.body.main && this.renderMain(
+                            fields.body.main,
+                            true,
+                            true,
+                            hasEntityNewModal,
+                            scrollContainer,
+                          )}
+                          {fields.body.aside && this.renderAside(
+                            fields.body.aside,
+                            true,
+                            hasEntityNewModal,
+                            scrollContainer,
+                          )}
+                        </ViewPanel>
+                      )
+                    }
+                  </FormBody>
+                  <FormFooter>
+                    {this.props.handleDelete && !this.state.deleteConfirmed
+                      && (
+                        <DeleteWrapper>
+                          <ButtonPreDelete type="button" onClick={this.preDelete}>
+                            <Icon name="trash" sizes={{ mobile: '1.8em' }} />
+                          </ButtonPreDelete>
+                        </DeleteWrapper>
+                      )
+                    }
+                    {this.props.handleDelete && this.state.deleteConfirmed
+                      && (
+                        <FormFooterButtons left>
+                          <DeleteConfirmText>
+                            <FormattedMessage {...messages.confirmDeleteQuestion} />
+                          </DeleteConfirmText>
+                          <ButtonCancel
+                            type="button"
+                            onClick={() => this.preDelete(false)}
+                          >
+                            <FormattedMessage {...messages.buttons.cancelDelete} />
+                          </ButtonCancel>
+                          <ButtonDelete type="button" onClick={this.props.handleDelete}>
+                            <FormattedMessage {...messages.buttons.confirmDelete} />
+                          </ButtonDelete>
+                        </FormFooterButtons>
+                      )
+                    }
+                    {!this.state.deleteConfirmed
+                      && (
+                        <FormFooterButtons>
+                          <ButtonCancel type="button" onClick={handleCancel}>
+                            <FormattedMessage {...appMessages.buttons.cancel} />
+                          </ButtonCancel>
+                          <ButtonSubmit type="submit" disabled={this.props.saving}>
+                            <FormattedMessage {...appMessages.buttons.save} />
+                          </ButtonSubmit>
+                        </FormFooterButtons>
+                      )
+                    }
+                    <Clear />
+                  </FormFooter>
+                </StyledForm>
+              );
+            }}
+          </Formik>
         </FormWrapper>
       </div>
     );
@@ -458,16 +518,14 @@ const mapStateToProps = (state) => ({
 EntityForm.propTypes = {
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
+  bindHandleSubmit: PropTypes.func,
   handleCancel: PropTypes.func.isRequired,
   handleDelete: PropTypes.func,
-  handleUpdate: PropTypes.func,
-  model: PropTypes.string,
   fields: PropTypes.object,
   formData: PropTypes.object,
   inModal: PropTypes.bool,
   saving: PropTypes.bool,
   newEntityModal: PropTypes.object,
-  validators: PropTypes.object,
   scrollContainer: PropTypes.object,
   intl: PropTypes.object.isRequired,
 };

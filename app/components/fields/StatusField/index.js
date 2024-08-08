@@ -35,7 +35,7 @@ class StatusField extends React.PureComponent { // eslint-disable-line react/pre
 
 StatusField.propTypes = {
   field: PropTypes.object.isRequired,
-  intl: PropTypes.object.isRequired.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 export default injectIntl(StatusField);

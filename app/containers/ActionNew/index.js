@@ -8,15 +8,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
 import { injectIntl } from 'react-intl';
 
 import { Map, List, fromJS } from 'immutable';
 
 import {
+  taxonomyOptions,
+  entityOptions,
   getConnectionUpdatesFromFormData,
   getTitleFormField,
-  getReferenceFormField,
   getStatusField,
   getMarkdownFormField,
   renderIndicatorControl,
@@ -24,9 +24,10 @@ import {
   getDateField,
   getTextareaField,
   renderTaxonomyControl,
-} from 'utils/forms';
+  getReferenceFormField,
+} from 'utils/formik';
 
-import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
+import { getCheckedValuesFromOptions } from 'components/formik/MultiSelectControl';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
@@ -38,7 +39,6 @@ import {
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   openNewEntityModal,
   submitInvalid,
   saveErrorDismiss,
@@ -75,11 +75,11 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('measureNew.form.data', FORM_INITIAL);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -94,6 +94,18 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
       scrollToTop(this.scrollContainer.current);
     }
   }
+
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getInitialFormData = ({ taxonomies, recommendationsByFw, indicators }) =>
+    FORM_INITIAL
+      .set('associatedTaxonomies', taxonomyOptions(taxonomies))
+      .set('associatedRecommendationsByFw', recommendationsByFw
+        ? recommendationsByFw.map((recs) => entityOptions(recs, true))
+        : Map())
+      .set('associatedIndicators', entityOptions(indicators, true));
 
   getHeaderMainFields = (existingReferences) => {
     const { intl } = this.props;
@@ -143,7 +155,6 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
             attribute: 'outcome',
             label: 'comment',
           }),
-          // getMarkdownFormField(intl.formatMessage, 'indicator_summary'),
         ],
       },
     );
@@ -212,6 +223,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
       canUserAdministerCategories,
       intl,
     } = this.props;
+
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     return (
       <div>
@@ -237,7 +249,11 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('measureNew.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }] : null
             }
           />
@@ -265,13 +281,12 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           {dataReady
             && (
               <EntityForm
-                model="measureNew.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
-                handleUpdate={this.props.handleUpdate}
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(existingReferences),
@@ -307,11 +322,9 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
 ActionNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
@@ -319,7 +332,6 @@ ActionNew.propTypes = {
   recommendationsByFw: PropTypes.object,
   indicators: PropTypes.object,
   onCreateOption: PropTypes.func,
-  initialiseForm: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
@@ -332,7 +344,7 @@ const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   authReady: selectReadyForAuthCheck(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  taxonomies: selectMeasureTaxonomies(state, { includeParents: false }),
+  taxonomies: selectMeasureTaxonomies(state),
   indicators: selectEntities(state, 'indicators'),
   recommendationsByFw: selectRecommendationsByFw(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
@@ -342,10 +354,6 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
@@ -361,12 +369,9 @@ function mapDispatchToProps(dispatch) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, recommendationsByFw) => {
+    handleSubmit: (formValues, recommendationsByFw) => {
+      const formData = fromJS(formValues);
       let saveData = formData;
-
       // measureCategories
       if (formData.get('associatedTaxonomies')) {
         saveData = saveData.set(
@@ -417,14 +422,10 @@ function mapDispatchToProps(dispatch) {
             })),
         }));
       }
-
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
       dispatch(updatePath(ROUTES.MEASURES), { replace: true });
-    },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
     },
     onCreateOption: (args) => {
       dispatch(openNewEntityModal(args));

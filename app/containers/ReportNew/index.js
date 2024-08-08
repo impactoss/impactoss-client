@@ -8,10 +8,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
 import { injectIntl } from 'react-intl';
 
-import { Map } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 import {
   getTitleFormField,
@@ -21,7 +20,7 @@ import {
   getUploadField,
   getDocumentStatusField,
   getDueDateDateOptions,
-} from 'utils/forms';
+} from 'utils/formik';
 
 import { getStatusField as getStatusInfoField } from 'utils/fields';
 
@@ -42,7 +41,6 @@ import appMessages from 'containers/App/messages';
 import {
   loadEntitiesIfNeeded,
   updatePath,
-  updateEntityForm,
   submitInvalid,
   saveErrorDismiss,
   redirectNotPermitted,
@@ -77,13 +75,11 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
       draftNoteDismissed: false,
     };
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.indicator) {
-      this.props.initialiseForm('reportNew.form.data', this.getInitialFormData());
-    }
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -91,10 +87,6 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.indicator) {
-      this.props.initialiseForm('reportNew.form.data', this.getInitialFormData(nextProps));
-    }
-    // console.log('UNSAFE_componentWillReceiveProps', nextProps.indicator, this.props.indicator)
     if (nextProps.dataAndAuthReady && nextProps.indicator) {
       // to allow creating it requires
       // user to have CONTRIBUTOR_MIN_ROLE
@@ -117,6 +109,10 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     }
   }
 
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
   getHeaderMainFields = () => {
     const { intl } = this.props;
     return ([ // fieldGroups
@@ -128,16 +124,13 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     ]);
   };
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const { indicator } = props;
-    return Map(FORM_INITIAL.setIn(
+  getInitialFormData = ({ indicator }) =>
+    Map(FORM_INITIAL.setIn(
       ['attributes', 'due_date_id'],
       indicator.get('dates')
         ? getDueDateDateOptions(indicator.get('dates'))[0].value
         : '0'
     ));
-  };
 
   getHeaderAsideFields = (canUserPublish) => {
     const { intl } = this.props;
@@ -221,9 +214,11 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => {
-                  this.dismissDraftNote();
-                  this.props.handleSubmitRemote('reportNew.form.data');
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.dismissDraftNote();
+                    this.remoteSubmitForm(e);
+                  }
                 },
               }] : null
             }
@@ -261,9 +256,9 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
           {dataReady
             && (
               <EntityForm
-                model="reportNew.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => {
                   this.dismissDraftNote();
                   this.props.handleSubmit(
@@ -274,7 +269,6 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                 }}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(indicatorReference)}
-                handleUpdate={this.props.handleUpdate}
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(),
@@ -300,17 +294,14 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
 
 ReportNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   onRedirectNotPermitted: PropTypes.func,
   indicator: PropTypes.object,
   params: PropTypes.object,
-  initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   highestRole: PropTypes.number,
@@ -332,10 +323,6 @@ const mapStateToProps = (state, props) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
@@ -351,10 +338,8 @@ function mapDispatchToProps(dispatch) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, indicatorReference, highestRole) => {
+    handleSubmit: (formValues, indicatorReference, highestRole) => {
+      const formData = fromJS(formValues);
       let saveData = formData;
 
       saveData = saveData.setIn(['attributes', 'indicator_id'], indicatorReference);
@@ -372,9 +357,6 @@ function mapDispatchToProps(dispatch) {
     },
     handleCancel: (indicatorReference) => {
       dispatch(updatePath(`${ROUTES.INDICATORS}/${indicatorReference}`, { replace: true }));
-    },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
     },
   };
 }

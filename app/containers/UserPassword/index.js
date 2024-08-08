@@ -80,7 +80,6 @@ UserPassword.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   params: PropTypes.object,
-  initialiseForm: PropTypes.func,
   intl: PropTypes.object.isRequired,
 };
 

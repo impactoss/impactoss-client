@@ -42,9 +42,11 @@ const DateControl = (props) => {
         parse(inputValue, DATE_FORMAT, new Date()),
         DB_DATE_FORMAT,
       );
+      setFieldValue(field.name, formattedDB);
       onChange(formattedDB);
     } else {
       // wrong format but store value for input field
+      setFieldValue(field.name, inputValue);
       onChange(inputValue);
     }
   };
