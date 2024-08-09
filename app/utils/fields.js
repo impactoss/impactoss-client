@@ -1,6 +1,6 @@
 import { truncateText } from 'utils/string';
 import { sortEntities, sortCategories } from 'utils/sort';
-import { filterTaxonomies, getAcceptanceStatus } from 'utils/entities';
+import { filterTaxonomies, getSupportLevel } from 'utils/entities';
 import { USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
@@ -369,7 +369,7 @@ export const getRecommendationConnectionField = (
   onEntityClick,
   entityIcon: (entity) => {
     if (!hasResponse) return null;
-    const status = getAcceptanceStatus(entity);
+    const status = getSupportLevel(entity);
     return status ? status.icon : null;
   },
 });
@@ -429,7 +429,7 @@ export const getRecommendationConnectionGroupsField = (
   onEntityClick,
   entityIcon: (entity) => {
     if (!hasResponse) return null;
-    const status = getAcceptanceStatus(entity);
+    const status = getSupportLevel(entity);
     return status ? status.icon : null;
   },
 });

@@ -23,7 +23,6 @@ import {
   getConnectionUpdatesFromFormData,
   getTitleFormField,
   getReferenceFormField,
-  getAcceptedField,
   getSupportField,
   getStatusField,
   getMarkdownFormField,
@@ -176,8 +175,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           hint: 'fullRecommendation',
         }),
         hasResponse && getSupportField(intl.formatMessage, entity),
-        hasResponse && getAcceptedField(intl.formatMessage, entity),
-        hasResponse && getMarkdownFormField({
+        getMarkdownFormField({
           formatMessage: intl.formatMessage,
           attribute: 'response',
         }),
@@ -479,11 +477,11 @@ function mapDispatchToProps(dispatch, props) {
       // cleanup attributes for framework
       if (!currentFramework || !currentFramework.getIn(['attributes', 'has_response'])) {
         saveData = saveData
-          .setIn(['attributes', 'accepted'], '')
+          .setIn(['attributes', 'support_level'], '')
           .setIn(['attributes', 'response'], '');
       }
-      if (saveData.getIn(['attributes', 'accepted']) === 'null') {
-        saveData = saveData.setIn(['attributes', 'accepted'], null);
+      if (saveData.getIn(['attributes', 'support_level']) === 'null') {
+        saveData = saveData.setIn(['attributes', 'support_level'], null);
       }
       // check if attributes have changed
       if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {

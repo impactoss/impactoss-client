@@ -172,8 +172,10 @@ const getCategoryCounts = (
         (rec) => !rec.getIn(['attributes', 'draft'])
       );
       // get all public accepted associated recs
+      // support level 1 or 2
       const publicAccepted = associatedRecsPublic.filter(
-        (rec) => !!rec.getIn(['attributes', 'accepted'])
+        (rec) => rec.getIn(['attributes', 'support_level'])
+          && parseInt(rec.getIn(['attributes', 'support_level']), 10) > 0
       );
 
       // all frameworks

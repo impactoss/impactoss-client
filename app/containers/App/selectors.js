@@ -386,10 +386,10 @@ export const selectFWRecommendations = createSelector(
       ).map(
         (rec) => {
           if (
-            rec.getIn(['attributes', 'accepted']) === null
-            || typeof rec.getIn(['attributes', 'accepted']) === 'undefined'
+            rec.getIn(['attributes', 'support_level']) === null
+            || typeof rec.getIn(['attributes', 'support_level']) === 'undefined'
           ) {
-            return rec.setIn(['attributes', 'accepted'], 'null');
+            return rec.setIn(['attributes', 'support_level'], 'null');
           }
           return rec;
         }

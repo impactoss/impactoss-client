@@ -196,8 +196,8 @@ theme.palette = {
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
   measuresHover: ['#C75300'], // FFC107  AA compliant
   measures: ['#ED7000'],
-  recommendationsHover: ['#023066', '#426BA6'], // accepted, noted ['#FF9B69', '#FFB28B'],
-  recommendations: ['#033A89', '#6889B8'],
+  recommendationsHover: ['#023066', '#023066', '#426BA6'], // supported, in part, noted ['#FF9B69', '#FFB28B'],
+  recommendations: ['#033A89', '#033A89', '#6889B8'],
   indicatorsHover: ['#15881A'],
   indicators: ['#1BAC29'],
   reportsHover: [error[1]],

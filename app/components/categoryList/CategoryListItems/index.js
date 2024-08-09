@@ -69,14 +69,19 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
           return [{
             items: [
               {
-                label: intl.formatMessage(appMessages.ui.acceptedStatuses.accepted),
+                label: intl.formatMessage(appMessages.ui.supportLevels.supported),
                 palette: 'recommendations',
                 pIndex: 0,
               },
               {
-                label: intl.formatMessage(appMessages.ui.acceptedStatuses.noted),
+                label: intl.formatMessage(appMessages.ui.supportLevels.supportedInPart),
                 palette: 'recommendations',
                 pIndex: 1,
+              },
+              {
+                label: intl.formatMessage(appMessages.ui.supportLevels.noted),
+                palette: 'recommendations',
+                pIndex: 2,
               },
             ],
           }];

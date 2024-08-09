@@ -364,13 +364,13 @@ export default defineMessages({
       id: 'app.containers.App.importFields.fullMeasure',
       defaultMessage: 'Full action text',
     },
-    accepted: {
-      id: 'app.containers.App.importFields.accepted',
-      defaultMessage: 'Accepted',
+    support_level: {
+      id: 'app.containers.App.importFields.support_level',
+      defaultMessage: 'Government response (support)',
     },
     response: {
       id: 'app.containers.App.importFields.response',
-      defaultMessage: 'Government response',
+      defaultMessage: 'Government response (text)',
     },
     outcome: {
       id: 'app.containers.App.importFields.outcome',
@@ -503,10 +503,6 @@ export default defineMessages({
     content: {
       id: 'app.containers.App.attributes.content',
       defaultMessage: 'Content',
-    },
-    accepted: {
-      id: 'app.containers.App.attributes.accepted',
-      defaultMessage: 'Government response',
     },
     support_level: {
       id: 'app.containers.App.attributes.support_level',
@@ -1530,20 +1526,6 @@ export default defineMessages({
       private: {
         id: 'app.containers.App.ui.docPublishStatuses.private',
         defaultMessage: 'Private',
-      },
-    },
-    acceptedStatuses: {
-      accepted: {
-        id: 'app.containers.App.ui.acceptedStatuses.accepted',
-        defaultMessage: 'Accepted',
-      },
-      noted: {
-        id: 'app.containers.App.ui.acceptedStatuses.noted',
-        defaultMessage: 'Not accepted',
-      },
-      null: {
-        id: 'app.containers.App.ui.acceptedStatuses.null',
-        defaultMessage: 'Not applicable',
       },
     },
     supportLevels: {

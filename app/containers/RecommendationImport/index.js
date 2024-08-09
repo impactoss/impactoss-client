@@ -121,8 +121,8 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
                     import: true,
                   },
                   {
-                    attribute: 'accepted',
-                    type: 'bool',
+                    attribute: 'support_level',
+                    type: 'int',
                     import: true,
                   },
                   {
