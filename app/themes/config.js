@@ -184,6 +184,12 @@ export const ACCEPTED_STATUSES = [
   { value: true, icon: 'recommendationAccepted', message: 'ui.acceptedStatuses.accepted' },
   { value: false, icon: 'recommendationNoted', message: 'ui.acceptedStatuses.noted' },
 ];
+export const SUPPORT_LEVELS = [
+  { value: 'null', icon: '', message: 'ui.supportLevels.null' },
+  { value: 0, icon: 'recommendationNoted', message: 'ui.supportLevels.noted' },
+  { value: 1, icon: 'recommendationAccepted', message: 'ui.supportLevels.supportedInPart' },
+  { value: 2, icon: 'recommendationAccepted', message: 'ui.supportLevels.supported' },
+];
 // Report frequencies
 export const REPORT_FREQUENCIES = [
   { value: 1, message: 'ui.reportFrequencies.monthly' },

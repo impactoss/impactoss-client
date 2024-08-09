@@ -24,6 +24,7 @@ import {
   getTitleFormField,
   getReferenceFormField,
   getAcceptedField,
+  getSupportField,
   getStatusField,
   getMarkdownFormField,
 } from 'utils/forms';
@@ -174,6 +175,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           placeholder: 'fullRecommendation',
           hint: 'fullRecommendation',
         }),
+        hasResponse && getSupportField(intl.formatMessage, entity),
         hasResponse && getAcceptedField(intl.formatMessage, entity),
         hasResponse && getMarkdownFormField({
           formatMessage: intl.formatMessage,

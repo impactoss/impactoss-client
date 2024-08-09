@@ -508,6 +508,10 @@ export default defineMessages({
       id: 'app.containers.App.attributes.accepted',
       defaultMessage: 'Government response',
     },
+    support_level: {
+      id: 'app.containers.App.attributes.support_level',
+      defaultMessage: 'Government response (level of support)',
+    },
     response: {
       id: 'app.containers.App.attributes.response',
       defaultMessage: 'Government response comment',
@@ -1539,6 +1543,24 @@ export default defineMessages({
       },
       null: {
         id: 'app.containers.App.ui.acceptedStatuses.null',
+        defaultMessage: 'Not applicable',
+      },
+    },
+    supportLevels: {
+      supported: {
+        id: 'app.containers.App.ui.supportLevels.supported',
+        defaultMessage: 'Supported',
+      },
+      supportedInPart: {
+        id: 'app.containers.App.ui.supportLevels.supportedInPart',
+        defaultMessage: 'Supported in part',
+      },
+      noted: {
+        id: 'app.containers.App.ui.supportLevels.noted',
+        defaultMessage: 'Noted',
+      },
+      null: {
+        id: 'app.containers.App.ui.supportLevels.null',
         defaultMessage: 'Not applicable',
       },
     },
