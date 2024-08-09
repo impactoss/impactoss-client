@@ -8,7 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
 import { injectIntl } from 'react-intl';
 
 import { fromJS } from 'immutable';
@@ -32,33 +31,24 @@ import {
 // import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import ImportEntitiesForm from 'components/forms/ImportEntitiesForm';
+import ImportEntitiesForm from 'components/formik/ImportEntitiesForm';
 
 import {
   selectErrors,
   selectProgress,
-  selectFormData,
   selectSuccess,
 } from './selectors';
 
 import messages from './messages';
-import { save, resetForm } from './actions';
+import { save } from './actions';
 import { FORM_INITIAL } from './constants';
 
 export class RecommendationImport extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  UNSAFE_componentWillMount() {
-    if (this.props.dataReady) {
-      this.props.initialiseForm('recommendationImport.form.data', FORM_INITIAL);
-    }
-  }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
-    }
-    if (nextProps.dataReady && !this.props.dataReady) {
-      this.props.initialiseForm('recommendationImport.form.data', FORM_INITIAL);
     }
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
@@ -66,7 +56,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
   }
 
   render() {
-    const { intl } = this.props;
+    const { intl } = this.props; 
     return (
       <div>
         <HelmetCanonical
@@ -89,12 +79,10 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
             }]}
           />
           <ImportEntitiesForm
-            model="recommendationImport.form.data"
             fieldModel="import"
-            formData={this.props.formData}
+            formData={FORM_INITIAL}
             handleSubmit={(formData) => this.props.handleSubmit(formData)}
             handleCancel={this.props.handleCancel}
-            handleReset={this.props.handleReset}
             resetProgress={this.props.resetProgress}
             errors={this.props.errors}
             success={this.props.success}
@@ -144,11 +132,8 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
 RecommendationImport.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  initialiseForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleReset: PropTypes.func.isRequired,
-  formData: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
   resetProgress: PropTypes.func.isRequired,
@@ -160,7 +145,6 @@ RecommendationImport.propTypes = {
 
 
 const mapStateToProps = (state) => ({
-  formData: selectFormData(state),
   progress: selectProgress(state),
   errors: selectErrors(state),
   success: selectSuccess(state),
@@ -179,17 +163,14 @@ function mapDispatchToProps(dispatch) {
     },
     resetProgress: () => {
       dispatch(resetProgress());
-      dispatch(resetForm());
-    },
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, formData));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    handleSubmit: (formData) => {
+    handleSubmit: (formValues) => {
+      const formData = fromJS(formValues)
       if (formData.get('import') !== null) {
-        fromJS(formData.get('import').rows).forEach((row, index) => {
+        formData.getIn(['import', 'rows']).forEach((row, index) => {
           const attributes = row
             .mapKeys((k) => getColumnAttribute(k))
             .set('draft', true)
@@ -206,10 +187,6 @@ function mapDispatchToProps(dispatch) {
     },
     handleCancel: () => {
       dispatch(updatePath(ROUTES.RECOMMENDATIONS));
-    },
-    handleReset: () => {
-      dispatch(resetProgress());
-      dispatch(resetForm());
     },
   };
 }
