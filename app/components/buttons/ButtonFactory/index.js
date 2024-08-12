@@ -142,7 +142,7 @@ const ButtonFactory = ({ button }) => {
         </ButtonFlat>
       );
     case 'bookmarker':
-      return <Bookmarker type={button.entityType} />;
+      return <Bookmarker viewTitle={button.title} type={button.entityType} />;
     case 'download':
     case 'icon':
       return (

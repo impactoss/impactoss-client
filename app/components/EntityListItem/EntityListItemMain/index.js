@@ -159,7 +159,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       }
       return memoX;
     }, []);
-  };
+  }
 
   getRole = (entityRoles, roles) => {
     const role = roles.find((r) => parseInt(r.get('id'), 10) === entityRoles.first());
@@ -220,18 +220,24 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     taxonomies,
   }) => {
     const { intl } = this.props;
+    let path = '';
+    if (entityPath) {
+      path = entityPath;
+    } else if (config && (config.expandableColumns || config.clientPath)) {
+      path = nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath;
+    }
     return ({
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
       subtitle: config && config.sublabel && entity.getIn(['attributes', config.sublabel]),
-      reference: this.getReference(entity, config, intl),
+      reference: this.getReference(entity),
       draft: entity.getIn(['attributes', 'draft']),
       role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
-      path: entityPath || (nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath),
+      path,
       entityIcon: entityIcon && entityIcon(entity),
       categories: taxonomies && this.getWithoutProgressCategories(taxonomies, entity.get('categories')),
       connectedCounts: config && config.connections
-        ? this.getConnections(entity, config.connections.options, connections, intl)
+        ? this.getConnections(entity, config.connections.options, connections)
         : [],
       assignedUser: entity.get('manager') && ({ name: entity.getIn(['manager', 'attributes', 'name']) }),
       targetDate: entity.getIn(['attributes', 'target_date'])
