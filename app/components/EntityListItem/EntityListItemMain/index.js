@@ -223,7 +223,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     return ({
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
-      subtitle: config.sublabel && entity.getIn(['attributes', config.sublabel]),
+      subtitle: config && config.sublabel && entity.getIn(['attributes', config.sublabel]),
       reference: this.getReference(entity, config, intl),
       draft: entity.getIn(['attributes', 'draft']),
       role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),

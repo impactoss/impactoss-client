@@ -312,7 +312,7 @@ export class ImportEntitiesForm extends React.PureComponent {
 ImportEntitiesForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  model: PropTypes.string,
+  resetProgress: PropTypes.func,
   fieldModel: PropTypes.string,
   formData: PropTypes.object,
   progress: PropTypes.number,

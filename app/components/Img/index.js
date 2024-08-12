@@ -11,14 +11,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import RetinaImage from 'react-retina-image';
 
-function Img(props) {
+function Img({
+  src,
+  alt,
+  className,
+  checkIfRetinaImgExists = true,
+  forceOriginalDimensions = false,
+}) {
   return (
     <RetinaImage
-      className={props.className}
-      src={props.src}
-      alt={props.alt}
-      forceOriginalDimensions={props.forceOriginalDimensions}
-      checkIfRetinaImgExists={props.checkIfRetinaImgExists}
+      className={className}
+      src={src}
+      alt={alt}
+      forceOriginalDimensions={forceOriginalDimensions}
+      checkIfRetinaImgExists={checkIfRetinaImgExists}
     />
   );
 }
@@ -33,11 +39,6 @@ Img.propTypes = {
   className: PropTypes.string,
   forceOriginalDimensions: PropTypes.bool,
   checkIfRetinaImgExists: PropTypes.bool,
-};
-
-Img.defaultProps = {
-  checkIfRetinaImgExists: true,
-  forceOriginalDimensions: false,
 };
 
 export default Img;
