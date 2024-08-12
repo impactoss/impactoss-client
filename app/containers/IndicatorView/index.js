@@ -34,6 +34,7 @@ import {
 } from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { IS_ARCHIVE_STATUSES, IS_CURRENT_STATUSES } from 'themes/config';
 
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
@@ -92,6 +93,8 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   getHeaderAsideFields = (entity) => ([{
     fields: [
       getStatusField(entity),
+      getStatusField(entity, 'is_current', IS_CURRENT_STATUSES, appMessages.attributes.is_current, 'current'),
+      getStatusField(entity, 'is_archive', IS_ARCHIVE_STATUSES, appMessages.attributes.is_archive, 'false'),
       getMetaField(entity),
     ],
   }]);

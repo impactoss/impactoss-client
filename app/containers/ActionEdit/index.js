@@ -19,6 +19,7 @@ import {
   getConnectionUpdatesFromFormData,
   getTitleFormField,
   getStatusField,
+  getArchiveField,
   getMarkdownFormField,
   renderIndicatorControl,
   renderRecommendationsByFwControl,
@@ -160,6 +161,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       {
         fields: [
           getStatusField(intl.formatMessage),
+          getArchiveField(intl.formatMessage),
           getMetaField(entity),
         ],
       },

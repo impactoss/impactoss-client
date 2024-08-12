@@ -28,6 +28,7 @@ import {
   getConnectionUpdatesFromFormData,
   getCheckboxField,
   getStatusField,
+  getArchiveField,
   parentCategoryOptions,
   getDateField,
 } from 'utils/forms';
@@ -171,6 +172,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     fields.push({
       fields: [
         getStatusField(intl.formatMessage),
+        getArchiveField(intl.formatMessage),
         getMetaField(entity),
       ],
     });

@@ -23,6 +23,7 @@ import {
   getTitleFormField,
   getReferenceFormField,
   getStatusField,
+  getArchiveField,
   getMarkdownFormField,
   getDateField,
   getFrequencyField,
@@ -164,6 +165,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       {
         fields: [
           getStatusField(intl.formatMessage),
+          getArchiveField(intl.formatMessage),
           getMetaField(entity),
         ],
       },

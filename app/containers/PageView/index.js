@@ -19,6 +19,7 @@ import {
 } from 'containers/App/actions';
 
 import { ROUTES, CONTENT_PAGE } from 'containers/App/constants';
+import { IS_ARCHIVE_STATUSES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Container from 'components/styled/Container';
@@ -40,7 +41,6 @@ import {
 } from 'utils/fields';
 
 import { scrollToTop } from 'utils/scroll-to-component';
-
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
@@ -85,6 +85,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
   getBodyAsideFields = (entity) => ([{
     fields: [
       getStatusField(entity),
+      getStatusField(entity, 'is_archive', IS_ARCHIVE_STATUSES, appMessages.attributes.is_archive, 'false'),
       getMetaField(entity),
     ],
   }]);

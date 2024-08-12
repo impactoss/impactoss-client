@@ -25,6 +25,7 @@ import {
   getReferenceFormField,
   getAcceptedField,
   getStatusField,
+  getArchiveField,
   getMarkdownFormField,
 } from 'utils/forms';
 
@@ -149,6 +150,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       {
         fields: [
           getStatusField(intl.formatMessage),
+          getArchiveField(intl.formatMessage),
           getMetaField(entity),
         ],
       },

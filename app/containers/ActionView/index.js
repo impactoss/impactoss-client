@@ -31,7 +31,7 @@ import { getEntityTitleTruncated, getEntityReference } from 'utils/entities';
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, IS_ARCHIVE_STATUSES, IS_CURRENT_STATUSES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -84,6 +84,8 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     {
       fields: [
         getStatusField(entity),
+        getStatusField(entity, 'is_current', IS_CURRENT_STATUSES, appMessages.attributes.is_current, 'current'),
+        getStatusField(entity, 'is_archive', IS_ARCHIVE_STATUSES, appMessages.attributes.is_archive, 'false'),
         getMetaField(entity),
       ],
     },

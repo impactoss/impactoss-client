@@ -27,7 +27,7 @@ import { getEntityTitleTruncated, getEntityReference } from 'utils/entities';
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { ACCEPTED_STATUSES } from 'themes/config';
+import { ACCEPTED_STATUSES, IS_CURRENT_STATUSES, IS_ARCHIVE_STATUSES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -94,6 +94,8 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     {
       fields: [
         getStatusField(entity),
+        getStatusField(entity, 'is_current', IS_CURRENT_STATUSES, appMessages.attributes.is_current, 'current'),
+        getStatusField(entity, 'is_archive', IS_ARCHIVE_STATUSES, appMessages.attributes.is_archive, 'false'),
         getMetaField(entity),
       ],
     },

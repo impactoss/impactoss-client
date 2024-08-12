@@ -39,7 +39,7 @@ import { qe } from 'utils/quasi-equals';
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
+import { CATEGORY_ADMIN_MIN_ROLE, IS_CURRENT_STATUSES, IS_ARCHIVE_STATUSES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -114,6 +114,8 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       fields.push({
         fields: [
           getStatusField(entity),
+          getStatusField(entity, 'is_current', IS_CURRENT_STATUSES, appMessages.attributes.is_current, 'current'),
+          getStatusField(entity, 'is_archive', IS_ARCHIVE_STATUSES, appMessages.attributes.is_archive, 'false'),
           getMetaField(entity),
         ],
       });

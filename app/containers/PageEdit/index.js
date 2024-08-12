@@ -19,6 +19,7 @@ import {
   getMenuOrderFormField,
   getMarkdownFormField,
   getStatusField,
+  getArchiveField,
 } from 'utils/forms';
 
 import {
@@ -127,6 +128,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
       {
         fields: [
           getStatusField(intl.formatMessage),
+          getArchiveField(intl.formatMessage),
           getMetaField(entity),
         ],
       },
