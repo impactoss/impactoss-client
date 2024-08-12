@@ -63,14 +63,12 @@ class EntityListItemMainTaxonomies extends React.PureComponent { // eslint-disab
     return tags;
   };
 
-  getSmartTitle = (title, isSmart) => {
-    const { intl } = this.props;
-    return intl
+  getSmartTitle = (title, isSmart, intl) =>
+    intl
       ? `${title}: ${intl.formatMessage(isSmart ? appMessages.labels.smart.met : appMessages.labels.smart.notMet)}`
       : title;
-  };
 
-  getEntitySmartTags = (categories, smartTaxonomy, onClick) => {
+  getEntitySmartTags = (categories, smartTaxonomy, onClick, intl) => {
     const tags = [];
     smartTaxonomy
       .get('categories')
@@ -81,7 +79,7 @@ class EntityListItemMainTaxonomies extends React.PureComponent { // eslint-disab
         const isSmart = categories && categories.includes(parseInt(catId, 10));
         tags.push({
           taxId: smartTaxonomy.get('id'),
-          title: this.getSmartTitle(category.getIn(['attributes', 'title']), isSmart),
+          title: this.getSmartTitle(category.getIn(['attributes', 'title']), isSmart, intl),
           isSmart,
           label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG, false),
           onClick: () => onClick(catId, 'category'),
@@ -92,7 +90,7 @@ class EntityListItemMainTaxonomies extends React.PureComponent { // eslint-disab
 
 
   render() {
-    const { categories, taxonomies, onEntityClick } = this.props;
+    const { categories, taxonomies, onEntityClick, intl } = this.props;
     const smartTaxonomy = taxonomies && taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
     const entityTags = categories && this.getEntityTags(categories, taxonomies, onEntityClick);
 
@@ -100,7 +98,7 @@ class EntityListItemMainTaxonomies extends React.PureComponent { // eslint-disab
       <Styled>
         {smartTaxonomy && (
           <SmartGroup border={entityTags && entityTags.length > 0}>
-            { this.getEntitySmartTags(categories, smartTaxonomy, onEntityClick).map((tag, i) => (
+            {this.getEntitySmartTags(categories, smartTaxonomy, onEntityClick, intl).map((tag, i) => (
               <ButtonTagCategory
                 key={i}
                 onClick={tag.onClick}

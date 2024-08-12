@@ -60,8 +60,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       )
     );
 
-  getColumnKeys = (taxonomy, frameworks) => {
-    const { intl } = this.props;
+  getColumnKeys = (taxonomy, frameworks, intl) => {
     // figure out if tagged directly or via child category
     const tagsRecs = this.getTagsTax(taxonomy, 'tags_recommendations');
     return tagsRecs && frameworks && taxonomy.get('frameworkIds').toArray().reduce(
@@ -90,8 +89,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     );
   };
 
-  getHeaderAttributes = (taxonomy, frameworkId, frameworks) => {
-    const { intl } = this.props;
+  getHeaderAttributes = (taxonomy, frameworkId, frameworks, intl) => {
     // figure out if tagged directly or via child category
     const tagsRecs = this.getTagsTax(taxonomy, 'tags_recommendations');
     const tagsMeasures = this.getTagsTax(taxonomy, 'tags_measures');
@@ -117,7 +115,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       attributes.push({
         query: 'recommendations',
         label: recLabel,
-        keys: this.getColumnKeys(taxonomy, frameworks),
+        keys: this.getColumnKeys(taxonomy, frameworks, intl),
       });
       // indirectly associated/inferred actions
       if (!tagsMeasures) {
@@ -148,13 +146,13 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     userOnly,
     isGrouped,
     frameworks,
+    intl,
   }) => {
-    const { intl } = this.props;
     const sortOptionActive = getSortOption(sortOptions, sortBy, 'query');
     const titleColumnSortOption = sortOptions.find((option) => option.query === 'title');
     const titleColumnActive = titleColumnSortOption.query === sortOptionActive.query;
     const titleColumnSortOrderOption = SORT_ORDER_OPTIONS.find((option) => (sortOrder || titleColumnSortOption.order) === option.value);
-    const headerAttributes = this.getHeaderAttributes(taxonomy, frameworkId, frameworks);
+    const headerAttributes = this.getHeaderAttributes(taxonomy, frameworkId, frameworks, intl);
     let titleColumnSortTitle = intl.formatMessage(messages.titleColumnSortTitle);
     if (titleColumnActive) {
       titleColumnSortTitle = intl.formatMessage(messages.titleColumnSortTitleSorted);
@@ -234,7 +232,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
   getCategoryMaxCount = (categoryGroups, attribute) => {
     const isList = !!attribute.frameworkIds;
     const allCategories = categoryGroups.reduce((memo, group) => memo.concat(group.get('categories')),
-      List(),);
+      List());
     return allCategories.reduce(
       (countsMemo, cat) => {
         if (isList) {
@@ -327,6 +325,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       userOnly,
       frameworks,
       frameworkId,
+      intl,
     } = this.props;
 
     const headerColumns = this.getListHeaderColumns({
@@ -339,6 +338,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       userOnly,
       isGrouped: categoryGroups.size > 0 && !!taxonomy.get('parent'),
       frameworks,
+      intl,
     });
 
     const columns = this.getListColumns({

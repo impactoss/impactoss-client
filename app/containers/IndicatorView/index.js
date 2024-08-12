@@ -108,8 +108,8 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     recommendationConnections,
     frameworks,
     canCreateReports,
+    intl,
   }) => {
-    const { intl } = this.props;
     const fields = [];
     // own attributes
     fields.push({
@@ -314,6 +314,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
                       recommendationConnections,
                       frameworks,
                       canCreateReports,
+                      intl,
                     }),
                     aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
                   },

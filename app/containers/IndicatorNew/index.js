@@ -108,9 +108,8 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       : Map())
     .set('associatedUser', userOptions(users, null))
 
-  getHeaderMainFields = (existingReferences) => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getHeaderMainFields = (existingReferences, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getReferenceFormField({
@@ -122,26 +121,23 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
         ],
       },
     ]);
-  };
 
-  getHeaderAsideFields = () => {
-    const { intl } = this.props;
-    return ([
+  getHeaderAsideFields = (intl) =>
+    ([
       {
         fields: [
           getStatusField(intl.formatMessage),
         ],
       },
     ]);
-  };
 
   getBodyMainFields = (
     connectedTaxonomies,
     measures,
     recommendationsByFw,
     onCreateOption,
+    intl,
   ) => {
-    const { intl } = this.props;
     const groups = [];
     groups.push({
       fields: [getMarkdownFormField({ formatMessage: intl.formatMessage })],
@@ -176,9 +172,8 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     return groups;
   };
 
-  getBodyAsideFields = (users, repeat) => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getBodyAsideFields = (users, repeat, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.schedule),
         icon: 'reminder',
@@ -191,7 +186,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             (model, value) =>
               this.props.onStartDateChange(
                 model, value, this.props.viewDomain.getIn(['form', 'data']), intl.formatMessage
-              ) 
+              )
           ),
           getCheckboxField(
             intl.formatMessage,
@@ -218,7 +213,6 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
         ],
       },
     ]);
-  };
 
   render() {
     const {
@@ -306,12 +300,12 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                 }}*/
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(existingReferences),
-                    aside: this.getHeaderAsideFields(),
+                    main: this.getHeaderMainFields(existingReferences, intl),
+                    aside: this.getHeaderAsideFields(intl),
                   },
                   body: {
-                    main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption),
-                    aside: this.getBodyAsideFields(users, viewDomain.getIn(['attributes', 'repeat'])),
+                    main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption, intl),
+                    aside: this.getBodyAsideFields(users, viewDomain.getIn(['attributes', 'repeat']), intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}

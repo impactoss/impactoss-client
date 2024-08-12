@@ -107,9 +107,8 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
         : Map())
       .set('associatedIndicators', entityOptions(indicators, true));
 
-  getHeaderMainFields = (existingReferences) => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getHeaderMainFields = (existingReferences, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getReferenceFormField({
@@ -121,26 +120,23 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
         ],
       },
     ]);
-  };
 
-  getHeaderAsideFields = () => {
-    const { intl } = this.props;
-    return ([
+  getHeaderAsideFields = (intl) =>
+    ([
       {
         fields: [
           getStatusField(intl.formatMessage),
         ],
       },
     ]);
-  };
 
   getBodyMainFields = (
     connectedTaxonomies,
     indicators,
     recommendationsByFw,
     onCreateOption,
+    intl,
   ) => {
-    const { intl } = this.props;
     const groups = [];
     groups.push(
       {
@@ -189,9 +185,8 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) => 
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getDateField(intl.formatMessage, 'target_date'),
@@ -208,7 +203,6 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
         }),
       },
     ]);
-  };
 
   render() {
     const {
@@ -289,8 +283,8 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                 handleCancel={this.props.handleCancel}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(existingReferences),
-                    aside: this.getHeaderAsideFields(),
+                    main: this.getHeaderMainFields(existingReferences, intl),
+                    aside: this.getHeaderAsideFields(intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
@@ -298,11 +292,13 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                       indicators,
                       recommendationsByFw,
                       onCreateOption,
+                      intl,
                     ),
                     aside: this.getBodyAsideFields(
                       taxonomies,
                       onCreateOption,
                       canUserAdministerCategories,
+                      intl,
                     ),
                   },
                 }}

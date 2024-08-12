@@ -101,9 +101,8 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     if (this.props.isFocus) this.title.focus();
   }
 
-  getConnections = (entity, connectionOptions, connections) => {
-    const { intl } = this.props;
-    return reduce(connectionOptions, (memo, option) => {
+  getConnections = (entity, connectionOptions, connections, intl) =>
+    reduce(connectionOptions, (memo, option) => {
       // console.log(memo, option, entity.toJS())
       let memoX = memo;
       if (
@@ -159,7 +158,6 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       }
       return memoX;
     }, []);
-  }
 
   getRole = (entityRoles, roles) => {
     const role = roles.find((r) => parseInt(r.get('id'), 10) === entityRoles.first());
@@ -168,8 +166,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     return role ? parseInt(role.get('id'), 10) : USER_ROLES.DEFAULT.value;
   };
 
-  getReference = (entity) => {
-    const { intl } = this.props;
+  getReference = (entity, intl) => {
     const reference = entity.getIn(['attributes', 'reference']) || entity.get('id');
     let type = entity.get('type');
     if (entity.getIn(['attributes', 'framework_id'])) {
@@ -218,8 +215,8 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     connections,
     entityIcon,
     taxonomies,
+    intl,
   }) => {
-    const { intl } = this.props;
     let path = '';
     if (entityPath) {
       path = entityPath;
@@ -230,14 +227,14 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
       subtitle: config && config.sublabel && entity.getIn(['attributes', config.sublabel]),
-      reference: this.getReference(entity),
+      reference: this.getReference(entity, intl),
       draft: entity.getIn(['attributes', 'draft']),
       role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
       path,
       entityIcon: entityIcon && entityIcon(entity),
       categories: taxonomies && this.getWithoutProgressCategories(taxonomies, entity.get('categories')),
       connectedCounts: config && config.connections
-        ? this.getConnections(entity, config.connections.options, connections)
+        ? this.getConnections(entity, config.connections.options, connections, intl)
         : [],
       assignedUser: entity.get('manager') && ({ name: entity.getIn(['manager', 'attributes', 'name']) }),
       targetDate: entity.getIn(['attributes', 'target_date'])

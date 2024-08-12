@@ -107,8 +107,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
         : DEFAULT_FRAMEWORK
     ));
 
-  getHeaderMainFields = (frameworkId, frameworks, existingReferences) => {
-    const { intl } = this.props;
+  getHeaderMainFields = (frameworkId, frameworks, existingReferences, intl) => {
     const hasFWOptions = frameworks && frameworks.size > 1 && frameworkId === 'all';
     return ([ // fieldGroups
       { // fieldGroup
@@ -125,12 +124,12 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     ]);
   };
 
-  getHeaderAsideFields = () => {
-    const { intl } = this.props;
-    return ([{
-      fields: [getStatusField(intl.formatMessage)],
-    }]);
-  };
+  getHeaderAsideFields = (intl) =>
+    ([
+      {
+        fields: [getStatusField(intl.formatMessage)],
+      },
+    ]);
 
   getBodyMainFields = (
     connectedTaxonomies,
@@ -138,8 +137,8 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     indicators,
     onCreateOption,
     hasResponse,
+    intl,
   ) => {
-    const { intl } = this.props;
     const groups = [];
     groups.push({
       fields: [
@@ -178,9 +177,8 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
-    const { intl } = this.props;
-    return ([ // fieldGroup
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) => 
+    ([ // fieldGroup
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
@@ -191,7 +189,6 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
         }),
       },
     ]);
-  };
 
   render() {
     const {
@@ -293,8 +290,8 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                 handleCancel={this.props.handleCancel}
                 fields={{ // isManager, taxonomies,
                   header: {
-                    main: this.getHeaderMainFields(frameworkId, frameworks, existingReferences),
-                    aside: this.getHeaderAsideFields(),
+                    main: this.getHeaderMainFields(frameworkId, frameworks, existingReferences, intl),
+                    aside: this.getHeaderAsideFields(intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
@@ -303,11 +300,13 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                       hasIndicators && indicators,
                       onCreateOption,
                       hasResponse,
+                      intl,
                     ),
                     aside: this.getBodyAsideFields(
                       fwTaxonomies,
                       onCreateOption,
                       canUserAdministerCategories,
+                      intl,
                     ),
                   },
                 }}

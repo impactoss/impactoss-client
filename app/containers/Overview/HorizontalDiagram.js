@@ -542,8 +542,8 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
     draftCount,
     stateButton,
     onPageLink,
+    intl,
   }) => {
-    const { intl } = this.props;
     const label = `${count || 0} ${intl.formatMessage(appMessages.entities[type][count !== 1 ? 'plural' : 'single'])}`;
     const labelDraft = draftCount > 0
       ? intl.formatMessage(messages.buttons.draft, { count: draftCount })
@@ -611,6 +611,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
     onTaxonomyIconMouseOver,
     frameworkId,
     mouseOverTaxonomy,
+    intl,
   ) => (
     <DiagramButtonWrap>
       {this.renderButton({
@@ -623,6 +624,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
         draftCount: recommendationDraftCount,
         stateButton: 'buttonRecs',
         onPageLink,
+        intl,
       })}
       {this.renderCategoryIcons(
         'tags_recommendations',
@@ -641,8 +643,8 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
     onPageLink,
     onTaxonomyIconMouseOver,
     mouseOverTaxonomy,
+    intl,
   ) => {
-    const { intl } = this.props;
     let iconSize = '5em';
     if (this.state.viewport === VIEWPORTS.MOBILE) {
       iconSize = null;
@@ -700,6 +702,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
     indicatorCount,
     indicatorDraftCount,
     onPageLink,
+    intl,
   ) => (
     <DiagramButtonWrap>
       {this.renderButton({
@@ -714,6 +717,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
         draftCount: indicatorDraftCount,
         stateButton: 'buttonIndicators',
         onPageLink,
+        intl,
       })}
     </DiagramButtonWrap>
   );
@@ -725,6 +729,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
     onPageLink,
     onTaxonomyIconMouseOver,
     mouseOverTaxonomy,
+    intl,
   ) => (
     <DiagramButtonWrap>
       {this.renderButton({
@@ -737,6 +742,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
         draftCount: sdgtargetDraftCount,
         stateButton: 'buttonSdgtargets',
         onPageLink,
+        intl,
       })}
       {this.renderCategoryIcons(
         'tags_sdgtargets',
@@ -762,6 +768,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
       onTaxonomyIconMouseOver,
       frameworkId,
       mouseOverTaxonomy,
+      intl,
     } = this.props;
 
     return (
@@ -788,6 +795,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                       onTaxonomyIconMouseOver,
                       frameworkId,
                       mouseOverTaxonomy,
+                      intl,
                     )}
                   </DiagramSectionVerticalHalf>
                 )}
@@ -801,6 +809,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                       onTaxonomyIconMouseOver,
                       frameworkId,
                       mouseOverTaxonomy,
+                      intl,
                     )}
                   </DiagramSectionVerticalCenter>
                 )}
@@ -813,6 +822,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                       onPageLink,
                       onTaxonomyIconMouseOver,
                       mouseOverTaxonomy,
+                      intl,
                     )}
                   </DiagramSectionVerticalHalf>
                 )}
@@ -829,6 +839,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                     onPageLink,
                     onTaxonomyIconMouseOver,
                     mouseOverTaxonomy,
+                    intl,
                   )}
                 </DiagramSectionVerticalCenter>
               </DiagramSectionVertical>
@@ -841,6 +852,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                     indicatorCount,
                     indicatorDraftCount,
                     onPageLink,
+                    intl,
                   )}
                 </DiagramSectionVerticalCenter>
               </DiagramSectionVertical>
@@ -860,6 +872,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                       onTaxonomyIconMouseOver,
                       frameworkId,
                       mouseOverTaxonomy,
+                      intl,
                     )}
                   </DiagramSectionHorizontalTop>
                 )}
@@ -873,6 +886,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                       onTaxonomyIconMouseOver,
                       frameworkId,
                       mouseOverTaxonomy,
+                      intl,
                     )}
                   </DiagramSectionHorizontalVCenter>
                 )}
@@ -885,6 +899,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                       onPageLink,
                       onTaxonomyIconMouseOver,
                       mouseOverTaxonomy,
+                      intl,
                     )}
                   </DiagramSectionHorizontalBottom>
                 )}
@@ -902,6 +917,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                       onPageLink,
                       onTaxonomyIconMouseOver,
                       mouseOverTaxonomy,
+                      intl,
                     )
                   }
                 </DiagramSectionHorizontalVCenter>
@@ -915,6 +931,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                     indicatorCount,
                     indicatorDraftCount,
                     onPageLink,
+                    intl,
                   )}
                 </DiagramSectionHorizontalVCenter>
               </DiagramSectionHorizontalHalf>

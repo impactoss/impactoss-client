@@ -107,8 +107,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     return groups;
   };
 
-  getHeaderAsideFields = (entity, isManager) => {
-    const { intl } = this.props;
+  getHeaderAsideFields = (entity, isManager, intl) => {
     const fields = []; // fieldGroups
     if (isManager) {
       fields.push({
@@ -359,7 +358,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(viewEntity, isManager, parentTaxonomy),
-                    aside: this.getHeaderAsideFields(viewEntity, isManager),
+                    aside: this.getHeaderAsideFields(viewEntity, isManager, intl),
                   },
                   body: {
                     main: this.getBodyMainFields(

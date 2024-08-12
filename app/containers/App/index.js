@@ -97,8 +97,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     }))
     .toArray();
 
-  prepareFrameworkOptions = (frameworks, activeId) => {
-    const { intl } = this.props;
+  prepareFrameworkOptions = (frameworks, activeId, intl) => {
     const options = Object.values(frameworks.toJS()).map((fw) => ({
       value: fw.id,
       label: intl.formatMessage(messages.frameworks[fw.id]),
@@ -117,8 +116,8 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     currentPath,
     currentFrameworkId,
     viewRecommendationFramework,
+    intl,
   ) => {
-    const { intl } = this.props;
     let navItems = [
       {
         path: ROUTES.OVERVIEW,
@@ -224,6 +223,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             location.pathname,
             currentFrameworkId,
             viewRecommendationFramework,
+            intl,
           )}
           search={{
             path: ROUTES.SEARCH,
@@ -238,6 +238,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             ? this.prepareFrameworkOptions(
               frameworks,
               currentFrameworkId,
+              intl,
             )
             : null}
           currentPath={location.pathname}

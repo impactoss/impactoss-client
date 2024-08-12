@@ -135,20 +135,17 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
       : Map();
   };
 
-  getHeaderMainFields = () => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getHeaderMainFields = (intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getTitleFormField(intl.formatMessage),
         ],
       },
     ]);
-  };
 
-  getHeaderAsideFields = (entity, canUserPublish) => {
-    const { intl } = this.props;
-    return ([
+  getHeaderAsideFields = (entity, canUserPublish, intl) =>
+    ([
       {
         fields: [
           canUserPublish
@@ -158,11 +155,9 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         ],
       },
     ]);
-  };
 
-  getBodyMainFields = () => {
-    const { intl } = this.props;
-    return ([
+  getBodyMainFields = (intl) =>
+    ([
       {
         fields: [
           getMarkdownFormField({ formatMessage: intl.formatMessage }),
@@ -171,11 +166,9 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         ],
       },
     ]);
-  };
 
-  getBodyAsideFields = (entity) => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getBodyAsideFields = (entity, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.single),
         icon: 'calendar',
@@ -193,7 +186,6 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           )],
       },
     ]);
-  };
 
   render() {
     const {
@@ -288,15 +280,16 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                 }
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
+                    main: this.getHeaderMainFields(intl),
                     aside: this.getHeaderAsideFields(
                       viewEntity,
                       canUserPublishReports(this.props.highestRole),
+                      intl,
                     ),
                   },
                   body: {
-                    main: this.getBodyMainFields(),
-                    aside: this.getBodyAsideFields(viewEntity),
+                    main: this.getBodyMainFields(intl),
+                    aside: this.getBodyAsideFields(viewEntity, intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}

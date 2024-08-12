@@ -120,12 +120,10 @@ const pageEntityGroups = (entityGroups, pager, formatMessage) => {
 
 
 export class EntityListGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  transformMessage = (msg, entityId) => {
-    const { intl } = this.props;
-    return intl
+  transformMessage = (msg, entityId, intl) =>
+    intl
       ? intl.formatMessage(messages.entityNoLongerPresent, { entityId })
       : msg;
-  };
 
   hasLocationQueryFilters = (locationQuery) => locationQuery.reduce((hasFilters, value, arg) => hasFilters || ['items', 'page', 'group', 'subgroup', 'sort', 'order'].indexOf(arg) === -1,
     false);
@@ -270,7 +268,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                   type="error"
                   messages={updateError
                     .getIn(['error', 'messages'])
-                    .map((msg) => this.transformMessage(msg, entityId))
+                    .map((msg) => this.transformMessage(msg, entityId, intl))
                     .valueSeq()
                     .toArray()
                   }

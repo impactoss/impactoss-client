@@ -68,8 +68,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
       || this.props.expandNo !== nextProps.expandNo;
   }
 
-  transformMessage = (type, msg) => {
-    const { intl } = this.props;
+  transformMessage = (type, msg, intl) => {
     if (type === 'delete') {
       return intl
         ? intl.formatMessage(messages.associationNotExistent)
@@ -112,7 +111,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
             messages={
               updateError
                 .getIn(['error', 'messages'])
-                .map((msg) => this.transformMessage(updateError.get('type'), msg))
+                .map((msg) => this.transformMessage(updateError.get('type'), msg, intl))
                 .valueSeq()
                 .toArray()
             }

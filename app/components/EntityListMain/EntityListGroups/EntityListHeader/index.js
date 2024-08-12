@@ -25,8 +25,7 @@ const Styled = styled.div`
 `;
 
 class EntityListHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  getListHeaderLabel = (entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage) => {
-    const { intl } = this.props;
+  getListHeaderLabel = (entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage, intl) => {
     if (selectedTotal > 0) {
       if (allSelected) {
         // return `All ${selectedTotal} ${selectedTotal === 1 ? entityTitle.single : entityTitle.plural} selected. `;
@@ -135,7 +134,7 @@ class EntityListHeader extends React.PureComponent { // eslint-disable-line reac
           width={firstColumnWidth}
           isSelect={isManager}
           isSelected={this.getSelectedState(selectedTotal, allSelected || allSelectedOnPage)}
-          label={this.getListHeaderLabel(entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage)}
+          label={this.getListHeaderLabel(entityTitle, selectedTotal, pageTotal, entitiesTotal, allSelected, allSelectedOnPage, intl)}
           onSelect={onSelect}
           hasSelectAll={allSelectedOnPage && !allSelected}
           onSelectAll={onSelectAll}

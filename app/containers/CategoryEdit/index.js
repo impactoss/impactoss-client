@@ -131,8 +131,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       })
       : Map();
 
-  getHeaderMainFields = (entity, parentOptions, parentTaxonomy) => {
-    const { intl } = this.props;
+  getHeaderMainFields = (entity, parentOptions, parentTaxonomy, intl) => {
     const groups = [];
     groups.push({ // fieldGroup
       fields: [
@@ -156,8 +155,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   };
 
 
-  getHeaderAsideFields = (entity) => {
-    const { intl } = this.props;
+  getHeaderAsideFields = (entity, intl) => {
     const fields = []; // fieldGroups
     fields.push({
       fields: [
@@ -185,8 +183,8 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     measures,
     onCreateOption,
     userOnly,
+    intl,
   ) => {
-    const { intl } = this.props;
     const fields = [];
     fields.push({
       fields: [getMarkdownFormField({ formatMessage: intl.formatMessage })],
@@ -227,8 +225,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     return fields;
   };
 
-  getBodyAsideFields = (entity, users, isAdmin) => {
-    const { intl } = this.props;
+  getBodyAsideFields = (entity, users, isAdmin, intl) => {
     const fields = []; // fieldGroups
     if (isAdmin && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
       fields.push({
@@ -376,8 +373,9 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                       viewEntity,
                       parentOptions,
                       parentTaxonomy,
+                      intl,
                     ),
-                    aside: this.getHeaderAsideFields(viewEntity),
+                    aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
@@ -387,8 +385,9 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                       measures,
                       onCreateOption,
                       viewEntity.getIn(['attributes', 'user_only']),
+                      intl,
                     ),
-                    aside: this.getBodyAsideFields(viewEntity, users, isAdmin),
+                    aside: this.getBodyAsideFields(viewEntity, users, isAdmin, intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}

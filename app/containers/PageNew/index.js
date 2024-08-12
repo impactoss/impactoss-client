@@ -76,9 +76,8 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
     this.remoteSubmitForm = submitForm;
   };
 
-  getHeaderMainFields = () => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getHeaderMainFields = (intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getTitleFormField(intl.formatMessage),
@@ -87,24 +86,23 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
         ],
       },
     ]);
-  };
 
-  getHeaderAsideFields = () => {
-    const { intl } = this.props;
-    return ([{
-      fields: [getStatusField(intl.formatMessage)],
-    }]);
-  };
+  getHeaderAsideFields = (intl) =>
+    ([
+      {
+        fields: [getStatusField(intl.formatMessage)],
+      },
+    ]);
 
-  getBodyMainFields = () => {
-    const { intl } = this.props;
-    return ([{
-      fields: [getMarkdownFormField({
-        formatMessage: intl.formatMessage,
-        attribute: 'content',
-      })],
-    }]);
-  };
+  getBodyMainFields = (intl) =>
+    ([
+      {
+        fields: [getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'content',
+        })],
+      },
+    ]);
 
   render() {
     const { viewDomain, dataReady, intl } = this.props;
@@ -174,11 +172,11 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
                 handleCancel={this.props.handleCancel}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
-                    aside: this.getHeaderAsideFields(),
+                    main: this.getHeaderMainFields(intl),
+                    aside: this.getHeaderAsideFields(intl),
                   },
                   body: {
-                    main: this.getBodyMainFields(),
+                    main: this.getBodyMainFields(intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}

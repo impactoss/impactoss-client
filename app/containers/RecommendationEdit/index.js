@@ -118,9 +118,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       })
       : Map();
 
-  getHeaderMainFields = (existingReferences) => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getHeaderMainFields = (existingReferences, intl) => 
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getReferenceFormField({
@@ -132,11 +131,9 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
         ],
       },
     ]);
-  };
 
-  getHeaderAsideFields = (entity) => {
-    const { intl } = this.props;
-    return ([
+  getHeaderAsideFields = (entity, intl) =>
+    ([
       {
         fields: [
           getStatusField(intl.formatMessage),
@@ -144,7 +141,6 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
         ],
       },
     ]);
-  };
 
   getBodyMainFields = (
     connectedTaxonomies,
@@ -153,8 +149,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     indicators,
     onCreateOption,
     hasResponse,
+    intl
   ) => {
-    const { intl } = this.props;
     const groups = [];
     groups.push({
       fields: [
@@ -193,9 +189,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
@@ -206,7 +201,6 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
         }),
       },
     ]);
-  };
 
   render() {
     const {
@@ -326,9 +320,10 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                     main: this.getHeaderMainFields(
                       existingReferences
                         ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
-                        : null
+                        : null,
+                      intl
                     ),
-                    aside: this.getHeaderAsideFields(viewEntity),
+                    aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
@@ -338,11 +333,13 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                       hasIndicators && indicators,
                       onCreateOption,
                       hasResponse,
+                      intl
                     ),
                     aside: this.getBodyAsideFields(
                       fwTaxonomies,
                       onCreateOption,
                       canUserAdministerCategories,
+                      intl
                     ),
                   },
                 }}

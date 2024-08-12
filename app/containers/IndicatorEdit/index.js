@@ -133,9 +133,8 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       : Map();
   };
 
-  getHeaderMainFields = (existingReferences) => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getHeaderMainFields = (existingReferences, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getReferenceFormField({
@@ -147,11 +146,9 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         ],
       },
     ]);
-  };
 
-  getHeaderAsideFields = (entity) => {
-    const { intl } = this.props;
-    return ([
+  getHeaderAsideFields = (entity, intl) =>
+    ([
       {
         fields: [
           getStatusField(intl.formatMessage),
@@ -159,10 +156,8 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         ],
       },
     ]);
-  };
 
-  getBodyMainFields = (connectedTaxonomies, measures, recommendationsByFw, onCreateOption) => {
-    const { intl } = this.props;
+  getBodyMainFields = (connectedTaxonomies, measures, recommendationsByFw, onCreateOption, intl) => {
     const groups = [];
     groups.push(
       {
@@ -349,13 +344,14 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                     main: this.getHeaderMainFields(
                       existingReferences
                         ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
-                        : null
+                        : null,
+                      intl
                     ),
-                    aside: this.getHeaderAsideFields(viewEntity),
+                    aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
                   body: {
-                    main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption),
-                    aside: this.getBodyAsideFields(viewEntity, users, viewEntity.getIn(['attributes', 'repeat'])),
+                    main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption, intl),
+                    aside: this.getBodyAsideFields(viewEntity, users, viewEntity.getIn(['attributes', 'repeat']), intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}

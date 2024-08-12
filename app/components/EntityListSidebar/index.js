@@ -201,9 +201,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     this.setState({ visible: false });
   };
 
-  getSidebarButtons = () => {
-    const { intl } = this.props;
-    return ([
+  getSidebarButtons = (intl) =>
+    ([
       {
         label: intl.formatMessage(messages.header.filterButton),
         panel: FILTERS_PANEL,
@@ -215,10 +214,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         icon: 'edit',
       },
     ]);
-  };
 
-  getFormButtons = (activeOption) => {
-    const { intl } = this.props;
+  getFormButtons = (activeOption, intl) => {
     const { onCreateOption } = this.props;
     return [
       activeOption.create
@@ -392,7 +389,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
                     {canEdit
                     && (
                       <ButtonToggle
-                        options={this.getSidebarButtons()}
+                        options={this.getSidebarButtons(intl)}
                         activePanel={activePanel}
                         onSelect={onPanelSelect}
                       />
@@ -422,7 +419,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
                             activeOptionId={activeOption.optionId}
                             formOptions={formOptions}
                             buttons={activePanel === EDIT_PANEL
-                              ? this.getFormButtons(activeOption)
+                              ? this.getFormButtons(activeOption, intl)
                               : null
                             }
                             onCancel={this.onHideForm}

@@ -378,49 +378,46 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
     stateButton,
     multiple,
     onPageLink,
-  }) => {
-    const { intl } = this.props;
-    return (
-      <DiagramButton
-        onClick={() => onPageLink(path, query)}
-        paletteDefault={paletteDefault}
-        paletteHover={paletteHover}
-        ref={(node) => {
-          if (!this.state[stateButton]) {
-            this.setState({ [stateButton]: node });
-          }
-        }}
-        draft={draftCount > 0}
-        multiple={multiple}
-        title={intl.formatMessage(
-          messages.buttons.title,
-          { label: `${count || 0} ${intl.formatMessage(appMessages.entities[type][count !== 1 ? 'plural' : 'single'])}` },
-        )}
-      >
-        <DiagramButtonIcon>
-          <Icon
-            name={icon}
-            sizes={{
-              mobile: '24px',
-              small: '24px',
-              medium: '24px',
-              large: '24px',
-            }}
-          />
-        </DiagramButtonIcon>
-        <div>
-          {`${count || 0} ${intl.formatMessage(appMessages.entities[type][count !== 1 ? 'plural' : 'single'])}`}
-        </div>
-        { draftCount > 0
-          && (
-            <DraftEntities>
-              <FormattedMessage {...messages.buttons.draft} values={{ count: draftCount }} />
-            </DraftEntities>
-          )
+    intl,
+  }) =>
+    <DiagramButton
+      onClick={() => onPageLink(path, query)}
+      paletteDefault={paletteDefault}
+      paletteHover={paletteHover}
+      ref={(node) => {
+        if (!this.state[stateButton]) {
+          this.setState({ [stateButton]: node });
         }
-      </DiagramButton>
-    );
-  };
+      }}
+      draft={draftCount > 0}
+      multiple={multiple}
+      title={intl.formatMessage(
+        messages.buttons.title,
+        { label: `${count || 0} ${intl.formatMessage(appMessages.entities[type][count !== 1 ? 'plural' : 'single'])}` },
+      )}
+    >
+      <DiagramButtonIcon>
+        <Icon
+          name={icon}
+          sizes={{
+            mobile: '24px',
+            small: '24px',
+            medium: '24px',
+            large: '24px',
+          }}
+        />
+      </DiagramButtonIcon>
+      <div>
+        {`${count || 0} ${intl.formatMessage(appMessages.entities[type][count !== 1 ? 'plural' : 'single'])}`}
+      </div>
+      {draftCount > 0
+        && (
+          <DraftEntities>
+            <FormattedMessage {...messages.buttons.draft} values={{ count: draftCount }} />
+          </DraftEntities>
+        )
+      }
+    </DiagramButton>
 
   render() {
     const {
@@ -432,6 +429,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
       indicatorCount,
       indicatorDraftCount,
       onPageLink,
+      intl,
     } = this.props;
 
     return (
@@ -470,6 +468,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
                         draftCount: recommendationDraftCountByFw.get(fwId),
                         multiple: frameworks.size > 1,
                         onPageLink,
+                        intl,
                       })}
                     </DiagramButtonWrap>
                   );
@@ -492,6 +491,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
                   type: 'measures',
                   count: measureCount,
                   draftCount: measureDraftCount,
+                  intl,
                 })}
               </DiagramButtonWrap>
             </DiagramSectionVerticalCenter>
@@ -511,6 +511,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
                   type: 'indicators',
                   count: indicatorCount,
                   draftCount: indicatorDraftCount,
+                  intl,
                 })}
               </DiagramButtonWrap>
             </DiagramSectionVerticalCenter>

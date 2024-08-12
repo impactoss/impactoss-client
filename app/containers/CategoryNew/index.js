@@ -118,8 +118,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     .set('associatedUser', users && userOptions(users, null));
 
 
-  getHeaderMainFields = (parentOptions, parentTaxonomy) => {
-    const { intl } = this.props;
+  getHeaderMainFields = (parentOptions, parentTaxonomy, intl) => {
     const groups = [];
     groups.push({ // fieldGroup
       fields: [
@@ -141,8 +140,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     return groups;
   };
 
-  getHeaderAsideFields = (taxonomy) => {
-    const { intl } = this.props;
+  getHeaderAsideFields = (taxonomy, intl) => {
     const fields = []; // fieldGroups
     fields.push({
       fields: [
@@ -169,8 +167,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     measures,
     onCreateOption,
     userOnly,
+    intl,
   ) => {
-    const { intl } = this.props;
     const groups = [];
     groups.push({
       fields: [getMarkdownFormField({ formatMessage: intl.formatMessage })],
@@ -209,8 +207,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     return groups;
   };
 
-  getBodyAsideFields = (users, isAdmin, taxonomy) => {
-    const { intl } = this.props;
+  getBodyAsideFields = (users, isAdmin, taxonomy, intl) => {
     const fields = []; // fieldGroups
     fields.push({
       fields: [
@@ -337,8 +334,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                 handleCancel={() => this.props.handleCancel(taxonomyReference)}
                 fields={{ // isManager, taxonomies,
                   header: {
-                    main: this.getHeaderMainFields(parentOptions, parentTaxonomy),
-                    aside: this.getHeaderAsideFields(taxonomy),
+                    main: this.getHeaderMainFields(parentOptions, parentTaxonomy, intl),
+                    aside: this.getHeaderAsideFields(taxonomy, intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
@@ -347,9 +344,10 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                       recommendationsByFw,
                       measures,
                       onCreateOption,
-                      FORM_INITIAL.getIn(['attributes', 'user_only'])
+                      FORM_INITIAL.getIn(['attributes', 'user_only']),
+                      intl
                     ),
-                    aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
+                    aside: this.getBodyAsideFields(users, isAdmin, taxonomy, intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}

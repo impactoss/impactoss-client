@@ -116,8 +116,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       associatedRole: getHighestUserRoleId(roles),
     });
 
-  getHeaderMainFields = (entity, isManager) => {
-    const { intl } = this.props;
+  getHeaderMainFields = (entity, isManager, intl) => {
     if (!ENABLE_AZURE) {
       return ([{ // fieldGroup
         fields: [getTitleFormField(intl.formatMessage, 'title', 'name')],
@@ -128,8 +127,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     }]);
   };
 
-  getHeaderAsideFields = (entity, roles, userId, highestRole) => {
-    const { intl } = this.props;
+  getHeaderAsideFields = (entity, roles, userId, highestRole, intl) => {
     let fields = [];
     const canSeeRole = canUserManageUsers(highestRole)
       || qe(entity.get('id'), userId);
@@ -149,8 +147,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     return ([{ fields }]);
   };
 
-  getBodyMainFields = (entity) => {
-    const { intl } = this.props;
+  getBodyMainFields = (entity, intl) => {
     if (!ENABLE_AZURE) {
       return ([{
         fields: [getEmailFormField(intl.formatMessage)],
@@ -161,9 +158,8 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     }]);
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: renderTaxonomyControl({
           taxonomies,
@@ -172,7 +168,6 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
         }),
       },
     ]);
-  };
 
   getEditableUserRoles = (roles, sessionUserHighestRoleId) => {
     if (roles) {
@@ -282,20 +277,22 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 handleCancel={() => this.props.handleCancel(reference)}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(viewEntity, isManager),
+                    main: this.getHeaderMainFields(viewEntity, isManager, intl),
                     aside: this.getHeaderAsideFields(
                       viewEntity,
                       editableRoles,
                       sessionUserId,
                       sessionUserHighestRoleId,
+                      intl,
                     ),
                   },
                   body: {
-                    main: this.getBodyMainFields(viewEntity),
+                    main: this.getBodyMainFields(viewEntity, intl),
                     aside: isAdmin && this.getBodyAsideFields(
                       taxonomies,
                       onCreateOption,
                       canUserAdministerCategories,
+                      intl,
                     ),
                   },
                 }}

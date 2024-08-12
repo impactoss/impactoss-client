@@ -101,9 +101,8 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
       })
       : Map();
 
-  getHeaderMainFields = () => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getHeaderMainFields = (intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getTitleFormField(intl.formatMessage),
@@ -112,11 +111,9 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
         ],
       },
     ]);
-  };
 
-  getHeaderAsideFields = (entity) => {
-    const { intl } = this.props;
-    return ([
+  getHeaderAsideFields = (entity, intl) =>
+    ([
       {
         fields: [
           getStatusField(intl.formatMessage),
@@ -124,17 +121,16 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
         ],
       },
     ]);
-  };
 
-  getBodyMainFields = () => {
-    const { intl } = this.props;
-    return ([{
-      fields: [getMarkdownFormField({
-        formatMessage: intl.formatMessage,
-        attribute: 'content',
-      })],
-    }]);
-  };
+  getBodyMainFields = (intl) =>
+    ([
+      {
+        fields: [getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'content',
+        })],
+      },
+    ]);
 
   render() {
     const {
@@ -216,11 +212,11 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
                 handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
-                    aside: this.getHeaderAsideFields(viewEntity),
+                    main: this.getHeaderMainFields(intl),
+                    aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
                   body: {
-                    main: this.getBodyMainFields(viewEntity),
+                    main: this.getBodyMainFields(intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}

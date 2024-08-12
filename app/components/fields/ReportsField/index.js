@@ -32,8 +32,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
     };
   }
 
-  getReportReference = (report) => {
-    const { intl } = this.props;
+  getReportReference = (report, intl) => {
     if (report.dueDate) {
       return intl.formatDate(report.dueDate);
     }
@@ -44,7 +43,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
   };
 
   render() {
-    const { field } = this.props;
+    const { field, intl } = this.props;
 
     return (
       <StyledFieldWrap>
@@ -67,7 +66,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
                 <ReportListItem key={i}>
                   <EntityListItemMainTop
                     entity={{
-                      reference: this.getReportReference(report),
+                      reference: this.getReportReference(report, intl),
                       entityIcon: 'report',
                       draft: report.draft,
                     }}

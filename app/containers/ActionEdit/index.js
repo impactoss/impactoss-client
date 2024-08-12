@@ -130,27 +130,22 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       : Map();
   };
 
-  getHeaderMainFields = (existingReferences) => {
-    const { intl } = this.props;
-    return (
-      [ // fieldGroups
-        { // fieldGroup
-          fields: [
-            getReferenceFormField({
-              formatMessage: intl.formatMessage,
-              required: true,
-              prohibitedValues: existingReferences,
-            }),
-            getTitleFormField(intl.formatMessage),
-          ],
-        },
-      ]
-    );
-  };
+  getHeaderMainFields = (existingReferences, intl) =>
+    ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getReferenceFormField({
+            formatMessage: intl.formatMessage,
+            required: true,
+            prohibitedValues: existingReferences,
+          }),
+          getTitleFormField(intl.formatMessage),
+        ],
+      },
+    ]);
 
-  getHeaderAsideFields = (entity) => {
-    const { intl } = this.props;
-    return ([
+  getHeaderAsideFields = (entity, intl) =>
+    ([
       {
         fields: [
           getStatusField(intl.formatMessage),
@@ -158,15 +153,14 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
         ],
       },
     ]);
-  };
 
   getBodyMainFields = (
     connectedTaxonomies,
     indicators,
     recommendationsByFw,
     onCreateOption,
+    intl,
   ) => {
-    const { intl } = this.props;
     const groups = [];
     groups.push(
       {
@@ -216,9 +210,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getDateField(
@@ -241,7 +234,6 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
         }),
       },
     ]);
-  };
 
   render() {
     const {
@@ -345,9 +337,10 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                     main: this.getHeaderMainFields(
                       existingReferences
                         ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
-                        : null
+                        : null,
+                      intl
                     ),
-                    aside: this.getHeaderAsideFields(viewEntity),
+                    aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
@@ -355,11 +348,13 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                       indicators,
                       recommendationsByFw,
                       onCreateOption,
+                      intl,
                     ),
                     aside: this.getBodyAsideFields(
                       taxonomies,
                       onCreateOption,
                       canUserAdministerCategories,
+                      intl,
                     ),
                   },
                 }}

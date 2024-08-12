@@ -177,16 +177,15 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
     this.forceUpdate();
   };
 
-  renderBookmarkTypes = () => {
-    const { intl } = this.props;
-    return (
-      <div>
-        <Group>
-          <SidebarGroupLabel>
-            <FormattedMessage {...messages.group} />
-          </SidebarGroupLabel>
-          <div>
-            {this.props.bookmarksForSearch && this.props.bookmarksForSearch
+  renderBookmarkTypes = (intl) =>
+    <div>
+      <Group>
+        <SidebarGroupLabel>
+          <FormattedMessage {...messages.group} />
+        </SidebarGroupLabel>
+        <div>
+          {
+            this.props.bookmarksForSearch && this.props.bookmarksForSearch
               .groupBy((e) => e.getIn(['attributes', 'view', 'type']))
               .keySeq()
               .sort((a, b) => a > b ? 1 : -1)
@@ -211,12 +210,10 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                   </Target>
                 );
               })
-            }
-          </div>
-        </Group>
-      </div>
-    );
-  };
+          }
+        </div>
+      </Group>
+    </div>
 
   updateViewport() {
     let viewport = VIEWPORTS.MOBILE;
@@ -267,7 +264,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                       <SupTitle title={intl.formatMessage(messages.sidebarTitle)} />
                     </SidebarHeader>
                     {
-                      this.renderBookmarkTypes()
+                      this.renderBookmarkTypes(intl)
                     }
                   </Component>
                 </ScrollableWrapper>

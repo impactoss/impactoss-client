@@ -113,16 +113,14 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     this.remoteSubmitForm = submitForm;
   };
 
-  getHeaderMainFields = () => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getHeaderMainFields = (intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getTitleFormField(intl.formatMessage),
         ],
       },
     ]);
-  };
 
   getInitialFormData = ({ indicator }) =>
     Map(FORM_INITIAL.setIn(
@@ -132,20 +130,20 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
         : '0'
     ));
 
-  getHeaderAsideFields = (canUserPublish) => {
-    const { intl } = this.props;
-    return ([{
-      fields: [
-        canUserPublish
-          ? getStatusField(intl.formatMessage)
-          : getStatusInfoField(),
-      ],
-    }]);
-  };
+  getHeaderAsideFields = (canUserPublish, intl) =>
+    ([
+      {
+        fields: [
+          canUserPublish
+            ? getStatusField(intl.formatMessage)
+            : getStatusInfoField(),
+        ],
+      },
+    ]);
 
-  getBodyMainFields = () => {
-    const { intl } = this.props;
-    return ([
+
+  getBodyMainFields = (intl) =>
+    ([
       {
         fields: [
           getMarkdownFormField({ formatMessage: intl.formatMessage }),
@@ -154,11 +152,9 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
         ],
       },
     ]);
-  };
 
-  getBodyAsideFields = (indicator) => {
-    const { intl } = this.props;
-    return ([ // fieldGroups
+  getBodyAsideFields = (indicator, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.single),
         icon: 'calendar',
@@ -173,7 +169,6 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
           )],
       },
     ]);
-  };
 
   dismissDraftNote = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -271,12 +266,12 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                 handleCancel={() => this.props.handleCancel(indicatorReference)}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
-                    aside: this.getHeaderAsideFields(canUserPublish),
+                    main: this.getHeaderMainFields(intl),
+                    aside: this.getHeaderAsideFields(canUserPublish, intl),
                   },
                   body: {
-                    main: this.getBodyMainFields(),
-                    aside: this.getBodyAsideFields(indicator),
+                    main: this.getBodyMainFields(intl),
+                    aside: this.getBodyAsideFields(indicator, intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
