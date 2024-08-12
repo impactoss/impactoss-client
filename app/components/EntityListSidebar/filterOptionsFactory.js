@@ -16,7 +16,7 @@ import {
   getEntityParentId,
 } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
-import { makeTagFilterGroups } from 'utils/forms';
+import { makeTagFilterGroups } from 'utils/formik';
 
 import {
   optionChecked,

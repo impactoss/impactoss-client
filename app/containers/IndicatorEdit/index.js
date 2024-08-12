@@ -36,10 +36,10 @@ import { canUserDeleteEntities } from 'utils/permissions';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
-//import validateDateAfterDate from 'components/forms/validators/validate-date-after-date';
-//import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
-//import validateRequired from 'components/forms/validators/validate-required';
+import { getCheckedValuesFromOptions } from 'components/formik/MultiSelectControl';
+//import validateDateAfterDate from 'components/formik/validators/validate-date-after-date';
+//import validatePresenceConditional from 'components/formik/validators/validate-presence-conditional';
+//import validateRequired from 'components/formik/validators/validate-required';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';

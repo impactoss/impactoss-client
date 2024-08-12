@@ -458,6 +458,7 @@ export const getDueDateDateOptions = (dates, formatMessage, formatDate, activeDa
       return memo;
     }, [])
     : [];
+
   return dateOptions.concat({
     value: '0',
     label: formatMessage && formatMessage(appMessages.entities.progress_reports.unscheduled_short),

@@ -7,16 +7,16 @@ import DebounceInput from 'react-debounce-input';
 
 import ButtonFlatWithIcon from 'components/buttons/ButtonFlatWithIcon';
 
-import FormWrapper from 'components/forms/FormWrapper';
-import FormBody from 'components/forms/FormBody';
-import FormFooter from 'components/forms/FormFooter';
-import FormFooterButtons from 'components/forms/FormFooterButtons';
-import FormFieldWrap from 'components/forms/FormFieldWrap';
+import FormWrapper from 'components/formik/FormWrapper';
+import FormBody from 'components/formik/FormBody';
+import FormFooter from 'components/formik/FormFooter';
+import FormFooterButtons from 'components/formik/FormFooterButtons';
+import FormFieldWrap from 'components/formik/FormFieldWrap';
 import FieldGroupWrapper from 'components/fields/FieldGroupWrapper';
 import FieldGroupLabel from 'components/fields/FieldGroupLabel';
 import Field from 'components/fields/Field';
 import GroupLabel from 'components/fields/GroupLabel';
-import FieldLabel from 'components/forms/Label';
+import FieldLabel from 'components/formik/Label';
 
 import Clear from 'components/styled/Clear';
 import ButtonCancel from 'components/buttons/ButtonCancel';

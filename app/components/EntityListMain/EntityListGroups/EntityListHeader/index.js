@@ -8,7 +8,7 @@ import { palette } from 'styled-theme';
 import { getSortOption } from 'utils/sort';
 import appMessage from 'utils/app-message';
 
-import { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
+import { STATES as CHECKBOX_STATES } from 'components/formik/IndeterminateCheckbox';
 import { SORT_ORDER_OPTIONS } from 'containers/App/constants';
 import { COLUMN_WIDTHS } from 'themes/config';
 

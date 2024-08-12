@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import { Box, Text } from 'grommet';
 import styled from 'styled-components';
 
-import IndeterminateCheckbox, { STATES } from 'components/forms/IndeterminateCheckbox';
+import IndeterminateCheckbox, { STATES } from 'components/formik/IndeterminateCheckbox';
 const Checkbox = styled(IndeterminateCheckbox)`
   vertical-align: middle;
 `;

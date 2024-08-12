@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Field } from 'react-redux-form/immutable';
+
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+
+const StyledWrapper = styled.span``;
 
 const Option = styled.div`
   padding: 0.25em 0;
@@ -21,20 +23,23 @@ const Label = styled.label`
 const LabelInner = styled.span`
   padding-left: 5px;
 `;
-
+const Input = styled.input`
+`;
 export class RadioControl extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { model, options, hints } = this.props;
+    const { options, hints, onChange, name, value } = this.props;
     return (
-      <Field model={model}>
+      <StyledWrapper>
         {
           options && options.map((option, i) => (
             <Option key={i}>
               <Label highlight={option.highlight}>
-                <input
-                  type="radio"
-                  name={model}
+                <Input
+                  type='radio'
+                  name={name}
                   value={option.value}
+                  checked={option.value === value}
+                  onChange={onChange}
                 />
                 <LabelInner>{option.label}</LabelInner>
               </Label>
@@ -54,15 +59,17 @@ export class RadioControl extends React.PureComponent { // eslint-disable-line r
             </Hint>
           )
         }
-      </Field>
+      </StyledWrapper>
     );
   }
 }
 
 RadioControl.propTypes = {
-  model: PropTypes.string.isRequired,
   options: PropTypes.array.isRequired,
   hints: PropTypes.object,
+  onChange: PropTypes.func,
+  name: PropTypes.string,
+  value: PropTypes.string,
 };
 
 export default RadioControl;

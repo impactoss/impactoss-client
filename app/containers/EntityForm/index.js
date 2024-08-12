@@ -12,7 +12,7 @@ import asArray from 'utils/as-array';
 import appMessage from 'utils/app-message';
 import { validateField } from 'utils/formik';
 
-import { ErrorMessage, Formik, Form, Field as FormikField, FieldArray as FormikFieldArray } from 'formik';
+import { ErrorMessage, Formik, Form, Field as FormikField } from 'formik';
 import { selectNewEntityModal } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -163,7 +163,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       scrollContainer={scrollContainer}
       fieldData={formData.getIn(field.dataPath)}
       closeOnClickOutside={!hasEntityNewModal}
-      handleUpdate={(fieldData) => formikActions.form.setFieldValue(field.name, fieldData.toJS())}
+      handleUpdate={(fieldData) => formikActions.setFieldValue(field.name, fieldData.toJS())}
     />
   );
 
@@ -277,11 +277,15 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         if (!field) return null;
         if (field.controlType !== 'info') {
           let fieldProps;
-          if (field.controlType === 'multiselect') {
-            return (
-              <FormikFieldArray key={i} name={field.name}>
-                {(arrayHelpers) => {
-                  const values = fromJS(arrayHelpers.form.values);
+          return (
+            <FormikField
+              key={i}
+              name={field.name}
+              validate={(value) => field.validators && validateField(value, field)}
+            >
+              {({ field: formikField, form, meta }) => {
+                if (field.controlType === 'multiselect') {
+                  const values = fromJS(form.values);
                   const formData = fromJS(this.props.formData);
                   fieldProps = {
                     ...field,
@@ -289,50 +293,33 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                     values: values.getIn(field.dataPath),
                     options: formData.getIn(field.dataPath) || List(),
                   };
-                  return this.renderFormField(
-                    fieldProps,
-                    false,
-                    hasEntityNewModal,
-                    scrollContainer,
-                    arrayHelpers
-                  );
-                }}
-              </FormikFieldArray>
-            );
-          } else {
-            return (
-              <FormikField
-                key={i}
-                name={field.name}
-                validate={(value) => validateField(value, field)}
-              >
-                {({ field: formikField, form, meta }) => {
+                } else {
                   fieldProps = { ...field, onChange: formikField.onChange, value: formikField.value };
-                  return (
-                    <Field id={field.id} labelledGroup={!!field.label}>
-                      {this.renderFormField(
-                        fieldProps,
-                        false,
-                        hasEntityNewModal,
-                        scrollContainer,
-                        form
-                      )}
-                      {meta.touched && meta.error && (
-                        <ErrorWrapper>
-                          <ErrorMessage
-                            className="errors"
-                            name={formikField.name}
-                            show={(fieldValue) => fieldValue.touched || !fieldValue.pristine}
-                          />
-                        </ErrorWrapper>
-                      )}
-                    </Field>
-                  );
                 }
-                }
-              </FormikField>
-            );
-          }
+                return (
+                  <Field id={field.id} labelledGroup={!!field.label} >
+                    {this.renderFormField(
+                      fieldProps,
+                      false,
+                      hasEntityNewModal,
+                      scrollContainer,
+                      form
+                    )}
+                    {meta.touched && meta.error && (
+                      <ErrorWrapper>
+                        <ErrorMessage
+                          className="errors"
+                          name={formikField.name}
+                          show={(fieldValue) => fieldValue.touched || !fieldValue.pristine}
+                        />
+                      </ErrorWrapper>
+                    )}
+                  </Field>
+                );
+              }
+              }
+            </FormikField>
+          );
         }
         return (
           <Field

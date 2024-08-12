@@ -28,7 +28,7 @@ import { qe } from 'utils/quasi-equals';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
+import { getCheckedValuesFromOptions } from 'components/formik/MultiSelectControl';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES, DEFAULT_FRAMEWORK } from 'themes/config';
