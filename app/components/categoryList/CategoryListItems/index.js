@@ -7,7 +7,6 @@ import { palette } from 'styled-theme';
 
 import { getSortOption } from 'utils/sort';
 import { getCategoryTitle } from 'utils/entities';
-import { qe } from 'utils/quasi-equals';
 
 import CategoryListHeader from 'components/categoryList/CategoryListHeader';
 import CategoryListItem from 'components/categoryList/CategoryListItem';
@@ -57,42 +56,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       )
     );
 
-  getColumnKeys = (taxonomy, frameworks) => {
-    const { intl } = this.context;
-    // figure out if tagged directly or via child category
-    const tagsRecs = this.getTagsTax(taxonomy, 'tags_recommendations');
-    return tagsRecs && frameworks && taxonomy.get('frameworkIds').toArray().reduce(
-      (memo, fwid) => {
-        const framework = frameworks.find((fw) => qe(fw.get('id'), fwid));
-        // TODO figure out multiple framework with responses
-        if (framework && framework.getIn(['attributes', 'has_response'])) {
-          return [{
-            items: [
-              {
-                label: intl.formatMessage(appMessages.ui.supportLevels.supported),
-                palette: 'recommendations',
-                pIndex: 0,
-              },
-              {
-                label: intl.formatMessage(appMessages.ui.supportLevels.supportedInPart),
-                palette: 'recommendations',
-                pIndex: 1,
-              },
-              {
-                label: intl.formatMessage(appMessages.ui.supportLevels.noted),
-                palette: 'recommendations',
-                pIndex: 2,
-              },
-            ],
-          }];
-        }
-        return memo;
-      },
-      [],
-    );
-  };
-
-  getHeaderAttributes = (taxonomy, frameworkId, frameworks) => {
+  getHeaderAttributes = (taxonomy, frameworkId) => {
     const { intl } = this.context;
     // figure out if tagged directly or via child category
     const tagsRecs = this.getTagsTax(taxonomy, 'tags_recommendations');
@@ -119,7 +83,6 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       attributes.push({
         query: 'recommendations',
         label: recLabel,
-        keys: this.getColumnKeys(taxonomy, frameworks),
       });
       // indirectly associated/inferred actions
       if (!tagsMeasures) {
@@ -149,14 +112,13 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     onSort,
     userOnly,
     isGrouped,
-    frameworks,
   }) => {
     const { intl } = this.context;
     const sortOptionActive = getSortOption(sortOptions, sortBy, 'query');
     const titleColumnSortOption = sortOptions.find((option) => option.query === 'title');
     const titleColumnActive = titleColumnSortOption.query === sortOptionActive.query;
     const titleColumnSortOrderOption = SORT_ORDER_OPTIONS.find((option) => (sortOrder || titleColumnSortOption.order) === option.value);
-    const headerAttributes = this.getHeaderAttributes(taxonomy, frameworkId, frameworks);
+    const headerAttributes = this.getHeaderAttributes(taxonomy, frameworkId);
     let titleColumnSortTitle = intl.formatMessage(messages.titleColumnSortTitle);
     if (titleColumnActive) {
       titleColumnSortTitle = intl.formatMessage(messages.titleColumnSortTitleSorted);
@@ -216,7 +178,6 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
           via: attribute.via,
           active: columnActive,
           width: ((1 - TITLE_COL_RATIO) / headerAttributes.length) * 100,
-          keys: attribute.keys,
           sortTitle: numberColumnSortTitle,
           sortIcon: columnActive && columnSortOrderOption
             ? columnSortOrderOption.icon
@@ -263,8 +224,6 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       attributes.push({
         total: 'recommendationsPublicCount',
         totalByFw: 'recommendationsPublicCountByFW',
-        accepted: 'recommendationsAcceptedCount',
-        acceptedByFw: 'recommendationsAcceptedCountByFW',
         entity: 'recommendations',
         frameworkIds:
           taxonomy.get('frameworkIds')
@@ -340,7 +299,6 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       onSort,
       userOnly,
       isGrouped: categoryGroups.size > 0 && !!taxonomy.get('parent'),
-      frameworks,
     });
 
     const columns = this.getListColumns({

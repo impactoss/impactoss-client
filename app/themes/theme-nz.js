@@ -189,8 +189,8 @@ theme.palette = {
   measuresHover: ['#964B00'], // FFC107  AA compliant
   measures: ['#BA5D03'],
   measuresConnectionText: [light[0], '#BA5D03'], // published, draft
-  recommendationsHover: ['#510064', '#510064', '#a94dbf'], // supported, in part, noted ['#FF9B69', '#FFB28B'],
-  recommendations: ['#73018E', '#73018E', '#a94dbf'],
+  recommendationsHover: ['#510064'],
+  recommendations: ['#73018E'],
   recommendationsConnectionText: [light[0], '#73018E'], // published, draft
   indicatorsHover: ['#F09F5B'],
   indicators: ['#FFCEA5'],
