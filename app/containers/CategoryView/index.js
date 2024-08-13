@@ -114,8 +114,21 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       fields.push({
         fields: [
           getStatusField(entity),
-          getStatusField(entity, 'is_current', IS_CURRENT_STATUSES, appMessages.attributes.is_current, 'current'),
-          getStatusField(entity, 'is_archive', IS_ARCHIVE_STATUSES, appMessages.attributes.is_archive, 'false'),
+          getStatusField(
+            entity,
+            'is_current',
+            IS_CURRENT_STATUSES,
+            appMessages.attributes.is_current,
+            true,
+          ),
+          entity.getIn(['attributes', 'is_archive'])
+          && getStatusField(
+            entity,
+            'is_archive',
+            IS_ARCHIVE_STATUSES,
+            appMessages.attributes.is_archive,
+            false,
+          ),
           getMetaField(entity),
         ],
       });
