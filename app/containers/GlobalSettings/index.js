@@ -9,9 +9,16 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl, intlShape } from 'react-intl';
 
-import { Box, Text, CheckBox } from 'grommet';
+import {
+  Box,
+  Text,
+  CheckBox,
+  ResponsiveContext,
+} from 'grommet';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+
+import { isMinSize } from 'utils/responsive';
 
 import {
   selectLoadArchivedQuery,
@@ -90,107 +97,116 @@ const GlobalSettings = ({
   onSetLoadArchived,
   onSetLoadNonCurrent,
   onClose,
-}) => (
-  <Box background="white" pad="large">
-    <StyledContainer>
-      <Box>
-        <TitleWrapper direction="row" gap="small" margin={{ bottom: 'medium' }}>
-          <Icon name="settings" size="24px" />
-          <StyledTitle size="large" weight="bold">
-            <FormattedMessage {...messages.title} />
-          </StyledTitle>
-        </TitleWrapper>
-        {onClose && (
-          <CloseButton onClick={onClose}>
-            <Icon name="close" />
-          </CloseButton>
-        )}
-      </Box>
-      <Box gap="small" margin={{ bottom: 'medium' }}>
-        <StyledLabel size="large" weight="bold">
-          <FormattedMessage {...messages.subHeading} />
-        </StyledLabel>
-        <StyledLabel size="medium" weight="normal">
-          <FormattedMessage {...messages.subHeadingText} />
-        </StyledLabel>
-      </Box>
-      <StyledForm>
-        <FormBody>
-          <Box>
-            <StyledFieldGroupWrapper>
-              {!!onSetLoadNonCurrent && (
-                <Field>
-                  <Box margin={{ bottom: 'medium' }}>
-                    <FormFieldWrap>
-                      <StyledLabel size="medium" weight="bold">
-                        <FormattedMessage {...messages.isCurrentTitle} />
-                      </StyledLabel>
-                    </FormFieldWrap>
-                  </Box>
-                  <FormFieldWrap>
-                    <Box direction="row" gap="medium">
-                      <Box basis="1/2">
-                        <Toggle
-                          toggle
-                          name="radio-ignore-noncurrent"
-                          checked={loadNonCurrent}
-                          label={(
-                            <StyledBodyText weight={500}>
-                              <FormattedMessage {...messages.isCurrentHint} />
-                            </StyledBodyText>
-                          )}
-                          onChange={() => onSetLoadNonCurrent(!loadNonCurrent)}
-                        />
-                      </Box>
-                      <Box basis="1/2">
-                        <StyledBodyText weight={300}>
-                          <FormattedMessage {...messages.isCurrentDescription} />
-                        </StyledBodyText>
-                      </Box>
+}) => {
+  const size = React.useContext(ResponsiveContext);
+  return (
+    <Box background="white" pad="large">
+      <StyledContainer>
+        <Box>
+          <TitleWrapper direction="row" gap="small" margin={{ bottom: 'medium' }}>
+            <Icon name="settings" size="24px" />
+            <StyledTitle size="large" weight="bold">
+              <FormattedMessage {...messages.title} />
+            </StyledTitle>
+          </TitleWrapper>
+          {onClose && (
+            <CloseButton onClick={onClose}>
+              <Icon name="close" />
+            </CloseButton>
+          )}
+        </Box>
+        <Box gap="small" margin={{ bottom: 'medium' }}>
+          <StyledLabel size="large" weight="bold">
+            <FormattedMessage {...messages.subHeading} />
+          </StyledLabel>
+          <StyledLabel size="medium" weight="normal">
+            <FormattedMessage {...messages.subHeadingText} />
+          </StyledLabel>
+        </Box>
+        <StyledForm>
+          <FormBody>
+            <Box>
+              <StyledFieldGroupWrapper>
+                {!!onSetLoadNonCurrent && (
+                  <Field>
+                    <Box margin={{ bottom: 'medium' }}>
+                      <FormFieldWrap>
+                        <StyledLabel size="medium" weight="bold">
+                          <FormattedMessage {...messages.isCurrentTitle} />
+                        </StyledLabel>
+                      </FormFieldWrap>
                     </Box>
-                  </FormFieldWrap>
-                </Field>
-              )}
-              {!!onSetLoadArchived && (
-                <Field>
-                  <Box margin={{ bottom: 'medium' }}>
                     <FormFieldWrap>
-                      <StyledLabel size="medium" weight="bold">
-                        <FormattedMessage {...messages.isArchivedTitle} />
-                      </StyledLabel>
+                      <Box
+                        direction={isMinSize(size, 'medium') ? 'row' : 'column'}
+                        gap="medium"
+                      >
+                        <Box basis={isMinSize(size, 'medium') ? '1/2' : '1'}>
+                          <Toggle
+                            toggle
+                            name="radio-ignore-noncurrent"
+                            checked={loadNonCurrent}
+                            label={(
+                              <StyledBodyText weight={500}>
+                                <FormattedMessage {...messages.isCurrentHint} />
+                              </StyledBodyText>
+                            )}
+                            onChange={() => onSetLoadNonCurrent(!loadNonCurrent)}
+                          />
+                        </Box>
+                        <Box basis={isMinSize(size, 'medium') ? '1/2' : '1'}>
+                          <StyledBodyText weight={300}>
+                            <FormattedMessage {...messages.isCurrentDescription} />
+                          </StyledBodyText>
+                        </Box>
+                      </Box>
                     </FormFieldWrap>
-                  </Box>
-                  <FormFieldWrap>
-                    <Box direction="row" gap="medium">
-                      <Box basis="1/2">
-                        <Toggle
-                          toggle
-                          name="radio-ignore-archived"
-                          checked={loadArchived}
-                          label={(
-                            <StyledBodyText weight={500}>
-                              <FormattedMessage {...messages.isArchivedHint} />
-                            </StyledBodyText>
-                          )}
-                          onChange={() => onSetLoadArchived(!loadArchived)}
-                        />
-                      </Box>
-                      <Box basis="1/2">
-                        <StyledBodyText weight={300}>
-                          <FormattedMessage {...messages.isArchivedDescription} />
-                        </StyledBodyText>
-                      </Box>
+                  </Field>
+                )}
+                {!!onSetLoadArchived && (
+                  <Field>
+                    <Box margin={{ bottom: 'medium' }}>
+                      <FormFieldWrap>
+                        <StyledLabel size="medium" weight="bold">
+                          <FormattedMessage {...messages.isArchivedTitle} />
+                        </StyledLabel>
+                      </FormFieldWrap>
                     </Box>
-                  </FormFieldWrap>
-                </Field>
-              )}
-            </StyledFieldGroupWrapper>
-          </Box>
-        </FormBody>
-      </StyledForm>
-    </StyledContainer>
-  </Box>
-);
+                    <FormFieldWrap>
+                      <Box
+                        direction={isMinSize(size, 'medium') ? 'row' : 'column'}
+                        gap="medium"
+                      >
+                        <Box basis={isMinSize(size, 'medium') ? '1/2' : '1'}>
+                          <Toggle
+                            toggle
+                            name="radio-ignore-archived"
+                            checked={loadArchived}
+                            label={(
+                              <StyledBodyText weight={500}>
+                                <FormattedMessage {...messages.isArchivedHint} />
+                              </StyledBodyText>
+                            )}
+                            onChange={() => onSetLoadArchived(!loadArchived)}
+                          />
+                        </Box>
+                        <Box basis={isMinSize(size, 'medium') ? '1/2' : '1'}>
+                          <StyledBodyText weight={300}>
+                            <FormattedMessage {...messages.isArchivedDescription} />
+                          </StyledBodyText>
+                        </Box>
+                      </Box>
+                    </FormFieldWrap>
+                  </Field>
+                )}
+              </StyledFieldGroupWrapper>
+            </Box>
+          </FormBody>
+        </StyledForm>
+      </StyledContainer>
+    </Box>
+  );
+};
 
 GlobalSettings.propTypes = {
   loadArchived: PropTypes.bool,
