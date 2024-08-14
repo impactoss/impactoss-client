@@ -37,6 +37,7 @@ import Field from 'components/fields/Field';
 import ButtonDefaultIconOnly from 'components/buttons/ButtonDefaultIconOnly';
 import Icon from 'components/Icon';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 const StyledContainer = styled((p) => <Box {...p} />)`
@@ -106,7 +107,7 @@ const GlobalSettings = ({
           <TitleWrapper direction="row" gap="small" margin={{ bottom: 'medium' }}>
             <Icon name="settings" size="24px" />
             <StyledTitle size="large" weight="bold">
-              <FormattedMessage {...messages.title} />
+              <FormattedMessage {...appMessages.labels.settings} />
             </StyledTitle>
           </TitleWrapper>
           {onClose && (

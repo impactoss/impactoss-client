@@ -211,6 +211,10 @@ export default defineMessages({
         defaultMessage: 'Not met',
       },
     },
+    settings: {
+      id: 'app.containers.App.labels.settings',
+      defaultMessage: 'Settings',
+    },
   },
   fields: {
     connectionsGrouped: {

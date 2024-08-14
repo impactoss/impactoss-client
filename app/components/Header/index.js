@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { filter } from 'lodash/collection';
+import { Box } from 'grommet';
 
 import { truncateText } from 'utils/string';
 
@@ -195,6 +196,12 @@ const SearchSecondary = styled(LinkPage)`
     display: none;
   }
 `;
+const ConfigSecondary = styled(LinkPage)`
+  display: block;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: none;
+  }
+`;
 
 const FrameworkOptions = styled(PrintHide)`
   display: none;
@@ -305,7 +312,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     this.forceUpdate();
   };
 
-  renderSecondary = (navItemsAdmin, search) => (
+  renderSecondary = (navItemsAdmin, search, showSettings) => (
     <PrintHide>
       <ShowSecondary
         visible={!this.state.showSecondary}
@@ -380,11 +387,24 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
               active={search.active}
               onClick={(evt) => this.onClick(evt, search.path)}
             >
-              {search.title}
-              {search.icon
-                && <Icon title={search.title} name={search.icon} text textRight size="1em" />
-              }
+              <Box direction="row" gap="xsmall" align="center">
+                <span>{search.title}</span>
+                {search.icon
+                  && <Icon title={search.title} name={search.icon} text textRight size="1em" />
+                }
+              </Box>
             </SearchSecondary>
+          )}
+          {showSettings && (
+            <ConfigSecondary
+              as="button"
+              onClick={() => showSettings()}
+            >
+              <Box direction="row" gap="xsmall" align="center">
+                <FormattedMessage {...appMessages.labels.settings} />
+                <Icon name="settings" size="18px" />
+              </Box>
+            </ConfigSecondary>
           )}
         </NavPages>
       </NavSecondary>
@@ -438,7 +458,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         {!SHOW_BRAND_ON_HOME && isHome
           && (
             <HomeNavWrap>
-              {this.renderSecondary(navItemsAdmin, search)}
+              {this.renderSecondary(navItemsAdmin, search, showSettings)}
             </HomeNavWrap>
           )
         }
@@ -463,7 +483,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 </BrandText>
               )}
             </Brand>
-            {this.renderSecondary(navItemsAdmin, search)}
+            {this.renderSecondary(navItemsAdmin, search, showSettings)}
           </Banner>
         )}
         {!isHome && (

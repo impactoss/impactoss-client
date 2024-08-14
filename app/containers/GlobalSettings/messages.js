@@ -6,10 +6,6 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
-  title: {
-    id: 'app.containers.GlobalSettings.title',
-    defaultMessage: 'Settings',
-  },
   subHeading: {
     id: 'app.containers.GlobalSettings.subHeading',
     defaultMessage: 'Configure content',
