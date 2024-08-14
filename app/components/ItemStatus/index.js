@@ -30,6 +30,7 @@ class ItemStatus extends React.PureComponent { // eslint-disable-line react/pref
       entity,
       attribute,
       options,
+      value,
     } = this.props;
     const { intl } = this.context;
     if (draft) {
@@ -39,8 +40,10 @@ class ItemStatus extends React.PureComponent { // eslint-disable-line react/pref
         </Status>
       );
     }
-    const value = entity[attribute];
-    const option = options.find((o) => qe(o.value, value));
+    const val = typeof value === 'undefined'
+      ? entity[attribute]
+      : value;
+    const option = options.find((o) => qe(o.value, val));
     return (
       <Status top={top} float={float}>
         {option
@@ -57,6 +60,7 @@ ItemStatus.propTypes = {
   top: PropTypes.bool,
   float: PropTypes.string,
   attribute: PropTypes.string,
+  value: PropTypes.string,
   entity: PropTypes.object,
   options: PropTypes.array,
 };
