@@ -74,12 +74,7 @@ const StyledBodyText = styled(Text)`
   color: ${palette('dark', 3)};
 `;
 
-const CloseButton = styled((p) => <ButtonDefaultIconOnly {...p} />)`
-  position: absolute;
-  right:0;
-  top:0;
-  margin: 3em;
-`;
+const CloseButton = styled((p) => <ButtonDefaultIconOnly {...p} />)``;
 
 const Toggle = styled(CheckBox)`
   border-radius: 50%;
@@ -103,17 +98,24 @@ const GlobalSettings = ({
   return (
     <Box background="white" pad="large">
       <StyledContainer>
-        <Box>
-          <TitleWrapper direction="row" gap="small" margin={{ bottom: 'medium' }}>
+        <Box
+          direction="row"
+          justify="between"
+          margin={{ bottom: 'medium' }}
+          align="center"
+        >
+          <TitleWrapper direction="row" gap="small">
             <Icon name="settings" size="24px" />
             <StyledTitle size="large" weight="bold">
               <FormattedMessage {...appMessages.labels.settings} />
             </StyledTitle>
           </TitleWrapper>
           {onClose && (
-            <CloseButton onClick={onClose}>
-              <Icon name="close" />
-            </CloseButton>
+            <Box>
+              <CloseButton onClick={onClose}>
+                <Icon name="close" />
+              </CloseButton>
+            </Box>
           )}
         </Box>
         <Box gap="small" margin={{ bottom: 'medium' }}>
