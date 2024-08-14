@@ -294,7 +294,9 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
               overlay: { zIndex: 99999999 },
             }}
           >
-            <GlobalSettings />
+            <GlobalSettings
+              onClose={() => this.onShowSettings(false)}
+            />
           </ReactModal>
         )}
         <GlobalStyle />

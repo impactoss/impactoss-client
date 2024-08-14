@@ -7,8 +7,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Box, Text, RadioButton } from 'grommet';
+import { FormattedMessage, injectIntl, intlShape } from 'react-intl';
+
+import { Box, Text, CheckBox } from 'grommet';
+import { SettingsOption } from 'grommet-icons';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 import {
   selectLoadArchivedQuery,
@@ -23,14 +27,16 @@ import {
 import FormBody from 'components/forms/FormBody';
 import FormFieldWrap from 'components/forms/FormFieldWrap';
 import FieldGroupWrapper from 'components/fields/FieldGroupWrapper';
-import FieldGroupLabel from 'components/fields/FieldGroupLabel';
 import Field from 'components/fields/Field';
-import GroupLabel from 'components/fields/GroupLabel';
-import FieldLabel from 'components/forms/Label';
+import ButtonDefaultIconOnly from 'components/buttons/ButtonDefaultIconOnly';
+import Icon from 'components/Icon';
+
+import messages from './messages';
 
 const StyledContainer = styled((p) => <Box {...p} />)`
   padding-bottom: 0px;
 `;
+
 const StyledFieldGroupWrapper = styled(FieldGroupWrapper)`
   padding: 15px 0;
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
@@ -44,129 +50,157 @@ const StyledForm = styled.form`
   width: 100%;
   margin-bottom: 20px;
 `;
-const StyledGroupLabel = styled(GroupLabel)`
-  font-size: 1.2em;
-  @media print {
-    font-size: ${(props) => props.theme.sizes.print.large};
-  }
+
+const StyledTitle = styled(Text)`
+  text-transform: uppercase;
+  color: ${palette('text', 1)};
 `;
 
-const Label = styled((p) => <Text size="small" {...p} />)``;
+const StyledLabel = styled(Text)`
+  color: ${palette('text', 1)};
+`;
 
+const StyledBodyText = styled(Text)`
+  color: ${palette('dark', 3)};
+`;
+
+const CloseButton = styled((p) => <ButtonDefaultIconOnly {...p} />)`
+  position: absolute;
+  right:0;
+  top:0;
+  margin: 3em;
+`;
+
+const Toggle = styled(CheckBox)`
+  border-radius: 50%;
+  + span {
+    background: ${palette('light', 1)};
+    outline-color: unset;
+    span {
+      background: ${({ checked }) => checked ? palette('buttonDefaultIconOnly', 1) : palette('text', 1)} !important;
+    }
+  }
+  `;
+
+const SettingsIcon = styled(SettingsOption)`
+  color: ${palette('text', 1)};
+`;
 
 const GlobalSettings = ({
   loadArchived,
   loadNonCurrent,
   onSetLoadArchived,
   onSetLoadNonCurrent,
-}) => {
-  console.log('loadArchived', loadArchived);
-  console.log('loadNonCurrent', loadNonCurrent);
-  console.log('onSetLoadArchived', !!onSetLoadArchived);
-  console.log('onSetLoadNonCurrent', !!onSetLoadNonCurrent);
-  return (
-    <Box
-      background="white"
-      pad="large"
-    >
-      <StyledContainer>
-        <Box>
-          <h2>
-            Global settings
-          </h2>
+  onClose,
+}) => (
+  <Box background="white" pad="large">
+    <StyledContainer>
+      <Box>
+        <Box direction="row" gap="small" margin={{ bottom: 'medium' }}>
+          <SettingsIcon size="small" />
+          <StyledTitle size="large" weight="bold">
+            <FormattedMessage {...messages.title} />
+          </StyledTitle>
         </Box>
-        <Box margin={{ bottom: 'medium' }}>
-          <Text size="large">
-            Configure global settings
-          </Text>
-        </Box>
-        <StyledForm>
-          <FormBody>
-            <FieldGroupLabel>
-              <StyledGroupLabel>
-                Configure data
-              </StyledGroupLabel>
-            </FieldGroupLabel>
-            <Box>
-              <StyledFieldGroupWrapper>
-                {!!onSetLoadArchived && (
-                  <Field>
+        {onClose && (
+          <CloseButton onClick={onClose}>
+            <Icon name="close" />
+          </CloseButton>
+        )}
+      </Box>
+      <Box gap="small" margin={{ bottom: 'medium' }}>
+        <StyledLabel size="large" weight="bold">
+          <FormattedMessage {...messages.subHeading} />
+        </StyledLabel>
+        <StyledLabel size="medium" weight="normal">
+          <FormattedMessage {...messages.subHeadingText} />
+        </StyledLabel>
+      </Box>
+      <StyledForm>
+        <FormBody>
+          <Box>
+            <StyledFieldGroupWrapper>
+              {!!onSetLoadNonCurrent && (
+                <Field>
+                  <Box margin={{ bottom: 'medium' }}>
                     <FormFieldWrap>
-                      <FieldLabel>
-                        Configure content
-                      </FieldLabel>
+                      <StyledLabel size="medium" weight="bold">
+                        <FormattedMessage {...messages.isCurrentTitle} />
+                      </StyledLabel>
                     </FormFieldWrap>
-                    <FormFieldWrap>
-                      <Box direction="row" gap="small">
-                        <Box basis="1/2">
-                          <Box direction="row" gap="medium">
-                            <RadioButton
-                              name="radio-ignore-archived"
-                              checked={!loadArchived}
-                              label={<Label>Ignore archived content</Label>}
-                              onChange={() => onSetLoadArchived(!loadArchived)}
-                            />
-                            <RadioButton
-                              name="radio-load-archived"
-                              checked={loadArchived}
-                              label={<Label>Include archived content</Label>}
-                              onChange={() => onSetLoadArchived(!loadArchived)}
-                            />
-                          </Box>
-                        </Box>
-                        <Box basis="1/2">
-                          <Text>Description TODO</Text>
-                        </Box>
+                  </Box>
+                  <FormFieldWrap>
+                    <Box direction="row" gap="medium">
+                      <Box basis="1/2">
+                        <Toggle
+                          toggle
+                          name="radio-ignore-noncurrent"
+                          checked={loadNonCurrent}
+                          label={(
+                            <StyledBodyText weight={500}>
+                              <FormattedMessage {...messages.isCurrentHint} />
+                            </StyledBodyText>
+                          )}
+                          onChange={() => onSetLoadNonCurrent(!loadNonCurrent)}
+                        />
                       </Box>
-                    </FormFieldWrap>
-                  </Field>
-                )}
-                {!!onSetLoadNonCurrent && (
-                  <Field>
-                    <FormFieldWrap>
-                      <FieldLabel>
-                        Configure reporting cycles
-                      </FieldLabel>
-                    </FormFieldWrap>
-                    <FormFieldWrap>
-                      <Box direction="row" gap="small">
-                        <Box basis="1/2">
-                          <Box direction="row" gap="medium">
-                            <RadioButton
-                              name="radio-ignore-noncurrent"
-                              checked={!loadNonCurrent}
-                              label={<Label>Ignore previous reporting cycles</Label>}
-                              onChange={() => onSetLoadNonCurrent(!loadNonCurrent)}
-                            />
-                            <RadioButton
-                              name="radio-load-noncurrent"
-                              checked={loadNonCurrent}
-                              label={<Label>Include previous reporting cycles</Label>}
-                              onChange={() => onSetLoadNonCurrent(!loadNonCurrent)}
-                            />
-                          </Box>
-                        </Box>
-                        <Box basis="1/2">
-                          <Text>Description TODO</Text>
-                        </Box>
+                      <Box basis="1/2">
+                        <StyledBodyText weight={300}>
+                          <FormattedMessage {...messages.isCurrentDescription} />
+                        </StyledBodyText>
                       </Box>
+                    </Box>
+                  </FormFieldWrap>
+                </Field>
+              )}
+              {!!onSetLoadArchived && (
+                <Field>
+                  <Box margin={{ bottom: 'medium' }}>
+                    <FormFieldWrap>
+                      <StyledLabel size="medium" weight="bold">
+                        <FormattedMessage {...messages.isArchivedTitle} />
+                      </StyledLabel>
                     </FormFieldWrap>
-                  </Field>
-                )}
-              </StyledFieldGroupWrapper>
-            </Box>
-          </FormBody>
-        </StyledForm>
-      </StyledContainer>
-    </Box>
-  );
-};
+                  </Box>
+                  <FormFieldWrap>
+                    <Box direction="row" gap="medium">
+                      <Box basis="1/2">
+                        <Toggle
+                          toggle
+                          name="radio-ignore-archived"
+                          checked={loadArchived}
+                          label={(
+                            <StyledBodyText weight={500}>
+                              <FormattedMessage {...messages.isArchivedHint} />
+                            </StyledBodyText>
+                          )}
+                          onChange={() => onSetLoadArchived(!loadArchived)}
+                        />
+                      </Box>
+                      <Box basis="1/2">
+                        <StyledBodyText weight={300}>
+                          <FormattedMessage {...messages.isArchivedDescription} />
+                        </StyledBodyText>
+                      </Box>
+                    </Box>
+                  </FormFieldWrap>
+                </Field>
+              )}
+            </StyledFieldGroupWrapper>
+          </Box>
+        </FormBody>
+      </StyledForm>
+    </StyledContainer>
+  </Box>
+);
 
 GlobalSettings.propTypes = {
   loadArchived: PropTypes.bool,
   loadNonCurrent: PropTypes.bool,
   onSetLoadArchived: PropTypes.func,
   onSetLoadNonCurrent: PropTypes.func,
+  onClose: PropTypes.func,
+  intl: intlShape,
 };
 
 const mapStateToProps = (state) => ({
@@ -181,4 +215,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(GlobalSettings);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(GlobalSettings));

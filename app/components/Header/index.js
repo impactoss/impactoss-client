@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { filter } from 'lodash/collection';
+import { SettingsOption } from 'grommet-icons';
 
 import { truncateText } from 'utils/string';
 
@@ -161,6 +162,7 @@ const SelectFrameworks = styled(LinkMain)`
 const Search = styled(LinkMain)`
   display: none;
   padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
+  border-right: 1px solid ${palette('dark', 3)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: inline-block;
     min-width: auto;
@@ -517,7 +519,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 as="button"
                 onClick={() => showSettings()}
               >
-                Settings
+                <SettingsOption size="small" />
               </Config>
             )}
             {search && (
