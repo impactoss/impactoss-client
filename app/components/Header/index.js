@@ -181,7 +181,7 @@ const Config = styled(LinkMain)`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: inline-block;
     min-width: auto;
-    padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px 0;
+    padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px;
     float: right;
     border-left: none;
   }
