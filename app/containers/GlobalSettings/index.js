@@ -10,7 +10,6 @@ import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl, intlShape } from 'react-intl';
 
 import { Box, Text, CheckBox } from 'grommet';
-import { SettingsOption } from 'grommet-icons';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
@@ -55,6 +54,9 @@ const StyledTitle = styled(Text)`
   text-transform: uppercase;
   color: ${palette('text', 1)};
 `;
+const TitleWrapper = styled((p) => <Box {...p} />)`
+  fill: ${palette('text', 1)};
+`;
 
 const StyledLabel = styled(Text)`
   color: ${palette('text', 1)};
@@ -82,10 +84,6 @@ const Toggle = styled(CheckBox)`
   }
   `;
 
-const SettingsIcon = styled(SettingsOption)`
-  color: ${palette('text', 1)};
-`;
-
 const GlobalSettings = ({
   loadArchived,
   loadNonCurrent,
@@ -96,12 +94,12 @@ const GlobalSettings = ({
   <Box background="white" pad="large">
     <StyledContainer>
       <Box>
-        <Box direction="row" gap="small" margin={{ bottom: 'medium' }}>
-          <SettingsIcon size="small" />
+        <TitleWrapper direction="row" gap="small" margin={{ bottom: 'medium' }}>
+          <Icon name="settings" size="24px" />
           <StyledTitle size="large" weight="bold">
             <FormattedMessage {...messages.title} />
           </StyledTitle>
-        </Box>
+        </TitleWrapper>
         {onClose && (
           <CloseButton onClick={onClose}>
             <Icon name="close" />

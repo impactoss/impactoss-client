@@ -4,7 +4,6 @@ import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { filter } from 'lodash/collection';
-import { SettingsOption } from 'grommet-icons';
 
 import { truncateText } from 'utils/string';
 
@@ -223,7 +222,6 @@ const FrameworkOption = styled(Button)`
   }
   color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
 `;
-
 const STATE_INITIAL = {
   showSecondary: false,
   showFrameworks: false,
@@ -519,7 +517,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 as="button"
                 onClick={() => showSettings()}
               >
-                <SettingsOption size="small" />
+                <Icon name="settings" size="24px" />
               </Config>
             )}
             {search && (
