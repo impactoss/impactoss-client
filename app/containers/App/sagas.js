@@ -55,6 +55,7 @@ import {
   DB_TABLES_CURRENT,
   DB_TABLES_ARCHIVED,
   ENABLE_AZURE,
+  KEEP_QUERY_ARGS,
 } from 'themes/config';
 
 import {
@@ -780,8 +781,10 @@ export function* updatePathSaga({ path, args }) {
       queryNext = location.get('query').toJS();
     }
   } else {
-    // always keep "framework filter"
-    queryNext = location.get('query').filter((val, key) => key === 'fw').toJS();
+    // always keep "specific filters" incl framework
+    queryNext = location.get('query').filter(
+      (val, key) => KEEP_QUERY_ARGS.indexOf(key) > -1
+    ).toJS();
   }
   // convert to string
   const queryNextString = getNextQueryString(queryNext);

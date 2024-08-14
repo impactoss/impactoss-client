@@ -108,6 +108,10 @@ export const TEXT_TRUNCATE = {
 };
 
 export const PROGRESS_TAXONOMY_ID = 9;
+// categories where "is_current" is relevant
+export const CURRENT_TAXONOMY_IDS = [
+  2, // reporting cycles
+];
 
 // WARNING: references as assigned by user
 export const PROGRESS_CATEGORY_ID = {
@@ -471,3 +475,5 @@ export const ENTITY_FIELDS = {
     },
   },
 };
+
+export const KEEP_QUERY_ARGS = ['fw', 'loadNonCurrent', 'loadArchived'];
