@@ -10,9 +10,7 @@ export const makeEditGroups = ({
   messages,
   frameworks,
   selectedFrameworkIds,
-  globalSettings,
 }) => {
-  console.log(globalSettings);
   const editGroups = {};
   const selectedFrameworks = frameworks && frameworks.filter(
     (fw) => selectedFrameworkIds.find((id) => qe(id, fw.get('id'))),
