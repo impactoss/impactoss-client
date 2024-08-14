@@ -8,6 +8,8 @@ import appMessage from 'utils/app-message';
 const Status = styled.div`
   float: right;
   padding-left: 5px;
+  text-transform: uppercase;
+  font-weight: 600;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-left: 13px;
   }
