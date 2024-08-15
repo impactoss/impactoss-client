@@ -77,10 +77,21 @@ const StyledBodyText = styled(Text)`
 const CloseButton = styled((p) => <ButtonDefaultIconOnly {...p} />)``;
 
 const Toggle = styled(CheckBox)`
-  border-radius: 50%;
+  width: 1px;
+  &:focus-visible {
+     + span {
+      outline: 2px solid ${palette('buttonDefaultIconOnly', 1)};
+      outline-offset: 2px;
+    } 
+  }
+  &:not([disabled]) {
+    border-color: unset;
+  }
   + span {
     background: ${palette('light', 1)};
-    outline-color: unset;
+    border-color: ${palette('light', 3)};
+    outline: unset;
+    box-shadow: unset;
     span {
       background: ${({ checked }) => checked ? palette('buttonDefaultIconOnly', 1) : palette('text', 1)} !important;
     }
