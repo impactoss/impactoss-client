@@ -93,7 +93,8 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
   getHeaderAsideFields = (entity) => ([{
     fields: [
       getStatusField(entity),
-      getStatusField(
+      !entity.getIn(['attributes', 'draft'])
+      && getStatusField(
         entity,
         'is_current',
         IS_CURRENT_STATUSES,

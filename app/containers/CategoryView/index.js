@@ -114,7 +114,8 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       fields.push({
         fields: [
           getStatusField(entity),
-          getStatusField(
+          !entity.getIn(['attributes', 'draft'])
+          && getStatusField(
             entity,
             'is_current',
             IS_CURRENT_STATUSES,

@@ -84,7 +84,8 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     {
       fields: [
         getStatusField(entity),
-        getStatusField(
+        !entity.getIn(['attributes', 'draft'])
+        && getStatusField(
           entity,
           'is_current',
           IS_CURRENT_STATUSES,
