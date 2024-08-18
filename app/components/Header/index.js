@@ -312,7 +312,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     this.forceUpdate();
   };
 
-  renderSecondary = (navItemsAdmin, search, showSettings) => (
+  renderSecondary = (navItemsAdmin, search, onShowSettings) => (
     <PrintHide>
       <ShowSecondary
         visible={!this.state.showSecondary}
@@ -395,10 +395,10 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
               </Box>
             </SearchSecondary>
           )}
-          {showSettings && (
+          {onShowSettings && (
             <ConfigSecondary
               as="button"
-              onClick={() => showSettings()}
+              onClick={() => onShowSettings()}
             >
               <Box direction="row" gap="xsmall" align="center">
                 <FormattedMessage {...appMessages.labels.settings} />
@@ -418,7 +418,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       onSelectFramework,
       search,
       brandPath,
-      showSettings,
+      onShowSettings,
     } = this.props;
     const { intl } = this.context;
     const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
@@ -458,7 +458,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         {!SHOW_BRAND_ON_HOME && isHome
           && (
             <HomeNavWrap>
-              {this.renderSecondary(navItemsAdmin, search, showSettings)}
+              {this.renderSecondary(navItemsAdmin, search, onShowSettings)}
             </HomeNavWrap>
           )
         }
@@ -483,7 +483,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 </BrandText>
               )}
             </Brand>
-            {this.renderSecondary(navItemsAdmin, search, showSettings)}
+            {this.renderSecondary(navItemsAdmin, search, onShowSettings)}
           </Banner>
         )}
         {!isHome && (
@@ -532,10 +532,10 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 </LinkTitle>
               </LinkMain>
             ))}
-            {showSettings && (
+            {onShowSettings && (
               <Config
                 as="button"
-                onClick={() => showSettings()}
+                onClick={() => onShowSettings()}
               >
                 <Icon name="settings" size="24px" />
               </Config>
@@ -571,7 +571,7 @@ Header.propTypes = {
   navItems: PropTypes.array,
   onPageLink: PropTypes.func.isRequired,
   onSelectFramework: PropTypes.func.isRequired,
-  showSettings: PropTypes.func.isRequired,
+  onShowSettings: PropTypes.func.isRequired,
   isHome: PropTypes.bool, // not shown on home page
   theme: PropTypes.object.isRequired,
   search: PropTypes.object,

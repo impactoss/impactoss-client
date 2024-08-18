@@ -33,6 +33,7 @@ import {
   INVALIDATE_ENTITIES,
   DUEDATE_ASSIGNED,
   OPEN_NEW_ENTITY_MODAL,
+  SHOW_SETTINGS_MODAL,
 } from './constants';
 
 // The initial state of the App
@@ -57,6 +58,7 @@ const initialState = fromJS({
     isSignedIn: isSignedIn(),
   },
   newEntityModal: null,
+  showSettings: false,
 });
 
 function appReducer(state = initialState, payload) {
@@ -159,6 +161,8 @@ function appReducer(state = initialState, payload) {
       return state;
     case OPEN_NEW_ENTITY_MODAL:
       return state.set('newEntityModal', fromJS(payload.args));
+    case SHOW_SETTINGS_MODAL:
+      return state.set('showSettings', fromJS(payload.open));
     default:
       return state;
   }

@@ -34,6 +34,7 @@ import {
   selectNewEntityModal,
   selectCurrentFrameworkId,
   selectViewRecommendationFrameworkId,
+  selectShowSettings,
 } from './selectors';
 
 import {
@@ -42,6 +43,7 @@ import {
   updatePath,
   updateRouteQuery,
   openNewEntityModal,
+  showSettingsModal,
 } from './actions';
 
 import { ROUTES, DEPENDENCIES } from './constants';
@@ -73,13 +75,6 @@ const Main = styled.div`
 `;
 
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor(props) {
-    super(props);
-    this.state = {
-      showSettings: false,
-    };
-  }
-
   UNSAFE_componentWillMount() {
     this.props.validateToken();
     this.props.loadEntitiesIfNeeded();
@@ -90,12 +85,6 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-  }
-
-  onShowSettings = (showSettings) => {
-    this.setState({
-      showSettings,
-    });
   }
 
   preparePageMenuPages = (pages) => sortEntities(
@@ -215,10 +204,13 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       viewRecommendationFramework,
       user,
       children,
+      showSettings,
+      onShowSettings,
     } = this.props;
     const { intl } = this.context;
     const title = intl.formatMessage(messages.app.title);
     const isHome = location.pathname === ROUTES.INTRO || location.pathname === `${ROUTES.INTRO}/`;
+
     return (
       <div>
         <SkipContent
@@ -256,7 +248,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             : null}
           currentPath={location.pathname}
           brandPath={ROUTES.OVERVIEW}
-          showSettings={() => this.onShowSettings(true)}
+          onShowSettings={() => onShowSettings(true)}
         />
         <Main isHome={isHome} role="main" id="main-content">
           {React.Children.toArray(children)}
@@ -283,11 +275,11 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             </ReactModal>
           )
         }
-        {this.state.showSettings && (
+        {showSettings && (
           <ReactModal
             isOpen
             contentLabel="Settings"
-            onRequestClose={() => this.onShowSettings(false)}
+            onRequestClose={() => onShowSettings(false)}
             className="global-settings-modal"
             overlayClassName="global-settings-modal-overlay"
             style={{
@@ -295,7 +287,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             }}
           >
             <GlobalSettings
-              onClose={() => this.onShowSettings(false)}
+              onClose={() => onShowSettings(false)}
             />
           </ReactModal>
         )}
@@ -321,6 +313,8 @@ App.propTypes = {
   currentFrameworkId: PropTypes.string,
   viewRecommendationFramework: PropTypes.string,
   frameworks: PropTypes.object,
+  onShowSettings: PropTypes.func,
+  showSettings: PropTypes.bool,
 };
 App.contextTypes = {
   intl: PropTypes.object.isRequired,
@@ -336,6 +330,7 @@ const mapStateToProps = (state, props) => ({
     where: { draft: false },
   }),
   newEntityModal: selectNewEntityModal(state),
+  showSettings: selectShowSettings(state),
   currentFrameworkId: selectCurrentFrameworkId(state),
   frameworks: selectFrameworks(state),
   viewRecommendationFramework: selectViewRecommendationFrameworkId(state, props.params.id),
@@ -351,6 +346,10 @@ export function mapDispatchToProps(dispatch) {
     },
     onPageLink: (path, args) => {
       dispatch(updatePath(path, args));
+    },
+    // open: bool
+    onShowSettings: (open) => {
+      dispatch(showSettingsModal(open));
     },
     onCloseModal: () => {
       dispatch(openNewEntityModal(null));

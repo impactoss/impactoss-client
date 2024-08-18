@@ -73,6 +73,7 @@ import {
   OPEN_BOOKMARK,
   SET_LOAD_ARCHIVED,
   SET_LOAD_NONCURRENT,
+  SHOW_SETTINGS_MODAL,
 } from './constants';
 
 export function submitInvalid(valid) {
@@ -534,5 +535,11 @@ export function openBookmark(bookmark) {
   return {
     type: OPEN_BOOKMARK,
     bookmark,
+  };
+}
+export function showSettingsModal(open = true) {
+  return {
+    type: SHOW_SETTINGS_MODAL,
+    open,
   };
 }
