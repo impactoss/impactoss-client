@@ -31,24 +31,21 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
       <Component>
         {entity.draft && (
           <ItemStatus
-            entity={entity}
-            attribute="draft"
+            value={entity.draft.toString()}
             float="left"
             options={PUBLISH_STATUSES}
           />
         )}
         {entity.is_archive && (
           <ItemStatus
-            entity={entity}
-            attribute="is_archive"
+            value={entity.is_archive.toString()}
             float="left"
             options={IS_ARCHIVE_STATUSES}
           />
         )}
         {!entity.is_current && (
           <ItemStatus
-            entity={entity}
-            attribute="is_current"
+            value={entity.is_current ? entity.is_current.toString() : 'false'}
             float="left"
             options={IS_CURRENT_STATUSES}
           />
