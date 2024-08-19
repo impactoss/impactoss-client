@@ -8,7 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
 
 import {
   getReferenceField,
@@ -29,6 +28,8 @@ import {
   canUserCreateOrEditReports,
   canUserBeAssignedToReports,
 } from 'utils/permissions';
+import { lowerCase } from 'utils/string';
+
 import {
   loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages,
 } from 'containers/App/actions';
@@ -41,6 +42,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
+import NotFoundEntity from 'containers/NotFoundEntity';
 
 import {
   selectReady,
@@ -249,7 +251,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
           },
         ];
       }
-      if (isManager) {
+      if (isManager && viewEntity) {
         buttons = [
           ...buttons,
           {
@@ -287,13 +289,12 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
             icon="indicators"
             buttons={buttons}
           />
-          { !viewEntity && dataReady
-            && (
-              <div>
-                <FormattedMessage {...messages.notFound} />
-              </div>
-            )
-          }
+          {!viewEntity && dataReady && (
+            <NotFoundEntity
+              id={this.props.params.id}
+              type={lowerCase(intl.formatMessage(appMessages.entities.indicators.single))}
+            />
+          )}
           {this.props.queryMessages.info && appMessages.entities[this.props.queryMessages.infotype]
             && (
               <Messages

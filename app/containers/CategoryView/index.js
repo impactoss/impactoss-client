@@ -8,7 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
 
 import {
   getReferenceField,
@@ -37,6 +36,7 @@ import {
 import { qe } from 'utils/quasi-equals';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
+import { lowerCase } from 'utils/string';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { CATEGORY_ADMIN_MIN_ROLE, IS_CURRENT_STATUSES, IS_ARCHIVE_STATUSES } from 'themes/config';
@@ -44,8 +44,8 @@ import { CATEGORY_ADMIN_MIN_ROLE, IS_CURRENT_STATUSES, IS_ARCHIVE_STATUSES } fro
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-
 import EntityView from 'components/EntityView';
+import NotFoundEntity from 'containers/NotFoundEntity';
 
 import {
   selectReady,
@@ -314,7 +314,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
-      buttons = hasUserRole[CATEGORY_ADMIN_MIN_ROLE]
+      buttons = (hasUserRole[CATEGORY_ADMIN_MIN_ROLE] && viewEntity)
         ? buttons.concat([
           {
             type: 'edit',
@@ -362,13 +362,12 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
           { !dataReady
             && <Loading />
           }
-          { !viewEntity && dataReady
-            && (
-              <div>
-                <FormattedMessage {...messages.notFound} />
-              </div>
-            )
-          }
+          {!viewEntity && dataReady && (
+            <NotFoundEntity
+              id={this.props.params.id}
+              type={lowerCase(intl.formatMessage(appMessages.entities.categories.single))}
+            />
+          )}
           { viewEntity && dataReady
             && (
               <EntityView

@@ -8,7 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map } from 'immutable';
@@ -38,7 +37,7 @@ import {
 } from 'utils/permissions';
 
 import qe from 'utils/quasi-equals';
-
+import { lowerCase } from 'utils/string';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { CONTRIBUTOR_MIN_ROLE_ASSIGNED } from 'themes/config';
@@ -57,7 +56,6 @@ import {
 
 import {
   selectReady,
-  selectReadyForAuthCheck,
   selectSessionUserHighestRoleId,
   selectSessionUserId,
 } from 'containers/App/selectors';
@@ -67,6 +65,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import NotFoundEntity from 'containers/NotFoundEntity';
 
 import {
   selectDomain,
@@ -266,13 +265,12 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
           }
-          {!viewEntity && dataReady && !saveError && !deleteSending
-            && (
-              <div>
-                <FormattedMessage {...messages.notFound} />
-              </div>
-            )
-          }
+          {!viewEntity && dataReady && !saveError && !deleteSending && (
+            <NotFoundEntity
+              id={this.props.params.id}
+              type={lowerCase(intl.formatMessage(appMessages.entities.progress_reports.single))}
+            />
+          )}
           {viewEntity && dataReady && !deleteSending
             && (
               <EntityForm
@@ -330,7 +328,6 @@ ReportEdit.propTypes = {
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
-  authReady: PropTypes.bool,
   highestRole: PropTypes.number,
   params: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
@@ -346,7 +343,6 @@ const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   highestRole: selectSessionUserHighestRoleId(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
   userId: selectSessionUserId(state),
 });

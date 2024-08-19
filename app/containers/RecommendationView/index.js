@@ -8,7 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
 
 import {
   getReferenceField,
@@ -23,6 +22,7 @@ import {
 } from 'utils/fields';
 import { qe } from 'utils/quasi-equals';
 import { getEntityTitleTruncated, getEntityReference } from 'utils/entities';
+import { lowerCase } from 'utils/string';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
@@ -33,6 +33,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
+import NotFoundEntity from 'containers/NotFoundEntity';
 
 import {
   selectReady,
@@ -42,6 +43,7 @@ import {
   selectIndicatorConnections,
   selectActiveFrameworks,
 } from 'containers/App/selectors';
+
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
@@ -231,7 +233,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
         title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
-      buttons = isManager
+      buttons = (isManager && viewEntity)
         ? buttons.concat([
           {
             type: 'edit',
@@ -270,13 +272,9 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
           { !dataReady
             && <Loading />
           }
-          { !viewEntity && dataReady
-            && (
-              <div>
-                <FormattedMessage {...messages.notFound} />
-              </div>
-            )
-          }
+          {!viewEntity && dataReady && (
+            <NotFoundEntity type={lowerCase(type)} id={this.props.params.id} />
+          )}
           { viewEntity && dataReady
             && (
               <EntityView
