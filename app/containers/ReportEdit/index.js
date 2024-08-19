@@ -16,6 +16,7 @@ import {
   getTitleFormField,
   getDueDateOptionsField,
   getStatusField,
+  getArchiveField,
   getMarkdownFormField,
   getUploadField,
   getDocumentStatusField,
@@ -40,7 +41,7 @@ import qe from 'utils/quasi-equals';
 import { lowerCase } from 'utils/string';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { CONTRIBUTOR_MIN_ROLE_ASSIGNED } from 'themes/config';
+import { CONTRIBUTOR_MIN_ROLE_ASSIGNED, IS_ARCHIVE_STATUSES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -161,6 +162,15 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           canUserPublish
             ? getStatusField(intl.formatMessage)
             : getStatusInfoField(entity),
+          canUserPublish
+            ? getArchiveField(intl.formatMessage)
+            : getStatusInfoField(
+              entity,
+              'is_archive',
+              IS_ARCHIVE_STATUSES,
+              appMessages.attributes.is_archive,
+              false
+            ),
           getMetaField(entity),
         ],
       },
