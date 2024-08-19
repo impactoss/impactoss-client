@@ -288,7 +288,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                 saving={saveSending}
                 bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
-                handleSubmitFail={this.props.handleSubmitFail()}
+                handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 /*validators={{
                   '': {

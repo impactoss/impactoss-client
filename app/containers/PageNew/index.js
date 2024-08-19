@@ -168,7 +168,7 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
                 saving={saveSending}
                 bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(formData)}
-                handleSubmitFail={() => this.props.handleSubmitFail()}
+                handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 fields={{
                   header: {
