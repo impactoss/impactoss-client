@@ -58,6 +58,7 @@ import MultiSelectField from 'components/formik/MultiSelectField';
 import messages from './messages';
 
 import SubmitFailedHandler from './SubmitFailedHandler';
+import FieldWithContext from './FieldWithContext';
 
 const StyledForm = styled(Form)`
   display: table;
@@ -156,6 +157,31 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   };
 
   handleSubmit = (formData) => !this.props.saving && this.props.handleSubmit(formData);
+
+  getFieldProps = (field, form, formikField) => {
+    let fieldProps;
+    if (field.controlType === 'multiselect') {
+      const values = fromJS(form.values);
+      const formData = fromJS(this.props.formData);
+      fieldProps = {
+        ...field,
+        formData: values,
+        values: values.getIn(field.dataPath),
+        options: formData.getIn(field.dataPath) || List(),
+      };
+    } else {
+      fieldProps = { ...field, onChange: formikField.onChange, value: formikField.value };
+    }
+    return fieldProps;
+  };
+
+  fieldValidation = (value, field, formikProps) => {
+    let errors = field.validators && validateField(value, field);
+    if (!errors && field.changeAction) {
+      errors = field.changeAction(value, formikProps);
+    }
+    return errors;
+  };
 
   renderMultiSelect = (field, formData, hasEntityNewModal, scrollContainer, formikActions) => (
     <MultiSelectField
@@ -276,28 +302,17 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       {group.fields.map((field, i) => {
         if (!field) return null;
         if (field.controlType !== 'info') {
-          let fieldProps;
+          const FieldComponent = field.changeAction ? FieldWithContext : FormikField;
           return (
-            <FormikField
+            <FieldComponent
               key={i}
               name={field.name}
-              validate={(value) => field.validators && validateField(value, field)}
+              validate={(value, formikProps) => this.fieldValidation(value, field, formikProps)}
             >
               {({ field: formikField, form, meta }) => {
-                if (field.controlType === 'multiselect') {
-                  const values = fromJS(form.values);
-                  const formData = fromJS(this.props.formData);
-                  fieldProps = {
-                    ...field,
-                    formData: values,
-                    values: values.getIn(field.dataPath),
-                    options: formData.getIn(field.dataPath) || List(),
-                  };
-                } else {
-                  fieldProps = { ...field, onChange: formikField.onChange, value: formikField.value };
-                }
+                let fieldProps = this.getFieldProps(field, form, formikField);
                 return (
-                  <Field id={field.id} labelledGroup={!!field.label} >
+                  <Field id={field.id} labelledGroup={!!field.label}>
                     {this.renderFormField(
                       fieldProps,
                       false,
@@ -318,7 +333,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                 );
               }
               }
-            </FormikField>
+            </FieldComponent>
           );
         }
         return (
@@ -406,7 +421,9 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                     isValid={isValid}
                     isValidating={isValidating}
                     isSubmitting={isSubmitting}
-                    handleSubmitFail={() => handleSubmitFail()}
+                    handleSubmitFail={() => {
+                      handleSubmitFail();
+                    }}
                   />
                   <FormBody>
                     {fields.header && (

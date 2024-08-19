@@ -37,9 +37,8 @@ import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/formik/MultiSelectControl';
-//import validateDateAfterDate from 'components/formik/validators/validate-date-after-date';
-//import validatePresenceConditional from 'components/formik/validators/validate-presence-conditional';
-//import validateRequired from 'components/formik/validators/validate-required';
+import validateDateAfterDate from 'components/formik/validators/validate-date-after-date';
+import validateRequired from 'components/formik/validators/validate-required';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
@@ -82,12 +81,15 @@ import messages from './messages';
 import { save } from './actions';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
-
+const STATE_INITIAL = {
+  repeat: null,
+};
 export class IndicatorEdit extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
     this.remoteSubmitForm = null;
+    this.state = STATE_INITIAL;
   }
 
   UNSAFE_componentWillMount() {
@@ -104,6 +106,11 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
       scrollToTop(this.scrollContainer.current);
+    }
+  }
+  componentDidMount() {
+    if (this.props.dataReady && this.props.viewEntity && this.state.repeat === null) {
+      this.setState({ repeat: this.props.viewEntity.getIn(['attributes', 'repeat']) || false });
     }
   }
 
@@ -195,9 +202,8 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     return groups;
   };
 
-  getBodyAsideFields = (entity, users, repeat) => {
-    const { intl, viewEntity } = this.props;
-    return ([ // fieldGroups
+  getBodyAsideFields = (entity, users, repeat, intl) =>
+    ([// fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.schedule),
         icon: 'reminder',
@@ -207,16 +213,11 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             'start_date',
             repeat,
             repeat ? 'start_date' : 'start_date_only',
-            (model, value) => this.props.onStartDateChange(
-              model, value, viewEntity, intl.formatMessage,
-            )
           ),
           getCheckboxField(
             intl.formatMessage,
             'repeat',
-            (model, value) => this.props.onRepeatChange(
-              model, value, viewEntity, intl.formatMessage,
-            )
+            (value) => this.setState({ repeat: value })
           ),
           repeat ? getFrequencyField(intl.formatMessage, entity) : null,
           repeat ? getDateField(
@@ -224,8 +225,8 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             'end_date',
             repeat,
             'end_date',
-            (model, value) => this.props.onEndDateChange(
-              model, value, viewEntity, intl.formatMessage,
+            (value, formData) => this.props.onEndDateChange(
+              value, formData, intl.formatMessage,
             )
           )
             : null,
@@ -237,7 +238,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         ],
       },
     ]);
-  };
 
   render() {
     const {
@@ -252,7 +252,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       existingReferences,
       intl,
     } = this.props;
-
     const {
       saveSending, saveError, deleteSending, deleteError, submitValid,
     } = viewDomain.get('page').toJS();
@@ -331,14 +330,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
-                /*validators={{
-                  '': {
-                  // Form-level validator
-                    endDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'end_date'])),
-                    startDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'start_date'])),
-                    endDateAfterStartDate: (vals) => vals.getIn(['attributes', 'repeat']) ? validateDateAfterDate(vals.getIn(['attributes', 'end_date']), vals.getIn(['attributes', 'start_date'])) : true,
-                  },
-                }}*/
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(
@@ -351,7 +342,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                   },
                   body: {
                     main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption, intl),
-                    aside: this.getBodyAsideFields(viewEntity, users, viewEntity.getIn(['attributes', 'repeat']), intl),
+                    aside: this.getBodyAsideFields(viewEntity, users, this.state.repeat, intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -417,68 +408,18 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    /*
-   TODO: bring back 2 field dependent validators 
-   onRepeatChange: (repeatModel, repeat, formData, formatMessage) => {
-      // reset repeat erros when repeat turned off
-      if (!repeat) {
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', {
-          required: false,
-          startDateAfterEndDateError: false,
-        }));
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', {
-          required: false,
-          endDateBeforeStartDateError: false,
-        }));
-      } else if (validateRequired(formData.getIn(['attributes', 'start_date']))
-        && validateRequired(formData.getIn(['attributes', 'end_date']))
-        && !validateDateAfterDate(formData.getIn(['attributes', 'end_date']), formData.getIn(['attributes', 'start_date']))
-      ) {
-        dispatch(formActions.setErrors(
-          'indicatorEdit.form.data.attributes.start_date',
-          { startDateAfterEndDateError: formatMessage(appMessages.forms.startDateAfterEndDateError) }
-        ));
-        dispatch(formActions.setErrors(
-          'indicatorEdit.form.data.attributes.end_date',
-          { endDateBeforeStartDateError: formatMessage(appMessages.forms.endDateBeforeStartDateError) }
-        ));
-      }
-      dispatch(formActions.change(repeatModel, repeat));
-    },
-    onStartDateChange: (dateModel, dateValue, formData, formatMessage) => {
-      // validateDateAfterDate if repeat and both dates present
-      if (formData.getIn(['attributes', 'repeat'])
-        && validateRequired(formData.getIn(['attributes', 'end_date']))
-        && validateRequired(dateValue)
-        && !validateDateAfterDate(formData.getIn(['attributes', 'end_date']), dateValue)
-      ) {
-        dispatch(formActions.setErrors(
-          'indicatorEdit.form.data.attributes.start_date',
-          { startDateAfterEndDateError: formatMessage(appMessages.forms.startDateAfterEndDateError) }
-        ));
-      } else {
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', { startDateAfterEndDateError: false }));
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', { endDateBeforeStartDateError: false }));
-      }
-      dispatch(formActions.change(dateModel, dateValue));
-    },
-    onEndDateChange: (dateModel, dateValue, formData, formatMessage) => {
+    onEndDateChange: (dateValue, formValues, formatMessage) => {
+      const formData = fromJS(formValues);
+      let errors;
       if (formData.getIn(['attributes', 'repeat'])
         && validateRequired(dateValue)
         && validateRequired(formData.getIn(['attributes', 'start_date']))
         && !validateDateAfterDate(dateValue, formData.getIn(['attributes', 'start_date']))
       ) {
-        dispatch(formActions.setErrors(
-          'indicatorEdit.form.data.attributes.end_date',
-          { endDateBeforeStartDateError: formatMessage(appMessages.forms.endDateBeforeStartDateError) }
-        ));
-      } else {
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.end_date', { endDateBeforeStartDateError: false }));
-        dispatch(formActions.setErrors('indicatorEdit.form.data.attributes.start_date', { startDateAfterEndDateError: false }));
-      }
-      dispatch(formActions.change(dateModel, dateValue));
+        errors = formatMessage(appMessages.forms.endDateBeforeStartDateError);
+      } 
+      return errors;
     },
-    */
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
     },
@@ -540,6 +481,7 @@ function mapDispatchToProps(dispatch, props) {
       if (formRef.trim() === '') {
         saveData = saveData.setIn(['attributes', 'reference'], formData.get('id'));
       }
+      console.log(saveData.getIn(['attributes', 'repeat']))
       // do not store repeat fields when not repeat
       if (!saveData.getIn(['attributes', 'repeat'])) {
         saveData = saveData

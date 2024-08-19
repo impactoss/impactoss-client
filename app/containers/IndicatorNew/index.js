@@ -32,9 +32,8 @@ import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/formik/MultiSelectControl';
-//import validateDateAfterDate from 'components/formik/validators/validate-date-after-date';
-//import validatePresenceConditional from 'components/formik/validators/validate-presence-conditional';
-//import validateRequired from 'components/formik/validators/validate-required';
+import validateDateAfterDate from 'components/formik/validators/validate-date-after-date';
+import validateRequired from 'components/formik/validators/validate-required';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
@@ -72,11 +71,14 @@ import {
 import messages from './messages';
 import { save } from './actions';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
-
+const STATE_INITIAL = {
+  repeat: false,
+};
 export class IndicatorNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.state = STATE_INITIAL;
   }
 
   UNSAFE_componentWillMount() {
@@ -106,7 +108,9 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     .set('associatedRecommendationsByFw', recommendationsByFw
       ? recommendationsByFw.map((recs) => entityOptions(recs, true))
       : Map())
-    .set('associatedUser', userOptions(users, null))
+    .set('associatedUser', userOptions(users, null));
+
+  handleRepeatChange = (repeat) => this.setState({ repeat: repeat });
 
   getHeaderMainFields = (existingReferences, intl) =>
     ([ // fieldGroups
@@ -172,7 +176,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     return groups;
   };
 
-  getBodyAsideFields = (users, repeat, intl) =>
+  getBodyAsideFields = (users, repeat, intl) => 
     ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.schedule),
@@ -182,27 +186,20 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             intl.formatMessage,
             'start_date',
             repeat,
-            repeat ? 'start_date' : 'start_date_only',
-            (model, value) =>
-              this.props.onStartDateChange(
-                model, value, this.props.viewDomain.getIn(['form', 'data']), intl.formatMessage
-              )
+            repeat ? 'start_date' : 'start_date_only'
           ),
           getCheckboxField(
             intl.formatMessage,
             'repeat',
-            (model, value) => this.props.onRepeatChange(
-              model, value, this.props.viewDomain.getIn(['form', 'data']), intl.formatMessage,
-            )
-          ),
+            (value) => this.handleRepeatChange(value)),
           repeat ? getFrequencyField(intl.formatMessage) : null,
           repeat ? getDateField(
             intl.formatMessage,
             'end_date',
             repeat,
             'end_date',
-            (model, value) => this.props.onEndDateChange(
-              model, value, this.props.viewDomain.getIn(['form', 'data']), intl.formatMessage,
+            (value, formData) => this.props.onEndDateChange(
+              value, formData, intl.formatMessage,
             )
           )
             : null,
@@ -227,7 +224,6 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       intl,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
-
     return (
       <div>
         <HelmetCanonical
@@ -290,14 +286,6 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                 handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
-                /*validators={{
-                  '': {
-                  // Form-level validator
-                    endDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'end_date'])),
-                    startDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'start_date'])),
-                    endDateAfterStartDate: (vals) => vals.getIn(['attributes', 'repeat']) ? validateDateAfterDate(vals.getIn(['attributes', 'end_date']), vals.getIn(['attributes', 'start_date'])) : true,
-                  },
-                }}*/
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(existingReferences, intl),
@@ -305,7 +293,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                   },
                   body: {
                     main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption, intl),
-                    aside: this.getBodyAsideFields(users, viewDomain.getIn(['attributes', 'repeat']), intl),
+                    aside: this.getBodyAsideFields(users, this.state.repeat, intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -334,7 +322,6 @@ IndicatorNew.propTypes = {
   onCreateOption: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
   onRepeatChange: PropTypes.func,
-  onStartDateChange: PropTypes.func,
   onEndDateChange: PropTypes.func,
   existingReferences: PropTypes.array,
   intl: PropTypes.object.isRequired,
@@ -361,40 +348,17 @@ function mapDispatchToProps(dispatch) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    /* TODO: bring back 2 field dependent validators
-    onRepeatChange: (repeat, formData, formatMessage) => {
-      let errors = {};
-      if (repeat
-        && validateRequired(formData.getIn(['attributes', 'start_date']))
-        && validateRequired(formData.getIn(['attributes', 'end_date']))
-        && !validateDateAfterDate(formData.getIn(['attributes', 'end_date']), formData.getIn(['attributes', 'start_date']))
-      ) {
-        errors.start_date = formatMessage(appMessages.forms.startDateAfterEndDateError);
-        errors.end_date = formatMessage(appMessages.forms.endDateBeforeStartDateError)
-      }
-      return errors;
-    },
-    onStartDateChange: (dateValue, formData, formatMessage) => {
-      let errors = {};
-      if (formData.getIn(['attributes', 'repeat'])
-        && validateRequired(formData.getIn(['attributes', 'end_date']))
-        && validateRequired(dateValue)
-        && !validateDateAfterDate(formData.getIn(['attributes', 'end_date']), dateValue)
-      ) {
-        errors.start_date = formatMessage(appMessages.forms.startDateAfterEndDateError)
-      }
-      return errors;
-    },
-    onEndDateChange: (dateValue, formData, formatMessage) => {
-      let errors = {};
+    onEndDateChange: (dateValue, formValues, formatMessage) => {
+      const formData = fromJS(formValues);
       if (formData.getIn(['attributes', 'repeat'])
         && validateRequired(dateValue)
         && validateRequired(formData.getIn(['attributes', 'start_date']))
         && !validateDateAfterDate(dateValue, formData.getIn(['attributes', 'start_date']))
       ) {
-        errors.end_date = formatMessage(appMessages.forms.endDateBeforeStartDateError);
+        return formatMessage(appMessages.forms.endDateBeforeStartDateError);
       }
-    },*/
+      return null;
+    },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
     },
