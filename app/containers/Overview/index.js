@@ -34,6 +34,7 @@ import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 import SkipContent from 'components/styled/SkipContent';
 import A from 'components/styled/A';
+import Description from 'components/styled/Description';
 
 // relative
 import VerticalDiagram from './VerticalDiagram';
@@ -51,17 +52,6 @@ import {
 
 const ViewContainer = styled(Container)`
   min-height: 66vH;
-`;
-const Description = styled.p`
-  margin-bottom: 1.5em;
-  font-size: 1em;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    margin-bottom: 2em;
-    font-size: 1.1em;
-  }
-  @media print {
-    font-size: ${(props) => props.theme.sizes.print.default};
-  }
 `;
 
 const AboutLink = styled(A)`
