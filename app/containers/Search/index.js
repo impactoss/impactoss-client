@@ -12,37 +12,49 @@ import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { fromJS } from 'immutable';
 import { FormattedMessage } from 'react-intl';
+import { Box, Text } from 'grommet';
+import { FormUp, FormDown } from 'grommet-icons';
+import ReactMarkdown from 'react-markdown';
 
 import { startsWith } from 'utils/string';
+import qe from 'utils/quasi-equals';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  updatePath,
+  showSettingsModal,
+} from 'containers/App/actions';
 import {
   selectReady,
+  selectLoadArchivedQuery,
+  selectLoadNonCurrentQuery,
 } from 'containers/App/selectors';
+
 import { CONTENT_LIST } from 'containers/App/constants';
 import { SEARCH } from 'themes/config';
 
 import Button from 'components/buttons/Button';
-import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
-import Container from 'components/styled/Container';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
-import Content from 'components/styled/Content';
-import { Box, Text } from 'grommet';
-
-import { FormUp, FormDown } from 'grommet-icons';
-
-import qe from 'utils/quasi-equals';
-
 import EntityListItem from 'components/EntityListItem';
+import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
+import Container from 'components/styled/Container';
+import A from 'components/styled/A';
+import Content from 'components/styled/Content';
+import Description from 'components/styled/Description';
 
 import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
 
 import { DEPENDENCIES } from './constants';
-import { selectEntitiesByQuery, selectPathQuery } from './selectors';
+
+import {
+  selectEntitiesByQuery,
+  selectPathQuery,
+} from './selectors';
+
 import {
   updateQuery,
   resetSearchQuery,
@@ -86,6 +98,23 @@ const ListHint = styled.div`
 `;
 const ListWrapper = styled.div``;
 
+const SettingsLink = styled(A)`
+  color: #ba5d03;
+  &:hover {
+    color: #ba5d03;
+    text-decoration: underline;
+  }
+`;
+
+const Markdown = styled(ReactMarkdown)`
+  font-size: 1em;
+  display: inline;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
+`;
+
+
 export class Search extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -123,6 +152,9 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       entities,
       onEntityClick,
       activeTargetPath,
+      loadArchived,
+      loadNonCurrent,
+      onShowSettingsModal,
     } = this.props;
     const hasQuery = !!location.query.search;
     const countResults = dataReady && hasQuery && entities && entities.reduce(
@@ -185,6 +217,33 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                 icon="search"
                 buttons={headerButtons}
               />
+              <Description>
+                <Markdown
+                  className="react-markdown"
+                  disallowedTypes={['paragraph']}
+                  unwrapDisallowed
+                  source={intl.formatMessage(
+                    messages.settingsHint,
+                    {
+                      includeArchived: loadArchived,
+                      includePast: loadNonCurrent,
+                    }
+                  )}
+                />
+                {' '}
+                <FormattedMessage
+                  {...messages.settingsHint2}
+                  values={{
+                    settingsLink: (
+                      <SettingsLink
+                        onClick={() => onShowSettingsModal()}
+                      >
+                        <FormattedMessage {...messages.settingsLinkAnchor} />
+                      </SettingsLink>
+                    ),
+                  }}
+                />
+              </Description>
               {!dataReady && <Loading />}
               {dataReady && (
                 <div>
@@ -339,6 +398,9 @@ Search.propTypes = {
   onSortBy: PropTypes.func.isRequired,
   activeTargetPath: PropTypes.string,
   theme: PropTypes.object,
+  loadArchived: PropTypes.bool,
+  loadNonCurrent: PropTypes.bool,
+  onShowSettingsModal: PropTypes.func,
 };
 
 Search.contextTypes = {
@@ -349,6 +411,8 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   entities: selectEntitiesByQuery(state, fromJS(props.location.query)),
   activeTargetPath: selectPathQuery(state, fromJS(props.location.query)),
+  loadArchived: selectLoadArchivedQuery(state),
+  loadNonCurrent: selectLoadNonCurrentQuery(state),
 });
 function mapDispatchToProps(dispatch) {
   return {
@@ -386,6 +450,9 @@ function mapDispatchToProps(dispatch) {
     },
     onSortBy: (sort) => {
       dispatch(updateSortBy(sort));
+    },
+    onShowSettingsModal: () => {
+      dispatch(showSettingsModal(true));
     },
   };
 }

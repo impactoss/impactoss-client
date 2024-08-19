@@ -22,6 +22,18 @@ export default defineMessages({
     id: 'app.containers.Search.search',
     defaultMessage: 'Search database',
   },
+  settingsHint: {
+    id: 'app.containers.Search.settingsHint',
+    defaultMessage: 'Please note: search results **{includePast, select, true {include} other {do not include}} content from past reporting cycles** and **{includeArchived, select, true {include} other {do not include}} archived content**. ',
+  },
+  settingsHint2: {
+    id: 'app.containers.Search.settingsHint2',
+    defaultMessage: 'You can configure the relevant content in the {settingsLink}.',
+  },
+  settingsLinkAnchor: {
+    id: 'app.containers.Search.settingsLinkAnchor',
+    defaultMessage: 'Settings',
+  },
   placeholder: {
     id: 'app.containers.Search.placeholder',
     defaultMessage: 'Search database by keyword',
