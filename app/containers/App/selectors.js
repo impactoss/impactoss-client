@@ -16,7 +16,12 @@ import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
 import { sortEntities } from 'utils/sort';
 
-import { USER_ROLES, DB_TABLES, CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
+import {
+  API,
+  USER_ROLES,
+  DB_TABLES,
+  CATEGORY_ADMIN_MIN_ROLE,
+} from 'themes/config';
 
 import {
   filterEntitiesByAttributes,
@@ -980,3 +985,9 @@ export const selectViewRecommendationFrameworkId = createSelector(
 //     ).keySeq()
 //   ),
 // );
+
+// select all categories
+export const selectCategories = createSelector(
+  (state) => selectEntities(state, API.CATEGORIES),
+  (entities) => entities
+);

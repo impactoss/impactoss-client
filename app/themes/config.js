@@ -207,28 +207,30 @@ export const SEE_DRAFT_MIN_ROLE = USER_ROLES.CONTRIBUTOR.value; // edit or creat
 export const SEE_META_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create when assigned
 
 // Map server database tables **************************
-export const DB_TABLES = [
-  'users',
-  'user_roles',
-  'roles',
-  'pages',
-  'bookmarks',
-  'taxonomies',
-  'categories',
-  'indicators',
-  'measure_categories',
-  'measure_indicators',
-  'measures',
-  'recommendation_categories',
-  'recommendation_measures',
-  'recommendations',
-  'user_categories',
-  'progress_reports',
-  'due_dates',
-  'frameworks',
-  'framework_taxonomies',
-  'recommendation_indicators',
-];
+export const API = {
+  FRAMEWORKS: 'frameworks', // frameworks aka recommendation-type / type of objective
+  TAXONOMIES: 'taxonomies',
+  CATEGORIES: 'categories',
+  USERS: 'users',
+  ROLES: 'roles',
+  RECOMMENDATIONS: 'recommendations', //
+  ACTIONS: 'measures', // actions/ACTIONS
+  INDICATORS: 'indicators', // actions/ACTIONS
+  PROGRESS_REPORTS: 'progress_reports', //
+  DUE_DATES: 'due_dates',
+  PAGES: 'pages',
+  BOOKMARKS: 'bookmarks',
+  USER_ROLES: 'user_roles',
+  USER_CATEGORIES: 'user_categories',
+  FRAMEWORK_TAXONOMIES: 'framework_taxonomies', // action taxonomies
+  RECOMMENDATION_CATEGORIES: 'recommendation_categories', // linking recs with cats
+  RECOMMENDATION_ACTIONS: 'recommendation_measures', // linking recs with actions
+  RECOMMENDATION_INDICATORS: 'recommendation_indicators', // linking recs with indicators
+  ACTION_CATEGORIES: 'measure_categories', // measure_categories
+  ACTION_INDICATORS: 'measure_indicators', // linking actions with indicators
+};
+
+export const DB_TABLES = Object.values(API);
 
 export const COLUMN_WIDTHS = {
   FULL: 1,
@@ -311,6 +313,28 @@ export const ENTITY_FIELDS = {
         exportColumn: 'connection_updated_by',
       },
     },
+    CONNECTIONS: {
+      categories: {
+        table: API.CATEGORIES,
+        connection: API.ACTION_CATEGORIES,
+        groupby: {
+          table: API.TAXONOMIES,
+          on: 'taxonomy_id',
+        },
+      },
+      recommendations: {
+        table: API.RECOMMENDATIONS,
+        connection: API.RECOMMENDATION_ACTIONS,
+        groupby: {
+          table: API.FRAMEWORKS,
+          on: 'framework_id',
+        },
+      },
+      indicators: {
+        table: API.INDICATORS,
+        connection: API.ACTION_INDICATORS,
+      },
+    },
   },
   indicators: {
     ATTRIBUTES: {
@@ -382,9 +406,31 @@ export const ENTITY_FIELDS = {
         exportColumn: 'connection_updated_by',
       },
     },
+    CONNECTIONS: {
+      actions: {
+        table: API.ACTIONS,
+        connection: API.RECOMMENDATION_INDICATORS,
+      },
+      recommendations: {
+        table: API.RECOMMENDATIONS,
+        connection: API.RECOMMENDATION_INDICATORS,
+        groupby: {
+          table: API.FRAMEWORKS,
+          on: 'framework_id',
+        },
+      },
+    },
   },
   recommendations: {
     ATTRIBUTES: {
+      // framework_id: {
+      //   defaultValue: '1',
+      //   required: true, // all types
+      //   type: 'number',
+      //   table: API.FRAMEWORKS,
+      //   exportColumn: 'framework',
+      //   export: true,
+      // },
       draft: {
         defaultValue: true,
         type: 'bool',
@@ -394,41 +440,51 @@ export const ENTITY_FIELDS = {
         exportColumn: 'public',
         exportFlip: true,
       },
+      reference: {
+        type: 'text',
+        required: true,
+        import: true,
+      },
       title: {
         type: 'text',
         exportDefault: true,
+        required: true,
+        import: true,
       },
       description: {
-        type: 'text',
-      },
-      reference: {
-        type: 'text',
+        type: 'markdown',
+        label: 'fullRecommendation',
+        import: true,
       },
       response: {
-        type: 'text',
+        type: 'markdown',
+        import: true,
       },
       accepted: {
         type: 'bool',
+        import: true,
       },
       created_at: {
+        skipImport: true,
         type: 'date',
         roleExport: USER_ROLES.MANAGER.value,
       },
       created_by_id: {
         skipImport: true,
         type: 'key',
-        table: 'users',
+        table: API.USERS,
         roleExport: USER_ROLES.MANAGER.value,
         exportColumn: 'created_by',
       },
       updated_at: {
+        skipImport: true,
         type: 'date',
         roleExport: USER_ROLES.MANAGER.value,
       },
       updated_by_id: {
         skipImport: true,
         type: 'key',
-        table: 'users',
+        table: API.USERS,
         roleExport: USER_ROLES.MANAGER.value,
         exportColumn: 'updated_by',
       },
@@ -441,9 +497,64 @@ export const ENTITY_FIELDS = {
       relationship_updated_by_id: {
         skipImport: true,
         type: 'key',
-        table: 'users',
+        table: API.USERS,
         roleExport: USER_ROLES.MANAGER.value,
         exportColumn: 'connection_updated_by',
+      },
+    },
+    CONNECTIONS: {
+      categories: {
+        table: API.CATEGORIES,
+        connection: API.RECOMMENDATION_CATEGORIES,
+        groupby: {
+          table: API.TAXONOMIES,
+          on: 'taxonomy_id',
+        },
+      },
+      actions: {
+        table: API.ACTIONS,
+        connection: API.RECOMMENDATION_ACTIONS,
+      },
+      indicators: {
+        table: API.INDICATORS,
+        connection: API.RECOMMENDATION_INDICATORS,
+      },
+    },
+    RELATIONSHIPS_IMPORT: {
+      // has category
+      'category-id': {
+        type: 'number',
+        table: API.RECOMMENDATION_CATEGORIES,
+        keyPair: ['recommendation_id', 'category_id'], // own, other
+        hint: 'one or more category ids (as assigned by the database / comma-separated)',
+      },
+      // has category
+      'category-code': {
+        type: 'number',
+        lookup: {
+          table: API.CATEGORIES, // id assumed
+          attribute: 'code',
+        },
+        table: API.RECOMMENDATION_CATEGORIES,
+        keyPair: ['recommendation_id', 'category_id'], // own, other
+        hint: 'one or more category codes (as assigned by the users / comma-separated)',
+      },
+      'action-code': {
+        type: 'text',
+        lookup: {
+          table: API.ACTIONS,
+          attribute: 'code',
+        },
+        table: API.RECOMMENDATION_ACTIONS,
+        keyPair: ['recommendation_id', 'measure_id'], // own, other
+        hint: 'one or more unique action code (as assigned by the users / comma-separated)',
+      },
+      'action-id': {
+        type: 'text',
+        multiple: true,
+        table: API.RECOMMENDATION_ACTIONS,
+        keyPair: ['measure_id', 'actor_id'], // own, other
+        hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
       },
     },
   },

@@ -6,6 +6,7 @@ import { Form } from 'react-redux-form/immutable';
 import CsvDownloader from 'react-csv-downloader';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { Text } from 'grommet';
 
 import { omit } from 'lodash/object';
 import { map } from 'lodash/collection';
@@ -62,7 +63,7 @@ const DocumentWrapEdit = styled(DocumentWrap)`
   padding: 1em 0.75em;
 `;
 
-const FormTitle = styled.h2`
+const FormTitle = styled.h3`
   padding-top: 0;
   margin-top: 0;
 `;
@@ -139,7 +140,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
     };
 
     const { id, ...props } = this.getControlProps(field);
-
+    // console.log('template', template)
     return (
       <FormWrapper white>
         <StyledForm model={model} onSubmit={(data) => data.get('import') !== null && handleSubmit(data)}>
@@ -151,28 +152,45 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                     <FormattedMessage {...messages.title} />
                   </FormTitle>
                   <Intro>
-                    <FormattedMessage {...messages.introduction} />
+                    <Text size="medium">
+                      <FormattedMessage {...messages.introduction} />
+                    </Text>
                   </Intro>
                   <Hint>
                     <HintTitle>
-                      <FormattedMessage {...messages.hintTitle} />
+                      <Text size="medium">
+                        <FormattedMessage {...messages.hintTitle} />
+                      </Text>
                     </HintTitle>
                     <HintList>
                       <li>
-                        <FormattedMessage {...messages.templateHint} />
+                        <Text size="medium">
+                          <FormattedMessage {...messages.templateHint} />
+                        </Text>
                         <CsvDownload>
                           <CsvDownloader
                             datas={asArray(template.data)}
                             filename={template.filename}
                           >
                             <NoteLink href="/" onClick={(evt) => evt.preventDefault()}>
-                              <FormattedMessage {...messages.templateHintDownloadLink} />
+                              <Text size="medium">
+                                <FormattedMessage {...messages.templateHintDownloadLink} />
+                              </Text>
                             </NoteLink>
                           </CsvDownloader>
                         </CsvDownload>
                       </li>
                       <li>
-                        <FormattedMessage {...messages.formatHint} />
+                        <Text size="medium">
+                          <FormattedMessage {...messages.formatHint} />
+                        </Text>
+                        {messages.formatHintLink && messages.formatHintLink !== '' && (
+                          <A href={intl.formatMessage(messages.formatHintLink)} target="_blank">
+                            <Text size="medium">
+                              {intl.formatMessage(messages.formatHintLinkAnchor)}
+                            </Text>
+                          </A>
+                        )}
                       </li>
                     </HintList>
                   </Hint>
