@@ -43,7 +43,7 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
             options={IS_ARCHIVE_STATUSES}
           />
         )}
-        {!entity.is_current && (
+        {typeof entity.is_current !== 'undefined' && !entity.is_current && (
           <ItemStatus
             value={entity.is_current ? entity.is_current.toString() : 'false'}
             float="left"
