@@ -258,6 +258,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           && (
             <ReactModal
               isOpen
+              appElement={document.getElementById('app')}
               contentLabel={newEntityModal.get('path')}
               onRequestClose={this.props.onCloseModal}
               className="new-entity-modal"
@@ -279,6 +280,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         {showSettings && (
           <ReactModal
             isOpen
+            appElement={document.getElementById('app')}
             contentLabel="Settings"
             onRequestClose={() => onShowSettings(false)}
             className="global-settings-modal"
