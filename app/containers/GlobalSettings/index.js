@@ -89,9 +89,12 @@ const Toggle = styled(CheckBox)`
   }
   + span {
     background: ${palette('light', 1)};
-    border-color: ${palette('light', 3)};
+    border-color: ${palette('light', 3)} !important;
     outline: unset;
     box-shadow: unset;
+    &:hover {
+      border-color: ${palette('dark', 3)} !important;
+    }
     span {
       background: ${({ checked }) => checked ? palette('buttonDefaultIconOnly', 1) : palette('text', 1)} !important;
     }
