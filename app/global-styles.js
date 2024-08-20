@@ -201,6 +201,10 @@ const GlobalStyle = createGlobalStyle`
     }
   }
 
+  .react-markdown-search strong{
+    font-weight: 500;
+  }
+
   .content-page {
     .react-markdown {
       p {

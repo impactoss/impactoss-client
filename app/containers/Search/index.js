@@ -217,33 +217,6 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                 icon="search"
                 buttons={headerButtons}
               />
-              <Description>
-                <Markdown
-                  className="react-markdown"
-                  disallowedTypes={['paragraph']}
-                  unwrapDisallowed
-                  source={intl.formatMessage(
-                    messages.settingsHint,
-                    {
-                      includeArchived: loadArchived,
-                      includePast: loadNonCurrent,
-                    }
-                  )}
-                />
-                {' '}
-                <FormattedMessage
-                  {...messages.settingsHint2}
-                  values={{
-                    settingsLink: (
-                      <SettingsLink
-                        onClick={() => onShowSettingsModal()}
-                      >
-                        <FormattedMessage {...messages.settingsLinkAnchor} />
-                      </SettingsLink>
-                    ),
-                  }}
-                />
-              </Description>
               {!dataReady && <Loading />}
               {dataReady && (
                 <div>
@@ -261,6 +234,33 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       }}
                     />
                   </EntityListSearch>
+                  <Description as="div">
+                    <Markdown
+                      className="react-markdown react-markdown-search"
+                      disallowedTypes={['paragraph']}
+                      unwrapDisallowed
+                      source={intl.formatMessage(
+                        messages.settingsHint,
+                        {
+                          includeArchived: loadArchived,
+                          includePast: loadNonCurrent,
+                        }
+                      )}
+                    />
+                    {' '}
+                    <FormattedMessage
+                      {...messages.settingsHint2}
+                      values={{
+                        settingsLink: (
+                          <SettingsLink
+                            onClick={() => onShowSettingsModal()}
+                          >
+                            <FormattedMessage {...messages.settingsLinkAnchor} />
+                          </SettingsLink>
+                        ),
+                      }}
+                    />
+                  </Description>
                   <ListWrapper
                     id="search-results"
                     ref={(el) => { this.searchResults = el; }}
