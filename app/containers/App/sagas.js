@@ -770,21 +770,47 @@ export function* dismissQueryMessagesSaga() {
 }
 
 export function* updatePathSaga({ path, args }) {
-  const relativePath = path.startsWith('/') ? path : `/${path}`;
+  let relativePath = path.startsWith('/') ? path : `/${path}`;
+  let query = (args && args.query) || [];
+  // keep query args from path (as is needed for login redirect)
+  if (relativePath.indexOf('?') > -1) {
+    const [p, search] = relativePath.split('?');
+    relativePath = p;
+    let searchParams = Object.fromEntries(new URLSearchParams(search));
+    searchParams = Object.keys(searchParams).reduce(
+      (memo, key) => ([
+        ...memo,
+        { arg: key, value: searchParams[key] },
+      ]),
+      [],
+    );
+    query = [
+      ...query,
+      ...searchParams,
+    ];
+  }
   const location = yield select(selectLocation);
+
   let queryNext = {};
-  if (args && (args.query || args.keepQuery)) {
-    if (args.query) {
-      queryNext = getNextQuery(args.query, args.extend, location);
-    }
-    if (args.keepQuery) {
-      queryNext = location.get('query').toJS();
-    }
+  // update query based on provided query args
+  if (query) {
+    queryNext = getNextQuery(query, args ? args.extend : false, location);
+  }
+  // optionally keep all previous query args
+  if (args && args.keepQuery) {
+    queryNext = {
+      ...queryNext,
+      ...location.get('query').toJS(),
+    };
   } else {
-    // always keep "specific filters" incl framework
-    queryNext = location.get('query').filter(
+    // otherwise keep "specific args" incl framework
+    const queryKeep = location.get('query').filter(
       (val, key) => KEEP_QUERY_ARGS.indexOf(key) > -1
     ).toJS();
+    queryNext = {
+      ...queryNext,
+      ...queryKeep,
+    };
   }
   // convert to string
   const queryNextString = getNextQueryString(queryNext);

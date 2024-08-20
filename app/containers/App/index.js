@@ -247,6 +247,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             )
             : null}
           currentPath={location.pathname}
+          fullPath={`${location.pathname}${location.search}`}
           brandPath={ROUTES.OVERVIEW}
           onShowSettings={() => onShowSettings(true)}
         />

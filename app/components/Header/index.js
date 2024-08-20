@@ -349,6 +349,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             this.props.onPageLink(path, query);
           }}
           currentPath={this.props.currentPath}
+          fullPath={this.props.fullPath}
         />
         {navItemsAdmin
           && (
@@ -567,6 +568,7 @@ Header.propTypes = {
   isSignedIn: PropTypes.bool,
   user: PropTypes.object,
   currentPath: PropTypes.string,
+  fullPath: PropTypes.string,
   pages: PropTypes.array,
   navItems: PropTypes.array,
   onPageLink: PropTypes.func.isRequired,
