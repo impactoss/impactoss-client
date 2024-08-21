@@ -22,7 +22,7 @@ import GlobalSettings from 'containers/GlobalSettings';
 import { sortEntities } from 'utils/sort';
 import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
 
-import { FOOTER, SEE_ARCHIVED_MIN_ROLE } from 'themes/config';
+import { FOOTER, SETTINGS } from 'themes/config';
 
 import {
   selectIsSignedIn,
@@ -38,6 +38,7 @@ import {
   selectHasPreviousCycles,
   selectLoadArchivedQuery,
   selectLoadNonCurrentQuery,
+  selectSettings,
 } from './selectors';
 
 import {
@@ -49,6 +50,7 @@ import {
   showSettingsModal,
   setLoadArchived,
   setLoadNonCurrent,
+  initializeSettings,
 } from './actions';
 
 import { ROUTES, DEPENDENCIES } from './constants';
@@ -86,9 +88,15 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
+    const { dataReady, settings } = nextProps;
     // reload entities if invalidated
-    if (!nextProps.dataReady) {
+    if (!dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    if (dataReady && settings) {
+      if (settings.some((setting) => setting.get('available') === null)) {
+        this.props.onInitializeSettings(nextProps);
+      }
     }
   }
 
@@ -211,31 +219,53 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       children,
       showSettings,
       onShowSettings,
-      hasPreviousCycles,
       loadArchived,
       loadNonCurrent,
       onSetLoadArchived,
       onSetLoadNonCurrent,
       dataReady,
+      settings,
     } = this.props;
     const { intl } = this.context;
     const title = intl.formatMessage(messages.app.title);
     const isHome = location.pathname === ROUTES.INTRO || location.pathname === `${ROUTES.INTRO}/`;
-    // global Settings
-    const settings = {
-      includeArchive: {
-        available: isUserSignedIn || highestRole <= SEE_ARCHIVED_MIN_ROLE,
-        active: loadArchived,
-        onToggle: () => onSetLoadArchived(!loadArchived),
+    // add actions global Settings
+    // {
+    //   includeArchive: {
+    //     available: isUserSignedIn || highestRole <= SEE_ARCHIVED_MIN_ROLE,
+    //     active: loadArchived,
+    //     onToggle: () => onSetLoadArchived(!loadArchived),
+    //   },
+    //   includePast: {
+    //     available: !dataReady || hasPreviousCycles,
+    //     active: loadNonCurrent,
+    //     onToggle: () => onSetLoadNonCurrent(!loadNonCurrent),
+    //   },
+    // };
+    const mySettings = Object.keys(SETTINGS).reduce(
+      (memo, key) => {
+        let onToggle;
+        let active;
+        if (key === 'loadArchived') {
+          onToggle = () => onSetLoadArchived(!loadArchived);
+          active = loadArchived;
+        } else if (key === 'loadNonCurrent') {
+          onToggle = () => onSetLoadNonCurrent(!loadNonCurrent);
+          active = loadNonCurrent;
+        }
+        const setting = settings.get(key);
+        return ({
+          ...memo,
+          [key]: {
+            available: setting && setting.get('available'),
+            active,
+            onToggle,
+          },
+        });
       },
-      includePast: {
-        available: !dataReady || hasPreviousCycles,
-        active: loadNonCurrent,
-        onToggle: () => onSetLoadNonCurrent(!loadNonCurrent),
-      },
-    };
-
-    const hasSettings = Object.values(settings).some((val) => !!val.available);
+      {},
+    );
+    const hasSettings = Object.values(mySettings).some((val) => !!val.available);
 
     return (
       <div>
@@ -318,7 +348,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           >
             <GlobalSettings
               onClose={() => onShowSettings(false)}
-              settings={settings}
+              settings={mySettings}
             />
           </ReactModal>
         )}
@@ -351,6 +381,8 @@ App.propTypes = {
   loadNonCurrent: PropTypes.bool,
   onSetLoadArchived: PropTypes.func,
   onSetLoadNonCurrent: PropTypes.func,
+  onInitializeSettings: PropTypes.func,
+  settings: PropTypes.object,
   dataReady: PropTypes.bool,
 };
 App.contextTypes = {
@@ -374,6 +406,7 @@ const mapStateToProps = (state, props) => ({
   viewRecommendationFramework: selectViewRecommendationFrameworkId(state, props.params.id),
   loadArchived: selectLoadArchivedQuery(state),
   loadNonCurrent: selectLoadNonCurrentQuery(state),
+  settings: selectSettings(state),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -405,6 +438,33 @@ export function mapDispatchToProps(dispatch) {
     },
     onSetLoadArchived: (value) => dispatch(setLoadArchived(value)),
     onSetLoadNonCurrent: (value) => dispatch(setLoadNonCurrent(value)),
+    onInitializeSettings: ({
+      settings, // immutable Map
+      isUserSignedIn,
+      highestRole,
+      hasPreviousCycles,
+    }) => {
+      // console.log(
+      //   'settings, isUserSignedIn, highestRole, hasPreviousCycles',
+      //   settings && settings.toJS(),
+      //   isUserSignedIn,
+      //   highestRole,
+      //   hasPreviousCycles
+      // );
+      const updatedSettings = settings.map((setting, key) => {
+        let updated = setting;
+        if (setting.get('available') === null) {
+          if (key === 'loadArchived' && isUserSignedIn) {
+            updated = setting.set('available', highestRole <= setting.get('minRole'));
+          }
+          if (key === 'loadNonCurrent') {
+            updated = setting.set('available', hasPreviousCycles);
+          }
+        }
+        return updated;
+      });
+      dispatch(initializeSettings(updatedSettings));
+    },
   };
 }
 

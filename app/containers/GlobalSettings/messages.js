@@ -15,32 +15,32 @@ export default defineMessages({
     defaultMessage: 'Optionally include content from past reporting cycles and/or archived content',
   },
   title: {
-    includePast: {
-      id: 'app.containers.GlobalSettings.title.includePast',
+    loadNonCurrent: {
+      id: 'app.containers.GlobalSettings.title.loadNonCurrent',
       defaultMessage: 'Content by reporting cycle',
     },
-    includeArchive: {
-      id: 'app.containers.GlobalSettings.title.includeArchive',
+    loadArchived: {
+      id: 'app.containers.GlobalSettings.title.loadArchived',
       defaultMessage: 'Archived content',
     },
   },
   label: {
-    includePast: {
-      id: 'app.containers.GlobalSettings.label.includePast',
+    loadNonCurrent: {
+      id: 'app.containers.GlobalSettings.label.loadNonCurrent',
       defaultMessage: 'Include content from past reporting cycles',
     },
-    includeArchive: {
-      id: 'app.containers.GlobalSettings.label.includeArchive',
+    loadArchived: {
+      id: 'app.containers.GlobalSettings.label.loadArchived',
       defaultMessage: 'Include archived content',
     },
   },
   description: {
-    includePast: {
-      id: 'app.containers.GlobalSettings.description.includePast',
+    loadNonCurrent: {
+      id: 'app.containers.GlobalSettings.description.loadNonCurrent',
       defaultMessage: 'By default only current recommendations are loaded, ie those that belong to the most recent reporting cycle of each human rights body. Likewise only those actions and indicators are loaded that are related to a current recommendation',
     },
-    includeArchive: {
-      id: 'app.containers.GlobalSettings.description.includeArchive',
+    loadArchived: {
+      id: 'app.containers.GlobalSettings.description.loadArchived',
       defaultMessage: 'By default archived content is not loaded',
     },
   },

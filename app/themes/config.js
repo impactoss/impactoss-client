@@ -478,3 +478,15 @@ export const ENTITY_FIELDS = {
 };
 
 export const KEEP_QUERY_ARGS = ['fw', 'loadNonCurrent', 'loadArchived'];
+
+export const SETTINGS = {
+  loadNonCurrent: {
+    available: null,
+    value: false,
+  },
+  loadArchived: { // key also query arg
+    available: null, // will only be set once, once data is loaded
+    value: false, // default value
+    minRole: SEE_ARCHIVED_MIN_ROLE,
+  },
+};

@@ -8,6 +8,7 @@ import {
 import { push, replace, goBack } from 'react-router-redux';
 import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
+import { fromJS } from 'immutable';
 
 import asArray from 'utils/as-array';
 import {
@@ -56,6 +57,7 @@ import {
   DB_TABLES_ARCHIVED,
   ENABLE_AZURE,
   KEEP_QUERY_ARGS,
+  SETTINGS,
 } from 'themes/config';
 
 import {
@@ -82,6 +84,7 @@ import {
   recoverError,
   forwardOnAuthenticationChange,
   updatePath,
+  initializeSettings,
 } from 'containers/App/actions';
 
 import {
@@ -264,6 +267,7 @@ export function* authChangeSaga() {
     // forward to home
     yield put(updatePath('/', { replace: true }));
   }
+  yield put(initializeSettings(fromJS(SETTINGS)));
 }
 
 export function* logoutSaga() {

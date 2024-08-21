@@ -74,6 +74,7 @@ import {
   SET_LOAD_ARCHIVED,
   SET_LOAD_NONCURRENT,
   SHOW_SETTINGS_MODAL,
+  INITIALIZE_SETTINGS,
 } from './constants';
 
 export function submitInvalid(valid) {
@@ -541,5 +542,11 @@ export function showSettingsModal(open = true) {
   return {
     type: SHOW_SETTINGS_MODAL,
     open,
+  };
+}
+export function initializeSettings(settings) { // Immutable Map
+  return {
+    type: INITIALIZE_SETTINGS,
+    settings,
   };
 }

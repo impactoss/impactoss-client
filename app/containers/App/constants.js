@@ -81,6 +81,7 @@ export const DISMISS_QUERY_MESSAGES = 'impactoss/App/DISMISS_QUERY_MESSAGES';
 export const SET_FRAMEWORK = 'impactoss/App/SET_FRAMEWORK';
 export const SET_LOAD_ARCHIVED = 'impactoss/App/SET_LOAD_ARCHIVED';
 export const SET_LOAD_NONCURRENT = 'impactoss/App/SET_LOAD_NONCURRENT';
+export const INITIALIZE_SETTINGS = 'impactoss/App/INITIALIZE_SETTINGS';
 
 export const FILTERS_PANEL = 'filters';
 export const EDIT_PANEL = 'edit';

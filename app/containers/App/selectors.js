@@ -46,6 +46,10 @@ export const selectShowSettings = createSelector(
   getGlobal,
   (globalState) => !!globalState.get('showSettings')
 );
+export const selectSettings = createSelector(
+  getGlobal,
+  (globalState) => globalState.get('settings')
+);
 
 export const selectIsAuthenticating = createSelector(
   getGlobal,
