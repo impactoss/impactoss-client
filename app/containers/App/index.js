@@ -22,7 +22,7 @@ import GlobalSettings from 'containers/GlobalSettings';
 import { sortEntities } from 'utils/sort';
 import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
 
-import { FOOTER } from 'themes/config';
+import { FOOTER, SEE_ARCHIVED_MIN_ROLE } from 'themes/config';
 
 import {
   selectIsSignedIn,
@@ -35,6 +35,9 @@ import {
   selectCurrentFrameworkId,
   selectViewRecommendationFrameworkId,
   selectShowSettings,
+  selectHasPreviousCycles,
+  selectLoadArchivedQuery,
+  selectLoadNonCurrentQuery,
 } from './selectors';
 
 import {
@@ -44,6 +47,8 @@ import {
   updateRouteQuery,
   openNewEntityModal,
   showSettingsModal,
+  setLoadArchived,
+  setLoadNonCurrent,
 } from './actions';
 
 import { ROUTES, DEPENDENCIES } from './constants';
@@ -206,10 +211,31 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       children,
       showSettings,
       onShowSettings,
+      hasPreviousCycles,
+      loadArchived,
+      loadNonCurrent,
+      onSetLoadArchived,
+      onSetLoadNonCurrent,
+      dataReady,
     } = this.props;
     const { intl } = this.context;
     const title = intl.formatMessage(messages.app.title);
     const isHome = location.pathname === ROUTES.INTRO || location.pathname === `${ROUTES.INTRO}/`;
+    // global Settings
+    const settings = {
+      includeArchive: {
+        available: isUserSignedIn || highestRole <= SEE_ARCHIVED_MIN_ROLE,
+        active: loadArchived,
+        onToggle: () => onSetLoadArchived(!loadArchived),
+      },
+      includePast: {
+        available: !dataReady || hasPreviousCycles,
+        active: loadNonCurrent,
+        onToggle: () => onSetLoadNonCurrent(!loadNonCurrent),
+      },
+    };
+
+    const hasSettings = Object.values(settings).some((val) => !!val.available);
 
     return (
       <div>
@@ -250,6 +276,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           fullPath={`${location.pathname}${location.search}`}
           brandPath={ROUTES.OVERVIEW}
           onShowSettings={() => onShowSettings(true)}
+          hasSettings={dataReady && hasSettings}
         />
         <Main isHome={isHome} role="main" id="main-content">
           {React.Children.toArray(children)}
@@ -291,6 +318,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           >
             <GlobalSettings
               onClose={() => onShowSettings(false)}
+              settings={settings}
             />
           </ReactModal>
         )}
@@ -318,6 +346,12 @@ App.propTypes = {
   frameworks: PropTypes.object,
   onShowSettings: PropTypes.func,
   showSettings: PropTypes.bool,
+  hasPreviousCycles: PropTypes.bool,
+  loadArchived: PropTypes.bool,
+  loadNonCurrent: PropTypes.bool,
+  onSetLoadArchived: PropTypes.func,
+  onSetLoadNonCurrent: PropTypes.func,
+  dataReady: PropTypes.bool,
 };
 App.contextTypes = {
   intl: PropTypes.object.isRequired,
@@ -336,7 +370,10 @@ const mapStateToProps = (state, props) => ({
   showSettings: selectShowSettings(state),
   currentFrameworkId: selectCurrentFrameworkId(state),
   frameworks: selectFrameworks(state),
+  hasPreviousCycles: selectHasPreviousCycles(state),
   viewRecommendationFramework: selectViewRecommendationFrameworkId(state, props.params.id),
+  loadArchived: selectLoadArchivedQuery(state),
+  loadNonCurrent: selectLoadNonCurrentQuery(state),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -366,6 +403,8 @@ export function mapDispatchToProps(dispatch) {
         }
       ));
     },
+    onSetLoadArchived: (value) => dispatch(setLoadArchived(value)),
+    onSetLoadNonCurrent: (value) => dispatch(setLoadNonCurrent(value)),
   };
 }
 

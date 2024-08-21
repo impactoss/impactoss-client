@@ -94,6 +94,7 @@ export const DEPENDENCIES = [
   'user_roles',
   'pages',
   'frameworks',
+  'categories',
 ];
 export const SORT_ORDER_OPTIONS = [
   {

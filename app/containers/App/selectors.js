@@ -16,7 +16,12 @@ import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
 import { sortEntities } from 'utils/sort';
 
-import { USER_ROLES, DB_TABLES, CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
+import {
+  USER_ROLES,
+  DB_TABLES,
+  CATEGORY_ADMIN_MIN_ROLE,
+  CURRENT_TAXONOMY_IDS,
+} from 'themes/config';
 
 import {
   filterEntitiesByAttributes,
@@ -1002,3 +1007,13 @@ export const selectViewRecommendationFrameworkId = createSelector(
 //     ).keySeq()
 //   ),
 // );
+
+
+// if there are any non-current categories from the relevant taxonomies then we have multiple cycles
+export const selectHasPreviousCycles = createSelector(
+  (state) => selectEntities(state, 'categories'),
+  (categories) => categories.some(
+    (cat) => !cat.getIn(['attributes', 'is_current'])
+      && CURRENT_TAXONOMY_IDS.indexOf(parseInt(cat.getIn(['attributes', 'taxonomy_id']), 10)) > -1
+  )
+);

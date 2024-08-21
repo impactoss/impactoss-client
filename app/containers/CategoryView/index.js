@@ -110,30 +110,28 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
   getHeaderAsideFields = (entity, isManager) => {
     const { intl } = this.context;
     const fields = []; // fieldGroups
-    if (isManager) {
-      fields.push({
-        fields: [
-          getStatusField(entity),
-          !entity.getIn(['attributes', 'draft'])
-          && getStatusField(
-            entity,
-            'is_current',
-            IS_CURRENT_STATUSES,
-            appMessages.attributes.is_current,
-            true,
-          ),
-          entity.getIn(['attributes', 'is_archive'])
-          && getStatusField(
-            entity,
-            'is_archive',
-            IS_ARCHIVE_STATUSES,
-            appMessages.attributes.is_archive,
-            false,
-          ),
-          getMetaField(entity),
-        ],
-      });
-    }
+    fields.push({
+      fields: [
+        isManager && getStatusField(entity),
+        !entity.getIn(['attributes', 'draft'])
+        && getStatusField(
+          entity,
+          'is_current',
+          IS_CURRENT_STATUSES,
+          appMessages.attributes.is_current,
+          true,
+        ),
+        entity.getIn(['attributes', 'is_archive'])
+        && getStatusField(
+          entity,
+          'is_archive',
+          IS_ARCHIVE_STATUSES,
+          appMessages.attributes.is_archive,
+          false,
+        ),
+        getMetaField(entity),
+      ],
+    });
     if (
       entity.getIn(['taxonomy', 'attributes', 'tags_users'])
       && entity.getIn(['attributes', 'user_only'])

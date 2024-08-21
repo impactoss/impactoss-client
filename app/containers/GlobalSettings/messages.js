@@ -14,31 +14,34 @@ export default defineMessages({
     id: 'app.containers.GlobalSettings.subHeadingText',
     defaultMessage: 'Optionally include content from past reporting cycles and/or archived content',
   },
-
-  isCurrentTitle: {
-    id: 'app.containers.GlobalSettings.isCurrentTitle',
-    defaultMessage: 'Content by reporting cycle',
+  title: {
+    includePast: {
+      id: 'app.containers.GlobalSettings.title.includePast',
+      defaultMessage: 'Content by reporting cycle',
+    },
+    includeArchive: {
+      id: 'app.containers.GlobalSettings.title.includeArchive',
+      defaultMessage: 'Archived content',
+    },
   },
-  isCurrentHint: {
-    id: 'app.containers.GlobalSettings.isCurrentHint',
-    defaultMessage: 'Include content from past reporting cycles',
+  label: {
+    includePast: {
+      id: 'app.containers.GlobalSettings.label.includePast',
+      defaultMessage: 'Include content from past reporting cycles',
+    },
+    includeArchive: {
+      id: 'app.containers.GlobalSettings.label.includeArchive',
+      defaultMessage: 'Include archived content',
+    },
   },
-  isCurrentDescription: {
-    id: 'app.containers.GlobalSettings.isCurrentDescription',
-    defaultMessage: 'By default only current recommendations are loaded, ie those that belong to the most recent reporting cycle of each human rights body. Likewise only those actions and indicators are loaded that are related to a current recommendation',
+  description: {
+    includePast: {
+      id: 'app.containers.GlobalSettings.description.includePast',
+      defaultMessage: 'By default only current recommendations are loaded, ie those that belong to the most recent reporting cycle of each human rights body. Likewise only those actions and indicators are loaded that are related to a current recommendation',
+    },
+    includeArchive: {
+      id: 'app.containers.GlobalSettings.description.includeArchive',
+      defaultMessage: 'By default archived content is not loaded',
+    },
   },
-
-  isArchivedTitle: {
-    id: 'app.containers.GlobalSettings.isArchivedTitle',
-    defaultMessage: 'Archived content',
-  },
-  isArchivedHint: {
-    id: 'app.containers.GlobalSettings.isArchivedHint',
-    defaultMessage: 'Include archived content',
-  },
-  isArchivedDescription: {
-    id: 'app.containers.GlobalSettings.isArchivedDescription',
-    defaultMessage: 'By default only archived is not loaded',
-  },
-
 });

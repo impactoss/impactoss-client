@@ -6,7 +6,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl, intlShape } from 'react-intl';
 
 import {
@@ -19,16 +18,6 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import { isMinSize } from 'utils/responsive';
-
-import {
-  selectLoadArchivedQuery,
-  selectLoadNonCurrentQuery,
-} from 'containers/App/selectors';
-
-import {
-  setLoadArchived,
-  setLoadNonCurrent,
-} from 'containers/App/actions';
 
 import FormBody from 'components/forms/FormBody';
 import FormFieldWrap from 'components/forms/FormFieldWrap';
@@ -82,7 +71,7 @@ const Toggle = styled(CheckBox)`
      + span {
       outline: 2px solid ${palette('buttonDefaultIconOnly', 1)};
       outline-offset: 2px;
-    } 
+    }
   }
   &:not([disabled]) {
     border-color: unset;
@@ -102,10 +91,7 @@ const Toggle = styled(CheckBox)`
   `;
 
 const GlobalSettings = ({
-  loadArchived,
-  loadNonCurrent,
-  onSetLoadArchived,
-  onSetLoadNonCurrent,
+  settings,
   onClose,
 }) => {
   const size = React.useContext(ResponsiveContext);
@@ -144,78 +130,49 @@ const GlobalSettings = ({
           <FormBody>
             <Box>
               <StyledFieldGroupWrapper>
-                {!!onSetLoadNonCurrent && (
-                  <Field>
-                    <Box margin={{ bottom: 'medium' }}>
-                      <FormFieldWrap>
-                        <StyledLabel size="medium" weight="bold">
-                          <FormattedMessage {...messages.isCurrentTitle} />
-                        </StyledLabel>
-                      </FormFieldWrap>
-                    </Box>
-                    <FormFieldWrap>
-                      <Box
-                        direction={isMinSize(size, 'medium') ? 'row' : 'column'}
-                        gap="medium"
-                      >
-                        <Box basis={isMinSize(size, 'medium') ? '1/2' : '1'}>
-                          <Toggle
-                            toggle
-                            name="radio-ignore-noncurrent"
-                            checked={loadNonCurrent}
-                            label={(
-                              <StyledBodyText weight={500}>
-                                <FormattedMessage {...messages.isCurrentHint} />
-                              </StyledBodyText>
-                            )}
-                            onChange={() => onSetLoadNonCurrent(!loadNonCurrent)}
-                          />
+                {Object.keys(settings)
+                  .filter((key) => settings[key].available)
+                  .map((key) => {
+                    const setting = settings[key];
+                    return (
+                      <Field key={key}>
+                        <Box margin={{ bottom: 'medium' }}>
+                          <FormFieldWrap>
+                            <StyledLabel size="medium" weight="bold">
+                              <FormattedMessage {...messages.title[key]} />
+                            </StyledLabel>
+                          </FormFieldWrap>
                         </Box>
-                        <Box basis={isMinSize(size, 'medium') ? '1/2' : '1'}>
-                          <StyledBodyText weight={300}>
-                            <FormattedMessage {...messages.isCurrentDescription} />
-                          </StyledBodyText>
-                        </Box>
-                      </Box>
-                    </FormFieldWrap>
-                  </Field>
-                )}
-                {!!onSetLoadArchived && (
-                  <Field>
-                    <Box margin={{ bottom: 'medium' }}>
-                      <FormFieldWrap>
-                        <StyledLabel size="medium" weight="bold">
-                          <FormattedMessage {...messages.isArchivedTitle} />
-                        </StyledLabel>
-                      </FormFieldWrap>
-                    </Box>
-                    <FormFieldWrap>
-                      <Box
-                        direction={isMinSize(size, 'medium') ? 'row' : 'column'}
-                        gap="medium"
-                      >
-                        <Box basis={isMinSize(size, 'medium') ? '1/2' : '1'}>
-                          <Toggle
-                            toggle
-                            name="radio-ignore-archived"
-                            checked={loadArchived}
-                            label={(
-                              <StyledBodyText weight={500}>
-                                <FormattedMessage {...messages.isArchivedHint} />
-                              </StyledBodyText>
-                            )}
-                            onChange={() => onSetLoadArchived(!loadArchived)}
-                          />
-                        </Box>
-                        <Box basis={isMinSize(size, 'medium') ? '1/2' : '1'}>
-                          <StyledBodyText weight={300}>
-                            <FormattedMessage {...messages.isArchivedDescription} />
-                          </StyledBodyText>
-                        </Box>
-                      </Box>
-                    </FormFieldWrap>
-                  </Field>
-                )}
+                        <FormFieldWrap>
+                          <Box
+                            direction={isMinSize(size, 'medium') ? 'row' : 'column'}
+                            gap="medium"
+                          >
+                            <Box basis={isMinSize(size, 'medium') ? '1/2' : '1'}>
+                              <Toggle
+                                toggle
+                                name="radio-ignore-noncurrent"
+                                checked={setting.active}
+                                label={(
+                                  <StyledBodyText weight={500}>
+                                    <FormattedMessage {...messages.label[key]} />
+                                  </StyledBodyText>
+                                )}
+                                onChange={setting.onToggle}
+                              />
+                            </Box>
+                            <Box basis={isMinSize(size, 'medium') ? '1/2' : '1'}>
+                              {messages.description[key] && (
+                                <StyledBodyText weight={300}>
+                                  <FormattedMessage {...messages.description[key]} />
+                                </StyledBodyText>
+                              )}
+                            </Box>
+                          </Box>
+                        </FormFieldWrap>
+                      </Field>
+                    );
+                  })}
               </StyledFieldGroupWrapper>
             </Box>
           </FormBody>
@@ -226,24 +183,9 @@ const GlobalSettings = ({
 };
 
 GlobalSettings.propTypes = {
-  loadArchived: PropTypes.bool,
-  loadNonCurrent: PropTypes.bool,
-  onSetLoadArchived: PropTypes.func,
-  onSetLoadNonCurrent: PropTypes.func,
+  settings: PropTypes.object,
   onClose: PropTypes.func,
   intl: intlShape,
 };
 
-const mapStateToProps = (state) => ({
-  loadArchived: selectLoadArchivedQuery(state),
-  loadNonCurrent: selectLoadNonCurrentQuery(state),
-});
-
-export function mapDispatchToProps(dispatch) {
-  return {
-    onSetLoadArchived: (value) => dispatch(setLoadArchived(value)),
-    onSetLoadNonCurrent: (value) => dispatch(setLoadNonCurrent(value)),
-  };
-}
-
-export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(GlobalSettings));
+export default injectIntl(GlobalSettings);

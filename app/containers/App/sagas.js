@@ -805,7 +805,7 @@ export function* updatePathSaga({ path, args }) {
   } else {
     // otherwise keep "specific args" incl framework (unless explicitly removed)
     const argsRemove = query
-      ? query.filter((item) => item.remove).map((item) => item.arg)
+      ? asArray(query).filter((item) => item.remove).map((item) => item.arg)
       : [];
     const queryKeep = location.get('query').filter(
       (val, key) => KEEP_QUERY_ARGS.indexOf(key) > -1 && argsRemove.indexOf(key) === -1
