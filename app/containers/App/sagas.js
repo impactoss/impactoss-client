@@ -803,9 +803,12 @@ export function* updatePathSaga({ path, args }) {
       ...location.get('query').toJS(),
     };
   } else {
-    // otherwise keep "specific args" incl framework
+    // otherwise keep "specific args" incl framework (unless explicitly removed)
+    const argsRemove = query
+      ? query.filter((item) => item.remove).map((item) => item.arg)
+      : [];
     const queryKeep = location.get('query').filter(
-      (val, key) => KEEP_QUERY_ARGS.indexOf(key) > -1
+      (val, key) => KEEP_QUERY_ARGS.indexOf(key) > -1 && argsRemove.indexOf(key) === -1
     ).toJS();
     queryNext = {
       ...queryNext,
