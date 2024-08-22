@@ -859,7 +859,7 @@ const getMeasureFields = ({ existingReferences }, formatMessage) => ({
     }],
     aside: [{ // fieldGroup
       fields: [
-        getDateField(formatMessage, 'target_date'),
+        getDateField({ formatMessage, attribute: 'target_date' }),
         getTextareaField(formatMessage, 'target_date_comment'),
       ],
     }],
