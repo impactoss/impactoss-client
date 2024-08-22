@@ -22,7 +22,7 @@ import GlobalSettings from 'containers/GlobalSettings';
 import { sortEntities } from 'utils/sort';
 import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
 
-import { FOOTER, SETTINGS } from 'themes/config';
+import { FOOTER } from 'themes/config';
 
 import {
   selectIsSignedIn,
@@ -36,8 +36,6 @@ import {
   selectViewRecommendationFrameworkId,
   selectShowSettings,
   selectHasPreviousCycles,
-  selectLoadArchivedQuery,
-  selectLoadNonCurrentQuery,
   selectSettings,
 } from './selectors';
 
@@ -48,8 +46,6 @@ import {
   updateRouteQuery,
   openNewEntityModal,
   showSettingsModal,
-  setLoadArchived,
-  setLoadNonCurrent,
   initializeSettings,
 } from './actions';
 
@@ -94,6 +90,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       this.props.loadEntitiesIfNeeded();
     }
     if (dataReady && settings) {
+      // only iniitlize settings if some not yet initialized (available = null)
       if (settings.some((setting) => setting.get('available') === null)) {
         this.props.onInitializeSettings(nextProps);
       }
@@ -219,54 +216,13 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       children,
       showSettings,
       onShowSettings,
-      loadArchived,
-      loadNonCurrent,
-      onSetLoadArchived,
-      onSetLoadNonCurrent,
       dataReady,
       settings,
     } = this.props;
     const { intl } = this.context;
     const title = intl.formatMessage(messages.app.title);
     const isHome = location.pathname === ROUTES.INTRO || location.pathname === `${ROUTES.INTRO}/`;
-    // add actions global Settings
-    // {
-    //   includeArchive: {
-    //     available: isUserSignedIn || highestRole <= SEE_ARCHIVED_MIN_ROLE,
-    //     active: loadArchived,
-    //     onToggle: () => onSetLoadArchived(!loadArchived),
-    //   },
-    //   includePast: {
-    //     available: !dataReady || hasPreviousCycles,
-    //     active: loadNonCurrent,
-    //     onToggle: () => onSetLoadNonCurrent(!loadNonCurrent),
-    //   },
-    // };
-    const mySettings = Object.keys(SETTINGS).reduce(
-      (memo, key) => {
-        let onToggle;
-        let active;
-        if (key === 'loadArchived') {
-          onToggle = () => onSetLoadArchived(!loadArchived);
-          active = loadArchived;
-        } else if (key === 'loadNonCurrent') {
-          onToggle = () => onSetLoadNonCurrent(!loadNonCurrent);
-          active = loadNonCurrent;
-        }
-        const setting = settings.get(key);
-        return ({
-          ...memo,
-          [key]: {
-            available: setting && setting.get('available'),
-            active,
-            onToggle,
-          },
-        });
-      },
-      {},
-    );
-    const hasSettings = Object.values(mySettings).some((val) => !!val.available);
-
+    const hasSettings = settings && settings.some((val) => !!val.get('available'));
     return (
       <div>
         <SkipContent
@@ -348,7 +304,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           >
             <GlobalSettings
               onClose={() => onShowSettings(false)}
-              settings={mySettings}
+              settings={settings}
             />
           </ReactModal>
         )}
@@ -377,10 +333,6 @@ App.propTypes = {
   onShowSettings: PropTypes.func,
   showSettings: PropTypes.bool,
   hasPreviousCycles: PropTypes.bool,
-  loadArchived: PropTypes.bool,
-  loadNonCurrent: PropTypes.bool,
-  onSetLoadArchived: PropTypes.func,
-  onSetLoadNonCurrent: PropTypes.func,
   onInitializeSettings: PropTypes.func,
   settings: PropTypes.object,
   dataReady: PropTypes.bool,
@@ -404,8 +356,6 @@ const mapStateToProps = (state, props) => ({
   frameworks: selectFrameworks(state),
   hasPreviousCycles: selectHasPreviousCycles(state),
   viewRecommendationFramework: selectViewRecommendationFrameworkId(state, props.params.id),
-  loadArchived: selectLoadArchivedQuery(state),
-  loadNonCurrent: selectLoadNonCurrentQuery(state),
   settings: selectSettings(state),
 });
 
@@ -436,21 +386,13 @@ export function mapDispatchToProps(dispatch) {
         }
       ));
     },
-    onSetLoadArchived: (value) => dispatch(setLoadArchived(value)),
-    onSetLoadNonCurrent: (value) => dispatch(setLoadNonCurrent(value)),
     onInitializeSettings: ({
       settings, // immutable Map
       isUserSignedIn,
       highestRole,
       hasPreviousCycles,
     }) => {
-      // console.log(
-      //   'settings, isUserSignedIn, highestRole, hasPreviousCycles',
-      //   settings && settings.toJS(),
-      //   isUserSignedIn,
-      //   highestRole,
-      //   hasPreviousCycles
-      // );
+      // only initialize settings not previously initialized (available === null)
       const updatedSettings = settings.map((setting, key) => {
         let updated = setting;
         if (setting.get('available') === null) {

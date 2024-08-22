@@ -6,6 +6,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl, intlShape } from 'react-intl';
 
 import {
@@ -25,6 +26,16 @@ import FieldGroupWrapper from 'components/fields/FieldGroupWrapper';
 import Field from 'components/fields/Field';
 import ButtonDefaultIconOnly from 'components/buttons/ButtonDefaultIconOnly';
 import Icon from 'components/Icon';
+
+import {
+  selectLoadArchivedQuery,
+  selectLoadNonCurrentQuery,
+} from 'containers/App/selectors';
+
+import {
+  setLoadArchived,
+  setLoadNonCurrent,
+} from 'containers/App/actions';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
@@ -92,6 +103,10 @@ const Toggle = styled(CheckBox)`
 
 const GlobalSettings = ({
   settings,
+  loadArchived,
+  loadNonCurrent,
+  onSetLoadArchived,
+  onSetLoadNonCurrent,
   onClose,
 }) => {
   const size = React.useContext(ResponsiveContext);
@@ -130,10 +145,16 @@ const GlobalSettings = ({
           <FormBody>
             <Box>
               <StyledFieldGroupWrapper>
-                {Object.keys(settings)
-                  .filter((key) => settings[key].available)
+                {settings
+                  .filter((setting) => setting.get('available'))
+                  .keySeq()
                   .map((key) => {
-                    const setting = settings[key];
+                    let active;
+                    if (key === 'loadArchived') {
+                      active = loadArchived;
+                    } else if (key === 'loadNonCurrent') {
+                      active = loadNonCurrent;
+                    }
                     return (
                       <Field key={key}>
                         <Box margin={{ bottom: 'medium' }}>
@@ -152,13 +173,19 @@ const GlobalSettings = ({
                               <Toggle
                                 toggle
                                 name="radio-ignore-noncurrent"
-                                checked={setting.active}
+                                checked={active}
                                 label={(
                                   <StyledBodyText weight={500}>
                                     <FormattedMessage {...messages.label[key]} />
                                   </StyledBodyText>
                                 )}
-                                onChange={setting.onToggle}
+                                onChange={() => {
+                                  if (key === 'loadArchived') {
+                                    onSetLoadArchived(!loadArchived);
+                                  } else if (key === 'loadNonCurrent') {
+                                    onSetLoadNonCurrent(!loadNonCurrent);
+                                  }
+                                }}
                               />
                             </Box>
                             <Box basis={isMinSize(size, 'medium') ? '1/2' : '1'}>
@@ -184,8 +211,24 @@ const GlobalSettings = ({
 
 GlobalSettings.propTypes = {
   settings: PropTypes.object,
+  loadArchived: PropTypes.bool,
+  loadNonCurrent: PropTypes.bool,
+  onSetLoadArchived: PropTypes.func,
+  onSetLoadNonCurrent: PropTypes.func,
   onClose: PropTypes.func,
   intl: intlShape,
 };
 
-export default injectIntl(GlobalSettings);
+const mapStateToProps = (state) => ({
+  loadArchived: selectLoadArchivedQuery(state),
+  loadNonCurrent: selectLoadNonCurrentQuery(state),
+});
+
+export function mapDispatchToProps(dispatch) {
+  return {
+    onSetLoadArchived: (value) => dispatch(setLoadArchived(value)),
+    onSetLoadNonCurrent: (value) => dispatch(setLoadNonCurrent(value)),
+  };
+}
+
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(GlobalSettings));
