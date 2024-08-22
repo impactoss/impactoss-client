@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { Formik, Field as FormikField, Form } from 'formik';
 
-import CsvDownloader from 'react-csv-downloader';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
@@ -36,6 +35,7 @@ import FormFooter from '../FormFooter';
 import FormFooterButtons from '../FormFooterButtons';
 
 import messages from './messages';
+import CsvDownloadHandler from './CsvDownloadHandler';
 
 const StyledForm = styled(Form)`
   display: table;
@@ -171,14 +171,14 @@ export class ImportEntitiesForm extends React.PureComponent {
                           <li>
                             <FormattedMessage {...messages.templateHint} />
                             <CsvDownload>
-                              <CsvDownloader
-                                datas={asArray(template.data)}
+                              <CsvDownloadHandler
+                                data={asArray(template.data)}
                                 filename={template.filename}
                               >
                                 <NoteLink href="/" onClick={(evt) => evt.preventDefault()}>
                                   <FormattedMessage {...messages.templateHintDownloadLink} />
                                 </NoteLink>
-                              </CsvDownloader>
+                              </CsvDownloadHandler>
                             </CsvDownload>
                           </li>
                           <li>

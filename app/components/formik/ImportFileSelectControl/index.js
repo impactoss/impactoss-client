@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import FileReaderInput from 'react-file-reader-input';
 import Papa from 'papaparse';
 
 import Icon from 'components/Icon';
@@ -13,6 +12,7 @@ import ButtonDefaultWithIcon from 'components/buttons/ButtonDefaultWithIcon';
 
 import DocumentWrap from 'components/fields/DocumentWrap';
 import Messages from 'components/Messages';
+import CsvReaderHandler from './CsvReaderHandler';
 
 import messages from './messages';
 
@@ -82,12 +82,14 @@ class ImportFileSelectControl extends React.PureComponent { // eslint-disable-li
     this.setState({ errors: [] });
   };
 
-  handleChange = (e, results) => {
+  handleChange = (results) => {
+    // console.log(results)
     // todo: limit to 1 file?
-    results.forEach((result) => {
+    results.data.forEach((result) => {
       const [evt, file] = result;
       try {
         const parsed = Papa.parse(evt.target.result, { header: true, skipEmptyLines: true, delimiter: ',' });
+        //console.log(parsed)
         if (parsed && parsed.errors && parsed.errors.length > 0) {
           this.setState(
             (prevState) => ({
@@ -153,15 +155,21 @@ class ImportFileSelectControl extends React.PureComponent { // eslint-disable-li
         }
         {!this.props.value && (this.state.errors.length === 0)
           && (
-            <FileReaderInput
+            <CsvReaderHandler
               as={this.props.as}
               accept={this.props.accept}
-              onChange={this.handleChange}
-            >
-              <ButtonDefaultWithIcon type="button" title={intl.formatMessage(messages.selectFile)} icon="add" />
-            </FileReaderInput>
-          )
-        }
+              onUploadAccepted={this.handleChange}
+            >{
+                ({ getRootProps }) => (
+                  <ButtonDefaultWithIcon
+                    {...getRootProps()}
+                    type="button"
+                    title={intl.formatMessage(messages.selectFile)}
+                    icon="add"
+                  />
+                )}
+            </CsvReaderHandler>
+          )}
       </Styled>
     );
   }

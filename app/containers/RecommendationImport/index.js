@@ -88,7 +88,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
             success={this.props.success}
             progress={this.props.progress}
             template={{
-              filename: `${intl.formatMessage(messages.filename)}.csv`,
+              filename: `${intl.formatMessage(messages.filename)}`,
               data: getImportFields({
                 fields: [
                   {

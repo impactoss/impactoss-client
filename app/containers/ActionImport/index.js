@@ -86,7 +86,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             success={this.props.success}
             progress={this.props.progress}
             template={{
-              filename: `${intl.formatMessage(messages.filename)}.csv`,
+              filename: `${intl.formatMessage(messages.filename)}`,
               data: getImportFields({
                 fields: [
                   {

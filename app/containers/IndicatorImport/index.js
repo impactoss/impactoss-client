@@ -89,7 +89,7 @@ export class IndicatorImport extends React.PureComponent { // eslint-disable-lin
             success={this.props.success}
             progress={this.props.progress}
             template={{
-              filename: `${intl.formatMessage(messages.filename)}.csv`,
+              filename: `${intl.formatMessage(messages.filename)}`,
               data: getImportFields({
                 fields: [
                   {

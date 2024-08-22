@@ -13,7 +13,6 @@ import { snakeCase } from 'lodash/string';
 
 import styled from 'styled-components';
 import { List, Map } from 'immutable';
-import CsvDownloader from 'react-csv-downloader';
 
 import {
   Box,
@@ -34,6 +33,7 @@ import { filterEntitiesByKeywords } from 'utils/entities';
 import { isMinSize } from 'utils/responsive';
 
 import OptionsForEntityList from './OptionsForEntityList';
+import CsvDownloadHandler from './CsvDownloadHandler';
 
 import messages from './messages';
 import {
@@ -443,11 +443,12 @@ export function EntityListDownload({
             <StyledButtonCancel type="button" onClick={() => onClose()}>
               <FormattedMessage {...appMessages.buttons.cancel} />
             </StyledButtonCancel>
-            <CsvDownloader
-              datas={csvData}
+            <CsvDownloadHandler
+              data={csvData}
               columns={csvColumns}
               filename={`${csvFilename}${csvSuffix ? csvDateSuffix : ''}`}
               bom={false}
+              config={{ quoteChar: '', escapeChar: '' }}
             >
               <ButtonSubmit
                 type="button"
@@ -458,7 +459,7 @@ export function EntityListDownload({
               >
                 <FormattedMessage {...messages.buttonDownload} />
               </ButtonSubmit>
-            </CsvDownloader>
+            </CsvDownloadHandler>
           </Box>
         </Footer>
       )}
