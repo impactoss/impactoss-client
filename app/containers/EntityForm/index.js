@@ -170,15 +170,19 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         options: formData.getIn(field.dataPath) || List(),
       };
     } else {
-      fieldProps = { ...field, onChange: formikField.onChange, value: formikField.value };
+      const modifiedField = field.modifyFieldAttributes
+        ? field.modifyFieldAttributes(field, form.values)
+        : field;
+
+      fieldProps = { ...modifiedField, onChange: formikField.onChange, value: formikField.value };
     }
     return fieldProps;
   };
 
   fieldValidation = (value, field, formikProps) => {
     let errors = field.validators && validateField(value, field);
-    if (!errors && field.changeAction) {
-      errors = field.changeAction(value, formikProps);
+    if (!errors && field.dynamicValidators && typeof field.dynamicValidators === 'function') {
+      errors = field.dynamicValidators(value, formikProps);
     }
     return errors;
   };
@@ -302,12 +306,19 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       {group.fields.map((field, i) => {
         if (!field) return null;
         if (field.controlType !== 'info') {
-          const FieldComponent = field.changeAction ? FieldWithContext : FormikField;
+          const isContextRequiredForField =
+            field.dynamicValidators
+            || field.modifyFieldAttributes
+            || field.isFieldDisabled;
+          const FieldComponent = isContextRequiredForField ? FieldWithContext : FormikField;
+
+          // if(field.modifyFieldAttribute)
           return (
             <FieldComponent
               key={i}
               name={field.name}
-              validate={(value, formikProps) => this.fieldValidation(value, field, formikProps)}
+              validate={(value, formData) => this.fieldValidation(value, field, formData)}
+              field={isContextRequiredForField ? field : null}
             >
               {({ field: formikField, form, meta }) => {
                 let fieldProps = this.getFieldProps(field, form, formikField);

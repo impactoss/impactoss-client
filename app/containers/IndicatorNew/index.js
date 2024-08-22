@@ -23,6 +23,7 @@ import {
   getStatusField,
   getMarkdownFormField,
   getDateField,
+  modifyStartDateField,
   getFrequencyField,
   getCheckboxField,
   getConnectionUpdatesFromFormData,
@@ -71,14 +72,11 @@ import {
 import messages from './messages';
 import { save } from './actions';
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
-const STATE_INITIAL = {
-  repeat: false,
-};
+
 export class IndicatorNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
-    this.state = STATE_INITIAL;
   }
 
   UNSAFE_componentWillMount() {
@@ -176,7 +174,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     return groups;
   };
 
-  getBodyAsideFields = (users, repeat, intl) => 
+  getBodyAsideFields = (users, intl) => 
     ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.schedule),
@@ -185,24 +183,38 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
           getDateField(
             intl.formatMessage,
             'start_date',
-            repeat,
-            repeat ? 'start_date' : 'start_date_only'
+            false,
+            'start_date',
+            false,
+            false,
+            (field, formData) =>
+              modifyStartDateField(
+                field,
+                this.props.isRepeat(formData),
+                this.props.intl,
+              )
           ),
           getCheckboxField(
             intl.formatMessage,
             'repeat',
-            (value) => this.handleRepeatChange(value)),
-          repeat ? getFrequencyField(intl.formatMessage) : null,
-          repeat ? getDateField(
+            false),
+          getFrequencyField(
+            intl.formatMessage,
+            (formData) => !this.props.isRepeat(formData)
+          ),
+          getDateField(
             intl.formatMessage,
             'end_date',
-            repeat,
+            false,
             'end_date',
-            (value, formData) => this.props.onEndDateChange(
-              value, formData, intl.formatMessage,
-            )
-          )
-            : null,
+            (value, formData) =>
+              this.props.onEndDateChange(
+                value,
+                formData,
+                intl.formatMessage,
+              ),
+            (formData) => !this.props.isRepeat(formData),
+          ),
           renderUserControl(
             users,
             intl.formatMessage(appMessages.attributes.manager_id.indicators),
@@ -293,7 +305,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                   },
                   body: {
                     main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption, intl),
-                    aside: this.getBodyAsideFields(users, this.state.repeat, intl),
+                    aside: this.getBodyAsideFields(users, intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -348,12 +360,13 @@ function mapDispatchToProps(dispatch) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    onEndDateChange: (dateValue, formValues, formatMessage) => {
+    isRepeat: (formData) => formData.attributes.repeat,
+    onEndDateChange: (endDate, formValues, formatMessage) => {
       const formData = fromJS(formValues);
       if (formData.getIn(['attributes', 'repeat'])
-        && validateRequired(dateValue)
+        && validateRequired(endDate)
         && validateRequired(formData.getIn(['attributes', 'start_date']))
-        && !validateDateAfterDate(dateValue, formData.getIn(['attributes', 'start_date']))
+        && !validateDateAfterDate(endDate, formData.getIn(['attributes', 'start_date']))
       ) {
         return formatMessage(appMessages.forms.endDateBeforeStartDateError);
       }

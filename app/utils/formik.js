@@ -386,12 +386,13 @@ export const getAcceptedField = (formatMessage) => ({
   options: ACCEPTED_STATUSES,
 });
 
-export const getFrequencyField = (formatMessage) => ({
+export const getFrequencyField = (formatMessage, isFieldDisabled) => ({
   id: 'frequency_months',
   controlType: 'select',
   name: 'attributes.frequency_months',
   label: formatMessage(appMessages.attributes.frequency_months),
   options: REPORT_FREQUENCIES,
+  isFieldDisabled: isFieldDisabled,
 });
 
 export const getDocumentStatusField = (formatMessage) => ({
@@ -547,28 +548,67 @@ export const getTextareaField = (formatMessage, attribute = 'description') => ge
   attribute,
 });
 
-export const getDateField = (formatMessage, attribute, required = false, label, onChange) => {
+export const getDateField = (
+  formatMessage,
+  attribute,
+  required = false,
+  label,
+  dynamicValidators,
+  isFieldDisabled,
+  modifyFieldAttributes
+) => {
   const field = getFormField({
     formatMessage,
     controlType: 'date',
     attribute,
     required,
     label,
-    onChange,
+    dynamicValidators,
   });
+  if (isFieldDisabled && typeof isFieldDisabled === 'function') {
+    field.isFieldDisabled = isFieldDisabled;
+  }
+  if (modifyFieldAttributes && typeof modifyFieldAttributes === 'function') {
+    field.modifyFieldAttributes = modifyFieldAttributes;
+  }
   field.validators.date = validateDateFormat;
   field.errorMessages.date = formatMessage(appMessages.forms.dateFormatError, { format: DATE_FORMAT });
   return field;
 };
 
-export const getCheckboxField = (formatMessage, attribute, onChange) => (
+export const modifyStartDateField = (field, isRepeat, intl) => {
+  const modifiedField = { ...field };
+  if (isRepeat) {
+    modifiedField.required = true;
+    modifiedField.validators = { ...modifiedField.validators, required: validateRequired };
+    modifiedField.errorMessages = { ...modifiedField.errorMessages, required: intl.formatMessage(appMessages.forms.fieldRequired) };
+    modifiedField.label = intl.formatMessage(appMessages.attributes['start_date_only']);
+  } else {
+    if (modifiedField.validators
+      && modifiedField.validators
+      && modifiedField.validators.required
+    ) {
+      delete modifiedField.validators.required;
+    }
+    if (modifiedField.errorMessages
+      && modifiedField.errorMessages
+      && modifiedField.errorMessages.required) {
+      delete modifiedField.errorMessages.required;
+    }
+    modifiedField.required = false;
+    modifiedField.label = intl.formatMessage(appMessages.attributes['start_date']);
+  }
+  return modifiedField;
+};
+
+export const getCheckboxField = (formatMessage, attribute, dynamicValidators) => (
   {
     id: attribute,
     controlType: 'checkbox',
     name: `attributes.${attribute}`,
     label: appMessages.attributes[attribute] && formatMessage(appMessages.attributes[attribute]),
     // value: entity && entity.getIn(['attributes', attribute]) ? entity.getIn(['attributes', attribute]) : false,
-    changeAction: onChange,
+    dynamicValidators,
     hint: appMessages.hints[attribute] && formatMessage(appMessages.hints[attribute]),
   });
 
@@ -658,7 +698,7 @@ export const getFormField = ({
   label,
   placeholder,
   hint,
-  onChange,
+  dynamicValidators,
   type,
   prohibitedValues,
 }) => {
@@ -673,8 +713,8 @@ export const getFormField = ({
     errorMessages: {},
     hint,
   };
-  if (onChange) {
-    field.changeAction = onChange;
+  if (dynamicValidators) {
+    field.dynamicValidators = dynamicValidators;
   }
   if (required) {
     field.validators.required = typeof required === 'function' ? required : validateRequired;
@@ -847,6 +887,10 @@ export const validateField = (value, field) => {
   const firstErrorKey =
     validators &&
     Object.keys(validators).length > 0 &&
-    Object.keys(validators).find((validator) => !validators[validator](value));
+    Object.keys(validators)
+      .find((validator) =>
+        validators[validator]
+        && !validators[validator](value));
+
   return firstErrorKey ? errorMessages[firstErrorKey] : null;
 };

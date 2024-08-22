@@ -24,6 +24,7 @@ import {
   getStatusField,
   getMarkdownFormField,
   getDateField,
+  modifyStartDateField,
   getFrequencyField,
   getCheckboxField,
 } from 'utils/formik';
@@ -202,8 +203,9 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     return groups;
   };
 
-  getBodyAsideFields = (entity, users, repeat, intl) =>
-    ([// fieldGroups
+  getBodyAsideFields = (entity, users, intl) => {
+    const repeat = entity.getIn(['attributes', 'repeat']) || false;
+    return ([// fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.schedule),
         icon: 'reminder',
@@ -213,23 +215,37 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             'start_date',
             repeat,
             repeat ? 'start_date' : 'start_date_only',
+            false,
+            false,
+            (field, formData) =>
+              modifyStartDateField(
+                field,
+                this.props.isRepeat(formData),
+                this.props.intl,
+              )
           ),
           getCheckboxField(
             intl.formatMessage,
             'repeat',
-            (value) => this.setState({ repeat: value })
+            repeat
           ),
-          repeat ? getFrequencyField(intl.formatMessage, entity) : null,
-          repeat ? getDateField(
+          getFrequencyField(
+            intl.formatMessage,
+            (formData) => !this.props.isRepeat(formData)
+          ),
+          getDateField(
             intl.formatMessage,
             'end_date',
             repeat,
             'end_date',
-            (value, formData) => this.props.onEndDateChange(
-              value, formData, intl.formatMessage,
-            )
-          )
-            : null,
+            (value, formData) =>
+              this.props.onEndDateChange(
+                value,
+                formData,
+                intl.formatMessage,
+              ),
+            (formData) => !this.props.isRepeat(formData),
+          ),
           renderUserControl(
             users,
             intl.formatMessage(appMessages.attributes.manager_id.indicators),
@@ -238,6 +254,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         ],
       },
     ]);
+  }
 
   render() {
     const {
@@ -342,7 +359,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                   },
                   body: {
                     main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption, intl),
-                    aside: this.getBodyAsideFields(viewEntity, users, this.state.repeat, intl),
+                    aside: this.getBodyAsideFields(viewEntity, users, intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -408,6 +425,7 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
+    isRepeat: (formData) => formData.attributes.repeat,
     onEndDateChange: (dateValue, formValues, formatMessage) => {
       const formData = fromJS(formValues);
       let errors;
@@ -481,7 +499,6 @@ function mapDispatchToProps(dispatch, props) {
       if (formRef.trim() === '') {
         saveData = saveData.setIn(['attributes', 'reference'], formData.get('id'));
       }
-      console.log(saveData.getIn(['attributes', 'repeat']))
       // do not store repeat fields when not repeat
       if (!saveData.getIn(['attributes', 'repeat'])) {
         saveData = saveData
