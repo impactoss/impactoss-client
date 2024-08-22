@@ -307,12 +307,10 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         if (!field) return null;
         if (field.controlType !== 'info') {
           const isContextRequiredForField =
-            field.dynamicValidators
-            || field.modifyFieldAttributes
-            || field.isFieldDisabled;
+            !!field.dynamicValidators
+            || !!field.modifyFieldAttributes
+            || !!field.isFieldDisabled;
           const FieldComponent = isContextRequiredForField ? FieldWithContext : FormikField;
-
-          // if(field.modifyFieldAttribute)
           return (
             <FieldComponent
               key={i}
