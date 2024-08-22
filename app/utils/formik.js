@@ -548,15 +548,15 @@ export const getTextareaField = (formatMessage, attribute = 'description') => ge
   attribute,
 });
 
-export const getDateField = (
+export const getDateField = ({  
   formatMessage,
   attribute,
   required = false,
   label,
   dynamicValidators,
   isFieldDisabled,
-  modifyFieldAttributes
-) => {
+  modifyFieldAttributes,
+}) => {
   const field = getFormField({
     formatMessage,
     controlType: 'date',

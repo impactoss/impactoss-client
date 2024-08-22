@@ -189,7 +189,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getDateField(intl.formatMessage, 'target_date'),
+          getDateField({ formatMessage: intl.formatMessage, attribute: 'target_date' }),
           getTextareaField(intl.formatMessage, 'target_date_comment'),
         ],
       },

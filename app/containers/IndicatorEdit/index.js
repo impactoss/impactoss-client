@@ -210,20 +210,19 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         label: intl.formatMessage(appMessages.entities.due_dates.schedule),
         icon: 'reminder',
         fields: [
-          getDateField(
-            intl.formatMessage,
-            'start_date',
+          getDateField({
+            formatMessage: intl.formatMessage,
+            attribute: 'start_date',
             repeat,
-            repeat ? 'start_date' : 'start_date_only',
-            false,
-            false,
+            label: repeat ? 'start_date' : 'start_date_only',
+            modifyFieldAttributes: 
             (field, formData) =>
               modifyStartDateField(
                 field,
                 this.props.isRepeat(formData),
                 this.props.intl,
-              )
-          ),
+              ),
+          }),
           getCheckboxField(
             intl.formatMessage,
             'repeat',
@@ -233,19 +232,19 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             intl.formatMessage,
             (formData) => !this.props.isRepeat(formData)
           ),
-          getDateField(
-            intl.formatMessage,
-            'end_date',
+          getDateField({
+            formatMessage: intl.formatMessage,
+            attribute: 'end_date',
             repeat,
-            'end_date',
-            (value, formData) =>
+            label: 'end_date',
+            dynamicValidators: (value, formData) =>
               this.props.onEndDateChange(
                 value,
                 formData,
                 intl.formatMessage,
               ),
-            (formData) => !this.props.isRepeat(formData),
-          ),
+            isFieldDisabled: (formData) => !this.props.isRepeat(formData),
+          }),
           renderUserControl(
             users,
             intl.formatMessage(appMessages.attributes.manager_id.indicators),

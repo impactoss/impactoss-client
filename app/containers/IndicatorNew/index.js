@@ -180,20 +180,17 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
         label: intl.formatMessage(appMessages.entities.due_dates.schedule),
         icon: 'reminder',
         fields: [
-          getDateField(
-            intl.formatMessage,
-            'start_date',
-            false,
-            'start_date',
-            false,
-            false,
-            (field, formData) =>
+          getDateField({
+            formatMessage: intl.formatMessage,
+            attribute: 'start_date',
+            label: 'start_date',
+            modifyFieldAttributes: (field, formData) =>
               modifyStartDateField(
                 field,
                 this.props.isRepeat(formData),
                 this.props.intl,
-              )
-          ),
+              ),
+          }),
           getCheckboxField(
             intl.formatMessage,
             'repeat',
@@ -202,19 +199,18 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
             intl.formatMessage,
             (formData) => !this.props.isRepeat(formData)
           ),
-          getDateField(
-            intl.formatMessage,
-            'end_date',
-            false,
-            'end_date',
-            (value, formData) =>
+          getDateField({
+            formatMessage: intl.formatMessage,
+            attribute: 'end_date',
+            label: 'end_date',
+            dynamicValidators: (value, formData) =>
               this.props.onEndDateChange(
                 value,
                 formData,
                 intl.formatMessage,
               ),
-            (formData) => !this.props.isRepeat(formData),
-          ),
+            isFieldDisabled: (formData) => !this.props.isRepeat(formData),
+          }),
           renderUserControl(
             users,
             intl.formatMessage(appMessages.attributes.manager_id.indicators),

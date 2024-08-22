@@ -214,10 +214,10 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getDateField(
-            intl.formatMessage,
-            'target_date',
-          ),
+          getDateField({
+            formatMessage: intl.formatMessage,
+            attribute: 'target_date',
+          }),
           getTextareaField(
             intl.formatMessage,
             'target_date_comment',

@@ -241,10 +241,10 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     fields.push({
       fields: [
         entity.getIn(['taxonomy', 'attributes', 'has_date'])
-          && getDateField(
-            intl.formatMessage,
-            'date',
-          ),
+        && getDateField({
+          formatMessage: intl.formatMessage,
+          attribute: 'date',
+        }),
         getFormField({
           formatMessage: intl.formatMessage,
           controlType: 'url',
