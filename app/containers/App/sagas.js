@@ -240,9 +240,15 @@ export function* logoutSaga() {
     yield put(logoutSuccess());
     if (ENABLE_AZURE) {
       // forward to home to prevent second login
-      yield put(updatePath('/', { replace: true }));
+      yield put(updatePath(
+        '/',
+        {
+          replace: true,
+          keepQuery: true,
+        }
+      ));
     } else {
-      yield put(updatePath(ROUTES.LOGIN, { replace: true }));
+      yield put(updatePath(ROUTES.LOGIN, { replace: true, keepQuery: true }));
     }
   } catch (err) {
     yield call(clearAuthValues);
@@ -301,7 +307,7 @@ function* createConnectionsSaga({
     [keyPair[0]]: create[keyPair[0]] || entityId,
     [keyPair[1]]: create[keyPair[1]] || entityId,
   }));
-
+  console.log('createConnectionsSaga', path, updatesUpdated);
   yield call(saveConnectionsSaga, { data: { path, updates: updatesUpdated } });
 }
 
@@ -468,15 +474,17 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
     // update entity attributes
     // on the server
     const entityCreated = yield call(newEntityRequest, data.path, data.entity.attributes);
-
+    console.log('entityCreated');
     if (!data.createAsGuest) {
       if (updateClient) {
         yield put(addEntity(data.path, entityCreated.data));
       }
       if (!multiple) {
+        console.log('!multiple');
         // check for associations/connections
         // update recommendation-action connections
         if (data.entity.recommendationMeasures) {
+          console.log('recommendationMeasures');
           yield call(createConnectionsSaga, {
             entityId: entityCreated.data.id,
             path: 'recommendation_measures',
@@ -516,6 +524,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
 
         // update recommendation-category connections
         if (data.entity.recommendationCategories) {
+          console.log('recommendationCategories');
           yield call(createConnectionsSaga, {
             entityId: entityCreated.data.id,
             path: 'recommendation_categories',
@@ -526,6 +535,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
       }
     }
     yield put(saveSuccess(dataTS));
+    console.log('saveSuccess');
     if (data.onSuccess) {
       data.onSuccess();
     }
@@ -548,8 +558,12 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
     if (updateClient && data.invalidateEntitiesOnSuccess) {
       yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
     }
+    console.log('invalidateEntities');
   } catch (err) {
-    err.response.json = yield err.response.json();
+    console.log('[err]', err);
+    if (err.response && err.response.json) {
+      err.response.json = yield err.response.json();
+    }
     yield put(saveError(err, dataTS));
     if (updateClient) {
       yield put(invalidateEntities(data.path));
@@ -577,16 +591,21 @@ export function* saveConnectionsSaga({ data }) {
     (data.updates.create && data.updates.create.length > 0)
     || (data.updates.delete && data.updates.delete.length > 0)
   )) {
+    console.log('saveConnectionsSaga', data);
     const dataTS = stampPayload(data);
     try {
       yield put(saveSending(dataTS));
       // on the server
       const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
+      console.log('connectionsUpdated', connectionsUpdated);
       // and on the client
       yield put(updateConnections(data.path, connectionsUpdated));
+      console.log('updateConnections');
       yield put(saveSuccess(dataTS));
     } catch (err) {
-      err.response.json = yield err.response.json();
+      if (err && err.response && err.response.json) {
+        err.response.json = yield err.response.json();
+      }
       yield put(saveError(err, dataTS));
       yield put(invalidateEntities(data.path));
     }

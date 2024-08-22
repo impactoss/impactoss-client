@@ -423,14 +423,15 @@ export const ENTITY_FIELDS = {
   },
   recommendations: {
     ATTRIBUTES: {
-      // framework_id: {
-      //   defaultValue: '1',
-      //   required: true, // all types
-      //   type: 'number',
-      //   table: API.FRAMEWORKS,
-      //   exportColumn: 'framework',
-      //   export: true,
-      // },
+      framework_id: {
+        defaultValue: '1',
+        required: true, // all types
+        type: 'number',
+        table: API.FRAMEWORKS,
+        exportColumn: 'framework',
+        export: true,
+        import: 'auto',
+      },
       draft: {
         defaultValue: true,
         type: 'bool',
@@ -522,37 +523,43 @@ export const ENTITY_FIELDS = {
     },
     RELATIONSHIPS_IMPORT: {
       // has category
+      'category-reference': {
+        type: 'text',
+        table: API.RECOMMENDATION_CATEGORIES,
+        lookup: {
+          table: API.CATEGORIES, // id assumed
+          attribute: 'reference',
+        },
+        keyPair: ['recommendation_id', 'category_id'], // own, other
+        hint: 'one or more category references (as assigned by the users / comma-separated)',
+      },
+      // has category
       'category-id': {
         type: 'number',
         table: API.RECOMMENDATION_CATEGORIES,
+        lookup: {
+          table: API.CATEGORIES, // id assumed
+        },
         keyPair: ['recommendation_id', 'category_id'], // own, other
         hint: 'one or more category ids (as assigned by the database / comma-separated)',
       },
-      // has category
-      'category-code': {
-        type: 'number',
-        lookup: {
-          table: API.CATEGORIES, // id assumed
-          attribute: 'code',
-        },
-        table: API.RECOMMENDATION_CATEGORIES,
-        keyPair: ['recommendation_id', 'category_id'], // own, other
-        hint: 'one or more category codes (as assigned by the users / comma-separated)',
-      },
-      'action-code': {
+      'action-reference': {
         type: 'text',
+        table: API.RECOMMENDATION_ACTIONS,
         lookup: {
           table: API.ACTIONS,
-          attribute: 'code',
+          attribute: 'reference',
         },
-        table: API.RECOMMENDATION_ACTIONS,
         keyPair: ['recommendation_id', 'measure_id'], // own, other
-        hint: 'one or more unique action code (as assigned by the users / comma-separated)',
+        hint: 'one or more unique action references (as assigned by the users / comma-separated)',
       },
       'action-id': {
         type: 'text',
         multiple: true,
         table: API.RECOMMENDATION_ACTIONS,
+        lookup: {
+          table: API.ACTIONS,
+        },
         keyPair: ['measure_id', 'actor_id'], // own, other
         hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
       },

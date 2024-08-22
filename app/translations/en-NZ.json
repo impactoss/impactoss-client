@@ -107,7 +107,7 @@
   "app.components.ImportEntitiesForm.errorHintTitle": "Important",
   "app.components.ImportEntitiesForm.formatHint": "IMPORTANT: when saving from Excel (Office 2016 or later) chose file type \"CSV UTF-8 (Comma delimited)\".",
   "app.components.ImportEntitiesForm.formatHintLink": "https://user-manual.impactoss.org/managers/import.html",
-  "app.components.ImportEntitiesForm.formatHintLinkAnchor": "user manual",
+  "app.components.ImportEntitiesForm.formatHintLinkAnchor": " ",
   "app.components.ImportEntitiesForm.hintLabel": "Please note:",
   "app.components.ImportEntitiesForm.importAgain": "Import another file",
   "app.components.ImportEntitiesForm.importing": "Importing: ",

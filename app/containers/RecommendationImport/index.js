@@ -179,11 +179,7 @@ const mapStateToProps = (state) => ({
   progress: selectProgress(state),
   errors: selectErrors(state),
   success: selectSuccess(state),
-  dataReady: selectReady(state, {
-    path: [
-      'user_roles',
-    ],
-  }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   connections: selectRecommendationConnections(state),
   categories: selectCategories(state),
@@ -207,10 +203,10 @@ function mapDispatchToProps(dispatch, { params }) {
     handleSubmit: (formData, connections, categories) => {
       if (formData.get('import') !== null) {
         fromJS(formData.get('import').rows).forEach((row, index) => {
-          let rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
+          console.log('row index', row, index);
+          const rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
           const typeId = params.id || 1;
           // make sure type id is set
-          rowCleanColumns = rowCleanColumns.set('framework_id', typeId);
           let rowClean = {
             attributes: rowCleanColumns
               // make sure only valid fields are imported
@@ -223,12 +219,13 @@ function mapDispatchToProps(dispatch, { params }) {
               //   //     return format(
               //   //       parse(val, DATE_FORMAT, new Date()),
               //   //       API_DATE_FORMAT
-              //   //     );
+              //   //     );F
               //   //   }
               //   //   return '';
               //   // }
               //   return val;
               // })
+              .set('framework_id', typeId)
               .set('draft', true)
               .toJS(),
             saveRef: index + 1,
@@ -263,9 +260,7 @@ function mapDispatchToProps(dispatch, { params }) {
           //   .mapKeys((k) => getColumnAttribute(k))
           //   .set('draft', true)
           //   .toJS();
-          // if (!attributes.framework_id) {
-          //   attributes.framework_id = 1;
-          // }
+
           // console.log(relRows)
           if (relRows) {
             let recommendationMeasures;
@@ -278,46 +273,47 @@ function mapDispatchToProps(dispatch, { params }) {
                   // console.log('connections', connections && connections.toJS(0))
                   relationship.values.forEach(
                     (relValue) => {
-                      const id = relValue;
+                      const idOrCode = relValue;
                       if (relConfig) {
                         // assume field to referencet the id
-                        let connectionId = id;
+                        let connectionId = 'INVALID';
                         // unless attribute specified
-                        if (relConfig.lookup
-                          && relConfig.lookup.table
-                          && relConfig.lookup.attribute
+                        if (relConfig.lookup && relConfig.lookup.table
                         ) {
                           if (categories && relConfig.lookup.table === API.CATEGORIES) {
-                            const category = categories.find(
-                              (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), id)
-                            );
-                            connectionId = category ? category.get('id') : 'INVALID';
-                          } else if (connections) {
-                            const connection = connections.get(relConfig.lookup.table)
-                              && connections.get(relConfig.lookup.table).find(
-                                (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), id)
-                              );
-                            connectionId = connection ? connection.get('id') : 'INVALID';
+                            const category = relConfig.lookup.attribute
+                              ? categories.find(
+                                (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), idOrCode)
+                              )
+                              : categories.get(idOrCode);
+                            if (category) {
+                              connectionId = category.get('id');
+                            }
+                          } else if (connections && connections.get(relConfig.lookup.table)) {
+                            const connection = relConfig.lookup.attribute
+                              ? connections.get(relConfig.lookup.table).find(
+                                (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), idOrCode)
+                              )
+                              : connections.get(relConfig.lookup.table).get(idOrCode);
+                            if (connection) {
+                              connectionId = connection.get('id');
+                            }
                           }
                         }
-                        // actor actions
-                        if (relField === 'action-code' || relField === 'action_id') {
-                          const create = {
-                            measure_id: connectionId,
-                          };
+                        // actor actions by code or id
+                        if (relField === 'action-reference' || relField === 'action-id') {
+                          const create = { measure_id: connectionId };
                           if (recommendationMeasures && recommendationMeasures.create) {
                             recommendationMeasures.create = [
                               ...recommendationMeasures.create,
                               create,
                             ];
                           } else {
-                            recommendationMeasures = {
-                              create: [create],
-                            };
+                            recommendationMeasures = { create: [create] };
                           }
                         }
                         // actorCategories by code or id
-                        if (relField === 'category-code' || relField === 'category-id') {
+                        if (relField === 'category-reference' || relField === 'category-id') {
                           const create = { category_id: connectionId };
                           if (recommendationCategories && recommendationCategories.create) {
                             recommendationCategories.create = [
@@ -340,7 +336,7 @@ function mapDispatchToProps(dispatch, { params }) {
               recommendationCategories,
             };
           }
-          // console.log(rowClean)
+          console.log(rowClean);
           dispatch(save(rowClean));
         });
       }
