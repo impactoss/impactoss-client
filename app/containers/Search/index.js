@@ -24,10 +24,12 @@ import {
   updatePath,
   showSettingsModal,
 } from 'containers/App/actions';
+
 import {
   selectReady,
-  selectLoadArchivedQuery,
-  selectLoadNonCurrentQuery,
+  selectSettings,
+  // selectLoadArchivedQuery,
+  // selectLoadNonCurrentQuery,
 } from 'containers/App/selectors';
 
 import { CONTENT_LIST } from 'containers/App/constants';
@@ -152,9 +154,10 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       entities,
       onEntityClick,
       activeTargetPath,
-      loadArchived,
-      loadNonCurrent,
       onShowSettingsModal,
+      settings,
+      // loadNonCurrent,
+      // loadArchived,
     } = this.props;
     const hasQuery = !!location.query.search;
     const countResults = dataReady && hasQuery && entities && entities.reduce(
@@ -199,6 +202,16 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       title: intl.formatMessage(appMessages.buttons.printTitle),
       icon: 'print',
     }];
+    const availableSettings = settings
+      .keySeq()
+      .filter((key) => (settings.getIn([key, 'available'])))
+      .toList();
+    const hasAvailableSettings = !!availableSettings.size;
+    const settingsHintContent = availableSettings
+      .toJS()
+      .map((option) => intl.formatMessage(messages[option], { value: settings.getIn([option, 'value']) }))
+      .reduce((acc, message, index) => (index === 0) ? `**${message}**` : `${acc} and **${message}**`, '');
+
     return (
       <div>
         <HelmetCanonical
@@ -234,33 +247,29 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       }}
                     />
                   </EntityListSearch>
-                  <Description as="div">
-                    <Markdown
-                      className="react-markdown react-markdown-search"
-                      disallowedTypes={['paragraph']}
-                      unwrapDisallowed
-                      source={intl.formatMessage(
-                        messages.settingsHint,
-                        {
-                          includeArchived: loadArchived,
-                          includePast: loadNonCurrent,
-                        }
-                      )}
-                    />
-                    {' '}
-                    <FormattedMessage
-                      {...messages.settingsHint2}
-                      values={{
-                        settingsLink: (
-                          <SettingsLink
-                            onClick={() => onShowSettingsModal()}
-                          >
-                            <FormattedMessage {...messages.settingsLinkAnchor} />
-                          </SettingsLink>
-                        ),
-                      }}
-                    />
-                  </Description>
+                  {hasAvailableSettings && (
+                    <Description as="div">
+                      <Markdown
+                        className="react-markdown react-markdown-search"
+                        disallowedTypes={['paragraph']}
+                        unwrapDisallowed
+                        source={intl.formatMessage(messages.settingsHint, { settingsHintContent })}
+                      />
+                      {' '}
+                      <FormattedMessage
+                        {...messages.settingsHint2}
+                        values={{
+                          settingsLink: (
+                            <SettingsLink
+                              onClick={() => onShowSettingsModal()}
+                            >
+                              <FormattedMessage {...messages.settingsLinkAnchor} />
+                            </SettingsLink>
+                          ),
+                        }}
+                      />
+                    </Description>
+                  )}
                   <ListWrapper
                     id="search-results"
                     ref={(el) => { this.searchResults = el; }}
@@ -398,9 +407,8 @@ Search.propTypes = {
   onSortBy: PropTypes.func.isRequired,
   activeTargetPath: PropTypes.string,
   theme: PropTypes.object,
-  loadArchived: PropTypes.bool,
-  loadNonCurrent: PropTypes.bool,
   onShowSettingsModal: PropTypes.func,
+  settings: PropTypes.object,
 };
 
 Search.contextTypes = {
@@ -411,8 +419,9 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   entities: selectEntitiesByQuery(state, fromJS(props.location.query)),
   activeTargetPath: selectPathQuery(state, fromJS(props.location.query)),
-  loadArchived: selectLoadArchivedQuery(state),
-  loadNonCurrent: selectLoadNonCurrentQuery(state),
+  settings: selectSettings(state),
+  // loadArchived: selectLoadArchivedQuery(state),
+  // loadNonCurrent: selectLoadNonCurrentQuery(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

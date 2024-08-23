@@ -24,7 +24,15 @@ export default defineMessages({
   },
   settingsHint: {
     id: 'app.containers.Search.settingsHint',
-    defaultMessage: 'Please note: search results **{includePast, select, true {include} other {do not include}} content from past reporting cycles** and **{includeArchived, select, true {include} other {do not include}} archived content**. ',
+    defaultMessage: 'Please note: search results {settingsHintContent}.',
+  },
+  loadArchived: {
+    id: 'app.containers.Search.loadArchived',
+    defaultMessage: '{value, select, true {include} other {do not include}} archived content',
+  },
+  loadNonCurrent: {
+    id: 'app.containers.Search.loadNonCurrent',
+    defaultMessage: '{value, select, true {include} other {do not include}} content from past reporting cycles',
   },
   settingsHint2: {
     id: 'app.containers.Search.settingsHint2',
