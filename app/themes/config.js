@@ -335,6 +335,73 @@ export const ENTITY_FIELDS = {
         connection: API.ACTION_INDICATORS,
       },
     },
+    RELATIONSHIPS_IMPORT: {
+      // has category
+      'category-reference': {
+        type: 'text',
+        table: API.ACTION_CATEGORIES,
+        lookup: {
+          table: API.CATEGORIES, // id assumed
+          attribute: 'reference',
+        },
+        keyPair: ['measure_id', 'category_id'], // own, other
+        hint: 'one or more category references (as assigned by the users / comma-separated)',
+      },
+      // has category
+      'category-id': {
+        type: 'number',
+        table: API.ACTION_CATEGORIES,
+        lookup: {
+          table: API.CATEGORIES, // id assumed
+        },
+        keyPair: ['measure_id', 'category_id'], // own, other
+        hint: 'one or more category ids (as assigned by the database / comma-separated)',
+      },
+      // has indicator
+      'indicator-reference': {
+        type: 'text',
+        table: API.ACTION_INDICATORS,
+        lookup: {
+          table: API.INDICATORS,
+          attribute: 'reference',
+        },
+        keyPair: ['measure_id', 'indicator_id'], // own, other
+        hint: 'one or more unique action references (as assigned by the users / comma-separated)',
+      },
+      // has indicator
+      'indicator-id': {
+        type: 'text',
+        multiple: true,
+        table: API.ACTION_INDICATORS,
+        lookup: {
+          table: API.INDICATORS,
+        },
+        keyPair: ['measure_id', 'indicator_id'], // own, other
+        hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
+      },
+      // has recommendation
+      'recommendation-reference': {
+        type: 'text',
+        table: API.RECOMMENDATION_ACTIONS,
+        lookup: {
+          table: API.RECOMMENDATIONS,
+          attribute: 'reference',
+        },
+        keyPair: ['measure_id', 'recommendation_id'], // own, other
+        hint: 'one or more unique action references (as assigned by the users / comma-separated)',
+      },
+      // has recommendation
+      'recommendation-id': {
+        type: 'text',
+        multiple: true,
+        table: API.RECOMMENDATION_ACTIONS,
+        lookup: {
+          table: API.RECOMMENDATIONS,
+        },
+        keyPair: ['measure_id', 'recommendation_id'], // own, other
+        hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
+      },
+    },
   },
   indicators: {
     ATTRIBUTES: {
@@ -560,7 +627,7 @@ export const ENTITY_FIELDS = {
         lookup: {
           table: API.ACTIONS,
         },
-        keyPair: ['measure_id', 'actor_id'], // own, other
+        keyPair: ['recommendation_id', 'measure_id'], // own, other
         hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
       },
     },
