@@ -29,7 +29,7 @@ import {
   selectCurrentPathname,
   selectAllTaxonomiesWithCategories,
   selectCanUserAdministerCategories,
-  selectGlobalSettings,
+  selectSettingsFromQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -438,7 +438,7 @@ const mapStateToProps = (state) => ({
   currentPath: selectCurrentPathname(state),
   allTaxonomies: selectAllTaxonomiesWithCategories(state),
   canUserAdministerCategories: selectCanUserAdministerCategories(state),
-  globalSettings: selectGlobalSettings(state),
+  globalSettings: selectSettingsFromQuery(state),
 });
 
 function mapDispatchToProps(dispatch, props) {

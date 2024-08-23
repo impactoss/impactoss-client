@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import { showSettingsModal } from 'containers/App/actions';
-import { selectLoadArchivedQuery, selectLoadNonCurrentQuery } from 'containers/App/selectors';
+import { selectSettingsFromQuery } from 'containers/App/selectors';
 import A from 'components/styled/A';
 
 import messages from './messages';
@@ -21,19 +21,19 @@ const SettingsLink = styled(A)`
 const NotFoundEntity = ({
   type,
   id,
-  loadArchived,
-  loadNonCurrent,
+  settingsFromQuery,
   onShowSettingsModal,
 }) => {
-  const loadAll = loadArchived && loadNonCurrent;
+  const allActive = settingsFromQuery
+    && Object.values(settingsFromQuery).every((value) => !!value);
   return (
     <>
-      {loadAll && (
+      {allActive && (
         <p>
           <FormattedMessage {...messages.notFoundAllLoaded} values={{ type, id }} />
         </p>
       )}
-      {!loadAll && (
+      {!allActive && (
         <>
           <p>
             <FormattedMessage {...messages.notFound} values={{ type, id }} />
@@ -61,15 +61,13 @@ const NotFoundEntity = ({
 NotFoundEntity.propTypes = {
   type: PropTypes.string,
   id: PropTypes.string,
-  loadArchived: PropTypes.bool,
-  loadNonCurrent: PropTypes.bool,
+  settingsFromQuery: PropTypes.object,
   onShowSettingsModal: PropTypes.func,
 };
 
 
 const mapStateToProps = (state) => ({
-  loadArchived: selectLoadArchivedQuery(state),
-  loadNonCurrent: selectLoadNonCurrentQuery(state),
+  settingsFromQuery: selectSettingsFromQuery(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

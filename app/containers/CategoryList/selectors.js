@@ -13,8 +13,7 @@ import {
   selectRecommendationMeasuresByMeasure,
   selectMeasureCategoriesByMeasure,
   selectRecommendationCategoriesByRecommendation,
-  selectLoadNonCurrentQuery,
-  selectLoadArchivedQuery,
+  selectSettingsFromQuery,
 } from 'containers/App/selectors';
 
 import { qe } from 'utils/quasi-equals';
@@ -256,9 +255,8 @@ const selectCategoryCountGroups = createSelector(
   selectRecommendations,
   selectMeasures,
   (state) => selectEntities(state, 'categories'),
-  selectLoadNonCurrentQuery,
-  selectLoadArchivedQuery,
-  (taxonomy, recommendations, measures, categories, loadNonCurrent, loadArchived) => {
+  selectSettingsFromQuery,
+  (taxonomy, recommendations, measures, categories, settingsFromQuery) => {
     if (taxonomy && recommendations && measures && categories) {
       const taxonomyCategories = taxonomy && categories && categories.filter(
         (cat) => qe(
@@ -266,10 +264,10 @@ const selectCategoryCountGroups = createSelector(
           taxonomy.get('id')
         ) && (
           CURRENT_TAXONOMY_IDS.indexOf(parseInt(taxonomy.get('id'), 10)) === -1
-          || loadNonCurrent
+          || settingsFromQuery.loadNonCurrent
           || !!cat.getIn(['attributes', 'is_current'])
         ) && (
-          loadArchived || !cat.getIn(['attributes', 'is_archive'])
+          settingsFromQuery.loadArchived || !cat.getIn(['attributes', 'is_archive'])
         )
       );
       if (taxonomyCategories) {

@@ -36,7 +36,7 @@ import {
   selectViewRecommendationFrameworkId,
   selectShowSettings,
   selectHasPreviousCycles,
-  selectSettings,
+  selectSettingsConfig,
 } from './selectors';
 
 import {
@@ -304,7 +304,6 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           >
             <GlobalSettings
               onClose={() => onShowSettings(false)}
-              settings={settings}
             />
           </ReactModal>
         )}
@@ -356,7 +355,7 @@ const mapStateToProps = (state, props) => ({
   frameworks: selectFrameworks(state),
   hasPreviousCycles: selectHasPreviousCycles(state),
   viewRecommendationFramework: selectViewRecommendationFrameworkId(state, props.params.id),
-  settings: selectSettings(state),
+  settings: selectSettingsConfig(state),
 });
 
 export function mapDispatchToProps(dispatch) {

@@ -27,9 +27,8 @@ import {
 
 import {
   selectReady,
-  selectSettings,
-  selectLoadArchivedQuery,
-  selectLoadNonCurrentQuery,
+  selectSettingsConfig,
+  selectSettingsFromQuery,
 } from 'containers/App/selectors';
 
 import { CONTENT_LIST } from 'containers/App/constants';
@@ -156,8 +155,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       activeTargetPath,
       onShowSettingsModal,
       settings,
-      loadNonCurrent,
-      loadArchived,
+      settingsFromQuery,
     } = this.props;
     const hasQuery = !!location.query.search;
     const countResults = dataReady && hasQuery && entities && entities.reduce(
@@ -202,18 +200,20 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       title: intl.formatMessage(appMessages.buttons.printTitle),
       icon: 'print',
     }];
-    const availableSettings = settings.filter((option) => !!option.get('available'));
+
+    // check if there are any settings available
+    const availableSettings = dataReady
+      && settings
+      && settings.filter((option) => !!option.get('available'));
 
     // prepare a markdown message from available settings
-    const settingsHintContent = availableSettings
-      .reduce((memo, option, key) => {
-        let active;
-        if (key === 'loadArchived') {
-          active = loadArchived;
-        } else if (key === 'loadNonCurrent') {
-          active = loadNonCurrent;
-        }
-        const message = intl.formatMessage(messages[key], { active });
+    const settingsHintContent = dataReady
+      && availableSettings
+      && availableSettings.reduce((memo, option, key) => {
+        const message = intl.formatMessage(
+          messages[key],
+          { active: settingsFromQuery[key] },
+        );
         if (memo.length === 0) {
           return `**${message}**`;
         }
@@ -412,9 +412,8 @@ Search.propTypes = {
   activeTargetPath: PropTypes.string,
   theme: PropTypes.object,
   onShowSettingsModal: PropTypes.func,
-  settings: PropTypes.object,
-  loadNonCurrent: PropTypes.bool,
-  loadArchived: PropTypes.bool,
+  settings: PropTypes.object, // Map
+  settingsFromQuery: PropTypes.object,
 };
 
 Search.contextTypes = {
@@ -425,9 +424,8 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   entities: selectEntitiesByQuery(state, fromJS(props.location.query)),
   activeTargetPath: selectPathQuery(state, fromJS(props.location.query)),
-  settings: selectSettings(state),
-  loadArchived: selectLoadArchivedQuery(state),
-  loadNonCurrent: selectLoadNonCurrentQuery(state),
+  settings: selectSettingsConfig(state),
+  settingsFromQuery: selectSettingsFromQuery(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

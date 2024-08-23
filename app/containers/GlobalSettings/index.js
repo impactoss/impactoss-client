@@ -28,8 +28,8 @@ import ButtonDefaultIconOnly from 'components/buttons/ButtonDefaultIconOnly';
 import Icon from 'components/Icon';
 
 import {
-  selectLoadArchivedQuery,
-  selectLoadNonCurrentQuery,
+  selectSettingsConfig,
+  selectSettingsFromQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -103,8 +103,7 @@ const Toggle = styled(CheckBox)`
 
 const GlobalSettings = ({
   settings,
-  loadArchived,
-  loadNonCurrent,
+  settingsFromQuery,
   onSetLoadArchived,
   onSetLoadNonCurrent,
   onClose,
@@ -149,12 +148,7 @@ const GlobalSettings = ({
                   .filter((setting) => setting.get('available'))
                   .keySeq()
                   .map((key) => {
-                    let active;
-                    if (key === 'loadArchived') {
-                      active = loadArchived;
-                    } else if (key === 'loadNonCurrent') {
-                      active = loadNonCurrent;
-                    }
+                    const active = settingsFromQuery[key];
                     return (
                       <Field key={key}>
                         <Box margin={{ bottom: 'medium' }}>
@@ -181,9 +175,9 @@ const GlobalSettings = ({
                                 )}
                                 onChange={() => {
                                   if (key === 'loadArchived') {
-                                    onSetLoadArchived(!loadArchived);
+                                    onSetLoadArchived(!settingsFromQuery[key]);
                                   } else if (key === 'loadNonCurrent') {
-                                    onSetLoadNonCurrent(!loadNonCurrent);
+                                    onSetLoadNonCurrent(!settingsFromQuery[key]);
                                   }
                                 }}
                               />
@@ -210,9 +204,8 @@ const GlobalSettings = ({
 };
 
 GlobalSettings.propTypes = {
-  settings: PropTypes.object,
-  loadArchived: PropTypes.bool,
-  loadNonCurrent: PropTypes.bool,
+  settings: PropTypes.object, // Map
+  settingsFromQuery: PropTypes.object,
   onSetLoadArchived: PropTypes.func,
   onSetLoadNonCurrent: PropTypes.func,
   onClose: PropTypes.func,
@@ -220,8 +213,8 @@ GlobalSettings.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  loadArchived: selectLoadArchivedQuery(state),
-  loadNonCurrent: selectLoadNonCurrentQuery(state),
+  settings: selectSettingsConfig(state),
+  settingsFromQuery: selectSettingsFromQuery(state),
 });
 
 export function mapDispatchToProps(dispatch) {

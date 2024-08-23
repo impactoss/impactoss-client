@@ -46,7 +46,7 @@ export const selectShowSettings = createSelector(
   getGlobal,
   (globalState) => !!globalState.get('showSettings')
 );
-export const selectSettings = createSelector(
+export const selectSettingsConfig = createSelector(
   getGlobal,
   (globalState) => globalState.get('settings')
 );
@@ -336,7 +336,7 @@ export const selectLoadNonCurrentQuery = createSelector(
   (query) => ((query && query.get('loadNonCurrent') === 'true') || false)
 );
 
-export const selectGlobalSettings = createSelector(
+export const selectSettingsFromQuery = createSelector(
   selectLoadArchivedQuery,
   selectLoadNonCurrentQuery,
   (loadArchived, loadNonCurrent) => ({
