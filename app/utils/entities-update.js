@@ -3,19 +3,29 @@ import apiRequest from 'utils/api-request';
 export function updateAssociationsRequest(path, associations) {
   // create action-category associations
   let requests = [];
-  requests = requests.concat(
-    associations.create.map(
-      (payload) => newEntityRequest(path, payload)
-    )
-  );
-
+  if (associations.create) {
+    requests = requests.concat(
+      associations.create.map(
+        (payload) => newEntityRequest(path, payload)
+      )
+    );
+  }
   // delete action-category associations
-  requests = requests.concat(
-    associations.delete.map(
-      (associationId) => deleteEntityRequest(path, associationId)
-    )
-  );
-
+  if (associations.delete) {
+    requests = requests.concat(
+      associations.delete.map(
+        (associationId) => deleteEntityRequest(path, associationId)
+      )
+    );
+  }
+  // update action-category associations
+  if (associations.update) {
+    requests = requests.concat(
+      associations.update.map(
+        (payload) => updateEntityRequest(path, payload)
+      )
+    );
+  }
   return Promise.all(requests);
 }
 export function updateAssociationsBatchRequest(path, associations) {

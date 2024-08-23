@@ -71,14 +71,14 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
   render() {
     const { intl } = this.context;
     const { connections, categories, params } = this.props;
-    const typeId = params.id || 1;
+    const frameworkId = params.id || 1;
     const recFields = ENTITY_FIELDS.recommendations;
-
+    // prepare attribute fields
     const fields = Object.keys(recFields.ATTRIBUTES).reduce((memo, key) => {
       const val = recFields.ATTRIBUTES[key];
       if (
         !val.skipImport
-        && checkRecommendationAttribute(typeId, key)
+        && checkRecommendationAttribute(frameworkId, key)
       ) {
         return [
           ...memo,
@@ -92,6 +92,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
       }
       return memo;
     }, []);
+    // prepare connection fields
     const relationshipFields = Object.keys(
       recFields.RELATIONSHIPS_IMPORT
     ).map((key) => {
@@ -202,47 +203,35 @@ function mapDispatchToProps(dispatch, { params }) {
     },
     handleSubmit: (formData, connections, categories) => {
       if (formData.get('import') !== null) {
+        // submit requests for each row
         fromJS(formData.get('import').rows).forEach((row, index) => {
-          console.log('row index', row, index);
+          // make sure we only take valid columns
           const rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
-          const typeId = params.id || 1;
-          // make sure type id is set
+          // use framework id from URL if set, otherwise assume default framework 1
+          const frameworkId = params.id || 1;
           let rowClean = {
             attributes: rowCleanColumns
               // make sure only valid fields are imported
-              .filter((val, att) => checkRecommendationAttribute(typeId, att))
-              // make sure we store well formatted date
-              // .map((val, att) => {
-              //   const config = ENTITY_FIELDS.recommendations.ATTRIBUTES[att];
-              //   // if (config.type === 'date' && val && val.trim() !== '') {
-              //   //   if (validateDateFormat(val, DATE_FORMAT)) {
-              //   //     return format(
-              //   //       parse(val, DATE_FORMAT, new Date()),
-              //   //       API_DATE_FORMAT
-              //   //     );F
-              //   //   }
-              //   //   return '';
-              //   // }
-              //   return val;
-              // })
-              .set('framework_id', typeId)
+              .filter((val, att) => checkRecommendationAttribute(frameworkId, att))
+              .set('framework_id', frameworkId)
+              // make sure we only import draft content
               .set('draft', true)
               .toJS(),
             saveRef: index + 1,
           };
           const rowJS = row.toJS();
-          const relRows = Object.keys(rowJS).reduce(
+          // check for relationships from [rel: ...] columns
+          // and prep values
+          const relationships = Object.keys(rowJS).reduce(
             (memo, key) => {
               const hasRelData = key.indexOf('[rel:') > -1
                 && rowJS[key]
                 && rowJS[key].trim() !== '';
-              // console.log('hasRelData', hasRelData, key, rowJS[key])
               if (!hasRelData) return memo;
               const start = key.indexOf('[');
               const end = key.indexOf(']');
               const [, fieldValues] = key.substring(start + 1, end).split('rel:');
               const [field, values] = fieldValues.split('|');
-              // console.log('values', values);
               return [
                 ...memo,
                 {
@@ -256,21 +245,16 @@ function mapDispatchToProps(dispatch, { params }) {
             },
             [],
           );
-          // const attributes = row
-          //   .mapKeys((k) => getColumnAttribute(k))
-          //   .set('draft', true)
-          //   .toJS();
-
-          // console.log(relRows)
-          if (relRows) {
+          // prepare data for sending it to the server,
+          // also make sure we only allow connections that exist
+          if (relationships) {
             let recommendationMeasures;
             let recommendationCategories;
-            Object.values(relRows).forEach(
+            Object.values(relationships).forEach(
               (relationship) => {
                 if (relationship.values) {
                   const relField = relationship.field;
                   const relConfig = ENTITY_FIELDS.recommendations.RELATIONSHIPS_IMPORT[relationship.field];
-                  // console.log('connections', connections && connections.toJS(0))
                   relationship.values.forEach(
                     (relValue) => {
                       const idOrCode = relValue;
@@ -336,7 +320,6 @@ function mapDispatchToProps(dispatch, { params }) {
               recommendationCategories,
             };
           }
-          console.log(rowClean);
           dispatch(save(rowClean));
         });
       }
