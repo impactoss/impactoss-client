@@ -322,6 +322,10 @@ export default defineMessages({
       id: 'app.containers.App.import.number',
       defaultMessage: 'number',
     },
+    int: {
+      id: 'app.containers.App.import.int',
+      defaultMessage: 'number',
+    },
     markdown: {
       id: 'app.containers.App.import.markdown',
       defaultMessage: 'text (markdown supported)',

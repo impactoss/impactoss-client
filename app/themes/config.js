@@ -476,7 +476,7 @@ export const ENTITY_FIELDS = {
     CONNECTIONS: {
       actions: {
         table: API.ACTIONS,
-        connection: API.RECOMMENDATION_INDICATORS,
+        connection: API.ACTION_INDICATORS,
       },
       recommendations: {
         table: API.RECOMMENDATIONS,
@@ -485,6 +485,30 @@ export const ENTITY_FIELDS = {
           table: API.FRAMEWORKS,
           on: 'framework_id',
         },
+      },
+    },
+    RELATIONSHIPS_IMPORT: {
+      // has action
+      'action-reference': {
+        type: 'text',
+        table: API.ACTION_INDICATORS,
+        lookup: {
+          table: API.ACTIONS,
+          attribute: 'reference',
+        },
+        keyPair: ['indicator_id', 'measure_id'], // own, other
+        hint: 'one or more unique action references (as assigned by the users / comma-separated)',
+      },
+      // has action
+      'action-id': {
+        type: 'text',
+        multiple: true,
+        table: API.ACTION_INDICATORS,
+        lookup: {
+          table: API.ACTIONS,
+        },
+        keyPair: ['indicator_id', 'measure_id'], // own, other
+        hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
       },
     },
   },

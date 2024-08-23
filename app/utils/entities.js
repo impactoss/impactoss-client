@@ -722,3 +722,12 @@ export const checkActionAttribute = (att, isAdmin) => ENTITY_FIELDS
     attributes: ENTITY_FIELDS.measures.ATTRIBUTES,
     isAdmin,
   });
+
+export const checkIndicatorAttribute = (att, isAdmin) => ENTITY_FIELDS
+  && ENTITY_FIELDS.indicators
+  && ENTITY_FIELDS.indicators.ATTRIBUTES
+  && checkAttribute({
+    att,
+    attributes: ENTITY_FIELDS.indicators.ATTRIBUTES,
+    isAdmin,
+  });

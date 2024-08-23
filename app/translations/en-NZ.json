@@ -462,6 +462,7 @@
   "app.containers.App.import.bool": "boolean ('true' or 'false'; leave blank if not applicable)",
   "app.containers.App.import.date": "date ({format})",
   "app.containers.App.import.hint": "IMPORTANT: This row provides additional information about the columns only. Please replace or remove it before importing.",
+  "app.containers.App.import.int": "number",
   "app.containers.App.import.markdown": "text (markdown supported)",
   "app.containers.App.import.number": "number",
   "app.containers.App.import.optional": "Optional",
