@@ -28,15 +28,19 @@ export default defineMessages({
   },
   loadArchived: {
     id: 'app.containers.Search.loadArchived',
-    defaultMessage: '{value, select, true {include} other {do not include}} archived content',
+    defaultMessage: '{active, select, true {include} other {do not include}} archived content',
   },
   loadNonCurrent: {
     id: 'app.containers.Search.loadNonCurrent',
-    defaultMessage: '{value, select, true {include} other {do not include}} content from past reporting cycles',
+    defaultMessage: '{active, select, true {include} other {do not include}} content from past reporting cycles',
   },
   settingsHint2: {
     id: 'app.containers.Search.settingsHint2',
     defaultMessage: 'You can configure the relevant content in the {settingsLink}.',
+  },
+  and: {
+    id: 'app.containers.Search.and',
+    defaultMessage: 'and',
   },
   settingsLinkAnchor: {
     id: 'app.containers.Search.settingsLinkAnchor',

@@ -28,8 +28,8 @@ import {
 import {
   selectReady,
   selectSettings,
-  // selectLoadArchivedQuery,
-  // selectLoadNonCurrentQuery,
+  selectLoadArchivedQuery,
+  selectLoadNonCurrentQuery,
 } from 'containers/App/selectors';
 
 import { CONTENT_LIST } from 'containers/App/constants';
@@ -156,8 +156,8 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       activeTargetPath,
       onShowSettingsModal,
       settings,
-      // loadNonCurrent,
-      // loadArchived,
+      loadNonCurrent,
+      loadArchived,
     } = this.props;
     const hasQuery = !!location.query.search;
     const countResults = dataReady && hasQuery && entities && entities.reduce(
@@ -202,15 +202,24 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       title: intl.formatMessage(appMessages.buttons.printTitle),
       icon: 'print',
     }];
-    const availableSettings = settings
-      .keySeq()
-      .filter((key) => (settings.getIn([key, 'available'])))
-      .toList();
-    const hasAvailableSettings = !!availableSettings.size;
+    const availableSettings = settings.filter((option) => !!option.get('available'));
+
+    // prepare a markdown message from available settings
     const settingsHintContent = availableSettings
-      .toJS()
-      .map((option) => intl.formatMessage(messages[option], { value: settings.getIn([option, 'value']) }))
-      .reduce((acc, message, index) => (index === 0) ? `**${message}**` : `${acc} and **${message}**`, '');
+      .reduce((memo, option, key) => {
+        let active;
+        if (key === 'loadArchived') {
+          active = loadArchived;
+        } else if (key === 'loadNonCurrent') {
+          active = loadNonCurrent;
+        }
+        const message = intl.formatMessage(messages[key], { active });
+        if (memo.length === 0) {
+          return `**${message}**`;
+        }
+        // TODO consider comma instead of and when not last item
+        return `${memo} ${intl.formatMessage(messages.and)} **${message}**`;
+      }, '');
 
     return (
       <div>
@@ -233,21 +242,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
               {!dataReady && <Loading />}
               {dataReady && (
                 <div>
-                  <EntityListSearch>
-                    <TagSearch
-                      filters={[]}
-                      placeholder={intl.formatMessage(messages.placeholder)}
-                      searchQuery={location.query.search || ''}
-                      onSearch={onSearch}
-                      onClear={() => onClear(['search'])}
-                      focusOnMount
-                      resultsId="search-results"
-                      onSkipToResults={() => {
-                        this.focusResults();
-                      }}
-                    />
-                  </EntityListSearch>
-                  {hasAvailableSettings && (
+                  {availableSettings && availableSettings.size > 0 && (
                     <Description as="div">
                       <Markdown
                         className="react-markdown react-markdown-search"
@@ -270,16 +265,25 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       />
                     </Description>
                   )}
+                  <EntityListSearch>
+                    <TagSearch
+                      filters={[]}
+                      placeholder={intl.formatMessage(messages.placeholder)}
+                      searchQuery={location.query.search || ''}
+                      onSearch={onSearch}
+                      onClear={() => onClear(['search'])}
+                      focusOnMount
+                      resultsId="search-results"
+                      onSkipToResults={() => {
+                        this.focusResults();
+                      }}
+                    />
+                  </EntityListSearch>
                   <ListWrapper
                     id="search-results"
                     ref={(el) => { this.searchResults = el; }}
                     tabindex="0"
                   >
-                    {noEntry && (
-                      <ListHint>
-                        <FormattedMessage {...messages.hints.noEntry} />
-                      </ListHint>
-                    )}
                     {!isQueryMinLength && hasEntry && !hasResults && (
                       <ListHint>
                         <FormattedMessage {...messages.hints.minLength} />
@@ -409,6 +413,8 @@ Search.propTypes = {
   theme: PropTypes.object,
   onShowSettingsModal: PropTypes.func,
   settings: PropTypes.object,
+  loadNonCurrent: PropTypes.bool,
+  loadArchived: PropTypes.bool,
 };
 
 Search.contextTypes = {
@@ -420,8 +426,8 @@ const mapStateToProps = (state, props) => ({
   entities: selectEntitiesByQuery(state, fromJS(props.location.query)),
   activeTargetPath: selectPathQuery(state, fromJS(props.location.query)),
   settings: selectSettings(state),
-  // loadArchived: selectLoadArchivedQuery(state),
-  // loadNonCurrent: selectLoadNonCurrentQuery(state),
+  loadArchived: selectLoadArchivedQuery(state),
+  loadNonCurrent: selectLoadNonCurrentQuery(state),
 });
 function mapDispatchToProps(dispatch) {
   return {
