@@ -4,7 +4,7 @@ import { fromJS } from 'immutable';
 export const FORM_INITIAL = fromJS({
   attributes: {
     draft: true,
-    accepted: true,
+    support_level: 'null',
     title: '',
     reference: '',
     response: '',

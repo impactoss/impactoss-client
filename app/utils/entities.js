@@ -2,9 +2,9 @@ import { Map } from 'immutable';
 
 import {
   TEXT_TRUNCATE,
-  ACCEPTED_STATUSES,
   SEARCH,
   ENTITY_FIELDS,
+  SUPPORT_LEVELS,
 } from 'themes/config';
 
 import { find, reduce, every } from 'lodash/collection';
@@ -15,9 +15,9 @@ import isNumber from 'utils/is-number';
 import appMessage from 'utils/app-message';
 import { qe } from 'utils/quasi-equals';
 
-export const getAcceptanceStatus = (entity) => find(
-  ACCEPTED_STATUSES,
-  (option) => option.value === (entity.getIn(['attributes', 'accepted']) || null)
+export const getSupportLevel = (entity) => find(
+  SUPPORT_LEVELS,
+  (option) => option.value === (entity.getIn(['attributes', 'support_level']) || null)
 );
 
 // check if entity has nested connection by id

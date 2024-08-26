@@ -14,7 +14,7 @@ import { fromJS } from 'immutable';
 
 import { checkResponseError } from 'utils/request';
 import { isSignedIn } from 'utils/api-request';
-import { DB_TABLES } from 'themes/config';
+import { DB_TABLES, SETTINGS } from 'themes/config';
 
 import {
   AUTHENTICATE_SENDING,
@@ -33,6 +33,8 @@ import {
   INVALIDATE_ENTITIES,
   DUEDATE_ASSIGNED,
   OPEN_NEW_ENTITY_MODAL,
+  SHOW_SETTINGS_MODAL,
+  INITIALIZE_SETTINGS,
 } from './constants';
 
 // The initial state of the App
@@ -57,6 +59,8 @@ const initialState = fromJS({
     isSignedIn: isSignedIn(),
   },
   newEntityModal: null,
+  showSettings: false,
+  settings: SETTINGS,
 });
 
 function appReducer(state = initialState, payload) {
@@ -159,6 +163,10 @@ function appReducer(state = initialState, payload) {
       return state;
     case OPEN_NEW_ENTITY_MODAL:
       return state.set('newEntityModal', fromJS(payload.args));
+    case SHOW_SETTINGS_MODAL:
+      return state.set('showSettings', fromJS(payload.open));
+    case INITIALIZE_SETTINGS:
+      return state.set('settings', fromJS(payload.settings));
     default:
       return state;
   }

@@ -108,6 +108,10 @@ export const TEXT_TRUNCATE = {
 };
 
 export const PROGRESS_TAXONOMY_ID = 9;
+// categories where "is_current" is relevant
+export const CURRENT_TAXONOMY_IDS = [
+  2, // reporting cycles
+];
 
 // WARNING: references as assigned by user
 export const PROGRESS_CATEGORY_ID = {
@@ -179,10 +183,20 @@ export const DOC_PUBLISH_STATUSES = [
   { value: false, message: 'ui.docPublishStatuses.private' },
 ];
 // Recommendation statuses
-export const ACCEPTED_STATUSES = [
-  { value: 'null', icon: '', message: 'ui.acceptedStatuses.null' },
-  { value: true, icon: 'recommendationAccepted', message: 'ui.acceptedStatuses.accepted' },
-  { value: false, icon: 'recommendationNoted', message: 'ui.acceptedStatuses.noted' },
+export const SUPPORT_LEVELS = [
+  { value: 'null', icon: '', message: 'ui.supportLevels.null' },
+  { value: 0, icon: 'recommendationNoted', message: 'ui.supportLevels.noted' },
+  { value: 1, icon: 'recommendationSupported', message: 'ui.supportLevels.supportedInPart' },
+  { value: 2, icon: 'recommendationSupported', message: 'ui.supportLevels.supported' },
+];
+// "current" statuses
+export const IS_CURRENT_STATUSES = [
+  { value: true, message: 'ui.currentStatuses.current' },
+  { value: false, message: 'ui.currentStatuses.notCurrent' },
+];
+export const IS_ARCHIVE_STATUSES = [
+  { value: true, message: 'ui.archiveStatuses.archived' },
+  { value: false, message: 'ui.archiveStatuses.notArchived' },
 ];
 // Report frequencies
 export const REPORT_FREQUENCIES = [
@@ -199,12 +213,14 @@ export const DELETE_MIN_ROLE = null;
 export const PAGE_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value;
 export const USER_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value;
 export const CATEGORY_MANAGER_MIN_ROLE = USER_ROLES.MANAGER.value; // can be assigned to category
-export const CATEGORY_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value; // can edit or create categories
 export const CONTRIBUTOR_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create
+export const CATEGORY_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value; // can edit or create categories
 export const CONTRIBUTOR_MIN_ROLE_PUBLISH = USER_ROLES.MANAGER.value; // publish
 export const CONTRIBUTOR_MIN_ROLE_ASSIGNED = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
 export const SEE_DRAFT_MIN_ROLE = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
+export const SEE_ARCHIVED_MIN_ROLE = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
 export const SEE_META_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create when assigned
+export const ARCHIVE_MIN_ROLE = USER_ROLES.ADMIN.value; // archive content
 
 // Map server database tables **************************
 export const API = {
@@ -231,6 +247,20 @@ export const API = {
 };
 
 export const DB_TABLES = Object.values(API);
+
+export const DB_TABLES_CURRENT = [
+  'indicators',
+  'measures',
+  'recommendations',
+];
+export const DB_TABLES_ARCHIVED = [
+  'users',
+  'pages',
+  'categories',
+  'indicators',
+  'measures',
+  'recommendations',
+];
 
 export const COLUMN_WIDTHS = {
   FULL: 1,
@@ -552,9 +582,8 @@ export const ENTITY_FIELDS = {
         type: 'markdown',
         import: true,
       },
-      accepted: {
-        type: 'bool',
-        import: true,
+      support_level: {
+        type: 'number',
       },
       created_at: {
         skipImport: true,
@@ -665,5 +694,19 @@ export const ENTITY_FIELDS = {
         hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
       },
     },
+  },
+};
+
+export const KEEP_QUERY_ARGS = ['fw', 'loadNonCurrent', 'loadArchived'];
+
+export const SETTINGS = {
+  loadNonCurrent: {
+    available: null,
+    value: false,
+  },
+  loadArchived: { // key also query arg
+    available: null, // will only be set once, once data is loaded
+    value: false, // default value
+    minRole: SEE_ARCHIVED_MIN_ROLE,
   },
 };

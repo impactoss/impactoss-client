@@ -8,7 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { Map, fromJS } from 'immutable';
 
@@ -19,6 +18,7 @@ import {
   getConnectionUpdatesFromFormData,
   getTitleFormField,
   getStatusField,
+  getArchiveField,
   getMarkdownFormField,
   renderIndicatorControl,
   renderRecommendationsByFwControl,
@@ -35,6 +35,7 @@ import {
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 import { canUserDeleteEntities } from 'utils/permissions';
+import { lowerCase } from 'utils/string';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
@@ -53,7 +54,6 @@ import {
 import {
   selectReady,
   selectReadyForAuthCheck,
-  selectIsUserAdmin,
   selectSessionUserHighestRoleId,
   selectCanUserAdministerCategories,
   selectMeasureReferences,
@@ -64,6 +64,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import NotFoundEntity from 'containers/NotFoundEntity';
 
 import appMessages from 'containers/App/messages';
 
@@ -160,6 +161,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       {
         fields: [
           getStatusField(intl.formatMessage),
+          getArchiveField(intl.formatMessage),
           getMetaField(entity),
         ],
       },
@@ -319,13 +321,12 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
           }
-          {!viewEntity && dataReady && !saveError && !deleteSending
-            && (
-              <div>
-                <FormattedMessage {...messages.notFound} />
-              </div>
-            )
-          }
+          {!viewEntity && dataReady && !saveError && !deleteSending && (
+            <NotFoundEntity
+              id={this.props.params.id}
+              type={lowerCase(intl.formatMessage(appMessages.entities.measures.single))}
+            />
+          )}
           {viewEntity && dataReady && !deleteSending
             && (
               <EntityForm
@@ -393,7 +394,6 @@ ActionEdit.propTypes = {
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
-  isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   highestRole: PropTypes.number,
@@ -413,7 +413,6 @@ ActionEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
-  isUserAdmin: selectIsUserAdmin(state),
   highestRole: selectSessionUserHighestRoleId(state),
   canUserAdministerCategories: selectCanUserAdministerCategories(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),

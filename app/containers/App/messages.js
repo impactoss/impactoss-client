@@ -211,6 +211,10 @@ export default defineMessages({
         defaultMessage: 'Not met',
       },
     },
+    settings: {
+      id: 'app.containers.App.labels.settings',
+      defaultMessage: 'Settings',
+    },
   },
   fields: {
     connectionsGrouped: {
@@ -368,13 +372,13 @@ export default defineMessages({
       id: 'app.containers.App.importFields.fullMeasure',
       defaultMessage: 'Full action text',
     },
-    accepted: {
-      id: 'app.containers.App.importFields.accepted',
-      defaultMessage: 'Accepted',
+    support_level: {
+      id: 'app.containers.App.importFields.support_level',
+      defaultMessage: 'Government response (support)',
     },
     response: {
       id: 'app.containers.App.importFields.response',
-      defaultMessage: 'Government response',
+      defaultMessage: 'Government response (text)',
     },
     outcome: {
       id: 'app.containers.App.importFields.outcome',
@@ -508,9 +512,9 @@ export default defineMessages({
       id: 'app.containers.App.attributes.content',
       defaultMessage: 'Content',
     },
-    accepted: {
-      id: 'app.containers.App.attributes.accepted',
-      defaultMessage: 'Government response',
+    support_level: {
+      id: 'app.containers.App.attributes.support_level',
+      defaultMessage: 'Government response (level of support)',
     },
     response: {
       id: 'app.containers.App.attributes.response',
@@ -693,6 +697,14 @@ export default defineMessages({
     framework_id: {
       id: 'app.containers.App.attributes.framework_id',
       defaultMessage: 'Framework',
+    },
+    is_archive: {
+      id: 'app.containers.App.attributes.is_archive',
+      defaultMessage: 'Archived/active',
+    },
+    is_current: {
+      id: 'app.containers.App.attributes.is_current',
+      defaultMessage: 'Latest/previous cycle',
     },
   },
   nav: {
@@ -1532,18 +1544,42 @@ export default defineMessages({
         defaultMessage: 'Private',
       },
     },
-    acceptedStatuses: {
-      accepted: {
-        id: 'app.containers.App.ui.acceptedStatuses.accepted',
-        defaultMessage: 'Accepted',
+    supportLevels: {
+      supported: {
+        id: 'app.containers.App.ui.supportLevels.supported',
+        defaultMessage: 'Supported',
+      },
+      supportedInPart: {
+        id: 'app.containers.App.ui.supportLevels.supportedInPart',
+        defaultMessage: 'Supported in part',
       },
       noted: {
-        id: 'app.containers.App.ui.acceptedStatuses.noted',
-        defaultMessage: 'Not accepted',
+        id: 'app.containers.App.ui.supportLevels.noted',
+        defaultMessage: 'Noted',
       },
       null: {
-        id: 'app.containers.App.ui.acceptedStatuses.null',
+        id: 'app.containers.App.ui.supportLevels.null',
         defaultMessage: 'Not applicable',
+      },
+    },
+    archiveStatuses: {
+      archived: {
+        id: 'app.containers.App.ui.archiveStatuses.archived',
+        defaultMessage: 'Archived',
+      },
+      notArchived: {
+        id: 'app.containers.App.ui.archiveStatuses.notArchived',
+        defaultMessage: 'Active',
+      },
+    },
+    currentStatuses: {
+      current: {
+        id: 'app.containers.App.ui.currentStatuses.current',
+        defaultMessage: 'Latest cycle',
+      },
+      notCurrent: {
+        id: 'app.containers.App.ui.currentStatuses.notCurrent',
+        defaultMessage: 'Previous cycle',
       },
     },
     reportFrequencies: {

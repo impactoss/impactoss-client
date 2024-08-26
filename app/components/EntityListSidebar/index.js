@@ -276,6 +276,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       connections,
       entityIdsSelected,
       frameworks,
+      globalSettings,
     } = this.props;
     const { intl } = this.context;
     const { activeOption } = this.state;
@@ -292,13 +293,13 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       && entities.filter((entity) => entityIdsSelected.includes(entity.get('id')));
 
     if (activePanel === FILTERS_PANEL) {
-      panelGroups = makeFilterGroups(
+      panelGroups = makeFilterGroups({
         config,
         taxonomies,
         connectedTaxonomies,
-        activeOption,
+        activeFilterOption: activeOption,
         hasUserRole,
-        {
+        messages: {
           attributes: intl.formatMessage(messages.filterGroupLabel.attributes),
           taxonomyGroup: intl.formatMessage(messages.filterGroupLabel.taxonomies),
           taxonomyGroupByFw:
@@ -315,23 +316,24 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           frameworks: intl.formatMessage(appMessages.frameworks.plural),
         },
         frameworks,
-      );
+        globalSettings,
+      });
     } else if (activePanel === EDIT_PANEL && canEdit && hasSelected) {
-      panelGroups = makeEditGroups(
+      panelGroups = makeEditGroups({
         config,
         taxonomies,
-        activeOption,
+        activeEditOption: activeOption,
         hasUserRole,
-        {
+        messages: {
           attributes: intl.formatMessage(messages.editGroupLabel.attributes),
           taxonomyGroup: intl.formatMessage(messages.editGroupLabel.taxonomies),
           connections: intl.formatMessage(messages.editGroupLabel.connections),
           taxonomies: (taxId) => this.context.intl.formatMessage(appMessages.entities.taxonomies[taxId].plural),
         },
         frameworks,
-        // selectedFrameworkIds
-        entitiesSelected.groupBy((e) => e.getIn(['attributes', 'framework_id'])).keySeq(),
-      );
+        selectedFrameworkIds: entitiesSelected.groupBy((e) => e.getIn(['attributes', 'framework_id'])).keySeq(),
+        globalSettings,
+      });
     }
     let formOptions = null;
     if (activeOption) {
@@ -493,6 +495,7 @@ EntityListSidebar.propTypes = {
   connectedTaxonomies: PropTypes.instanceOf(Map),
   entityIdsSelected: PropTypes.instanceOf(List),
   locationQuery: PropTypes.instanceOf(Map),
+  globalSettings: PropTypes.object,
   canEdit: PropTypes.bool,
   hasUserRole: PropTypes.object,
   config: PropTypes.object,

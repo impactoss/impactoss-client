@@ -2,16 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Component from 'components/styled/Component';
-import Icon from 'components/Icon';
 
 import ItemStatus from 'components/ItemStatus';
 import ItemRole from 'components/ItemRole';
 import ItemProgress from 'components/ItemProgress';
+import ItemSupport from 'components/ItemSupport';
+
+import {
+  PUBLISH_STATUSES,
+  IS_CURRENT_STATUSES,
+  IS_ARCHIVE_STATUSES,
+} from 'themes/config';
 
 import EntityListItemMainTopReference from './EntityListItemMainTopReference';
-import EntityListItemMainTopIcon from './EntityListItemMainTopIcon';
 import EntityListItemMainTargetDate from './EntityListItemMainTargetDate';
 import EntityListItemMainUser from './EntityListItemMainUser';
+
 
 export default class EntityListItemMainTop extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
@@ -20,12 +26,29 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
 
   render() {
     const { entity } = this.props;
-
     return (
       <Component>
-        { entity.draft
-          && <ItemStatus draft={entity.draft} float="left" />
-        }
+        {entity.draft && (
+          <ItemStatus
+            value={entity.draft.toString()}
+            float="left"
+            options={PUBLISH_STATUSES}
+          />
+        )}
+        {entity.is_archive && (
+          <ItemStatus
+            value={entity.is_archive.toString()}
+            float="left"
+            options={IS_ARCHIVE_STATUSES}
+          />
+        )}
+        {typeof entity.is_current !== 'undefined' && !entity.is_current && (
+          <ItemStatus
+            value={entity.is_current ? entity.is_current.toString() : 'false'}
+            float="left"
+            options={IS_CURRENT_STATUSES}
+          />
+        )}
         <EntityListItemMainTopReference>
           {entity.reference}
         </EntityListItemMainTopReference>
@@ -43,16 +66,13 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
             />
           )
         }
-        { entity.entityIcon
-          && (
-            <EntityListItemMainTopIcon>
-              <Icon name={entity.entityIcon} text />
-            </EntityListItemMainTopIcon>
-          )
-        }
         {
           entity.progressCategory
           && <ItemProgress status={entity.progressCategory} />
+        }
+        {
+          entity.support
+          && <ItemSupport supportLevel={entity.support} />
         }
         { entity.role
           && <ItemRole role={entity.role} />

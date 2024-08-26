@@ -8,6 +8,7 @@ import {
 import { push, replace, goBack } from 'react-router-redux';
 import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
+import { fromJS } from 'immutable';
 
 import asArray from 'utils/as-array';
 import {
@@ -43,6 +44,8 @@ import {
   ROUTES,
   PARAMS,
   SET_FRAMEWORK,
+  SET_LOAD_ARCHIVED,
+  SET_LOAD_NONCURRENT,
   OPEN_BOOKMARK,
 } from 'containers/App/constants';
 
@@ -50,7 +53,11 @@ import {
   ENDPOINTS,
   KEYS,
   DB_TABLES,
+  DB_TABLES_CURRENT,
+  DB_TABLES_ARCHIVED,
   ENABLE_AZURE,
+  KEEP_QUERY_ARGS,
+  SETTINGS,
 } from 'themes/config';
 
 import {
@@ -77,6 +84,7 @@ import {
   recoverError,
   forwardOnAuthenticationChange,
   updatePath,
+  initializeSettings,
 } from 'containers/App/actions';
 
 import {
@@ -88,6 +96,8 @@ import {
   selectLocation,
   selectSessionUserRoles,
   selectIsAuthenticating,
+  selectLoadArchivedQuery,
+  selectLoadNonCurrentQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -119,8 +129,34 @@ export function* checkEntitiesSaga(payload) {
           yield put(entitiesLoaded({}, payload.path, Date.now()));
         } else {
           // Call the API, cancel on invalidate
+          let query = {};
+          // if (payload.includeArchive) {
+          const includeArchive = yield select(selectLoadArchivedQuery);
+          const includeNonCurrent = yield select(selectLoadNonCurrentQuery);
+          // only apply to relevant tables
+          if (!includeArchive && DB_TABLES_ARCHIVED.indexOf(payload.path) > -1) {
+            query = {
+              ...query,
+              include_archive: 'false',
+            };
+          }
+          if (!includeNonCurrent && DB_TABLES_CURRENT.indexOf(payload.path) > -1) {
+            query = {
+              ...query,
+              current_only: 'true',
+            };
+          }
           const { response } = yield race({
-            response: call(apiRequest, 'get', payload.path),
+            response: call(
+              apiRequest,
+              'get',
+              payload.path,
+              query,
+              // {
+              //   // include_archive: 'false',
+              //   // current_only: 'true',
+              // },
+            ),
             cancel: take(INVALIDATE_ENTITIES), // will also reset entities requested
           });
           if (response) {
@@ -235,6 +271,7 @@ export function* authChangeSaga() {
     // forward to home
     yield put(updatePath('/', { replace: true }));
   }
+  yield put(initializeSettings(fromJS(SETTINGS)));
 }
 
 export function* logoutSaga() {
@@ -693,6 +730,42 @@ export function* setFrameworkSaga({ framework }) {
 
   yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
+export function* setLoadArchivedSaga({ loadArchived }) {
+  const location = yield select(selectLocation);
+
+  yield put(updatePath(
+    location.get('pathname'),
+    {
+      query: [
+        {
+          arg: 'loadArchived',
+          value: loadArchived || null,
+          remove: !loadArchived,
+        },
+      ],
+      extend: true,
+    },
+  ));
+  yield put(invalidateEntities()); // important invalidate to allow for reloading of entities
+}
+export function* setLoadNonCurrentSaga({ loadNonCurrent }) {
+  const location = yield select(selectLocation);
+
+  yield put(updatePath(
+    location.get('pathname'),
+    {
+      query: [
+        {
+          arg: 'loadNonCurrent',
+          value: loadNonCurrent || null,
+          remove: !loadNonCurrent,
+        },
+      ],
+      extend: true,
+    },
+  ));
+  yield put(invalidateEntities()); // important invalidate to allow for reloading of entities
+}
 
 export function* openBookmarkSaga({ bookmark }) {
   const path = bookmark.getIn(['attributes', 'view', 'path']);
@@ -719,19 +792,50 @@ export function* dismissQueryMessagesSaga() {
 }
 
 export function* updatePathSaga({ path, args }) {
-  const relativePath = path.startsWith('/') ? path : `/${path}`;
+  let relativePath = path.startsWith('/') ? path : `/${path}`;
+  let query = (args && args.query) || [];
+  // keep query args from path (as is needed for login redirect)
+  if (relativePath.indexOf('?') > -1) {
+    const [p, search] = relativePath.split('?');
+    relativePath = p;
+    let searchParams = Object.fromEntries(new URLSearchParams(search));
+    searchParams = Object.keys(searchParams).reduce(
+      (memo, key) => ([
+        ...memo,
+        { arg: key, value: searchParams[key] },
+      ]),
+      [],
+    );
+    query = [
+      ...query,
+      ...searchParams,
+    ];
+  }
   const location = yield select(selectLocation);
+
   let queryNext = {};
-  if (args && (args.query || args.keepQuery)) {
-    if (args.query) {
-      queryNext = getNextQuery(args.query, args.extend, location);
-    }
-    if (args.keepQuery) {
-      queryNext = location.get('query').toJS();
-    }
+  // update query based on provided query args
+  if (query) {
+    queryNext = getNextQuery(query, args ? args.extend : false, location);
+  }
+  // optionally keep all previous query args
+  if (args && args.keepQuery) {
+    queryNext = {
+      ...queryNext,
+      ...location.get('query').toJS(),
+    };
   } else {
-    // always keep "framework filter"
-    queryNext = location.get('query').filter((val, key) => key === 'fw').toJS();
+    // otherwise keep "specific args" incl framework (unless explicitly removed)
+    const argsRemove = query
+      ? asArray(query).filter((item) => item.remove).map((item) => item.arg)
+      : [];
+    const queryKeep = location.get('query').filter(
+      (val, key) => KEEP_QUERY_ARGS.indexOf(key) > -1 && argsRemove.indexOf(key) === -1
+    ).toJS();
+    queryNext = {
+      ...queryNext,
+      ...queryKeep,
+    };
   }
   // convert to string
   const queryNextString = getNextQueryString(queryNext);
@@ -783,6 +887,8 @@ export default function* rootSaga() {
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
   yield takeEvery(UPDATE_PATH, updatePathSaga);
   yield takeEvery(SET_FRAMEWORK, setFrameworkSaga);
+  yield takeEvery(SET_LOAD_ARCHIVED, setLoadArchivedSaga);
+  yield takeEvery(SET_LOAD_NONCURRENT, setLoadNonCurrentSaga);
   yield takeEvery(OPEN_BOOKMARK, openBookmarkSaga);
   yield takeEvery(DISMISS_QUERY_MESSAGES, dismissQueryMessagesSaga);
 

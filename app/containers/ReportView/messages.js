@@ -14,8 +14,4 @@ export default defineMessages({
     id: 'app.containers.ReportView.metaDescription',
     defaultMessage: 'Progress report page description',
   },
-  notFound: {
-    id: 'app.containers.ReportView.notFound',
-    defaultMessage: 'Sorry no progress report found',
-  },
 });
