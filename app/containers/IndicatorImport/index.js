@@ -17,7 +17,7 @@ import { USER_ROLES, ENTITY_FIELDS } from 'themes/config';
 import { getImportFields, getColumnAttribute } from 'utils/import';
 
 import qe from 'utils/quasi-equals';
-import { checkIndicatorAttribute, checkActionAttribute } from 'utils/entities';
+import { checkIndicatorAttribute } from 'utils/entities';
 
 import {
   redirectIfNotPermitted,
@@ -42,6 +42,7 @@ import {
   selectProgress,
   selectFormData,
   selectSuccess,
+  selectSending,
 } from './selectors';
 
 import messages from './messages';
@@ -139,6 +140,7 @@ export class IndicatorImport extends React.PureComponent { // eslint-disable-lin
             errors={this.props.errors}
             success={this.props.success}
             progress={this.props.progress}
+            sending={this.props.sending}
             template={{
               filename: `${intl.formatMessage(messages.filename)}.csv`,
               data: getImportFields({ fields, relationshipFields }, intl.formatMessage),
@@ -162,8 +164,9 @@ IndicatorImport.propTypes = {
   authReady: PropTypes.bool,
   resetProgress: PropTypes.func.isRequired,
   progress: PropTypes.number,
-  errors: PropTypes.object,
-  success: PropTypes.object,
+  errors: PropTypes.object, // Map
+  sending: PropTypes.object, // Map
+  success: PropTypes.object, // Map
   connections: PropTypes.object,
 };
 
@@ -176,12 +179,13 @@ const mapStateToProps = (state) => ({
   progress: selectProgress(state),
   errors: selectErrors(state),
   success: selectSuccess(state),
+  sending: selectSending(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   connections: selectIndicatorConnections(state),
 });
 
-function mapDispatchToProps(dispatch, { params }) {
+function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
@@ -202,12 +206,10 @@ function mapDispatchToProps(dispatch, { params }) {
           // make sure we only take valid columns
           const rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
           // use framework id from URL if set, otherwise assume default framework 1
-          const frameworkId = params.id || 1;
           let rowClean = {
             attributes: rowCleanColumns
               // make sure only valid fields are imported
-              .filter((val, att) => checkActionAttribute(att))
-              .set('framework_id', frameworkId)
+              .filter((val, att) => checkIndicatorAttribute(att))
               // make sure we only import draft content
               .set('draft', true)
               // for testing, give new ref everytime
@@ -245,6 +247,7 @@ function mapDispatchToProps(dispatch, { params }) {
           // also make sure we only allow connections that exist
           if (relationships) {
             let measureIndicators;
+            let recommendationIndicators;
             Object.values(relationships).forEach(
               (relationship) => {
                 if (relationship.values) {
@@ -252,10 +255,10 @@ function mapDispatchToProps(dispatch, { params }) {
                   const relConfig = ENTITY_FIELDS.indicators.RELATIONSHIPS_IMPORT[relationship.field];
                   relationship.values.forEach(
                     (relValue) => {
-                      const idOrCode = relValue;
+                      const idOrCode = relValue.trim();
                       if (relConfig) {
                         // assume field to referencet the id
-                        let connectionId = 'INVALID';
+                        let connectionId = idOrCode;
                         // unless attribute specified
                         if (relConfig.lookup && relConfig.lookup.table) {
                           if (connections && connections.get(relConfig.lookup.table)) {
@@ -264,14 +267,12 @@ function mapDispatchToProps(dispatch, { params }) {
                                 (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), idOrCode)
                               )
                               : connections.get(relConfig.lookup.table).get(idOrCode);
-                            if (connection) {
-                              connectionId = connection.get('id');
-                            }
+                            connectionId = connection ? connection.get('id') : `INVALID|${idOrCode}`;
                           }
                         }
                         // action by code or id
                         if (relField === 'action-reference' || relField === 'action-id') {
-                          const create = { action_id: connectionId };
+                          const create = { measure_id: connectionId };
                           if (measureIndicators && measureIndicators.create) {
                             measureIndicators.create = [
                               ...measureIndicators.create,
@@ -279,6 +280,18 @@ function mapDispatchToProps(dispatch, { params }) {
                             ];
                           } else {
                             measureIndicators = { create: [create] };
+                          }
+                        }
+                        // action by code or id
+                        if (relField === 'recommendation-reference' || relField === 'recommendation-id') {
+                          const create = { recommendation_id: connectionId };
+                          if (recommendationIndicators && recommendationIndicators.create) {
+                            recommendationIndicators.create = [
+                              ...recommendationIndicators.create,
+                              create,
+                            ];
+                          } else {
+                            recommendationIndicators = { create: [create] };
                           }
                         }
                       } // relConfig
@@ -290,6 +303,7 @@ function mapDispatchToProps(dispatch, { params }) {
             rowClean = {
               ...rowClean,
               measureIndicators,
+              recommendationIndicators,
             };
             dispatch(save(rowClean));
           }

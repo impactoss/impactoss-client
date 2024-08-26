@@ -285,6 +285,9 @@ export const ENTITY_FIELDS = {
         exportColumn: 'public',
         exportFlip: true,
       },
+      reference: {
+        type: 'markdown',
+      },
       title: {
         type: 'text',
         exportDefault: true,
@@ -293,9 +296,6 @@ export const ENTITY_FIELDS = {
         type: 'markdown',
       },
       outcome: {
-        type: 'markdown',
-      },
-      reference: {
         type: 'markdown',
       },
       indicator_summary: {
@@ -308,6 +308,7 @@ export const ENTITY_FIELDS = {
         type: 'text',
       },
       created_at: {
+        skipImport: true,
         type: 'date',
         roleExport: USER_ROLES.MANAGER.value,
       },
@@ -319,6 +320,7 @@ export const ENTITY_FIELDS = {
         exportColumn: 'created_by',
       },
       updated_at: {
+        skipImport: true,
         type: 'date',
         roleExport: USER_ROLES.MANAGER.value,
       },
@@ -376,6 +378,16 @@ export const ENTITY_FIELDS = {
         },
         keyPair: ['measure_id', 'category_id'], // own, other
         hint: 'one or more category references (as assigned by the users / comma-separated)',
+      },
+      'category-short-title': {
+        type: 'text',
+        table: API.ACTION_CATEGORIES,
+        lookup: {
+          table: API.CATEGORIES, // id assumed
+          attribute: 'short_title',
+        },
+        keyPair: ['measure_id', 'category_id'], // own, other
+        hint: 'one or more category "short titles" (as assigned by the users / comma-separated)',
       },
       // has category
       'category-id': {
@@ -444,6 +456,9 @@ export const ENTITY_FIELDS = {
         exportColumn: 'public',
         exportFlip: true,
       },
+      reference: {
+        type: 'text',
+      },
       title: {
         type: 'text',
         exportDefault: true,
@@ -458,16 +473,14 @@ export const ENTITY_FIELDS = {
         type: 'date',
       },
       frequency_months: {
-        type: 'int',
-      },
-      reference: {
-        type: 'text',
+        type: 'number',
       },
       repeat: {
         defaultValue: false,
         type: 'bool',
       },
       created_at: {
+        skipImport: true,
         type: 'date',
         roleExport: USER_ROLES.MANAGER.value,
       },
@@ -479,6 +492,7 @@ export const ENTITY_FIELDS = {
         exportColumn: 'created_by',
       },
       updated_at: {
+        skipImport: true,
         type: 'date',
         roleExport: USER_ROLES.MANAGER.value,
       },

@@ -253,6 +253,7 @@ function mapDispatchToProps(dispatch, { params }) {
           // also make sure we only allow connections that exist
           if (relationships) {
             let recommendationMeasures;
+            let recommendationIndicators;
             let recommendationCategories;
             Object.values(relationships).forEach(
               (relationship) => {
@@ -299,6 +300,18 @@ function mapDispatchToProps(dispatch, { params }) {
                             recommendationMeasures = { create: [create] };
                           }
                         }
+                        // indicator by code or id
+                        if (relField === 'indicator-reference' || relField === 'indicator-id') {
+                          const create = { indicator_id: connectionId };
+                          if (recommendationIndicators && recommendationIndicators.create) {
+                            recommendationIndicators.create = [
+                              ...recommendationIndicators.create,
+                              create,
+                            ];
+                          } else {
+                            recommendationIndicators = { create: [create] };
+                          }
+                        }
                         // actorCategories by code or id
                         if (
                           relField === 'category-reference'
@@ -327,6 +340,7 @@ function mapDispatchToProps(dispatch, { params }) {
             rowClean = {
               ...rowClean,
               recommendationMeasures,
+              recommendationIndicators,
               recommendationCategories,
             };
           }

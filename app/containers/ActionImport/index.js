@@ -42,6 +42,7 @@ import {
   selectProgress,
   selectFormData,
   selectSuccess,
+  selectSending,
 } from './selectors';
 
 import messages from './messages';
@@ -139,6 +140,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             errors={this.props.errors}
             success={this.props.success}
             progress={this.props.progress}
+            sending={this.props.sending}
             template={{
               filename: `${intl.formatMessage(messages.filename)}.csv`,
               data: getImportFields({ fields, relationshipFields }, intl.formatMessage),
@@ -162,8 +164,9 @@ ActionImport.propTypes = {
   authReady: PropTypes.bool,
   resetProgress: PropTypes.func.isRequired,
   progress: PropTypes.number,
-  errors: PropTypes.object,
-  success: PropTypes.object,
+  errors: PropTypes.object, // Map
+  sending: PropTypes.object, // Map
+  success: PropTypes.object, // Map
   connections: PropTypes.object,
   categories: PropTypes.object,
 };
@@ -177,13 +180,14 @@ const mapStateToProps = (state) => ({
   progress: selectProgress(state),
   errors: selectErrors(state),
   success: selectSuccess(state),
+  sending: selectSending(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   connections: selectMeasureConnections(state),
   categories: selectCategories(state),
 });
 
-function mapDispatchToProps(dispatch, { params }) {
+function mapDispatchToProps(dispatch) {
   return {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
@@ -204,12 +208,10 @@ function mapDispatchToProps(dispatch, { params }) {
           // make sure we only take valid columns
           const rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
           // use framework id from URL if set, otherwise assume default framework 1
-          const frameworkId = params.id || 1;
           let rowClean = {
             attributes: rowCleanColumns
               // make sure only valid fields are imported
               .filter((val, att) => checkActionAttribute(att))
-              .set('framework_id', frameworkId)
               // make sure we only import draft content
               .set('draft', true)
               // for testing, give new ref everytime
@@ -256,7 +258,7 @@ function mapDispatchToProps(dispatch, { params }) {
                   const relConfig = ENTITY_FIELDS.measures.RELATIONSHIPS_IMPORT[relationship.field];
                   relationship.values.forEach(
                     (relValue) => {
-                      const idOrCode = relValue;
+                      const idOrCode = relValue.trim();
                       if (relConfig) {
                         // assume field to referencet the id
                         let connectionId = 'INVALID';
@@ -264,23 +266,19 @@ function mapDispatchToProps(dispatch, { params }) {
                         if (relConfig.lookup && relConfig.lookup.table
                         ) {
                           if (categories && relConfig.lookup.table === API.CATEGORIES) {
-                            const recommendation = relConfig.lookup.attribute
+                            const category = relConfig.lookup.attribute
                               ? categories.find(
                                 (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), idOrCode)
                               )
                               : categories.get(idOrCode);
-                            if (recommendation) {
-                              connectionId = recommendation.get('id');
-                            }
+                            connectionId = category ? category.get('id') : `INVALID|${idOrCode}`;
                           } else if (connections && connections.get(relConfig.lookup.table)) {
                             const connection = relConfig.lookup.attribute
                               ? connections.get(relConfig.lookup.table).find(
                                 (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), idOrCode)
                               )
                               : connections.get(relConfig.lookup.table).get(idOrCode);
-                            if (connection) {
-                              connectionId = connection.get('id');
-                            }
+                            connectionId = connection ? connection.get('id') : `INVALID|${idOrCode}`;
                           }
                         }
                         // recommendations by code or id
@@ -308,7 +306,11 @@ function mapDispatchToProps(dispatch, { params }) {
                           }
                         }
                         // categories by code or id
-                        if (relField === 'category-reference' || relField === 'category-id') {
+                        if (
+                          relField === 'category-reference'
+                          || relField === 'category-id'
+                          || relField === 'category-short-title'
+                        ) {
                           const create = { category_id: connectionId };
                           if (measureCategories && measureCategories.create) {
                             measureCategories.create = [
