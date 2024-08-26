@@ -29,7 +29,6 @@ import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/ac
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 
 import {
-  ACCEPTED_STATUSES,
   IS_CURRENT_STATUSES,
   IS_ARCHIVE_STATUSES,
   SUPPORT_LEVELS,
