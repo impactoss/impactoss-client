@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import Papa from 'papaparse';
 
 import Icon from 'components/Icon';
 import ButtonSubmit from 'components/buttons/ButtonSubmit';
@@ -82,35 +81,28 @@ class ImportFileSelectControl extends React.PureComponent { // eslint-disable-li
     this.setState({ errors: [] });
   };
 
-  handleChange = (results) => {
-    // console.log(results)
-    // todo: limit to 1 file?
-    results.data.forEach((result) => {
-      const [evt, file] = result;
-      try {
-        const parsed = Papa.parse(evt.target.result, { header: true, skipEmptyLines: true, delimiter: ',' });
-        //console.log(parsed)
-        if (parsed && parsed.errors && parsed.errors.length > 0) {
-          this.setState(
-            (prevState) => ({
-              errors: prevState.errors.concat(parsed.errors),
-            })
-          );
-        } else {
-          this.props.onChange({
-            rows: parsed.data,
-            meta: parsed.meta,
-            file,
-          });
-        }
-      } catch (err) {
+  handleChange = (parsed, file) => {
+    if (parsed && parsed.errors && parsed.errors.length > 0) {
+      this.setState(
+        (prevState) => ({
+          errors: prevState.errors.concat(parsed.errors),
+        })
+      );
+    } else {
+      this.props.onChange({
+        rows: parsed.data,
+        meta: parsed.meta,
+        file,
+      });
+    }
+    /*  } catch (err) {
         this.setState(
           (prevState) => ({
             errors: prevState.errors.concat([{ error: 0 }]),
           })
         );
-      }
-    });
+      }*/
+    // });
   };
 
   handleRemove = (evt) => {
@@ -159,15 +151,20 @@ class ImportFileSelectControl extends React.PureComponent { // eslint-disable-li
               as={this.props.as}
               accept={this.props.accept}
               onUploadAccepted={this.handleChange}
-            >{
-                ({ getRootProps }) => (
-                  <ButtonDefaultWithIcon
-                    {...getRootProps()}
-                    type="button"
-                    title={intl.formatMessage(messages.selectFile)}
-                    icon="add"
-                  />
-                )}
+              config={{
+                header: true,
+                skipEmptyLines: true,
+                delimiter: ',',
+              }}
+            >
+              {({ getRootProps }) => (
+                <ButtonDefaultWithIcon
+                  {...getRootProps()}
+                  type="button"
+                  title={intl.formatMessage(messages.selectFile)}
+                  icon="add"
+                />
+              )}
             </CsvReaderHandler>
           )}
       </Styled>
