@@ -11,7 +11,7 @@ import { lowerCase } from 'utils/string';
 import appMessage from 'utils/app-message';
 
 import ContainerWrapperSidebar from 'components/styled/Container/ContainerWrapperSidebar';
-import MultiSelectControl from 'components/formik/MultiSelectControl';
+import MultiSelectControl from 'components/forms/MultiSelectControl';
 
 import { FILTER_FORM_MODEL, INITIAL_FORM } from './constants';
 import { setFilter } from './actions';

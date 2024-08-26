@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { omit } from 'lodash/object';
 import { startCase } from 'lodash/string';
 
-import { validateField } from 'utils/formik';
+import { validateField } from 'utils/forms';
 
 import appMessages from 'containers/App/messages';
 

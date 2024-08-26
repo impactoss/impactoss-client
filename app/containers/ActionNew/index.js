@@ -25,9 +25,9 @@ import {
   getTextareaField,
   renderTaxonomyControl,
   getReferenceFormField,
-} from 'utils/formik';
+} from 'utils/forms';
 
-import { getCheckedValuesFromOptions } from 'components/formik/MultiSelectControl';
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';

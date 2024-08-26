@@ -29,7 +29,7 @@ import {
   getStatusField,
   parentCategoryOptions,
   getDateField,
-} from 'utils/formik';
+} from 'utils/forms';
 
 import {
   getMetaField,
@@ -39,7 +39,7 @@ import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 import { canUserDeleteEntities } from 'utils/permissions';
 
-import { getCheckedValuesFromOptions } from 'components/formik/MultiSelectControl';
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';

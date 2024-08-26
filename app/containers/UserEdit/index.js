@@ -19,7 +19,7 @@ import {
   getEmailFormField,
   getHighestUserRoleId,
   getRoleFormField,
-} from 'utils/formik';
+} from 'utils/forms';
 
 import {
   getMetaField,

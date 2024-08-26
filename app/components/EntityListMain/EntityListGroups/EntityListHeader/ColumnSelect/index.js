@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import IndeterminateCheckbox from 'components/formik/IndeterminateCheckbox';
+import IndeterminateCheckbox from 'components/forms/IndeterminateCheckbox';
 import SelectReset from 'components/SelectReset';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 import Icon from 'components/Icon';

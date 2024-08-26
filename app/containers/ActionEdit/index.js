@@ -25,7 +25,7 @@ import {
   getTextareaField,
   renderTaxonomyControl,
   getReferenceFormField,
-} from 'utils/formik';
+} from 'utils/forms';
 
 import {
   getMetaField,

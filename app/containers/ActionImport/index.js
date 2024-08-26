@@ -30,7 +30,7 @@ import {
 
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
-import ImportEntitiesForm from 'components/formik/ImportEntitiesForm';
+import ImportEntitiesForm from 'components/forms/ImportEntitiesForm';
 
 import {
   selectErrors,

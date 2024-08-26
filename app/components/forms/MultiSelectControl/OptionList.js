@@ -7,7 +7,7 @@ import { kebabCase } from 'lodash/string';
 import { FormattedMessage } from 'react-intl';
 
 import A from 'components/styled/A';
-import IndeterminateCheckbox from 'components/formik/IndeterminateCheckbox';
+import IndeterminateCheckbox from 'components/forms/IndeterminateCheckbox';
 
 import Option from './Option';
 

@@ -25,7 +25,7 @@ import {
   getAcceptedField,
   getStatusField,
   getMarkdownFormField,
-} from 'utils/formik';
+} from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';

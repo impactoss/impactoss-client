@@ -13,14 +13,14 @@ import styled from 'styled-components';
 
 import {
   getEmailFormField,
-} from 'utils/formik';
+} from 'utils/forms';
 
 import Icon from 'components/Icon';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
-import AuthForm from 'components/formik/AuthForm';
+import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
 import { ROUTES } from 'containers/App/constants';

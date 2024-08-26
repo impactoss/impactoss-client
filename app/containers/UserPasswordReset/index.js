@@ -13,13 +13,13 @@ import { injectIntl } from 'react-intl';
 import {
   getPasswordField,
   getPasswordConfirmationField,
-} from 'utils/formik';
+} from 'utils/forms';
 
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
-import AuthForm from 'components/formik/AuthForm';
+import AuthForm from 'components/forms/AuthForm';
 
 import { updatePath } from 'containers/App/actions';
 

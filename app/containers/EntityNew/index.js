@@ -11,7 +11,7 @@ import { Map, List, fromJS } from 'immutable';
 
 import { Box } from 'grommet';
 
-import { getEntityAttributeFields } from 'utils/formik';
+import { getEntityAttributeFields } from 'utils/forms';
 import { qe } from 'utils/quasi-equals';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
@@ -37,7 +37,7 @@ import { selectParentOptions, selectParentTaxonomy } from 'containers/CategoryNe
 import { DEFAULT_FRAMEWORK } from 'themes/config';
 import { CONTENT_MODAL } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
-import { getCheckedValuesFromOptions } from 'components/formik/MultiSelectControl';
+import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import Content from 'components/Content';
 import Messages from 'components/Messages';

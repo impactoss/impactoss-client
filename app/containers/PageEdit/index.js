@@ -18,7 +18,7 @@ import {
   getMenuOrderFormField,
   getMarkdownFormField,
   getStatusField,
-} from 'utils/formik';
+} from 'utils/forms';
 
 import {
   getMetaField,

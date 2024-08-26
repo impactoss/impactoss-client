@@ -20,7 +20,7 @@ import {
   getUploadField,
   getDocumentStatusField,
   getDueDateDateOptions,
-} from 'utils/formik';
+} from 'utils/forms';
 
 import { getStatusField as getStatusInfoField } from 'utils/fields';
 

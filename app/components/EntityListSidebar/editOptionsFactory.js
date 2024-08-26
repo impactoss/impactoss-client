@@ -1,5 +1,5 @@
 import { find, forEach } from 'lodash/collection';
-import { STATES as CHECKBOX } from 'components/formik/IndeterminateCheckbox';
+import { STATES as CHECKBOX } from 'components/forms/IndeterminateCheckbox';
 import { startsWith } from 'utils/string';
 
 import {
@@ -10,7 +10,7 @@ import {
   getEntityParentId,
 } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
-import { makeTagFilterGroups } from 'utils/formik';
+import { makeTagFilterGroups } from 'utils/forms';
 
 export const checkedState = (count, length) => {
   if (count === length) {

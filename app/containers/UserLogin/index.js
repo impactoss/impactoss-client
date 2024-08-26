@@ -14,7 +14,7 @@ import styled from 'styled-components';
 import {
   getEmailFormField,
   getPasswordField,
-} from 'utils/formik';
+} from 'utils/forms';
 
 import ButtonHero from 'components/buttons/ButtonHero';
 import Messages from 'components/Messages';
@@ -22,7 +22,7 @@ import Loading from 'components/Loading';
 import Icon from 'components/Icon';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
-import AuthForm from 'components/formik/AuthForm';
+import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
 import { selectQueryMessages } from 'containers/App/selectors';

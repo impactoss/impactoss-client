@@ -10,7 +10,7 @@ import { FormattedMessage } from 'react-intl';
 import ButtonFactory from 'components/buttons/ButtonFactory';
 import TagSearch from 'components/TagSearch';
 
-import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/formik/IndeterminateCheckbox';
+import IndeterminateCheckbox, { STATES as CHECKBOX_STATES } from 'components/forms/IndeterminateCheckbox';
 
 import {
   sortOptions,
