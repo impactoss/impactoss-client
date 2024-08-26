@@ -288,10 +288,13 @@ function mapDispatchToProps(dispatch, { params }) {
                         if (relField === 'action-reference' || relField === 'action-id') {
                           const create = { measure_id: connectionId };
                           if (recommendationMeasures && recommendationMeasures.create) {
-                            recommendationMeasures.create = [
-                              ...recommendationMeasures.create,
-                              create,
-                            ];
+                            // make sure does not already exist
+                            if (!recommendationMeasures.create.find((el) => el.measure_id === connectionId)) {
+                              recommendationMeasures.create = [
+                                ...recommendationMeasures.create,
+                                create,
+                              ];
+                            }
                           } else {
                             recommendationMeasures = { create: [create] };
                           }
@@ -300,10 +303,13 @@ function mapDispatchToProps(dispatch, { params }) {
                         if (relField === 'category-reference' || relField === 'category-id') {
                           const create = { category_id: connectionId };
                           if (recommendationCategories && recommendationCategories.create) {
-                            recommendationCategories.create = [
-                              ...recommendationCategories.create,
-                              create,
-                            ];
+                            // only add if not already present
+                            if (!recommendationCategories.create.find((el) => el.category_id === connectionId)) {
+                              recommendationCategories.create = [
+                                ...recommendationCategories.create,
+                                create,
+                              ];
+                            }
                           } else {
                             recommendationCategories = { create: [create] };
                           }

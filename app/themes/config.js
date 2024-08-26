@@ -624,6 +624,16 @@ export const ENTITY_FIELDS = {
         keyPair: ['recommendation_id', 'category_id'], // own, other
         hint: 'one or more category references (as assigned by the users / comma-separated)',
       },
+      'category-short-title': {
+        type: 'text',
+        table: API.RECOMMENDATION_CATEGORIES,
+        lookup: {
+          table: API.CATEGORIES, // id assumed
+          attribute: 'short_title',
+        },
+        keyPair: ['recommendation_id', 'category_id'], // own, other
+        hint: 'one or more category "short titles" (as assigned by the users / comma-separated)',
+      },
       // has category
       'category-id': {
         type: 'number',
