@@ -298,9 +298,6 @@ export const ENTITY_FIELDS = {
       outcome: {
         type: 'markdown',
       },
-      indicator_summary: {
-        type: 'markdown',
-      },
       target_date: {
         type: 'date',
       },
