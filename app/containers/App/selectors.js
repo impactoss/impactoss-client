@@ -1022,3 +1022,8 @@ export const selectHasPreviousCycles = createSelector(
       && CURRENT_TAXONOMY_IDS.indexOf(parseInt(cat.getIn(['attributes', 'taxonomy_id']), 10)) > -1
   )
 );
+// select all categories
+export const selectCategories = createSelector(
+  (state) => selectEntities(state, API.CATEGORIES),
+  (entities) => entities
+);

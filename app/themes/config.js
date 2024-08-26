@@ -551,7 +551,7 @@ export const ENTITY_FIELDS = {
         table: API.FRAMEWORKS,
         exportColumn: 'framework',
         export: true,
-        import: 'auto',
+        skipImport: true,
       },
       draft: {
         defaultValue: true,
@@ -584,6 +584,7 @@ export const ENTITY_FIELDS = {
       },
       support_level: {
         type: 'number',
+        import: true,
       },
       created_at: {
         skipImport: true,
