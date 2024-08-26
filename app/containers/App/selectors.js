@@ -16,7 +16,12 @@ import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
 import { sortEntities } from 'utils/sort';
 
-import { USER_ROLES, DB_TABLES, CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
+import {
+  USER_ROLES,
+  DB_TABLES,
+  CATEGORY_ADMIN_MIN_ROLE,
+  CURRENT_TAXONOMY_IDS,
+} from 'themes/config';
 
 import {
   filterEntitiesByAttributes,
@@ -36,6 +41,14 @@ const getGlobalRequested = (state) => state.getIn(['global', 'requested']);
 export const selectNewEntityModal = createSelector(
   getGlobal,
   (globalState) => globalState.get('newEntityModal')
+);
+export const selectShowSettings = createSelector(
+  getGlobal,
+  (globalState) => !!globalState.get('showSettings')
+);
+export const selectSettingsConfig = createSelector(
+  getGlobal,
+  (globalState) => globalState.get('settings')
 );
 
 export const selectIsAuthenticating = createSelector(
@@ -312,6 +325,24 @@ export const selectFrameworkQuery = createSelector(
   (query) => (query && query.get('fw'))
     ? query.get('fw')
     : 'all'
+);
+
+export const selectLoadArchivedQuery = createSelector(
+  selectLocationQuery,
+  (query) => ((query && query.get('loadArchived') === 'true') || false)
+);
+export const selectLoadNonCurrentQuery = createSelector(
+  selectLocationQuery,
+  (query) => ((query && query.get('loadNonCurrent') === 'true') || false)
+);
+
+export const selectSettingsFromQuery = createSelector(
+  selectLoadArchivedQuery,
+  selectLoadNonCurrentQuery,
+  (loadArchived, loadNonCurrent) => ({
+    loadArchived,
+    loadNonCurrent,
+  })
 );
 
 const selectEntitiesAll = (state) => state.getIn(['global', 'entities']);
@@ -980,3 +1011,13 @@ export const selectViewRecommendationFrameworkId = createSelector(
 //     ).keySeq()
 //   ),
 // );
+
+
+// if there are any non-current categories from the relevant taxonomies then we have multiple cycles
+export const selectHasPreviousCycles = createSelector(
+  (state) => selectEntities(state, 'categories'),
+  (categories) => categories.some(
+    (cat) => !cat.getIn(['attributes', 'is_current'])
+      && CURRENT_TAXONOMY_IDS.indexOf(parseInt(cat.getIn(['attributes', 'taxonomy_id']), 10)) > -1
+  )
+);

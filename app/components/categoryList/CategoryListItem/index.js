@@ -6,6 +6,11 @@ import { palette } from 'styled-theme';
 import ItemStatus from 'components/ItemStatus';
 import Clear from 'components/styled/Clear';
 import { ROUTES } from 'containers/App/constants';
+import {
+  IS_CURRENT_STATUSES,
+  IS_ARCHIVE_STATUSES,
+  CURRENT_TAXONOMY_IDS,
+} from 'themes/config';
 
 import { qe } from 'utils/quasi-equals';
 import appMessages from 'containers/App/messages';
@@ -296,6 +301,9 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
       reference,
       title: category.getIn(['attributes', 'title']),
       draft: category.getIn(['attributes', 'draft']),
+      is_not_current: CURRENT_TAXONOMY_IDS.indexOf(parseInt(category.getIn(['attributes', 'taxonomy_id']), 10)) > -1
+        && !category.getIn(['attributes', 'is_current']),
+      is_archive: category.getIn(['attributes', 'is_archive']),
     };
 
     return (
@@ -314,9 +322,17 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
                   && col.attribute.frameworkIds.length > 1
                 }
               >
-                {col.type === 'title' && catItem.draft && (
+                {col.type === 'title' && (
                   <StatusWrap>
-                    <ItemStatus draft />
+                    {catItem.is_not_current && (
+                      <ItemStatus options={IS_CURRENT_STATUSES} value="false" />
+                    )}
+                    {catItem.is_archive && (
+                      <ItemStatus options={IS_ARCHIVE_STATUSES} value="true" />
+                    )}
+                    {catItem.draft && (
+                      <ItemStatus draft />
+                    )}
                     <Clear />
                   </StatusWrap>
                 )}

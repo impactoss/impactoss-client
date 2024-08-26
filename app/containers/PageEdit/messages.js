@@ -18,8 +18,4 @@ export default defineMessages({
     id: 'app.containers.PageEdit.header',
     defaultMessage: 'Edit Page',
   },
-  notFound: {
-    id: 'app.containers.PageEdit.notFound',
-    defaultMessage: 'Sorry no page found',
-  },
 });

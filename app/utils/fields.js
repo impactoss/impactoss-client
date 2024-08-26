@@ -247,6 +247,8 @@ const mapReports = (reports) => reports
     updatedAt: report.getIn(['attributes', 'updated_at']),
     createdAt: report.getIn(['attributes', 'created_at']),
     draft: report.getIn(['attributes', 'draft']),
+    is_archive: report.getIn(['attributes', 'is_archive']),
+    is_current: report.getIn(['attributes', 'is_current']),
     linkTo: `${ROUTES.PROGRESS_REPORTS}/${report.get('id')}`,
     updatedBy: report.get('user') && report.getIn(['user', 'attributes']).toJS(),
   })).valueSeq().toArray()

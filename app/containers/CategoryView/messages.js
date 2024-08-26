@@ -14,8 +14,4 @@ export default defineMessages({
     id: 'app.containers.CategoryView.metaDescription',
     defaultMessage: 'Category page description',
   },
-  notFound: {
-    id: 'app.containers.CategoryView.notFound',
-    defaultMessage: 'Sorry no category found',
-  },
 });

@@ -211,6 +211,10 @@ export default defineMessages({
         defaultMessage: 'Not met',
       },
     },
+    settings: {
+      id: 'app.containers.App.labels.settings',
+      defaultMessage: 'Settings',
+    },
   },
   fields: {
     connectionsGrouped: {
@@ -689,6 +693,14 @@ export default defineMessages({
     framework_id: {
       id: 'app.containers.App.attributes.framework_id',
       defaultMessage: 'Framework',
+    },
+    is_archive: {
+      id: 'app.containers.App.attributes.is_archive',
+      defaultMessage: 'Archived/active',
+    },
+    is_current: {
+      id: 'app.containers.App.attributes.is_current',
+      defaultMessage: 'Latest/previous cycle',
     },
   },
   nav: {
@@ -1544,6 +1556,26 @@ export default defineMessages({
       null: {
         id: 'app.containers.App.ui.supportLevels.null',
         defaultMessage: 'Not applicable',
+      },
+    },
+    archiveStatuses: {
+      archived: {
+        id: 'app.containers.App.ui.archiveStatuses.archived',
+        defaultMessage: 'Archived',
+      },
+      notArchived: {
+        id: 'app.containers.App.ui.archiveStatuses.notArchived',
+        defaultMessage: 'Active',
+      },
+    },
+    currentStatuses: {
+      current: {
+        id: 'app.containers.App.ui.currentStatuses.current',
+        defaultMessage: 'Latest cycle',
+      },
+      notCurrent: {
+        id: 'app.containers.App.ui.currentStatuses.notCurrent',
+        defaultMessage: 'Previous cycle',
       },
     },
     reportFrequencies: {

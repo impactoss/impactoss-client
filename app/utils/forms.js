@@ -23,6 +23,8 @@ import {
   USER_ROLES,
   DATE_FORMAT,
   DOC_PUBLISH_STATUSES,
+  ACCEPTED_STATUSES,
+  IS_ARCHIVE_STATUSES,
   SUPPORT_LEVELS,
 } from 'themes/config';
 
@@ -402,6 +404,15 @@ export const getStatusField = (formatMessage) => ({
   label: formatMessage(appMessages.attributes.draft),
   options: PUBLISH_STATUSES,
 });
+
+export const getArchiveField = (formatMessage) => ({
+  id: 'is_archive',
+  controlType: 'select',
+  model: '.attributes.is_archive',
+  label: formatMessage(appMessages.attributes.is_archive),
+  options: IS_ARCHIVE_STATUSES,
+});
+
 export const getFrameworkFormField = (formatMessage, fwOptions) => ({
   id: 'framework',
   controlType: 'select',

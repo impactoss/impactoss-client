@@ -18,8 +18,4 @@ export default defineMessages({
     id: 'app.containers.IndicatorEdit.header',
     defaultMessage: 'Edit Indicator',
   },
-  notFound: {
-    id: 'app.containers.IndicatorEdit.notFound',
-    defaultMessage: 'Sorry no indicator found',
-  },
 });

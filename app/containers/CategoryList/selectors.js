@@ -1,6 +1,8 @@
 import { createSelector } from 'reselect';
 import { Map } from 'immutable';
 
+import { CURRENT_TAXONOMY_IDS } from 'themes/config';
+
 import {
   selectEntities,
   selectSortByQuery,
@@ -11,6 +13,7 @@ import {
   selectRecommendationMeasuresByMeasure,
   selectMeasureCategoriesByMeasure,
   selectRecommendationCategoriesByRecommendation,
+  selectSettingsFromQuery,
 } from 'containers/App/selectors';
 
 import { qe } from 'utils/quasi-equals';
@@ -252,12 +255,19 @@ const selectCategoryCountGroups = createSelector(
   selectRecommendations,
   selectMeasures,
   (state) => selectEntities(state, 'categories'),
-  (taxonomy, recommendations, measures, categories) => {
+  selectSettingsFromQuery,
+  (taxonomy, recommendations, measures, categories, settingsFromQuery) => {
     if (taxonomy && recommendations && measures && categories) {
       const taxonomyCategories = taxonomy && categories && categories.filter(
         (cat) => qe(
           cat.getIn(['attributes', 'taxonomy_id']),
           taxonomy.get('id')
+        ) && (
+          CURRENT_TAXONOMY_IDS.indexOf(parseInt(taxonomy.get('id'), 10)) === -1
+          || settingsFromQuery.loadNonCurrent
+          || !!cat.getIn(['attributes', 'is_current'])
+        ) && (
+          settingsFromQuery.loadArchived || !cat.getIn(['attributes', 'is_archive'])
         )
       );
       if (taxonomyCategories) {
@@ -318,20 +328,20 @@ const mapCategoryGroups = (
   const sortOption = getSortOption(SORT_OPTIONS, sort, 'query');
   const groups = categoryGroups && categoryGroups.map(
     (group) => {
-      const filtered = group.get('categories').filter(
+      const filteredCategories = group.get('categories').filter(
         (cat) => userOnly
           ? cat.getIn(['attributes', 'user_only'])
           : !cat.getIn(['attributes', 'user_only'])
       );
       return group.set(
         'measures',
-        filtered.reduce(
+        filteredCategories.reduce(
           (sum, cat) => sum + cat.get('measuresPublicCount'),
           0,
         ),
       ).set(
         'recommendations',
-        filtered.reduce(
+        filteredCategories.reduce(
           (sum, cat) => sum + cat.get('recommendationsPublicCount'),
           0,
         ),
@@ -339,7 +349,7 @@ const mapCategoryGroups = (
         'categories',
         sortEntities(
           sortEntities(
-            filtered,
+            filteredCategories,
             order || (sortOption ? sortOption.order : 'asc'),
             sortOption ? sortOption.field : 'title',
             sortOption ? sortOption.type : 'string',

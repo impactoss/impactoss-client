@@ -8,7 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
 
 import {
   getTitleField,
@@ -27,15 +26,18 @@ import {
 } from 'utils/permissions';
 
 import qe from 'utils/quasi-equals';
+import { lowerCase } from 'utils/string';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { IS_ARCHIVE_STATUSES, IS_CURRENT_STATUSES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
+import NotFoundEntity from 'containers/NotFoundEntity';
 
 import {
   selectReady,
@@ -74,6 +76,22 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
     {
       fields: [
         getStatusField(entity),
+        !entity.getIn(['attributes', 'draft'])
+        && getStatusField(
+          entity,
+          'is_current',
+          IS_CURRENT_STATUSES,
+          appMessages.attributes.is_current,
+          true,
+        ),
+        entity.getIn(['attributes', 'is_archive'])
+        && getStatusField(
+          entity,
+          'is_archive',
+          IS_ARCHIVE_STATUSES,
+          appMessages.attributes.is_archive,
+          false,
+        ),
         getMetaField(entity),
       ],
     },
@@ -106,6 +124,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
     const hasUserMinimumRole = dataReady
       && canUserCreateOrEditReports(highestRole);
     const isUserAssigned = dataReady
+      && viewEntity
       && canUserBeAssignedToReports(highestRole)
       && viewEntity.get('indicator')
       && qe(viewEntity.get('indicator').getIn(['attributes', 'manager_id']), sessionUserId);
@@ -119,7 +138,7 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
         title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
-      buttons = canEdit
+      buttons = (canEdit && viewEntity)
         ? buttons.concat([
           {
             type: 'edit',
@@ -160,13 +179,12 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
           { !dataReady
             && <Loading />
           }
-          { !viewEntity && dataReady
-            && (
-              <div>
-                <FormattedMessage {...messages.notFound} />
-              </div>
-            )
-          }
+          {!viewEntity && dataReady && (
+            <NotFoundEntity
+              id={this.props.params.id}
+              type={lowerCase(intl.formatMessage(appMessages.entities.progress_reports.single))}
+            />
+          )}
           { viewEntity && dataReady
             && (
               <EntityView

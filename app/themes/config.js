@@ -108,6 +108,10 @@ export const TEXT_TRUNCATE = {
 };
 
 export const PROGRESS_TAXONOMY_ID = 9;
+// categories where "is_current" is relevant
+export const CURRENT_TAXONOMY_IDS = [
+  2, // reporting cycles
+];
 
 // WARNING: references as assigned by user
 export const PROGRESS_CATEGORY_ID = {
@@ -185,6 +189,15 @@ export const SUPPORT_LEVELS = [
   { value: 1, icon: 'recommendationSupported', message: 'ui.supportLevels.supportedInPart' },
   { value: 2, icon: 'recommendationSupported', message: 'ui.supportLevels.supported' },
 ];
+// "current" statuses
+export const IS_CURRENT_STATUSES = [
+  { value: true, message: 'ui.currentStatuses.current' },
+  { value: false, message: 'ui.currentStatuses.notCurrent' },
+];
+export const IS_ARCHIVE_STATUSES = [
+  { value: true, message: 'ui.archiveStatuses.archived' },
+  { value: false, message: 'ui.archiveStatuses.notArchived' },
+];
 // Report frequencies
 export const REPORT_FREQUENCIES = [
   { value: 1, message: 'ui.reportFrequencies.monthly' },
@@ -200,12 +213,14 @@ export const DELETE_MIN_ROLE = null;
 export const PAGE_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value;
 export const USER_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value;
 export const CATEGORY_MANAGER_MIN_ROLE = USER_ROLES.MANAGER.value; // can be assigned to category
-export const CATEGORY_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value; // can edit or create categories
 export const CONTRIBUTOR_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create
+export const CATEGORY_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value; // can edit or create categories
 export const CONTRIBUTOR_MIN_ROLE_PUBLISH = USER_ROLES.MANAGER.value; // publish
 export const CONTRIBUTOR_MIN_ROLE_ASSIGNED = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
 export const SEE_DRAFT_MIN_ROLE = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
+export const SEE_ARCHIVED_MIN_ROLE = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
 export const SEE_META_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create when assigned
+export const ARCHIVE_MIN_ROLE = USER_ROLES.ADMIN.value; // archive content
 
 // Map server database tables **************************
 export const DB_TABLES = [
@@ -229,6 +244,19 @@ export const DB_TABLES = [
   'frameworks',
   'framework_taxonomies',
   'recommendation_indicators',
+];
+export const DB_TABLES_CURRENT = [
+  'indicators',
+  'measures',
+  'recommendations',
+];
+export const DB_TABLES_ARCHIVED = [
+  'users',
+  'pages',
+  'categories',
+  'indicators',
+  'measures',
+  'recommendations',
 ];
 
 export const COLUMN_WIDTHS = {
@@ -447,5 +475,19 @@ export const ENTITY_FIELDS = {
         exportColumn: 'connection_updated_by',
       },
     },
+  },
+};
+
+export const KEEP_QUERY_ARGS = ['fw', 'loadNonCurrent', 'loadArchived'];
+
+export const SETTINGS = {
+  loadNonCurrent: {
+    available: null,
+    value: false,
+  },
+  loadArchived: { // key also query arg
+    available: null, // will only be set once, once data is loaded
+    value: false, // default value
+    minRole: SEE_ARCHIVED_MIN_ROLE,
   },
 };
