@@ -261,7 +261,7 @@ function mapDispatchToProps(dispatch) {
                       const idOrCode = relValue.trim();
                       if (relConfig) {
                         // assume field to referencet the id
-                        let connectionId = 'INVALID';
+                        let connectionId = idOrCode;
                         // unless attribute specified
                         if (relConfig.lookup && relConfig.lookup.table
                         ) {
@@ -285,10 +285,12 @@ function mapDispatchToProps(dispatch) {
                         if (relField === 'recommendation-reference' || relField === 'recommendation-id') {
                           const create = { recommendation_id: connectionId };
                           if (recommendationMeasures && recommendationMeasures.create) {
-                            recommendationMeasures.create = [
-                              ...recommendationMeasures.create,
-                              create,
-                            ];
+                            if (!recommendationMeasures.create.find((el) => el.recommendation_id === connectionId)) {
+                              recommendationMeasures.create = [
+                                ...recommendationMeasures.create,
+                                create,
+                              ];
+                            }
                           } else {
                             recommendationMeasures = { create: [create] };
                           }
@@ -334,9 +336,8 @@ function mapDispatchToProps(dispatch) {
               measureIndicators,
               measureCategories,
             };
-
-            dispatch(save(rowClean));
           }
+          dispatch(save(rowClean));
         });
       }
     },

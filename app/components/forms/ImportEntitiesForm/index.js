@@ -257,7 +257,12 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                               <Importing>
                                 <ImportingText>
                                   <FormattedMessage {...messages.importing} />
-                                  { formData && `"${formData.get('import').file.name}"`}
+                                  {formData
+                                    && formData.get('import')
+                                    && formData.get('import').file
+                                    ? `"${formData.get('import').file.name}"`
+                                    : 'OOPS'
+                                  }
                                 </ImportingText>
                                 <Loading progress={progress} />
                               </Importing>
