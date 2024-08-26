@@ -9,9 +9,10 @@ import { palette } from 'styled-theme';
 import { Text } from 'grommet';
 
 import { omit } from 'lodash/object';
-import { map } from 'lodash/collection';
+// import { map } from 'lodash/collection';
 
 import asArray from 'utils/as-array';
+import { truncateText } from 'utils/string';
 
 import A from 'components/styled/A';
 import Field from 'components/fields/Field';
@@ -97,7 +98,7 @@ const NoteLink = styled(A)`
     text-decoration: underline;
   }
 `;
-const RowErrors = styled.div`
+const RowResults = styled.div`
   margin-top: 2em;
 `;
 
@@ -131,6 +132,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
       progress,
       errors,
       success,
+      sending,
     } = this.props;
     const { intl } = this.context;
     const field = {
@@ -140,7 +142,22 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
     };
 
     const { id, ...props } = this.getControlProps(field);
-    // console.log('template', template)
+
+    // const rows = formData
+    //   && formData.getIn(['import', 'rows']);
+
+    const stats = {
+      // totalRows: rows && rows.length,
+      // sendingNo: sending && sending.size,
+      // sendingByRow: sending && sending.groupBy((item) => item.saveRef).toJS(),
+      totalRowsSending: sending && sending.groupBy((item) => item.saveRef).size,
+      // successNo: success && success.size,
+      // successByRow: success && success.groupBy((item) => item.saveRef).toJS(),
+      // totalRowsSuccess: success && success.groupBy((item) => item.saveRef).size,
+      // errorsNo: errors && errors.size,
+      // errorsByRow: errors && errors.groupBy((item) => item.data && item.data.saveRef).toJS(),
+      totalRowsErrors: errors && errors.groupBy((item) => item.data.saveRef).size,
+    };
     return (
       <FormWrapper white>
         <StyledForm model={model} onSubmit={(data) => data.get('import') !== null && handleSubmit(data)}>
@@ -196,105 +213,121 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                   </Hint>
                   <Field noPadding>
                     <FormFieldWrap>
-                      { (progress === null)
-                        && (
-                          <ImportFileSelectControl
-                            id={id}
-                            model={field.model}
-                            as="text"
-                            accept=".csv, text/csv"
-                            {...props}
-                          />
-                        )
-                      }
-                      { progress !== null
-                        && (
-                          <div>
-                            { progress < 100
-                            && (
-                              <DocumentWrapEdit>
-                                <Importing>
-                                  <ImportingText>
-                                    <FormattedMessage {...messages.importing} />
-                                    { formData && `"${formData.get('import').file.name}"`}
-                                  </ImportingText>
-                                  <Loading progress={progress} />
-                                </Importing>
-                              </DocumentWrapEdit>
-                            )
-                            }
-                            { progress >= 100
-                            && (
-                              <div>
-                                {(errors.size > 0 && success.size === 0)
-                                && (
-                                  <Messages
-                                    type="error"
-                                    message={intl.formatMessage(messages.allErrors)}
-                                  />
-                                )
-                                }
-                                {(errors.size > 0 && success.size > 0)
-                                && (
-                                  <Messages
-                                    type="error"
-                                    message={intl.formatMessage(messages.someErrors, {
-                                      successNo: success.size,
-                                      rowNo: errors.size + success.size,
-                                    })}
-                                  />
-                                )
-                                }
-                                {(errors.size === 0)
-                                && (
-                                  <Messages
-                                    type="success"
-                                    message={intl.formatMessage(messages.success, {
-                                      rowNo: success.size,
-                                    })}
-                                  />
-                                )
-                                }
-                              </div>
-                            )
-                            }
-                            {(errors.size > 0)
-                            && (
-                              <RowErrors>
-                                <FormattedMessage {...messages.rowErrorHint} />
+                      {(progress === null) && (
+                        <ImportFileSelectControl
+                          id={id}
+                          model={field.model}
+                          as="text"
+                          accept=".csv, text/csv"
+                          {...props}
+                        />
+                      )}
+                      {progress !== null && (
+                        <div>
+                          {progress < 100 && (
+                            <DocumentWrapEdit>
+                              <Importing>
+                                <ImportingText>
+                                  <FormattedMessage {...messages.importing} />
+                                  { formData && `"${formData.get('import').file.name}"`}
+                                </ImportingText>
+                                <Loading progress={progress} />
+                              </Importing>
+                            </DocumentWrapEdit>
+                          )}
+                          {progress >= 100 && (
+                            <div>
+                              {(
+                                stats.totalRowsErrors > 0
+                                && stats.totalRowsSending === stats.totalRowsErrors
+                              )
+                              && (
                                 <Messages
                                   type="error"
-                                  details
-                                  preMessage={false}
-                                  messages={
-                                    errors
-                                      .sortBy((error) => error && error.data && error.data.saveRef)
-                                      .reduce((memo, error) => error.error.messages
-                                        ? memo.concat(map(error.error.messages, (message) => error.data.saveRef
-                                          ? [`${error.data.saveRef}:`, message]
-                                          : message))
-                                        : memo,
-                                      [])
-                                  }
+                                  message={intl.formatMessage(messages.allErrors)}
                                 />
-                              </RowErrors>
-                            )
-                            }
-                            {(errors.size > 0 && progress >= 100)
-                            && (
-                              <ErrorHint>
-                                <ErrorHintTitle>
-                                  <FormattedMessage {...messages.errorHintTitle} />
-                                </ErrorHintTitle>
-                                <ErrorHintText>
-                                  <FormattedMessage {...messages.errorHintText} />
-                                </ErrorHintText>
-                              </ErrorHint>
-                            )
-                            }
-                          </div>
-                        )
-                      }
+                              )}
+                              {(
+                                stats.totalRowsErrors > 0
+                                && stats.totalRowsSending > stats.totalRowsErrors
+                              ) && (
+                                <Messages
+                                  type="error"
+                                  message={intl.formatMessage(messages.someErrors, {
+                                    successNo: stats.totalRowsSending - stats.totalRowsErrors,
+                                    errorNo: stats.totalRowsErrors,
+                                    tryNo: stats.totalRowsSending,
+                                  })}
+                                />
+                              )}
+                              {(stats.totalRowsErrors === 0) && (
+                                <Messages
+                                  type="success"
+                                  message={intl.formatMessage(messages.success, {
+                                    tryNo: success.size,
+                                  })}
+                                />
+                              )}
+                            </div>
+                          )}
+                          {(progress >= 100 && stats.totalRowsSending > 0) && (
+                            <RowResults>
+                              <FormattedMessage {...messages.rowResultsHint} />
+                              {sending
+                                && sending.groupBy(
+                                  (item) => item && item.saveRef
+                                ).sortBy(
+                                  (item, key) => key
+                                ).entrySeq().map(
+                                  ([rowNo, row]) => row.entrySeq().map(
+                                    ([rowItemKey, rowItem]) => {
+                                      const error = errors.get(rowItemKey);
+                                      const isMainItem = !!rowItem.entity;
+                                      const rowItemRef = isMainItem
+                                        && (rowItem.entity.attributes.reference || truncateText(rowItem.entity.attributes.title, 22));
+                                      let message = intl.formatMessage(messages.resultRowNo, { rowNo });
+                                      if (error) {
+                                        message = `${message} ${intl.formatMessage(messages.resultError, { isMainItem })}`;
+                                        if (isMainItem) {
+                                          message = `${message}: ${rowItemRef}`;
+                                        }
+                                        message = error.error.messages.reduce(
+                                          (memo, msg) => `${memo} "${msg}"`,
+                                          message,
+                                        );
+                                      } else {
+                                        message = `${message} ${intl.formatMessage(messages.resultSuccess, { isMainItem })}`;
+                                        if (isMainItem) {
+                                          message = `${message}: ${rowItemRef}`;
+                                        }
+                                      }
+                                      return (
+                                        <Messages
+                                          key={rowItemKey}
+                                          type={error ? 'error' : 'success'}
+                                          details
+                                          preMessage={false}
+                                          messages={[message]}
+                                        />
+                                      );
+                                    }
+                                  )
+                                )
+                              }
+                            </RowResults>
+                          )}
+                          {(progress >= 100 && errors.size > 0 && progress >= 100) && (
+                            <ErrorHint>
+                              <ErrorHintTitle>
+                                <FormattedMessage {...messages.errorHintTitle} />
+                              </ErrorHintTitle>
+                              <ErrorHintText>
+                                <FormattedMessage {...messages.errorHintText} />
+                              </ErrorHintText>
+                            </ErrorHint>
+                          )}
+                        </div>
+                      )}
                     </FormFieldWrap>
                   </Field>
                 </FieldGroupWrapper>
@@ -333,6 +366,7 @@ ImportEntitiesForm.propTypes = {
   errors: PropTypes.object,
   success: PropTypes.object,
   template: PropTypes.object,
+  sending: PropTypes.object,
 };
 
 ImportEntitiesForm.contextTypes = {

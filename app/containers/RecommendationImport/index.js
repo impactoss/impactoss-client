@@ -42,6 +42,7 @@ import {
   selectProgress,
   selectFormData,
   selectSuccess,
+  selectSending,
 } from './selectors';
 
 import messages from './messages';
@@ -141,6 +142,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
             errors={this.props.errors}
             success={this.props.success}
             progress={this.props.progress}
+            sending={this.props.sending}
             template={{
               filename: `${intl.formatMessage(messages.filename)}.csv`,
               data: getImportFields({ fields, relationshipFields }, intl.formatMessage),
@@ -164,8 +166,9 @@ RecommendationImport.propTypes = {
   authReady: PropTypes.bool,
   resetProgress: PropTypes.func.isRequired,
   progress: PropTypes.number,
-  errors: PropTypes.object,
-  success: PropTypes.object,
+  errors: PropTypes.object, // Map
+  sending: PropTypes.object, // Map
+  success: PropTypes.object, // Map
   params: PropTypes.object,
   connections: PropTypes.object,
   categories: PropTypes.object,
@@ -180,6 +183,7 @@ const mapStateToProps = (state) => ({
   progress: selectProgress(state),
   errors: selectErrors(state),
   success: selectSuccess(state),
+  sending: selectSending(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   connections: selectRecommendationConnections(state),
@@ -257,10 +261,10 @@ function mapDispatchToProps(dispatch, { params }) {
                   const relConfig = ENTITY_FIELDS.recommendations.RELATIONSHIPS_IMPORT[relationship.field];
                   relationship.values.forEach(
                     (relValue) => {
-                      const idOrCode = relValue;
+                      const idOrCode = relValue.trim();
                       if (relConfig) {
                         // assume field to referencet the id
-                        let connectionId = 'INVALID';
+                        let connectionId = idOrCode;
                         // unless attribute specified
                         if (relConfig.lookup && relConfig.lookup.table
                         ) {
@@ -270,18 +274,14 @@ function mapDispatchToProps(dispatch, { params }) {
                                 (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), idOrCode)
                               )
                               : categories.get(idOrCode);
-                            if (category) {
-                              connectionId = category.get('id');
-                            }
+                            connectionId = category ? category.get('id') : `INVALID|${idOrCode}`;
                           } else if (connections && connections.get(relConfig.lookup.table)) {
                             const connection = relConfig.lookup.attribute
                               ? connections.get(relConfig.lookup.table).find(
                                 (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), idOrCode)
                               )
                               : connections.get(relConfig.lookup.table).get(idOrCode);
-                            if (connection) {
-                              connectionId = connection.get('id');
-                            }
+                            connectionId = connection ? connection.get('id') : `INVALID|${idOrCode}`;
                           }
                         }
                         // actor actions by code or id
@@ -300,7 +300,11 @@ function mapDispatchToProps(dispatch, { params }) {
                           }
                         }
                         // actorCategories by code or id
-                        if (relField === 'category-reference' || relField === 'category-id') {
+                        if (
+                          relField === 'category-reference'
+                          || relField === 'category-id'
+                          || relField === 'category-short-title'
+                        ) {
                           const create = { category_id: connectionId };
                           if (recommendationCategories && recommendationCategories.create) {
                             // only add if not already present
@@ -326,6 +330,7 @@ function mapDispatchToProps(dispatch, { params }) {
               recommendationCategories,
             };
           }
+          // console.log('rowClean', rowClean)
           dispatch(save(rowClean));
         });
       }

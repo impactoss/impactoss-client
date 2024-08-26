@@ -341,7 +341,7 @@ function stampPayload(payload, type) {
 
 
 function* createConnectionsSaga({
-  entityId, path, updates, keyPair,
+  entityId, path, updates, keyPair, saveRef,
 }) {
   // make sure to use new entity id for full payload
   // we should have either the one (recommendation_id) or the other (measure_id)
@@ -350,7 +350,7 @@ function* createConnectionsSaga({
     [keyPair[0]]: create[keyPair[0]] || entityId,
     [keyPair[1]]: create[keyPair[1]] || entityId,
   }));
-  yield call(saveConnectionsSaga, { data: { path, updates: updatesUpdated } });
+  yield call(saveConnectionsSaga, { data: { path, updates: updatesUpdated, saveRef } });
 }
 
 export function* saveEntitySaga({ data }, updateClient = true, multiple = false) {
@@ -533,6 +533,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
             path: 'recommendation_measures',
             updates: data.entity.recommendationMeasures,
             keyPair: ['recommendation_id', 'measure_id'],
+            saveRef: data.saveRef,
           });
         }
         // update sdgtarget-indicator connections
@@ -542,6 +543,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
             path: 'recommendation_indicators',
             updates: data.entity.recommendationIndicators,
             keyPair: ['indicator_id', 'recommendation_id'],
+            saveRef: data.saveRef,
           });
         }
 
@@ -552,6 +554,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
             path: 'measure_indicators',
             updates: data.entity.measureIndicators,
             keyPair: ['indicator_id', 'measure_id'],
+            saveRef: data.saveRef,
           });
         }
 
@@ -562,6 +565,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
             path: 'measure_categories',
             updates: data.entity.measureCategories,
             keyPair: ['category_id', 'measure_id'],
+            saveRef: data.saveRef,
           });
         }
 
@@ -572,6 +576,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
             path: 'recommendation_categories',
             updates: data.entity.recommendationCategories,
             keyPair: ['category_id', 'recommendation_id'],
+            saveRef: data.saveRef,
           });
         }
       }

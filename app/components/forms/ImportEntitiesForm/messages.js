@@ -65,6 +65,22 @@ export default defineMessages({
     id: 'app.components.ImportEntitiesForm.rowErrorHint',
     defaultMessage: 'Import of the following rows failed:',
   },
+  rowResultsHint: {
+    id: 'app.components.ImportEntitiesForm.rowResultsHint',
+    defaultMessage: 'Please review the results, specifically any errors',
+  },
+  resultRowNo: {
+    id: 'app.components.ImportEntitiesForm.resultRowNo',
+    defaultMessage: 'Row {rowNo}',
+  },
+  resultError: {
+    id: 'app.components.ImportEntitiesForm.resultError',
+    defaultMessage: 'ERROR creating {isMainItem, select, true {entity} other {relationship(s)}}',
+  },
+  resultSuccess: {
+    id: 'app.components.ImportEntitiesForm.resultSuccess',
+    defaultMessage: 'SUCCESS creating {isMainItem, select, true {entity} other {relationship(s)}}',
+  },
   errorHintTitle: {
     id: 'app.components.ImportEntitiesForm.errorHintTitle',
     defaultMessage: 'Important',
