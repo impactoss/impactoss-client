@@ -71,10 +71,10 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
 
   render() {
     const { connections, categories } = this.props;
-    const recFields = ENTITY_FIELDS.measures;
+    const measureFields = ENTITY_FIELDS.measures;
     // prepare attribute fields
-    const fields = Object.keys(recFields.ATTRIBUTES).reduce((memo, key) => {
-      const val = recFields.ATTRIBUTES[key];
+    const fields = Object.keys(measureFields.ATTRIBUTES).reduce((memo, key) => {
+      const val = measureFields.ATTRIBUTES[key];
       if (
         !val.skipImport
         && checkActionAttribute(key)
@@ -93,9 +93,9 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
     }, []);
     // prepare connection fields
     const relationshipFields = Object.keys(
-      recFields.RELATIONSHIPS_IMPORT
+      measureFields.RELATIONSHIPS_IMPORT
     ).map((key) => {
-      const val = recFields.RELATIONSHIPS_IMPORT[key];
+      const val = measureFields.RELATIONSHIPS_IMPORT[key];
       return {
         attribute: key,
         type: val.type || 'text',

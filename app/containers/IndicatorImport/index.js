@@ -73,10 +73,10 @@ export class IndicatorImport extends React.PureComponent { // eslint-disable-lin
     const { intl } = this.context;
     const { connections } = this.props;
 
-    const recFields = ENTITY_FIELDS.indicators;
+    const indicatorFields = ENTITY_FIELDS.indicators;
     // prepare attribute fields
-    const fields = Object.keys(recFields.ATTRIBUTES).reduce((memo, key) => {
-      const val = recFields.ATTRIBUTES[key];
+    const fields = Object.keys(indicatorFields.ATTRIBUTES).reduce((memo, key) => {
+      const val = indicatorFields.ATTRIBUTES[key];
       if (
         !val.skipImport
         && checkIndicatorAttribute(key)
@@ -95,9 +95,9 @@ export class IndicatorImport extends React.PureComponent { // eslint-disable-lin
     }, []);
     // prepare connection fields
     const relationshipFields = Object.keys(
-      recFields.RELATIONSHIPS_IMPORT
+      indicatorFields.RELATIONSHIPS_IMPORT
     ).map((key) => {
-      const val = recFields.RELATIONSHIPS_IMPORT[key];
+      const val = indicatorFields.RELATIONSHIPS_IMPORT[key];
       return {
         attribute: key,
         type: val.type || 'text',
