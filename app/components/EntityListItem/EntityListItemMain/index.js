@@ -6,9 +6,10 @@ import { palette } from 'styled-theme';
 import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
 import { qe } from 'utils/quasi-equals';
+
 import Component from 'components/styled/Component';
 import SkipContent from 'components/styled/SkipContent';
-import { USER_ROLES, PROGRESS_TAXONOMY_ID } from 'themes/config';
+import { USER_ROLES, PROGRESS_TAXONOMY_ID, SUPPORT_LEVELS } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import EntityListItemMainTop from './EntityListItemMainTop';
@@ -214,7 +215,6 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     nestLevel,
     entityPath,
     connections,
-    entityIcon,
     taxonomies,
   }) => {
     const { intl } = this.context;
@@ -223,6 +223,15 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       path = entityPath;
     } else if (config && (config.expandableColumns || config.clientPath)) {
       path = nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath;
+    }
+    let supportLevel;
+    if (
+      typeof entity.getIn(['attributes', 'support_level']) !== 'undefined'
+      && entity.getIn(['attributes', 'support_level']) !== 'null'
+    ) {
+      supportLevel = SUPPORT_LEVELS.find(
+        (level) => qe(level.value, entity.getIn(['attributes', 'support_level'])),
+      );
     }
     return ({
       id: entity.get('id'),
@@ -234,7 +243,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       is_current: entity.getIn(['attributes', 'is_current']),
       role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
       path,
-      entityIcon: entityIcon && entityIcon(entity),
+      support: supportLevel,
       categories: taxonomies && this.getWithoutProgressCategories(taxonomies, entity.get('categories')),
       connectedCounts: config && config.connections
         ? this.getConnections(entity, config.connections.options, connections)

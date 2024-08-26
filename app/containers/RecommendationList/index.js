@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { Map, List, fromJS } from 'immutable';
 
-import { getAcceptanceStatus } from 'utils/entities';
+import { getSupportLevel } from 'utils/entities';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
@@ -147,7 +147,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
             plural: intl.formatMessage(appMessages.entities[type].plural),
           }}
           entityIcon={(entity) => {
-            const status = getAcceptanceStatus(entity);
+            const status = getSupportLevel(entity);
             return status ? status.icon : null;
           }}
           locationQuery={fromJS(this.props.location.query)}

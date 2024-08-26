@@ -5,6 +5,7 @@ import {
   IS_ARCHIVE_STATUSES,
   ARCHIVE_MIN_ROLE,
   SEE_DRAFT_MIN_ROLE,
+  SUPPORT_LEVELS,
 } from 'themes/config';
 
 export const DEPENDENCIES = [
@@ -89,9 +90,9 @@ export const CONFIG = {
     options: [
       {
         search: false,
-        message: 'attributes.accepted',
-        attribute: 'accepted',
-        options: ACCEPTED_STATUSES,
+        message: 'attributes.support_level',
+        attribute: 'support_level',
+        options: SUPPORT_LEVELS,
         editForFrameworks: true,
         frameworkFilter: 'has_response',
       },

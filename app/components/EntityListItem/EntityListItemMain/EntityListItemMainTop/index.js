@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Component from 'components/styled/Component';
-import Icon from 'components/Icon';
 
 import ItemStatus from 'components/ItemStatus';
 import ItemRole from 'components/ItemRole';
 import ItemProgress from 'components/ItemProgress';
+import ItemSupport from 'components/ItemSupport';
 
 import {
   PUBLISH_STATUSES,
@@ -15,7 +15,6 @@ import {
 } from 'themes/config';
 
 import EntityListItemMainTopReference from './EntityListItemMainTopReference';
-import EntityListItemMainTopIcon from './EntityListItemMainTopIcon';
 import EntityListItemMainTargetDate from './EntityListItemMainTargetDate';
 import EntityListItemMainUser from './EntityListItemMainUser';
 
@@ -67,16 +66,13 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
             />
           )
         }
-        { entity.entityIcon
-          && (
-            <EntityListItemMainTopIcon>
-              <Icon name={entity.entityIcon} text />
-            </EntityListItemMainTopIcon>
-          )
-        }
         {
           entity.progressCategory
           && <ItemProgress status={entity.progressCategory} />
+        }
+        {
+          entity.support
+          && <ItemSupport supportLevel={entity.support} />
         }
         { entity.role
           && <ItemRole role={entity.role} />

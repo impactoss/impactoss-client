@@ -27,7 +27,13 @@ import { lowerCase } from 'utils/string';
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { ACCEPTED_STATUSES, IS_CURRENT_STATUSES, IS_ARCHIVE_STATUSES } from 'themes/config';
+
+import {
+  ACCEPTED_STATUSES,
+  IS_CURRENT_STATUSES,
+  IS_ARCHIVE_STATUSES,
+  SUPPORT_LEVELS,
+} from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -134,17 +140,17 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       fields: [
         getMarkdownField(entity, 'description', true, 'fullRecommendation'),
         hasResponse
-        && entity.getIn(['attributes', 'accepted']) !== null
-        && entity.getIn(['attributes', 'accepted']) !== 'null'
-        && typeof entity.getIn(['attributes', 'accepted']) !== 'undefined'
+        && entity.getIn(['attributes', 'support_level']) !== null
+        && entity.getIn(['attributes', 'support_level']) !== 'null'
+        && typeof entity.getIn(['attributes', 'support_level']) !== 'undefined'
         && getStatusField(
           entity,
-          'accepted',
-          ACCEPTED_STATUSES,
-          appMessages.attributes.accepted,
-          'false' // defaultValue
+          'support_level',
+          SUPPORT_LEVELS,
+          appMessages.attributes.support_level,
+          0 // defaultValue
         ),
-        hasResponse && getMarkdownField(entity, 'response', true),
+        getMarkdownField(entity, 'response', true),
       ],
     });
     // indicators

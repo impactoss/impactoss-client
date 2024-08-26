@@ -183,10 +183,11 @@ export const DOC_PUBLISH_STATUSES = [
   { value: false, message: 'ui.docPublishStatuses.private' },
 ];
 // Recommendation statuses
-export const ACCEPTED_STATUSES = [
-  { value: 'null', icon: '', message: 'ui.acceptedStatuses.null' },
-  { value: true, icon: 'recommendationAccepted', message: 'ui.acceptedStatuses.accepted' },
-  { value: false, icon: 'recommendationNoted', message: 'ui.acceptedStatuses.noted' },
+export const SUPPORT_LEVELS = [
+  { value: 'null', icon: '', message: 'ui.supportLevels.null' },
+  { value: 0, icon: 'recommendationNoted', message: 'ui.supportLevels.noted' },
+  { value: 1, icon: 'recommendationSupported', message: 'ui.supportLevels.supportedInPart' },
+  { value: 2, icon: 'recommendationSupported', message: 'ui.supportLevels.supported' },
 ];
 // "current" statuses
 export const IS_CURRENT_STATUSES = [
@@ -435,8 +436,8 @@ export const ENTITY_FIELDS = {
       response: {
         type: 'text',
       },
-      accepted: {
-        type: 'bool',
+      support_level: {
+        type: 'int',
       },
       created_at: {
         type: 'date',

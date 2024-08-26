@@ -568,7 +568,7 @@ function mapDispatchToProps(dispatch, props) {
               });
             }
           });
-          if (activeEditOption.optionId === 'accepted' && newValue === 'null') {
+          if (activeEditOption.optionId === 'support_level' && newValue === 'null') {
             newValue = null;
           }
           dispatch(saveMultiple(
