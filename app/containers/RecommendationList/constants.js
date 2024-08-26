@@ -1,4 +1,4 @@
-import { USER_ROLES, PUBLISH_STATUSES, ACCEPTED_STATUSES } from 'themes/config';
+import { USER_ROLES, PUBLISH_STATUSES, SUPPORT_LEVELS } from 'themes/config';
 
 export const DEPENDENCIES = [
   'user_roles',
@@ -84,9 +84,9 @@ export const CONFIG = {
     options: [
       {
         search: false,
-        message: 'attributes.accepted',
-        attribute: 'accepted',
-        options: ACCEPTED_STATUSES,
+        message: 'attributes.support_level',
+        attribute: 'support_level',
+        options: SUPPORT_LEVELS,
         editForFrameworks: true,
         frameworkFilter: 'has_response',
       },

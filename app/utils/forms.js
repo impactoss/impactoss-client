@@ -23,7 +23,7 @@ import {
   USER_ROLES,
   DATE_FORMAT,
   DOC_PUBLISH_STATUSES,
-  ACCEPTED_STATUSES,
+  SUPPORT_LEVELS,
 } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
@@ -371,12 +371,12 @@ export const getRoleFormField = (formatMessage, roleOptions) => ({
     || userRole.value === USER_ROLES.DEFAULT.value)),
 });
 
-export const getAcceptedField = (formatMessage) => ({
-  id: 'accepted',
+export const getSupportField = (formatMessage) => ({
+  id: 'support_level',
   controlType: 'select',
-  model: '.attributes.accepted',
-  label: formatMessage(appMessages.attributes.accepted),
-  options: ACCEPTED_STATUSES,
+  model: '.attributes.support_level',
+  label: formatMessage(appMessages.attributes.support_level),
+  options: SUPPORT_LEVELS,
 });
 
 export const getFrequencyField = (formatMessage) => ({
@@ -787,7 +787,7 @@ const getRecommendationFields = ({ frameworks, hasResponse, existingReferences }
           placeholder: 'fullRecommendation',
           hint: 'fullRecommendation',
         }),
-        hasResponse && getAcceptedField(formatMessage),
+        hasResponse && getSupportField(formatMessage),
         hasResponse && getMarkdownFormField({
           formatMessage,
           attribute: 'response',

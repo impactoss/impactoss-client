@@ -8,7 +8,6 @@ import {
   selectFWTaxonomiesSorted,
   selectFWRecommendations,
   selectFWMeasures,
-  selectActiveFrameworks,
   selectRecommendationMeasuresByMeasure,
   selectMeasureCategoriesByMeasure,
   selectRecommendationCategoriesByRecommendation,
@@ -107,7 +106,6 @@ const getCategoryCounts = (
   measures,
   recommendations,
   categories,
-  frameworks,
 ) => taxonomyCategories.map(
   (cat, categoryId) => {
     let category = cat;
@@ -171,21 +169,11 @@ const getCategoryCounts = (
       const associatedRecsPublic = associatedRecs.filter(
         (rec) => !rec.getIn(['attributes', 'draft'])
       );
-      // get all public accepted associated recs
-      const publicAccepted = associatedRecsPublic.filter(
-        (rec) => !!rec.getIn(['attributes', 'accepted'])
-      );
-
       // all frameworks
       category = category.set('recommendationsCount', associatedRecs.size);
       category = category.set(
         'recommendationsPublicCount',
         associatedRecsPublic ? associatedRecsPublic.size : 0
-      );
-      // const framework = frameworks.find((fw) => qe(fw.get('id'), taxonomy.get('frameworkIds').first()));
-      category = category.set(
-        'recommendationsAcceptedCount',
-        publicAccepted ? publicAccepted.size : 0
       );
       // by framework
       category = category.set(
@@ -202,21 +190,7 @@ const getCategoryCounts = (
           ).map((group) => group.size)
           : 0,
       );
-      category = category.set(
-        'recommendationsAcceptedCountByFW',
-        publicAccepted
-          ? publicAccepted.groupBy(
-            (rec) => rec.getIn(['attributes', 'framework_id'])
-          ).map((group, key) => {
-            const framework = frameworks.find(
-              (fw) => qe(fw.get('id'), key)
-            );
-            return (framework && framework.getIn(['attributes', 'has_response']))
-              ? group.size
-              : -1;
-          })
-          : 0
-      );
+
       // for sorting
       category = category.set(
         'recommendations',
@@ -278,9 +252,8 @@ const selectCategoryCountGroups = createSelector(
   selectRecommendations,
   selectMeasures,
   (state) => selectEntities(state, 'categories'),
-  selectActiveFrameworks,
-  (taxonomy, recommendations, measures, categories, frameworks) => {
-    if (taxonomy && recommendations && measures && categories && frameworks) {
+  (taxonomy, recommendations, measures, categories) => {
+    if (taxonomy && recommendations && measures && categories) {
       const taxonomyCategories = taxonomy && categories && categories.filter(
         (cat) => qe(
           cat.getIn(['attributes', 'taxonomy_id']),
@@ -295,7 +268,6 @@ const selectCategoryCountGroups = createSelector(
             measures,
             recommendations,
             categories,
-            frameworks,
           );
           return catCounts
             ? Map().set(
@@ -325,7 +297,6 @@ const selectCategoryCountGroups = createSelector(
                 measures,
                 recommendations,
                 categories,
-                frameworks,
               );
               return parentCat.set('categories', catCounts);
             }
