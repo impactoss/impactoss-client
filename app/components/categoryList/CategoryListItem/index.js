@@ -6,6 +6,11 @@ import { palette } from 'styled-theme';
 import ItemStatus from 'components/ItemStatus';
 import Clear from 'components/styled/Clear';
 import { ROUTES } from 'containers/App/constants';
+import {
+  IS_CURRENT_STATUSES,
+  IS_ARCHIVE_STATUSES,
+  CURRENT_TAXONOMY_IDS,
+} from 'themes/config';
 
 import { qe } from 'utils/quasi-equals';
 import appMessages from 'containers/App/messages';
@@ -116,19 +121,7 @@ const Count = styled.div`
     font-weight: regular;
   }
 `;
-const CountSecondary = styled(Count)`
-  right: 0;
-  top: 100%;
-  color: ${(props) => palette(props.palette, 1)};
-  @media print, (min-width: ${(props) => props.theme.breakpoints.small}) {
-    text-align: left;
-    padding: 0 0 0 5px;
-    left: 100%;
-    right: auto;
-    bottom: auto;
-    top: auto;
-  }
-`;
+
 const Title = styled.div`
   display: inline-block;
   padding: 0 4px;
@@ -171,12 +164,6 @@ const Reference = styled.span`
     padding-right: 8px;
   }
 `;
-const WrapAcceptedBars = styled.span`
-  height: ${({ multiple }) => multiple ? 10 : 15}px;
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    height: ${({ multiple }) => multiple ? 15 : 25}px;
-  }
-`;
 
 class CategoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   renderSimpleBar = (col, total, multiple) => (
@@ -191,37 +178,37 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
     </Bar>
   );
 
-  renderAcceptedBar = (col, total, accepted, multiple) => {
-    const noted = total - accepted;
-    return (
-      <WrapAcceptedBars multiple={multiple}>
-        <Bar
-          length={(accepted / col.maxCount) * 100}
-          palette={col.attribute.entity}
-          secondary
-          multiple={multiple}
-        >
-          <Count palette={col.attribute.entity} multiple={multiple}>
-            {accepted}
-          </Count>
-        </Bar>
-        { noted > 0
-          && (
-            <Bar
-              length={(noted / col.maxCount) * 100}
-              palette={col.attribute.entity}
-              pIndex={1}
-              multiple={multiple}
-            >
-              <CountSecondary palette={col.attribute.entity} multiple={multiple}>
-                {noted}
-              </CountSecondary>
-            </Bar>
-          )
-        }
-      </WrapAcceptedBars>
-    );
-  };
+  // renderAcceptedBar = (col, total, accepted, multiple) => {
+  //   const noted = total - accepted;
+  //   return (
+  //     <WrapAcceptedBars multiple={multiple}>
+  //       <Bar
+  //         length={(accepted / col.maxCount) * 100}
+  //         palette={col.attribute.entity}
+  //         secondary
+  //         multiple={multiple}
+  //       >
+  //         <Count palette={col.attribute.entity} multiple={multiple}>
+  //           {accepted}
+  //         </Count>
+  //       </Bar>
+  //       { noted > 0
+  //         && (
+  //           <Bar
+  //             length={(noted / col.maxCount) * 100}
+  //             palette={col.attribute.entity}
+  //             pIndex={1}
+  //             multiple={multiple}
+  //           >
+  //             <CountSecondary palette={col.attribute.entity} multiple={multiple}>
+  //               {noted}
+  //             </CountSecondary>
+  //           </Bar>
+  //         )
+  //       }
+  //     </WrapAcceptedBars>
+  //   );
+  // };
 
   renderCountColumn = (col, category, frameworks, frameworkId) => {
     if (!col.attribute) {
@@ -232,7 +219,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
     const connected = col.attribute.entity === 'measures';
     if (countsByFramework) {
       const total = category[col.attribute.totalByFw];
-      const accepted = category[col.attribute.acceptedByFw];
+      // const accepted = category[col.attribute.acceptedByFw];
       if (!fwSet) {
         return (
           <div>
@@ -241,7 +228,7 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
               if (!framework) {
                 return null;
               }
-              const hasResponse = !connected && framework.getIn(['attributes', 'has_response']);
+              // const hasResponse = !connected && framework.getIn(['attributes', 'has_response']);
               const multipleFWs = col.attribute.frameworkIds.length > 1;
               const totalCount = (total && total[id]) || 0;
               if (totalCount === 0) {
@@ -257,25 +244,13 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
                       )}
                     </FrameworkLabel>
                   )}
-                  {hasResponse && (
-                    <BarWrap secondary multiple={multipleFWs}>
-                      {this.renderAcceptedBar(
-                        col,
-                        totalCount,
-                        (accepted && accepted[id]) || 0,
-                        multipleFWs, // multiple,
-                      )}
-                    </BarWrap>
-                  )}
-                  {!hasResponse && (
-                    <BarWrap multiple={multipleFWs}>
-                      {this.renderSimpleBar(
-                        col,
-                        totalCount,
-                        multipleFWs, // multiple,
-                      )}
-                    </BarWrap>
-                  )}
+                  <BarWrap multiple={multipleFWs}>
+                    {this.renderSimpleBar(
+                      col,
+                      totalCount,
+                      multipleFWs, // multiple,
+                    )}
+                  </BarWrap>
                 </div>
               );
             })}
@@ -287,27 +262,15 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
         if (!framework || !total[id]) {
           return null;
         }
-        const hasResponse = !connected && framework.getIn(['attributes', 'has_response']);
         const totalCount = (total && total[id]) || 0;
         if (totalCount === 0) {
           return null;
         }
         return (
           <div>
-            {hasResponse && (
-              <BarWrap secondary>
-                {this.renderAcceptedBar(
-                  col,
-                  totalCount,
-                  (accepted && accepted[id]) || 0
-                )}
-              </BarWrap>
-            )}
-            {!hasResponse && (
-              <BarWrap>
-                {this.renderSimpleBar(col, (total && total[id]) || 0)}
-              </BarWrap>
-            )}
+            <BarWrap>
+              {this.renderSimpleBar(col, (total && total[id]) || 0)}
+            </BarWrap>
           </div>
         );
       }
@@ -338,6 +301,9 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
       reference,
       title: category.getIn(['attributes', 'title']),
       draft: category.getIn(['attributes', 'draft']),
+      is_not_current: CURRENT_TAXONOMY_IDS.indexOf(parseInt(category.getIn(['attributes', 'taxonomy_id']), 10)) > -1
+        && !category.getIn(['attributes', 'is_current']),
+      is_archive: category.getIn(['attributes', 'is_archive']),
     };
 
     return (
@@ -356,9 +322,17 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
                   && col.attribute.frameworkIds.length > 1
                 }
               >
-                {col.type === 'title' && catItem.draft && (
+                {col.type === 'title' && (
                   <StatusWrap>
-                    <ItemStatus draft />
+                    {catItem.is_not_current && (
+                      <ItemStatus options={IS_CURRENT_STATUSES} value="false" />
+                    )}
+                    {catItem.is_archive && (
+                      <ItemStatus options={IS_ARCHIVE_STATUSES} value="true" />
+                    )}
+                    {catItem.draft && (
+                      <ItemStatus draft />
+                    )}
                     <Clear />
                   </StatusWrap>
                 )}

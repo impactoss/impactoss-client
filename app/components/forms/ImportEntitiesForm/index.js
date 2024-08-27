@@ -99,7 +99,6 @@ const NoteLink = styled(A)`
     text-decoration: underline;
   }
 `;
-
 const RowErrors = styled.div`
   margin-top: 2em;
 `;

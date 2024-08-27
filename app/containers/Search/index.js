@@ -12,37 +12,50 @@ import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { fromJS } from 'immutable';
 import { FormattedMessage, injectIntl } from 'react-intl';
+import { Box, Text } from 'grommet';
+import { FormUp, FormDown } from 'grommet-icons';
+import ReactMarkdown from 'react-markdown';
 
 import { startsWith } from 'utils/string';
+import qe from 'utils/quasi-equals';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  updatePath,
+  showSettingsModal,
+} from 'containers/App/actions';
+
 import {
   selectReady,
+  selectSettingsConfig,
+  selectSettingsFromQuery,
 } from 'containers/App/selectors';
+
 import { CONTENT_LIST } from 'containers/App/constants';
 import { SEARCH } from 'themes/config';
 
 import Button from 'components/buttons/Button';
-import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
-import Container from 'components/styled/Container';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
-import Content from 'components/styled/Content';
-import { Box, Text } from 'grommet';
-
-import { FormUp, FormDown } from 'grommet-icons';
-
-import qe from 'utils/quasi-equals';
-
 import EntityListItem from 'components/EntityListItem';
+import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
+import Container from 'components/styled/Container';
+import A from 'components/styled/A';
+import Content from 'components/styled/Content';
+import Description from 'components/styled/Description';
 
 import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
 
 import { DEPENDENCIES } from './constants';
-import { selectEntitiesByQuery, selectPathQuery } from './selectors';
+
+import {
+  selectEntitiesByQuery,
+  selectPathQuery,
+} from './selectors';
+
 import {
   updateQuery,
   resetSearchQuery,
@@ -86,6 +99,23 @@ const ListHint = styled.div`
 `;
 const ListWrapper = styled.div``;
 
+const SettingsLink = styled(A)`
+  color: #ba5d03;
+  &:hover {
+    color: #ba5d03;
+    text-decoration: underline;
+  }
+`;
+
+const Markdown = styled(ReactMarkdown)`
+  font-size: 1em;
+  display: inline;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
+`;
+
+
 export class Search extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -122,6 +152,9 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       entities,
       onEntityClick,
       activeTargetPath,
+      onShowSettingsModal,
+      settings,
+      settingsFromQuery,
       intl,
     } = this.props;
     const hasQuery = !!location.query.search;
@@ -167,6 +200,27 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       title: intl.formatMessage(appMessages.buttons.printTitle),
       icon: 'print',
     }];
+
+    // check if there are any settings available
+    const availableSettings = dataReady
+      && settings
+      && settings.filter((option) => !!option.get('available'));
+
+    // prepare a markdown message from available settings
+    const settingsHintContent = dataReady
+      && availableSettings
+      && availableSettings.reduce((memo, option, key) => {
+        const message = intl.formatMessage(
+          messages[key],
+          { active: settingsFromQuery[key] },
+        );
+        if (memo.length === 0) {
+          return `**${message}**`;
+        }
+        // TODO consider comma instead of and when not last item
+        return `${memo} ${intl.formatMessage(messages.and)} **${message}**`;
+      }, '');
+
     return (
       <div>
         <HelmetCanonical
@@ -188,6 +242,29 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
               {!dataReady && <Loading />}
               {dataReady && (
                 <div>
+                  {availableSettings && availableSettings.size > 0 && (
+                    <Description as="div">
+                      <Markdown
+                        className="react-markdown react-markdown-search"
+                        disallowedTypes={['paragraph']}
+                        unwrapDisallowed
+                        source={intl.formatMessage(messages.settingsHint, { settingsHintContent })}
+                      />
+                      {' '}
+                      <FormattedMessage
+                        {...messages.settingsHint2}
+                        values={{
+                          settingsLink: (
+                            <SettingsLink
+                              onClick={() => onShowSettingsModal()}
+                            >
+                              <FormattedMessage {...messages.settingsLinkAnchor} />
+                            </SettingsLink>
+                          ),
+                        }}
+                      />
+                    </Description>
+                  )}
                   <EntityListSearch>
                     <TagSearch
                       filters={[]}
@@ -207,11 +284,6 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                     ref={(el) => { this.searchResults = el; }}
                     tabindex="0"
                   >
-                    {noEntry && (
-                      <ListHint>
-                        <FormattedMessage {...messages.hints.noEntry} />
-                      </ListHint>
-                    )}
                     {!isQueryMinLength && hasEntry && !hasResults && (
                       <ListHint>
                         <FormattedMessage {...messages.hints.minLength} />
@@ -339,6 +411,9 @@ Search.propTypes = {
   onSortBy: PropTypes.func.isRequired,
   activeTargetPath: PropTypes.string,
   theme: PropTypes.object,
+  onShowSettingsModal: PropTypes.func,
+  settings: PropTypes.object, // Map
+  settingsFromQuery: PropTypes.object,
   intl: PropTypes.object.isRequired,
 };
 
@@ -346,6 +421,8 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   entities: selectEntitiesByQuery(state, fromJS(props.location.query)),
   activeTargetPath: selectPathQuery(state, fromJS(props.location.query)),
+  settings: selectSettingsConfig(state),
+  settingsFromQuery: selectSettingsFromQuery(state),
 });
 function mapDispatchToProps(dispatch) {
   return {
@@ -383,6 +460,9 @@ function mapDispatchToProps(dispatch) {
     },
     onSortBy: (sort) => {
       dispatch(updateSortBy(sort));
+    },
+    onShowSettingsModal: () => {
+      dispatch(showSettingsModal(true));
     },
   };
 }

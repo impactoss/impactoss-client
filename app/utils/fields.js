@@ -1,6 +1,6 @@
 import { truncateText } from 'utils/string';
 import { sortEntities, sortCategories } from 'utils/sort';
-import { filterTaxonomies, getAcceptanceStatus } from 'utils/entities';
+import { filterTaxonomies, getSupportLevel } from 'utils/entities';
 import { USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
@@ -247,6 +247,8 @@ const mapReports = (reports) => reports
     updatedAt: report.getIn(['attributes', 'updated_at']),
     createdAt: report.getIn(['attributes', 'created_at']),
     draft: report.getIn(['attributes', 'draft']),
+    is_archive: report.getIn(['attributes', 'is_archive']),
+    is_current: report.getIn(['attributes', 'is_current']),
     linkTo: `${ROUTES.PROGRESS_REPORTS}/${report.get('id')}`,
     updatedBy: report.get('user') && report.getIn(['user', 'attributes']).toJS(),
   })).valueSeq().toArray()
@@ -369,7 +371,7 @@ export const getRecommendationConnectionField = (
   onEntityClick,
   entityIcon: (entity) => {
     if (!hasResponse) return null;
-    const status = getAcceptanceStatus(entity);
+    const status = getSupportLevel(entity);
     return status ? status.icon : null;
   },
 });
@@ -429,7 +431,7 @@ export const getRecommendationConnectionGroupsField = (
   onEntityClick,
   entityIcon: (entity) => {
     if (!hasResponse) return null;
-    const status = getAcceptanceStatus(entity);
+    const status = getSupportLevel(entity);
     return status ? status.icon : null;
   },
 });

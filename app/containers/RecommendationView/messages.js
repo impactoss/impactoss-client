@@ -14,8 +14,4 @@ export default defineMessages({
     id: 'app.containers.RecommendationView.metaDescription',
     defaultMessage: 'Recommendation page description',
   },
-  notFound: {
-    id: 'app.containers.RecommendationView.notFound',
-    defaultMessage: 'Sorry no recommendation found',
-  },
 });

@@ -22,8 +22,4 @@ export default defineMessages({
     id: 'app.containers.CategoryEdit.header',
     defaultMessage: 'Edit Category',
   },
-  notFound: {
-    id: 'app.containers.CategoryEdit.notFound',
-    defaultMessage: 'Sorry no category found',
-  },
 });

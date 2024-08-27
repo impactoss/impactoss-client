@@ -151,6 +151,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
             attribute: 'outcome',
             label: 'comment',
           }),
+          // getMarkdownFormField(intl.formatMessage, 'indicator_summary'),
         ],
       },
     );

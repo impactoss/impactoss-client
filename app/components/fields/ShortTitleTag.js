@@ -1,16 +1,9 @@
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-const getFontColor = ({ pIndex }) => {
-  if (pIndex === 6 || pIndex === 7) {
-    return palette('dark', 0);
-  }
-  return palette('text', 2);
-};
-
 const ShortTitleTag = styled.span`
   display: inline-block;
-  color: ${(props) => getFontColor(props)};
+  color: ${({ pIndex }) => palette('taxonomiesTextColor', pIndex)}};
   background-color: ${({ pIndex }) => palette('taxonomies', pIndex || 0)};
   padding: 1px 6px;
   margin-right: 2px;

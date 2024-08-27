@@ -7,9 +7,10 @@ import { injectIntl } from 'react-intl';
 import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
 import { qe } from 'utils/quasi-equals';
+
 import Component from 'components/styled/Component';
 import SkipContent from 'components/styled/SkipContent';
-import { USER_ROLES, PROGRESS_TAXONOMY_ID } from 'themes/config';
+import { USER_ROLES, PROGRESS_TAXONOMY_ID, SUPPORT_LEVELS } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import EntityListItemMainTop from './EntityListItemMainTop';
@@ -213,7 +214,6 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     nestLevel,
     entityPath,
     connections,
-    entityIcon,
     taxonomies,
     intl,
   }) => {
@@ -223,15 +223,26 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     } else if (config && (config.expandableColumns || config.clientPath)) {
       path = nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath;
     }
+    let supportLevel;
+    if (
+      typeof entity.getIn(['attributes', 'support_level']) !== 'undefined'
+      && entity.getIn(['attributes', 'support_level']) !== 'null'
+    ) {
+      supportLevel = SUPPORT_LEVELS.find(
+        (level) => qe(level.value, entity.getIn(['attributes', 'support_level'])),
+      );
+    }
     return ({
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
       subtitle: config && config.sublabel && entity.getIn(['attributes', config.sublabel]),
       reference: this.getReference(entity, intl),
       draft: entity.getIn(['attributes', 'draft']),
+      is_archive: entity.getIn(['attributes', 'is_archive']),
+      is_current: entity.getIn(['attributes', 'is_current']),
       role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
       path,
-      entityIcon: entityIcon && entityIcon(entity),
+      support: supportLevel,
       categories: taxonomies && this.getWithoutProgressCategories(taxonomies, entity.get('categories')),
       connectedCounts: config && config.connections
         ? this.getConnections(entity, config.connections.options, connections, intl)

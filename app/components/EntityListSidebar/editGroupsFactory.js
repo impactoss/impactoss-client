@@ -2,7 +2,7 @@ import { reduce } from 'lodash/collection';
 import { sortEntities } from 'utils/sort';
 import { qe } from 'utils/quasi-equals';
 import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
-export const makeEditGroups = (
+export const makeEditGroups = ({
   config,
   taxonomies,
   activeEditOption,
@@ -10,7 +10,7 @@ export const makeEditGroups = (
   messages,
   frameworks,
   selectedFrameworkIds,
-) => {
+}) => {
   const editGroups = {};
   const selectedFrameworks = frameworks && frameworks.filter(
     (fw) => selectedFrameworkIds.find((id) => qe(id, fw.get('id'))),
@@ -26,6 +26,7 @@ export const makeEditGroups = (
       options: reduce(
         config.attributes.options,
         (optionsMemo, option) => {
+          // check for frameworks
           if (
             option.frameworkFilter
             && option.editForFrameworks
@@ -34,9 +35,11 @@ export const makeEditGroups = (
           ) {
             return optionsMemo;
           }
+          // check for user roles and settings
           return (
             (typeof option.edit === 'undefined' || option.edit)
             && (typeof option.role === 'undefined' || hasUserRole[option.role])
+            && (typeof option.editRole === 'undefined' || hasUserRole[option.editRole])
           )
             ? optionsMemo.concat({
               id: option.attribute, // filterOptionId

@@ -17,6 +17,7 @@ import { palette } from 'styled-theme';
 import Header from 'components/Header';
 import SkipContent from 'components/styled/SkipContent';
 import EntityNew from 'containers/EntityNew';
+import GlobalSettings from 'containers/GlobalSettings';
 
 import { sortEntities } from 'utils/sort';
 import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
@@ -33,6 +34,9 @@ import {
   selectNewEntityModal,
   selectCurrentFrameworkId,
   selectViewRecommendationFrameworkId,
+  selectShowSettings,
+  selectHasPreviousCycles,
+  selectSettingsConfig,
 } from './selectors';
 
 import {
@@ -41,6 +45,8 @@ import {
   updatePath,
   updateRouteQuery,
   openNewEntityModal,
+  showSettingsModal,
+  initializeSettings,
 } from './actions';
 
 import { ROUTES, DEPENDENCIES } from './constants';
@@ -78,9 +84,16 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
+    const { dataReady, settings } = nextProps;
     // reload entities if invalidated
-    if (!nextProps.dataReady) {
+    if (!dataReady) {
       this.props.loadEntitiesIfNeeded();
+    }
+    if (dataReady && settings) {
+      // only iniitlize settings if some not yet initialized (available = null)
+      if (settings.some((setting) => setting.get('available') === null)) {
+        this.props.onInitializeSettings(nextProps);
+      }
     }
   }
 
@@ -200,10 +213,15 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       viewRecommendationFramework,
       user,
       children,
+      showSettings,
+      onShowSettings,
+      dataReady,
+      settings,
       intl,
     } = this.props;
     const title = intl.formatMessage(messages.app.title);
     const isHome = location.pathname === ROUTES.INTRO || location.pathname === `${ROUTES.INTRO}/`;
+    const hasSettings = settings && settings.some((val) => !!val.get('available'));
     return (
       <div>
         <SkipContent
@@ -242,7 +260,10 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             )
             : null}
           currentPath={location.pathname}
+          fullPath={`${location.pathname}${location.search}`}
           brandPath={ROUTES.OVERVIEW}
+          onShowSettings={() => onShowSettings(true)}
+          hasSettings={dataReady && hasSettings}
         />
         <Main isHome={isHome} role="main" id="main-content">
           {React.Children.toArray(children)}
@@ -251,6 +272,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           && (
             <ReactModal
               isOpen
+              appElement={document.getElementById('app')}
               contentLabel={newEntityModal.get('path')}
               onRequestClose={this.props.onCloseModal}
               className="new-entity-modal"
@@ -269,6 +291,23 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             </ReactModal>
           )
         }
+        {showSettings && (
+          <ReactModal
+            isOpen
+            appElement={document.getElementById('app')}
+            contentLabel="Settings"
+            onRequestClose={() => onShowSettings(false)}
+            className="global-settings-modal"
+            overlayClassName="global-settings-modal-overlay"
+            style={{
+              overlay: { zIndex: 99999999 },
+            }}
+          >
+            <GlobalSettings
+              onClose={() => onShowSettings(false)}
+            />
+          </ReactModal>
+        )}
         <GlobalStyle />
       </div>
     );
@@ -291,6 +330,12 @@ App.propTypes = {
   currentFrameworkId: PropTypes.string,
   viewRecommendationFramework: PropTypes.string,
   frameworks: PropTypes.object,
+  onShowSettings: PropTypes.func,
+  showSettings: PropTypes.bool,
+  hasPreviousCycles: PropTypes.bool,
+  onInitializeSettings: PropTypes.func,
+  settings: PropTypes.object,
+  dataReady: PropTypes.bool,
   intl: PropTypes.object.isRequired,
 };
 
@@ -304,9 +349,12 @@ const mapStateToProps = (state, props) => ({
     where: { draft: false },
   }),
   newEntityModal: selectNewEntityModal(state),
+  showSettings: selectShowSettings(state),
   currentFrameworkId: selectCurrentFrameworkId(state),
   frameworks: selectFrameworks(state),
+  hasPreviousCycles: selectHasPreviousCycles(state),
   viewRecommendationFramework: selectViewRecommendationFrameworkId(state, props.params.id),
+  settings: selectSettingsConfig(state),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -320,6 +368,10 @@ export function mapDispatchToProps(dispatch) {
     onPageLink: (path, args) => {
       dispatch(updatePath(path, args));
     },
+    // open: bool
+    onShowSettings: (open) => {
+      dispatch(showSettingsModal(open));
+    },
     onCloseModal: () => {
       dispatch(openNewEntityModal(null));
     },
@@ -331,6 +383,27 @@ export function mapDispatchToProps(dispatch) {
           replace: true,
         }
       ));
+    },
+    onInitializeSettings: ({
+      settings, // immutable Map
+      isUserSignedIn,
+      highestRole,
+      hasPreviousCycles,
+    }) => {
+      // only initialize settings not previously initialized (available === null)
+      const updatedSettings = settings.map((setting, key) => {
+        let updated = setting;
+        if (setting.get('available') === null) {
+          if (key === 'loadArchived' && isUserSignedIn) {
+            updated = setting.set('available', highestRole <= setting.get('minRole'));
+          }
+          if (key === 'loadNonCurrent') {
+            updated = setting.set('available', hasPreviousCycles);
+          }
+        }
+        return updated;
+      });
+      dispatch(initializeSettings(updatedSettings));
     },
   };
 }

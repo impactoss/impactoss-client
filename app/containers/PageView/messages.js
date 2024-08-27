@@ -18,8 +18,4 @@ export default defineMessages({
     id: 'app.containers.PageView.header',
     defaultMessage: 'Page',
   },
-  notFound: {
-    id: 'app.containers.PageView.notFound',
-    defaultMessage: 'Sorry no page found',
-  },
 });

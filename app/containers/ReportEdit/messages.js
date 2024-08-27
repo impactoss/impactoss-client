@@ -22,8 +22,4 @@ export default defineMessages({
     id: 'app.containers.ReportEdit.header',
     defaultMessage: 'Edit Report',
   },
-  notFound: {
-    id: 'app.containers.ReportEdit.notFound',
-    defaultMessage: 'Sorry no report found',
-  },
 });

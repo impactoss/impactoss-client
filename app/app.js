@@ -30,6 +30,7 @@ import LanguageProvider from 'containers/LanguageProvider';
 // Import ThemeProvider
 import { Grommet } from 'grommet';
 import theme from 'themes/theme-nz';
+import './fonts/fonts.css';
 
 import configureStore from './store';
 

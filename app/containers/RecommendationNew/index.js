@@ -17,7 +17,7 @@ import {
   renderTaxonomyControl,
   getTitleFormField,
   getReferenceFormField,
-  getAcceptedField,
+  getSupportField,
   getStatusField,
   getMarkdownFormField,
   renderIndicatorControl,
@@ -149,8 +149,8 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
           placeholder: 'fullRecommendation',
           hint: 'fullRecommendation',
         }),
-        hasResponse && getAcceptedField(intl.formatMessage),
-        hasResponse && getMarkdownFormField({
+        hasResponse && getSupportField(intl.formatMessage),
+        getMarkdownFormField({
           formatMessage: intl.formatMessage,
           attribute: 'response',
         }),
@@ -436,11 +436,11 @@ function mapDispatchToProps(dispatch) {
       // cleanup attributes for framework
       if (!currentFramework.getIn(['attributes', 'has_response'])) {
         saveData = saveData
-          .setIn(['attributes', 'accepted'], null)
+          .setIn(['attributes', 'support_level'], null)
           .setIn(['attributes', 'response'], null);
       }
-      if (saveData.getIn(['attributes', 'accepted']) === 'null') {
-        saveData = saveData.setIn(['attributes', 'accepted'], null);
+      if (saveData.getIn(['attributes', 'support_level']) === 'null') {
+        saveData = saveData.setIn(['attributes', 'support_level'], null);
       }
       if (!currentFramework.get('id')) {
         saveData = saveData.setIn(['attributes', 'framework_id'], DEFAULT_FRAMEWORK);

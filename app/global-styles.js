@@ -1,4 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
+
 /* eslint no-unused-expressions: 0 */
 const GlobalStyle = createGlobalStyle`
   html,
@@ -144,6 +145,10 @@ const GlobalStyle = createGlobalStyle`
     }
   }
 
+  .react-markdown-search strong{
+    font-weight: 500;
+  }
+
   .content-page {
     .react-markdown {
       p {
@@ -171,6 +176,7 @@ const GlobalStyle = createGlobalStyle`
     max-width: none !important;
   }
 
+  .global-settings-modal,
   .download-csv-modal,
   .new-entity-modal {
     position: absolute;
@@ -188,6 +194,7 @@ const GlobalStyle = createGlobalStyle`
     max-width: 1170px;
   }
   @media (min-width: 769px) {
+    .global-settings-modal,
     .download-csv-modal,
     .new-entity-modal {
       padding: 20px;
@@ -199,6 +206,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .download-csv-modal,
+  .global-settings-modal-overlay,
   .new-entity-modal-overlay {
     position: fixed;
     top: 0;

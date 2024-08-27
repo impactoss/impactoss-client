@@ -68,7 +68,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
                     entity={{
                       reference: this.getReportReference(report, intl),
                       entityIcon: 'report',
-                      draft: report.draft,
+                      ...report,
                     }}
                   />
                   <Clear />

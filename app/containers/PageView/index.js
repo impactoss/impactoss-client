@@ -8,7 +8,7 @@ import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage, injectIntl } from 'react-intl';
+import { injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
@@ -18,7 +18,8 @@ import {
   // closeEntity
 } from 'containers/App/actions';
 
-import { ROUTES, CONTENT_PAGE } from 'containers/App/constants';
+import { ROUTES, CONTENT_PAGE, CONTENT_SINGLE } from 'containers/App/constants';
+import { IS_ARCHIVE_STATUSES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Container from 'components/styled/Container';
@@ -26,6 +27,7 @@ import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
 import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
 import Footer from 'containers/Footer';
+import NotFoundEntity from 'containers/NotFoundEntity';
 
 import {
   selectReady,
@@ -40,7 +42,7 @@ import {
 } from 'utils/fields';
 
 import { scrollToTop } from 'utils/scroll-to-component';
-
+import { lowerCase } from 'utils/string';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
@@ -85,6 +87,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
   getBodyAsideFields = (entity) => ([{
     fields: [
       getStatusField(entity),
+      getStatusField(entity, 'is_archive', IS_ARCHIVE_STATUSES, appMessages.attributes.is_archive, 'false'),
       getMetaField(entity),
     ],
   }]);
@@ -114,7 +117,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
         title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
-      if (isAdmin) {
+      if (isAdmin && page) {
         buttons.push({
           type: 'edit',
           onClick: this.props.handleEdit,
@@ -133,21 +136,20 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
         <Styled className={`content-${CONTENT_PAGE}`} ref={this.scrollContainerRef}>
           <ViewContainer isNarrow={!isManager}>
             <ContentHeader
-              title={page ? page.getIn(['attributes', 'title']) : ''}
+              title={page ? page.getIn(['attributes', 'title']) : 'Page'}
               supTitle={page ? page.getIn(['attributes', 'menu_title']) : ''}
-              type={CONTENT_PAGE}
-              buttons={buttons}
+              type={page ? CONTENT_PAGE : CONTENT_SINGLE}
+              buttons={page ? buttons : []}
             />
             { !dataReady
               && <Loading />
             }
-            { !page && dataReady
-              && (
-                <div>
-                  <FormattedMessage {...messages.notFound} />
-                </div>
-              )
-            }
+            {!page && dataReady && (
+              <NotFoundEntity
+                id={this.props.params.id}
+                type={lowerCase(intl.formatMessage(appMessages.entities.pages.single))}
+              />
+            )}
             { page && dataReady
               && (
                 <EntityView
