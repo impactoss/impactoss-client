@@ -97,7 +97,7 @@ module.exports = {
 
     if (!test) {
       actions.push(() => {
-        const cmd = 'npm run extract-intl';
+        const cmd = 'npm run extract';
         exec(cmd, (err, result) => {
           if (err) throw err;
           process.stdout.write(result);
