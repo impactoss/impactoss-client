@@ -14,10 +14,8 @@ import {
 } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
 
-export const selectDomain = createSelector(
-  (state) => state.get('indicatorNew'),
-  (substate) => substate
-);
+export const selectDomain = (state) => state.get('indicatorNew');
+
 // all users of role contributor
 export const selectUsers = createSelector(
   (state) => selectEntities(state, 'users'),

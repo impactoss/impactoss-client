@@ -9,10 +9,7 @@ import { qe } from 'utils/quasi-equals';
 
 import { sortEntities } from 'utils/sort';
 
-export const selectDomain = createSelector(
-  (state) => state.get('reportNew'),
-  (substate) => substate
-);
+export const selectDomain = (state) => state.get('reportNew');
 
 export const selectIndicator = createSelector(
   (state, id) => selectEntity(state, { path: 'indicators', id }),

@@ -32,10 +32,8 @@ import { sortEntities, sortCategories } from 'utils/sort';
 
 import { DEPENDENCIES } from './constants';
 
-export const selectCategory = createSelector(
-  (state, id) => selectEntity(state, { path: 'categories', id }),
-  (category) => category
-);
+export const selectCategory = (state, id) => selectEntity(state, { path: 'categories', id });
+
 export const selectTaxonomy = createSelector(
   selectCategory,
   selectTaxonomiesSorted,

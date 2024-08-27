@@ -18,11 +18,7 @@ import {
 } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
 
-export const selectDomain = createSelector(
-  (state) => state.get('categoryNew'),
-  (substate) => substate
-);
-
+export const selectDomain = (state) => state.get('categoryNew');
 
 export const selectParentOptions = createSelector(
   (state, id) => selectEntity(state, { path: 'taxonomies', id }),

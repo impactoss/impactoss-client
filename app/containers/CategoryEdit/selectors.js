@@ -19,10 +19,8 @@ import {
   prepareTaxonomiesMultiple,
 } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
-export const selectDomain = createSelector(
-  (state) => state.get('categoryEdit'),
-  (substate) => substate
-);
+
+export const selectDomain = (state) => state.get('categoryEdit');
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),

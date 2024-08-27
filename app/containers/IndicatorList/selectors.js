@@ -184,13 +184,11 @@ export const selectConnectedTaxonomies = createSelector(
   }
 );
 
-const selectIndicatorsNestedQ = createSelector(
-  (state, locationQuery) => selectIndicatorsSearchQuery(state, {
+const selectIndicatorsNestedQ = (state, locationQuery) =>
+  selectIndicatorsSearchQuery(state, {
     searchAttributes: CONFIG.search || ['title', 'reference'],
     locationQuery,
-  }),
-  (entities) => entities
-);
+  });
 
 // nest connected recommendation ids
 // nest connected recommendation ids byfw
