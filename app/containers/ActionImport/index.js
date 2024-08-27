@@ -272,6 +272,11 @@ function mapDispatchToProps(dispatch) {
                               )
                               : categories.get(idOrCode);
                             connectionId = category ? category.get('id') : `INVALID|${idOrCode}`;
+                            if (!category) {
+                              console.log('category not found');
+                              console.log('row', index + 1);
+                              console.log('idOrCode', idOrCode);
+                            }
                           } else if (connections && connections.get(relConfig.lookup.table)) {
                             const connection = relConfig.lookup.attribute
                               ? connections.get(relConfig.lookup.table).find(
@@ -279,6 +284,11 @@ function mapDispatchToProps(dispatch) {
                               )
                               : connections.get(relConfig.lookup.table).get(idOrCode);
                             connectionId = connection ? connection.get('id') : `INVALID|${idOrCode}`;
+                            if (!connection) {
+                              console.log('connection not found');
+                              console.log('row', index + 1);
+                              console.log('idOrCode', idOrCode);
+                            }
                           }
                         }
                         // recommendations by code or id
