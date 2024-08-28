@@ -12,7 +12,8 @@ import ReactModal from 'react-modal';
 import GlobalStyle from 'global-styles';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
-import styled from 'styled-components';
+import styled, { StyleSheetManager } from 'styled-components';
+import isPropValid from '@emotion/is-prop-valid';
 import { palette } from 'styled-theme';
 import Header from 'components/Header';
 import SkipContent from 'components/styled/SkipContent';
@@ -224,91 +225,93 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     const hasSettings = settings && settings.some((val) => !!val.get('available'));
     return (
       <div>
-        <SkipContent
-          href="#main-content"
-          title={intl.formatMessage(messages.screenreader.skipToContent)}
-        >
-          <FormattedMessage {...messages.screenreader.skipToContent} />
-        </SkipContent>
-        <HelmetCanonical titleTemplate={`${title} - %s`} defaultTitle={title} />
-        <Header
-          isSignedIn={isUserSignedIn}
-          user={user}
-          pages={pages && this.preparePageMenuPages(pages)}
-          navItems={this.prepareMainMenuItems(
-            highestRole,
-            isUserSignedIn,
-            location.pathname,
-            currentFrameworkId,
-            viewRecommendationFramework,
-            intl,
-          )}
-          search={{
-            path: ROUTES.SEARCH,
-            title: intl.formatMessage(messages.nav.search),
-            active: location.pathname.startsWith(ROUTES.SEARCH),
-            icon: 'search',
-          }}
-          onPageLink={onPageLink}
-          isHome={isHome}
-          onSelectFramework={onSelectFramework}
-          frameworkOptions={frameworks && frameworks.size > 1
-            ? this.prepareFrameworkOptions(
-              frameworks,
+        <StyleSheetManager shouldForwardProp={isPropValid}>
+          <SkipContent
+            href="#main-content"
+            title={intl.formatMessage(messages.screenreader.skipToContent)}
+          >
+            <FormattedMessage {...messages.screenreader.skipToContent} />
+          </SkipContent>
+          <HelmetCanonical titleTemplate={`${title} - %s`} defaultTitle={title} />
+          <Header
+            isSignedIn={isUserSignedIn}
+            user={user}
+            pages={pages && this.preparePageMenuPages(pages)}
+            navItems={this.prepareMainMenuItems(
+              highestRole,
+              isUserSignedIn,
+              location.pathname,
               currentFrameworkId,
+              viewRecommendationFramework,
               intl,
+            )}
+            search={{
+              path: ROUTES.SEARCH,
+              title: intl.formatMessage(messages.nav.search),
+              active: location.pathname.startsWith(ROUTES.SEARCH),
+              icon: 'search',
+            }}
+            onPageLink={onPageLink}
+            isHome={isHome}
+            onSelectFramework={onSelectFramework}
+            frameworkOptions={frameworks && frameworks.size > 1
+              ? this.prepareFrameworkOptions(
+                frameworks,
+                currentFrameworkId,
+                intl,
+              )
+              : null}
+            currentPath={location.pathname}
+            fullPath={`${location.pathname}${location.search}`}
+            brandPath={ROUTES.OVERVIEW}
+            onShowSettings={() => onShowSettings(true)}
+            hasSettings={dataReady && hasSettings}
+          />
+          <Main isHome={isHome} role="main" id="main-content">
+            {React.Children.toArray(children)}
+          </Main>
+          {newEntityModal
+            && (
+              <ReactModal
+                isOpen
+                appElement={document.getElementById('app')}
+                contentLabel={newEntityModal.get('path')}
+                onRequestClose={this.props.onCloseModal}
+                className="new-entity-modal"
+                overlayClassName="new-entity-modal-overlay"
+                style={{
+                  overlay: { zIndex: 99999999 },
+                }}
+              >
+                <EntityNew
+                  path={newEntityModal.get('path')}
+                  attributes={newEntityModal.get('attributes')}
+                  onSaveSuccess={this.props.onCloseModal}
+                  onCancel={this.props.onCloseModal}
+                  inModal
+                />
+              </ReactModal>
             )
-            : null}
-          currentPath={location.pathname}
-          fullPath={`${location.pathname}${location.search}`}
-          brandPath={ROUTES.OVERVIEW}
-          onShowSettings={() => onShowSettings(true)}
-          hasSettings={dataReady && hasSettings}
-        />
-        <Main isHome={isHome} role="main" id="main-content">
-          {React.Children.toArray(children)}
-        </Main>
-        {newEntityModal
-          && (
+          }
+          {showSettings && (
             <ReactModal
               isOpen
               appElement={document.getElementById('app')}
-              contentLabel={newEntityModal.get('path')}
-              onRequestClose={this.props.onCloseModal}
-              className="new-entity-modal"
-              overlayClassName="new-entity-modal-overlay"
+              contentLabel="Settings"
+              onRequestClose={() => onShowSettings(false)}
+              className="global-settings-modal"
+              overlayClassName="global-settings-modal-overlay"
               style={{
                 overlay: { zIndex: 99999999 },
               }}
             >
-              <EntityNew
-                path={newEntityModal.get('path')}
-                attributes={newEntityModal.get('attributes')}
-                onSaveSuccess={this.props.onCloseModal}
-                onCancel={this.props.onCloseModal}
-                inModal
+              <GlobalSettings
+                onClose={() => onShowSettings(false)}
               />
             </ReactModal>
-          )
-        }
-        {showSettings && (
-          <ReactModal
-            isOpen
-            appElement={document.getElementById('app')}
-            contentLabel="Settings"
-            onRequestClose={() => onShowSettings(false)}
-            className="global-settings-modal"
-            overlayClassName="global-settings-modal-overlay"
-            style={{
-              overlay: { zIndex: 99999999 },
-            }}
-          >
-            <GlobalSettings
-              onClose={() => onShowSettings(false)}
-            />
-          </ReactModal>
-        )}
-        <GlobalStyle />
+          )}
+          <GlobalStyle />
+        </StyleSheetManager>
       </div>
     );
   }
