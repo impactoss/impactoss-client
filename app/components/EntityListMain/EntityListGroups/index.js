@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 
@@ -120,12 +120,10 @@ const pageEntityGroups = (entityGroups, pager, formatMessage) => {
 
 
 export class EntityListGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  transformMessage = (msg, entityId) => {
-    const { intl } = this.context;
-    return intl
+  transformMessage = (msg, entityId, intl) =>
+    intl
       ? intl.formatMessage(messages.entityNoLongerPresent, { entityId })
       : msg;
-  };
 
   hasLocationQueryFilters = (locationQuery) => locationQuery.reduce((hasFilters, value, arg) => hasFilters || ['items', 'page', 'group', 'subgroup', 'sort', 'order'].indexOf(arg) === -1,
     false);
@@ -152,8 +150,8 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       entities,
       errors,
       entityGroups,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     let pageSize = PAGE_SIZE_MAX;
     if (locationQuery.get('items')) {
       if (locationQuery.get('items') === 'all') {
@@ -270,7 +268,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                   type="error"
                   messages={updateError
                     .getIn(['error', 'messages'])
-                    .map((msg) => this.transformMessage(msg, entityId))
+                    .map((msg) => this.transformMessage(msg, entityId, intl))
                     .valueSeq()
                     .toArray()
                   }
@@ -394,11 +392,7 @@ EntityListGroups.propTypes = {
   subgroupSelectValue: PropTypes.string,
   groupTaxonomyTitle: PropTypes.string,
   subgroupTaxonomyTitle: PropTypes.string,
+  intl: PropTypes.object.isRequired,
 };
 
-EntityListGroups.contextTypes = {
-  intl: PropTypes.object,
-};
-
-
-export default EntityListGroups;
+export default injectIntl(EntityListGroups);

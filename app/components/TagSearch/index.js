@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -126,13 +126,13 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
 
   getLabels = (labels) => reduce(labels, (memo, label) => {
     if (!label.label) return memo;
-    let labelValue = label.appMessage ? appMessage(this.context.intl, label.label) : label.label;
+    let labelValue = label.appMessage ? appMessage(this.props.intl, label.label) : label.label;
     labelValue = label.postfix ? `${labelValue}${label.postfix}` : labelValue;
     return `${memo}${label.lowerCase ? lowerCase(labelValue) : labelValue} `;
   }, '').trim();
 
   getFilterLabel = (filter) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     // not used I think?
     if (filter.message) {
       return filter.messagePrefix
@@ -152,7 +152,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     } else {
       title = filter.title || this.getFilterLabel(filter);
     }
-    return this.context.intl.formatMessage(messages.removeTag, { title });
+    return this.props.intl.formatMessage(messages.removeTag, { title });
   };
 
   focusLastFilter = () => {
@@ -169,8 +169,8 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       resultsId,
       searchAttributes,
       placeholderMessageId,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     const searchHasFilters = (searchQuery || filters.length > 0);
     let inputPlaceholder;
     if (placeholder) {
@@ -314,7 +314,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
               <ButtonTagSearch
                 onClick={onClear}
                 small={this.props.multiselect}
-                title={this.context.intl.formatMessage(messages.removeAll)}
+                title={this.props.intl.formatMessage(messages.removeAll)}
               >
                 <Icon name="removeSmall" />
               </ButtonTagSearch>
@@ -332,7 +332,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             <ButtonTagSearch
               as="a"
               href={`#${resultsId}`}
-              title={this.context.intl.formatMessage(messages.skipToResults)}
+              title={this.props.intl.formatMessage(messages.skipToResults)}
               isSearchIcon
             >
               <Icon name="search" size="1em" />
@@ -360,10 +360,7 @@ TagSearch.propTypes = {
   onClear: PropTypes.func,
   multiselect: PropTypes.bool,
   focusOnMount: PropTypes.bool,
-};
-
-TagSearch.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default TagSearch;
+export default injectIntl(TagSearch);

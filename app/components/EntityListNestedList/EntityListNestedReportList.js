@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { injectIntl } from 'react-intl';
 import { Map, List } from 'immutable';
 
 import A from 'components/styled/A';
@@ -42,9 +43,8 @@ class EntityListNestedReportList extends React.PureComponent { // eslint-disable
   };
 
   render() {
-    const { intl } = this.context;
     const {
-      reports, dates, onEntityClick, isContributor, nestLevel,
+      reports, dates, onEntityClick, isContributor, nestLevel, intl,
     } = this.props;
     return (
       <ChildItems>
@@ -96,10 +96,7 @@ EntityListNestedReportList.propTypes = {
   onEntityClick: PropTypes.func,
   isContributor: PropTypes.bool,
   nestLevel: PropTypes.number,
+  intl: PropTypes.object.isRequired,
 };
 
-EntityListNestedReportList.contextTypes = {
-  intl: PropTypes.object,
-};
-
-export default EntityListNestedReportList;
+export default injectIntl(EntityListNestedReportList);

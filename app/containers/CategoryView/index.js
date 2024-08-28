@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
+import { injectIntl } from 'react-intl';
 
 import {
   getReferenceField,
@@ -107,8 +108,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     return groups;
   };
 
-  getHeaderAsideFields = (entity, isManager) => {
-    const { intl } = this.context;
+  getHeaderAsideFields = (entity, isManager, intl) => {
     const fields = []; // fieldGroups
     fields.push({
       fields: [
@@ -146,7 +146,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       });
     }
     return fields.length > 0 ? fields : null;
-  }
+  };
 
   getBodyMainFields = (
     entity,
@@ -280,13 +280,12 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
   };
 
   /* eslint-disable react/destructuring-assignment */
-  getTaxTitle = (id) => this.context.intl.formatMessage(
+  getTaxTitle = (id) => this.props.intl.formatMessage(
     appMessages.entities.taxonomies[id].single
   );
   /* eslint-ensable react/destructuring-assignment */
 
   render() {
-    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -303,6 +302,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       parentTaxonomy,
       childTaxonomies,
       frameworks,
+      intl,
     } = this.props;
     let buttons = [];
     if (dataReady) {
@@ -372,7 +372,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(viewEntity, isManager, parentTaxonomy),
-                    aside: this.getHeaderAsideFields(viewEntity, isManager),
+                    aside: this.getHeaderAsideFields(viewEntity, isManager, intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
@@ -423,9 +423,6 @@ CategoryView.propTypes = {
   measureConnections: PropTypes.object,
   recommendationConnections: PropTypes.object,
   frameworks: PropTypes.object,
-};
-
-CategoryView.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -463,4 +460,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoryView);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(CategoryView));

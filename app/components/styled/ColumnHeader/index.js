@@ -7,7 +7,7 @@ const ColumnHeader = styled.div`
   padding-left: ${(props) => (props.isSelect)
     ? 0
     : 4
-}px
+}px;
   word-break: break-word;
   width: ${(props) => props.colWidth}%;
   position: relative;
@@ -38,7 +38,7 @@ const ColumnHeader = styled.div`
     line-height: 30px;
     padding-top: 0;
     padding-bottom: 0;
-    &:before {
+    &::before {
       content: '';
       display: block;
       position: absolute;

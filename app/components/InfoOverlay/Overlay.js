@@ -1,12 +1,13 @@
+/* eslint-disable react/no-children-prop */
 /*
  *
  * Overlay
  *
  */
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
+import rehypeExternalLinks from 'rehype-external-links';
 
 import styled from 'styled-components';
 import {
@@ -65,7 +66,11 @@ function Overlay({
         <LayerContent flex={{ grow: 1 }}>
           <div>
             {markdown && (
-              <Markdown source={content} className="react-markdown" linkTarget="_blank" />
+              <Markdown
+                children={content}
+                className="react-markdown"
+                rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
+              />
             )}
             {!markdown && content}
           </div>

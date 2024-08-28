@@ -126,8 +126,4 @@ EntityListPrintKey.propTypes = {
   config: PropTypes.object,
 };
 
-EntityListPrintKey.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
-
 export default EntityListPrintKey;

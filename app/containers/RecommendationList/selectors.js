@@ -37,13 +37,11 @@ import { sortEntities, getSortOption } from 'utils/sort';
 
 import { CONFIG, DEPENDENCIES } from './constants';
 
-const selectRecommendationsQ = createSelector(
-  (state, locationQuery) => selectRecommendationsSearchQuery(state, {
+const selectRecommendationsQ = (state, locationQuery) =>
+  selectRecommendationsSearchQuery(state, {
     searchAttributes: CONFIG.search || ['reference', 'title'],
     locationQuery,
-  }),
-  (entities) => entities
-);
+  });
 const selectRecommendationsWithCategories = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectRecommendationsQ,

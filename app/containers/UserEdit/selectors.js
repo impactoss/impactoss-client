@@ -13,10 +13,7 @@ import {
 } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
 
-export const selectDomain = createSelector(
-  (state) => state.get('userEdit'),
-  (substate) => substate
-);
+export const selectDomain = (state) => state.get('userEdit');
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'users', id }),

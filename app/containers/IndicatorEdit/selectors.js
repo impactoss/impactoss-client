@@ -25,10 +25,7 @@ import { qe } from 'utils/quasi-equals';
 /**
  * Direct selector to the indicatorEdit state domain
  */
-export const selectDomain = createSelector(
-  (state) => state.get('indicatorEdit'),
-  (substate) => substate
-);
+export const selectDomain = (state) => state.get('indicatorEdit');
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'indicators', id }),

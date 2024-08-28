@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Map, fromJS } from 'immutable';
+import { fromJS } from 'immutable';
 import { connect } from 'react-redux';
-import { isEqual } from 'lodash/lang';
-import { Form, actions as formActions } from 'react-redux-form/immutable';
+import { Form, Formik, Field } from 'formik';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { injectIntl } from 'react-intl';
 
 import { lowerCase } from 'utils/string';
 import appMessage from 'utils/app-message';
@@ -13,12 +13,8 @@ import appMessage from 'utils/app-message';
 import ContainerWrapperSidebar from 'components/styled/Container/ContainerWrapperSidebar';
 import MultiSelectControl from 'components/forms/MultiSelectControl';
 
-import {
-  FILTER_FORM_MODEL,
-} from './constants';
-import {
-  setFilter,
-} from './actions';
+import { FILTER_FORM_MODEL, INITIAL_FORM } from './constants';
+import { setFilter } from './actions';
 
 const Styled = styled(ContainerWrapperSidebar)`
   z-index: ${(props) => props.sidebarResponsiveLarge ? 99 : 101};
@@ -56,21 +52,17 @@ const FormWrapper = styled.div`
 // z-index:-1;
 
 class EntityListForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
-  UNSAFE_componentWillMount() {
-    this.props.initialiseForm(this.props.model, this.props.formOptions.options);
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    // Todo this is not efficent, parent component is creating a new map every time so we can't hashCode compare :(
-    if (!isEqual(nextProps.formOptions.options, this.props.formOptions.options)) {
-      this.props.initialiseForm(nextProps.model, nextProps.formOptions.options);
+  getInitialFormData = (options, fieldName) => {
+    let formData = INITIAL_FORM;
+    if (options) {
+      formData[fieldName] = Object.values(options);
     }
+    return formData;
   }
 
   render() {
-    const { intl } = this.context;
     const {
-      model, onSubmit, onCancel, buttons, formOptions, activeOptionId, showCancelButton,
+      model, onSubmit, onCancel, buttons, formOptions, activeOptionId, showCancelButton, intl,
     } = this.props;
     let formTitle;
     if (formOptions.message) {
@@ -80,6 +72,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
     } else {
       formTitle = formOptions.title;
     }
+    const fieldName = 'values';
     return (
       <Styled
         sidebarResponsiveLarge={!formOptions.advanced}
@@ -93,32 +86,42 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
           wide={formOptions.advanced}
           onClick={(evt) => evt.stopPropagation()}
         >
-          <Form
-            model={model}
-            onSubmit={onSubmit}
-          >
-            <MultiSelectControl
-              model=".values"
-              threeState
-              title={formTitle}
-              options={fromJS(formOptions.options).toList()}
-              multiple={formOptions.multiple}
-              required={formOptions.required}
-              search={formOptions.search}
-              advanced={formOptions.advanced}
-              groups={formOptions.groups}
-              closeOnClickOutside={false}
-              selectAll={formOptions.multiple && formOptions.selectAll}
-              tagFilterGroups={formOptions.tagFilterGroups}
-              panelId={activeOptionId}
-              onCancel={showCancelButton && onCancel ? onCancel : null}
-              onChange={(values) => {
-                this.props.onFormChange(values, model);
-                this.props.onSelect();
-              }}
-              buttons={buttons}
-            />
-          </Form>
+          <Formik
+            initialValues={this.getInitialFormData(formOptions.options, fieldName)}
+            onSubmit={(values) => onSubmit(fromJS(values))}
+          >       
+            {() =>
+              <Form>
+                <Field name={fieldName}>
+                  {({ form }) => (
+                    <MultiSelectControl
+                      threeState
+                      title={formTitle}
+                      values={fromJS(form.values[fieldName]).toList()}
+                      options={fromJS(formOptions.options).toList()}
+                      multiple={formOptions.multiple}
+                      required={formOptions.required}
+                      search={formOptions.search}
+                      advanced={formOptions.advanced}
+                      groups={formOptions.groups}
+                      closeOnClickOutside={false}
+                      selectAll={formOptions.multiple && formOptions.selectAll}
+                      tagFilterGroups={formOptions.tagFilterGroups}
+                      panelId={activeOptionId}
+                      onCancel={showCancelButton && onCancel ? onCancel : null}
+                      onChange={(fieldData) => {
+                        form.setFieldValue(fieldName, fieldData.toJS());
+                        this.props.onFormChange(fieldData, model);
+                        this.props.onSelect();
+                      }}
+                      buttons={buttons}
+                    />
+                  )
+                  }
+                </Field>
+              </Form>
+            }
+          </Formik>
         </FormWrapper>
       </Styled>
     );
@@ -126,7 +129,6 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
 }
 
 EntityListForm.propTypes = {
-  initialiseForm: PropTypes.func.isRequired,
   onFormChange: PropTypes.func.isRequired,
   model: PropTypes.string.isRequired,
   formOptions: PropTypes.object,
@@ -136,23 +138,14 @@ EntityListForm.propTypes = {
   buttons: PropTypes.array,
   activeOptionId: PropTypes.string,
   showCancelButton: PropTypes.bool,
+  intl: PropTypes.object.isRequired,
 };
 
 EntityListForm.defaultProps = {
   showCancelButton: true,
 };
 
-EntityListForm.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
-
 const mapDispatchToProps = (dispatch) => ({
-  // resetForm: (model) => {
-  //   dispatch(formActions.reset(model));
-  // },
-  initialiseForm: (model, options) => {
-    dispatch(formActions.load(model, Map({ values: fromJS(options).toList() })));
-  },
   onFormChange: (values, model) => {
     if (model === FILTER_FORM_MODEL) {
       dispatch(setFilter(values));
@@ -160,4 +153,4 @@ const mapDispatchToProps = (dispatch) => ({
   },
 });
 
-export default connect(null, mapDispatchToProps)(EntityListForm);
+export default injectIntl(connect(null, mapDispatchToProps)(EntityListForm));

@@ -5,7 +5,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import ContentHeader from 'components/ContentHeader';
@@ -21,7 +21,7 @@ const ViewContainer = styled(Container)`
 
 export class Unauthorised extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { intl } = this.context;
+    const { intl } = this.props;
     return (
       <div>
         <HelmetCanonical
@@ -46,8 +46,8 @@ export class Unauthorised extends React.PureComponent { // eslint-disable-line r
   }
 }
 
-Unauthorised.contextTypes = {
+Unauthorised.propTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default Unauthorised;
+export default injectIntl(Unauthorised);

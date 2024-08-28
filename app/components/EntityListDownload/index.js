@@ -6,14 +6,13 @@
 
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { intlShape, injectIntl, FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { palette } from 'styled-theme';
 import DebounceInput from 'react-debounce-input';
 import { snakeCase } from 'lodash/string';
 
 import styled from 'styled-components';
 import { List, Map } from 'immutable';
-import CsvDownloader from 'react-csv-downloader';
 
 import {
   Box,
@@ -34,6 +33,7 @@ import { filterEntitiesByKeywords } from 'utils/entities';
 import { isMinSize } from 'utils/responsive';
 
 import OptionsForEntityList from './OptionsForEntityList';
+import CsvDownloadHandler from './CsvDownloadHandler';
 
 import messages from './messages';
 import {
@@ -107,12 +107,12 @@ export function EntityListDownload({
   taxonomies,
   connections,
   onClose,
-  intl,
   hasUserRole,
   searchQuery,
   entityIdsSelected,
   entityTitle,
 }) {
+  const intl = useIntl();
   const [typeTitle, setTypeTitle] = useState('entities');
   const [csvFilename, setCSVFilename] = useState('csv');
   const [csvSuffix, setCSVSuffix] = useState(true);
@@ -443,11 +443,12 @@ export function EntityListDownload({
             <StyledButtonCancel type="button" onClick={() => onClose()}>
               <FormattedMessage {...appMessages.buttons.cancel} />
             </StyledButtonCancel>
-            <CsvDownloader
-              datas={csvData}
+            <CsvDownloadHandler
+              data={csvData}
               columns={csvColumns}
               filename={`${csvFilename}${csvSuffix ? csvDateSuffix : ''}`}
               bom={false}
+              config={{ quoteChar: '', escapeChar: '' }}
             >
               <ButtonSubmit
                 type="button"
@@ -458,7 +459,7 @@ export function EntityListDownload({
               >
                 <FormattedMessage {...messages.buttonDownload} />
               </ButtonSubmit>
-            </CsvDownloader>
+            </CsvDownloadHandler>
           </Box>
         </Footer>
       )}
@@ -480,7 +481,6 @@ EntityListDownload.propTypes = {
   entityIdsSelected: PropTypes.object,
   hasUserRole: PropTypes.object,
   entityTitle: PropTypes.object,
-  intl: intlShape,
 };
 
-export default injectIntl(EntityListDownload);
+export default EntityListDownload;

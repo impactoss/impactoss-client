@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { injectIntl } from 'react-intl';
+
 import Label from 'components/styled/Label';
 import qe from 'utils/quasi-equals';
 import appMessage from 'utils/app-message';
@@ -24,6 +26,7 @@ const Status = styled(Label)`
 class ItemStatus extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const {
+     
       draft, // deprecated
       top,
       float,
@@ -31,8 +34,9 @@ class ItemStatus extends React.PureComponent { // eslint-disable-line react/pref
       attribute,
       options,
       value,
+      intl,
     } = this.props;
-    const { intl } = this.context;
+
     if (draft) {
       return (
         <Status top={top} float={float}>
@@ -63,10 +67,7 @@ ItemStatus.propTypes = {
   value: PropTypes.string,
   entity: PropTypes.object,
   options: PropTypes.array,
+  intl: PropTypes.object.isRequired,
 };
 
-ItemStatus.contextTypes = {
-  intl: PropTypes.object,
-};
-
-export default ItemStatus;
+export default injectIntl(ItemStatus);

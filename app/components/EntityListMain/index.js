@@ -7,7 +7,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Map, List } from 'immutable';
 import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { jumpToComponent } from 'utils/scroll-to-component';
 import { lowerCase } from 'utils/string';
@@ -85,7 +85,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       this.ScrollReference.current,
       this.ScrollContainer.current
     );
-  }
+  };
 
   render() {
     const {
@@ -111,8 +111,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       errors,
       frameworks,
       onDismissAllErrors,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     const expandNo = config.expandableColumns && locationQuery.get('expand')
       ? parseInt(locationQuery.get('expand'), 10)
       : 0;
@@ -255,7 +255,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                   />
                   <SkipContent
                     href="#filter-options"
-                    title={this.context.intl.formatMessage(appMessages.screenreader[
+                    title={intl.formatMessage(appMessages.screenreader[
                       isManager ? 'skipToListFilterEdit' : 'skipToListFilter'])}
                   >
                     <FormattedMessage
@@ -366,11 +366,8 @@ EntityListMain.propTypes = {
   onDismissError: PropTypes.func.isRequired,
   onDismissAllErrors: PropTypes.func.isRequired,
   listUpdating: PropTypes.bool,
-};
-
-EntityListMain.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default EntityListMain;
+export default injectIntl(EntityListMain);
 // export default EntityListMain;

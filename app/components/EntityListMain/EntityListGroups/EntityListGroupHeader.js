@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -57,9 +58,8 @@ const Divider = styled.div`
 `;
 export class EntityListGroupHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { intl } = this.context;
     const {
-      group, level, expanded, groupTypeTitle,
+      group, level, expanded, groupTypeTitle, intl,
     } = this.props;
 
     if (group.get('id') === 'without') {
@@ -117,8 +117,7 @@ EntityListGroupHeader.propTypes = {
   level: PropTypes.number,
   expanded: PropTypes.bool,
   groupTypeTitle: PropTypes.string,
-};
-EntityListGroupHeader.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
-export default EntityListGroupHeader;
+
+export default injectIntl(EntityListGroupHeader);

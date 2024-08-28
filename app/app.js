@@ -6,15 +6,17 @@
  */
 
 // Needed for redux-saga es6 generator support
-import '@babel/polyfill';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 
 // Import all the third party stuff
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 import 'sanitize.css/sanitize.css';
+import './fonts.css';
 
 // Import root app
 import App from 'containers/App';
@@ -29,19 +31,6 @@ import LanguageProvider from 'containers/LanguageProvider';
 import { Grommet } from 'grommet';
 import theme from 'themes/theme-nz';
 import './fonts/fonts.css';
-
-// Load the favicon, and the .htaccess file
-/* eslint-disable import/no-unresolved, import/extensions */
-import '!file-loader?name=[name].[ext]!./favicon.ico';
-import '!file-loader?name=[name].[ext]!./favicon-16x16.png';
-import '!file-loader?name=[name].[ext]!./favicon-32x32.png';
-import '!file-loader?name=[name].[ext]!./android-chrome-192x192.png';
-import '!file-loader?name=[name].[ext]!./android-chrome-256x256.png';
-import '!file-loader?name=[name].[ext]!./mstile-150x150.png';
-import '!file-loader?name=[name].[ext]!./apple-touch-icon.png';
-import '!file-loader?name=[name].[ext]!./safari-pinned-tab.svg';
-import 'file-loader?name=[name].[ext]!./.htaccess';
-/* eslint-enable import/no-unresolved, import/extensions */
 
 import configureStore from './store';
 
@@ -71,9 +60,10 @@ const rootRoute = {
   childRoutes: createRoutes(store),
 };
 
-// console.log(this.props.location)
+const container = document.getElementById('app');
+const root = createRoot(container);
 const render = (messages) => {
-  ReactDOM.render(
+  root.render(
     <Provider store={store}>
       <LanguageProvider messages={messages}>
         <Grommet theme={theme}>
@@ -83,8 +73,7 @@ const render = (messages) => {
           />
         </Grommet>
       </LanguageProvider>
-    </Provider>,
-    document.getElementById('app'),
+    </Provider>
   );
 };
 
@@ -98,6 +87,7 @@ if (module.hot) {
 }
 
 // Chunked polyfill for browsers without Intl support
+/* eslint-disable import/extensions */
 if (!window.Intl) {
   new Promise((resolve) => {
     resolve(import('intl'));

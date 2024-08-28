@@ -1,16 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { FormattedMessage } from 'react-intl';
-import { Control, Form, Errors } from 'react-redux-form/immutable';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import { fromJS, List } from 'immutable';
 import { omit } from 'lodash/object';
 
 import asArray from 'utils/as-array';
 import appMessage from 'utils/app-message';
+import { validateField } from 'utils/forms';
 
+import { ErrorMessage, Formik, Form, Field as FormikField } from 'formik';
 import { selectNewEntityModal } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -54,6 +56,9 @@ import RadioControl from 'components/forms/RadioControl';
 import Required from 'components/forms/Required';
 import MultiSelectField from 'components/forms/MultiSelectField';
 import messages from './messages';
+
+import SubmitFailedHandler from './SubmitFailedHandler';
+import FieldWithContext from './FieldWithContext';
 
 const StyledForm = styled(Form)`
   display: table;
@@ -111,7 +116,7 @@ const controls = {
   select: ControlSelect,
   radio: RadioControl,
   checkbox: ControlCheckbox,
-  button: Control.button,
+  button: Button,
   file: UploadControl,
   uploader: UploadControl,
 };
@@ -135,7 +140,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       default:
         return omit(field, NON_CONTROL_PROPS);
     }
-  }
+  };
 
   // REGULAR COMPONENT
   getFieldComponent = (field) => {
@@ -145,26 +150,55 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       return controls[field.controlType];
     }
     return controls.input; // Default to input type if not specified
-  }
+  };
 
   preDelete = (confirm = true) => {
     this.setState({ deleteConfirmed: confirm });
-  }
+  };
 
   handleSubmit = (formData) => !this.props.saving && this.props.handleSubmit(formData);
 
-  renderMultiSelect = (field, formData, hasEntityNewModal, scrollContainer) => (
+  getFieldProps = (field, form, formikField) => {
+    let fieldProps;
+    if (field.controlType === 'multiselect') {
+      const values = fromJS(form.values);
+      const formData = fromJS(this.props.formData);
+      fieldProps = {
+        ...field,
+        formData: values,
+        values: values.getIn(field.dataPath),
+        options: formData.getIn(field.dataPath) || List(),
+      };
+    } else {
+      const modifiedField = field.modifyFieldAttributes
+        ? field.modifyFieldAttributes(field, form.values)
+        : field;
+
+      fieldProps = { ...modifiedField, onChange: formikField.onChange, value: formikField.value };
+    }
+    return fieldProps;
+  };
+
+  fieldValidation = (value, field, formikProps) => {
+    let errors = field.validators && validateField(value, field);
+    if (!errors && field.dynamicValidators && typeof field.dynamicValidators === 'function') {
+      errors = field.dynamicValidators(value, formikProps);
+    }
+    return errors;
+  };
+
+  renderMultiSelect = (field, formData, hasEntityNewModal, scrollContainer, formikActions) => (
     <MultiSelectField
       field={field}
       scrollContainer={scrollContainer}
       fieldData={formData.getIn(field.dataPath)}
       closeOnClickOutside={!hasEntityNewModal}
-      handleUpdate={(fieldData) => this.props.handleUpdate(formData.setIn(field.dataPath, fieldData))}
+      handleUpdate={(fieldData) => formikActions.setFieldValue(field.name, fieldData.toJS())}
     />
-  )
+  );
 
   renderFieldChildren = (field) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     // handle known cases here
     switch (field.controlType) {
       case 'select':
@@ -181,21 +215,18 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       default:
         return field.children || null; // enables passing children component, or null
     }
-  }
+  };
 
   renderComponent = (field) => {
-    const { id, model, ...props } = this.getControlProps(field);
+    const { id, ...props } = this.getControlProps(field);
     const FieldComponent = this.getFieldComponent(field);
+
     return (
-      <FieldComponent
-        id={id}
-        model={model || `.${id}`}
-        {...props}
-      >
+      <FieldComponent id={id} {...props}>
         {this.renderFieldChildren(field)}
       </FieldComponent>
     );
-  }
+  };
 
   renderCombo = (field) => (
     <FieldWrap>
@@ -209,8 +240,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     </FieldWrap>
   );
 
-  renderFormField = (field, nested, hasEntityNewModal, scrollContainer) => {
-    // field.controlType === 'date' && console.log('field', field)
+  renderFormField = (field, nested, hasEntityNewModal, scrollContainer, formikActions) => {
     let formField;
     if (!field.controlType) {
       formField = this.renderComponent(field);
@@ -225,9 +255,10 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         case 'multiselect':
           formField = this.renderMultiSelect(
             field,
-            this.props.formData,
+            field.formData,
             hasEntityNewModal,
             scrollContainer,
+            formikActions
           );
           break;
         default:
@@ -253,11 +284,11 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         { field.controlType !== 'checkbox' && formField }
       </FormFieldWrap>
     );
-  }
+  };
 
   renderGroup = (group, hasEntityNewModal, scrollContainer) => (
     <FieldGroupWrapper>
-      { group.label
+      {group.label
         && (
           <FieldGroupLabel>
             <GroupLabel>
@@ -268,40 +299,69 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
               <GroupIcon>
                 <Icon name={group.icon} />
               </GroupIcon>
-            )
-            }
+            )}
           </FieldGroupLabel>
         )
       }
-      {
-        group.fields.map((field, i) => field
-          ? (
-            <Field labelledGroup={!!group.label} key={i}>
-              {this.renderFormField(
-                field,
-                false,
-                hasEntityNewModal,
-                scrollContainer,
-              )}
-              {
-                field.errorMessages
-                && (
-                  <ErrorWrapper>
-                    <Errors
-                      className="errors"
-                      model={field.model}
-                      show={(fieldValue) => fieldValue.touched || !fieldValue.pristine}
-                      messages={field.errorMessages}
-                    />
-                  </ErrorWrapper>
-                )
+      {group.fields.map((field, i) => {
+        if (!field) return null;
+        if (field.controlType !== 'info') {
+          const isContextRequiredForField =
+            !!field.dynamicValidators
+            || !!field.modifyFieldAttributes
+            || !!field.isFieldDisabled;
+          const FieldComponent = isContextRequiredForField ? FieldWithContext : FormikField;
+          return (
+            <FieldComponent
+              key={i}
+              name={field.name}
+              validate={(value, formData) => this.fieldValidation(value, field, formData)}
+              field={isContextRequiredForField ? field : null}
+            >
+              {({ field: formikField, form, meta }) => {
+                let fieldProps = this.getFieldProps(field, form, formikField);
+                return (
+                  <Field id={field.id} labelledGroup={!!field.label}>
+                    {this.renderFormField(
+                      fieldProps,
+                      false,
+                      hasEntityNewModal,
+                      scrollContainer,
+                      form
+                    )}
+                    {meta.touched && meta.error && (
+                      <ErrorWrapper>
+                        <ErrorMessage
+                          className="errors"
+                          name={formikField.name}
+                          show={(fieldValue) => fieldValue.touched || !fieldValue.pristine}
+                        />
+                      </ErrorWrapper>
+                    )}
+                  </Field>
+                );
               }
-            </Field>
-          )
-          : null)
+              }
+            </FieldComponent>
+          );
+        }
+        return (
+          <Field
+            key={field.controlType}
+            labelledGroup={!!field.label}
+          >
+            {this.renderFormField(
+              field,
+              false,
+              hasEntityNewModal,
+              scrollContainer,
+            )}
+          </Field>
+        );
+      })
       }
     </FieldGroupWrapper>
-  )
+  );
 
   renderMain = (
     fieldGroups,
@@ -345,106 +405,119 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
   render() {
     const {
       fields,
-      model,
+      handleSubmit,
+      bindHandleSubmit,
       handleCancel,
       handleSubmitFail,
       inModal,
-      validators,
       newEntityModal,
       scrollContainer,
+      formData,
     } = this.props;
     const hasEntityNewModal = !!newEntityModal;
-
     return (
       <div>
         <FormWrapper withoutShadow={inModal} hasMarginBottom={!inModal}>
-          <StyledForm
-            model={model}
-            onSubmit={this.handleSubmit}
-            onSubmitFailed={handleSubmitFail}
-            validators={validators}
+          <Formik
+            initialValues={formData}
+            onSubmit={(values) => handleSubmit(values)}
           >
-            <FormBody>
-              { fields.header && (
-                <ViewPanel>
-                  {fields.header.main && this.renderMain(
-                    fields.header.main,
-                    !!fields.header.aside,
-                    false,
-                    hasEntityNewModal,
-                    scrollContainer,
-                  )}
-                  {fields.header.aside && this.renderAside(
-                    fields.header.aside,
-                    false,
-                    hasEntityNewModal,
-                    scrollContainer,
-                  )}
-                </ViewPanel>
-              )}
-              { fields.body
-                && (
-                  <ViewPanel>
-                    {fields.body.main && this.renderMain(
-                      fields.body.main,
-                      true,
-                      true,
-                      hasEntityNewModal,
-                      scrollContainer,
+            {({ submitForm, isValid, isValidating, isSubmitting }) => {
+              bindHandleSubmit && bindHandleSubmit(submitForm);
+              return (
+                <StyledForm>
+                  <SubmitFailedHandler
+                    isValid={isValid}
+                    isValidating={isValidating}
+                    isSubmitting={isSubmitting}
+                    handleSubmitFail={() => {
+                      handleSubmitFail();
+                    }}
+                  />
+                  <FormBody>
+                    {fields.header && (
+                      <ViewPanel>
+                        {fields.header.main && this.renderMain(
+                          fields.header.main,
+                          !!fields.header.aside,
+                          false,
+                          hasEntityNewModal,
+                          scrollContainer,
+                        )}
+                        {fields.header.aside && this.renderAside(
+                          fields.header.aside,
+                          false,
+                          hasEntityNewModal,
+                          scrollContainer,
+                        )}
+                      </ViewPanel>
                     )}
-                    {fields.body.aside && this.renderAside(
-                      fields.body.aside,
-                      true,
-                      hasEntityNewModal,
-                      scrollContainer,
-                    )}
-                  </ViewPanel>
-                )
-              }
-            </FormBody>
-            <FormFooter>
-              {this.props.handleDelete && !this.state.deleteConfirmed
-                && (
-                  <DeleteWrapper>
-                    <ButtonPreDelete type="button" onClick={this.preDelete}>
-                      <Icon name="trash" sizes={{ mobile: '1.8em' }} />
-                    </ButtonPreDelete>
-                  </DeleteWrapper>
-                )
-              }
-              {this.props.handleDelete && this.state.deleteConfirmed
-                && (
-                  <FormFooterButtons left>
-                    <DeleteConfirmText>
-                      <FormattedMessage {...messages.confirmDeleteQuestion} />
-                    </DeleteConfirmText>
-                    <ButtonCancel
-                      type="button"
-                      onClick={() => this.preDelete(false)}
-                    >
-                      <FormattedMessage {...messages.buttons.cancelDelete} />
-                    </ButtonCancel>
-                    <ButtonDelete type="button" onClick={this.props.handleDelete}>
-                      <FormattedMessage {...messages.buttons.confirmDelete} />
-                    </ButtonDelete>
-                  </FormFooterButtons>
-                )
-              }
-              {!this.state.deleteConfirmed
-                && (
-                  <FormFooterButtons>
-                    <ButtonCancel type="button" onClick={handleCancel}>
-                      <FormattedMessage {...appMessages.buttons.cancel} />
-                    </ButtonCancel>
-                    <ButtonSubmit type="submit" disabled={this.props.saving}>
-                      <FormattedMessage {...appMessages.buttons.save} />
-                    </ButtonSubmit>
-                  </FormFooterButtons>
-                )
-              }
-              <Clear />
-            </FormFooter>
-          </StyledForm>
+                    {fields.body
+                      && (
+                        <ViewPanel>
+                          {fields.body.main && this.renderMain(
+                            fields.body.main,
+                            true,
+                            true,
+                            hasEntityNewModal,
+                            scrollContainer,
+                          )}
+                          {fields.body.aside && this.renderAside(
+                            fields.body.aside,
+                            true,
+                            hasEntityNewModal,
+                            scrollContainer,
+                          )}
+                        </ViewPanel>
+                      )
+                    }
+                  </FormBody>
+                  <FormFooter>
+                    {this.props.handleDelete && !this.state.deleteConfirmed
+                      && (
+                        <DeleteWrapper>
+                          <ButtonPreDelete type="button" onClick={this.preDelete}>
+                            <Icon name="trash" sizes={{ mobile: '1.8em' }} />
+                          </ButtonPreDelete>
+                        </DeleteWrapper>
+                      )
+                    }
+                    {this.props.handleDelete && this.state.deleteConfirmed
+                      && (
+                        <FormFooterButtons left>
+                          <DeleteConfirmText>
+                            <FormattedMessage {...messages.confirmDeleteQuestion} />
+                          </DeleteConfirmText>
+                          <ButtonCancel
+                            type="button"
+                            onClick={() => this.preDelete(false)}
+                          >
+                            <FormattedMessage {...messages.buttons.cancelDelete} />
+                          </ButtonCancel>
+                          <ButtonDelete type="button" onClick={this.props.handleDelete}>
+                            <FormattedMessage {...messages.buttons.confirmDelete} />
+                          </ButtonDelete>
+                        </FormFooterButtons>
+                      )
+                    }
+                    {!this.state.deleteConfirmed
+                      && (
+                        <FormFooterButtons>
+                          <ButtonCancel type="button" onClick={handleCancel}>
+                            <FormattedMessage {...appMessages.buttons.cancel} />
+                          </ButtonCancel>
+                          <ButtonSubmit type="submit" disabled={this.props.saving}>
+                            <FormattedMessage {...appMessages.buttons.save} />
+                          </ButtonSubmit>
+                        </FormFooterButtons>
+                      )
+                    }
+                    <Clear />
+                  </FormFooter>
+                </StyledForm>
+              );
+            }}
+          </Formik>
         </FormWrapper>
       </div>
     );
@@ -458,24 +531,19 @@ const mapStateToProps = (state) => ({
 EntityForm.propTypes = {
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
+  bindHandleSubmit: PropTypes.func,
   handleCancel: PropTypes.func.isRequired,
   handleDelete: PropTypes.func,
-  handleUpdate: PropTypes.func,
-  model: PropTypes.string,
   fields: PropTypes.object,
   formData: PropTypes.object,
   inModal: PropTypes.bool,
   saving: PropTypes.bool,
   newEntityModal: PropTypes.object,
-  validators: PropTypes.object,
   scrollContainer: PropTypes.object,
+  intl: PropTypes.object.isRequired,
 };
 EntityForm.defaultProps = {
   saving: false,
 };
 
-EntityForm.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
-
-export default connect(mapStateToProps)(EntityForm);
+export default injectIntl(connect(mapStateToProps)(EntityForm));

@@ -7,7 +7,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { fromJS } from 'immutable';
 import { getDefaultTaxonomy } from 'utils/taxonomies';
@@ -92,17 +92,16 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
   }
 
   /* eslint-disable react/destructuring-assignment */
-  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
+  getTaxTitle = (id) => this.props.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
 
-  getTaxDescription = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].description);
+  getTaxDescription = (id) => this.props.intl.formatMessage(appMessages.entities.taxonomies[id].description);
 
-  getTaxButtonTitle = (id) => this.context.intl.formatMessage(
+  getTaxButtonTitle = (id) => this.props.intl.formatMessage(
     appMessages.entities.taxonomies[id].shortSingle || appMessages.entities.taxonomies[id].single
   );
   /* eslint-enable react/destructuring-assignment */
 
   render() {
-    const { intl } = this.context;
     const {
       taxonomy,
       taxonomies,
@@ -115,6 +114,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
       onTaxonomyLink,
       frameworks,
       frameworkId,
+      intl,
     } = this.props;
     const reference = taxonomy && taxonomy.get('id');
     const contentTitle = (taxonomy && typeof reference !== 'undefined') ? this.getTaxTitle(reference) : '';
@@ -171,7 +171,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 }
                 <SkipContent
                   href="#sidebar-taxonomy-options"
-                  title={this.context.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
+                  title={this.props.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
                 >
                   <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
                 </SkipContent>
@@ -256,9 +256,6 @@ CategoryList.propTypes = {
   location: PropTypes.object,
   frameworks: PropTypes.object,
   frameworkId: PropTypes.string,
-};
-
-CategoryList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -309,4 +306,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoryList);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(CategoryList));

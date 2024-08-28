@@ -4,7 +4,10 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { find } from 'lodash/collection';
 import { Map, List } from 'immutable';
+import { injectIntl } from 'react-intl';
+
 import asList from 'utils/as-list';
+
 import { COLUMN_WIDTHS } from 'themes/config';
 
 import Messages from 'components/Messages';
@@ -65,8 +68,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
       || this.props.expandNo !== nextProps.expandNo;
   }
 
-  transformMessage = (type, msg) => {
-    const { intl } = this.context;
+  transformMessage = (type, msg, intl) => {
     if (type === 'delete') {
       return intl
         ? intl.formatMessage(messages.associationNotExistent)
@@ -78,7 +80,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
         : msg;
     }
     return msg;
-  }
+  };
 
   render() {
     const {
@@ -98,8 +100,8 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
       isConnection,
       isFocus,
       skipTargetId,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     return (
       <Styled expanded={expandNo > 0}>
         { error && error.map((updateError, i) => (
@@ -109,7 +111,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
             messages={
               updateError
                 .getIn(['error', 'messages'])
-                .map((msg) => this.transformMessage(updateError.get('type'), msg))
+                .map((msg) => this.transformMessage(updateError.get('type'), msg, intl))
                 .valueSeq()
                 .toArray()
             }
@@ -188,6 +190,7 @@ EntityListItem.propTypes = {
   onDismissError: PropTypes.func,
   wrapper: PropTypes.object,
   skipTargetId: PropTypes.string,
+  intl: PropTypes.object.isRequired,
 };
 
 EntityListItem.defaultProps = {
@@ -195,8 +198,4 @@ EntityListItem.defaultProps = {
   expandNo: 0,
 };
 
-EntityListItem.contextTypes = {
-  intl: PropTypes.object,
-};
-
-export default EntityListItem;
+export default injectIntl(EntityListItem);

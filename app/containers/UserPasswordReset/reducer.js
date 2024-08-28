@@ -9,7 +9,6 @@ import { fromJS } from 'immutable';
 import { checkResponseError } from 'utils/request';
 
 import { combineReducers } from 'redux-immutable';
-import { combineForms } from 'react-redux-form/immutable';
 
 import {
   RESET_PASSWORD_SENDING,
@@ -46,15 +45,6 @@ function userResetReducer(state = initialState, action) {
   }
 }
 
-
-const formData = fromJS({
-  password: '',
-  passwordConfirmation: '',
-});
-
 export default combineReducers({
   page: userResetReducer,
-  form: combineForms({
-    data: formData,
-  }, 'userPasswordReset.form'),
 });

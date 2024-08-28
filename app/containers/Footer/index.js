@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { FormattedMessage, injectIntl, intlShape } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { Box, Text, ResponsiveContext } from 'grommet';
@@ -84,13 +84,13 @@ const FooterNote = styled((p) => <Text size="xxxsmall" {...p} />)``;
 const FooterVersion = styled((p) => <Text size="xxxsmall" {...p} />)``;
 
 const Footer = ({
-  intl,
   theme,
   onPageLink,
   pages,
   fill,
   hasBorder,
 }) => {
+  const intl = useIntl();
   const size = useContext(ResponsiveContext);
   const isMobile = isMaxSize(size, 'small');
   return (
@@ -226,7 +226,6 @@ Footer.propTypes = {
   pages: PropTypes.object,
   fill: PropTypes.bool,
   hasBorder: PropTypes.bool,
-  intl: intlShape,
 };
 
 const mapStateToProps = (state) => ({
@@ -243,4 +242,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(withTheme(Footer)));
+export default connect(mapStateToProps, mapDispatchToProps)(withTheme(Footer));

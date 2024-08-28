@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
+import { injectIntl } from 'react-intl';
 
 import {
   getReferenceField,
@@ -195,7 +196,6 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
   ]);
 
   render() {
-    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -208,6 +208,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       indicatorConnections,
       onEntityClick,
       frameworks,
+      intl,
     } = this.props;
     const frameworkId = viewEntity && viewEntity.getIn(['attributes', 'framework_id']);
     const type = intl.formatMessage(
@@ -327,11 +328,9 @@ RecommendationView.propTypes = {
   params: PropTypes.object,
   isManager: PropTypes.bool,
   frameworks: PropTypes.object,
-};
-
-RecommendationView.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
+
 
 const mapStateToProps = (state, props) => ({
   isManager: selectIsUserManager(state),
@@ -363,4 +362,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RecommendationView);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(RecommendationView));

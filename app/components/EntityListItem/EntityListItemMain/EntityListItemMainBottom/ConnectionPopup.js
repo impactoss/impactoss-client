@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { injectIntl } from 'react-intl';
 // import Link from 'containers/Link';
 
 import { TEXT_TRUNCATE } from 'themes/config';
@@ -92,7 +93,7 @@ const TriangleBottom = styled.div`
   }}%;
    margin-left: -10px;
 
-   &:after {
+   &::after {
       content: "";
       position: absolute;
       width: 20px;
@@ -186,9 +187,8 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
 
   render() {
     const {
-      entities, option, wrapper, draft,
+      entities, option, wrapper, draft, intl,
     } = this.props;
-    const { intl } = this.context;
     const entitiesTotal = entities ? entities.size : 0;
     return (
       <PopupWrapper
@@ -272,10 +272,7 @@ ConnectionPopup.propTypes = {
   option: PropTypes.object,
   wrapper: PropTypes.object,
   draft: PropTypes.bool,
-};
-ConnectionPopup.contextTypes = {
-  intl: PropTypes.object,
+  intl: PropTypes.object.isRequired,
 };
 
-
-export default ConnectionPopup;
+export default injectIntl(ConnectionPopup);

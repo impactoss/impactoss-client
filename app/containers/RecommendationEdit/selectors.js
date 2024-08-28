@@ -18,10 +18,7 @@ import {
   prepareTaxonomiesMultiple,
 } from 'utils/entities';
 
-export const selectDomain = createSelector(
-  (state) => state.get('recommendationEdit'),
-  (substate) => substate
-);
+export const selectDomain = (state) => state.get('recommendationEdit');
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'recommendations', id }),

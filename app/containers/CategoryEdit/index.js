@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
 import { Map, List, fromJS } from 'immutable';
 
@@ -51,7 +51,6 @@ import {
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   deleteEntity,
   submitInvalid,
   saveErrorDismiss,
@@ -93,23 +92,17 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-
-    if (this.props.dataReady && this.props.viewEntity) {
-      this.props.initialiseForm('categoryEdit.form.data', this.getInitialFormData());
-    }
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
-    }
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.initialiseForm('categoryEdit.form.data', this.getInitialFormData(nextProps));
     }
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
@@ -119,12 +112,12 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     }
   }
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const {
-      viewEntity, users, measures, recommendationsByFw, parentOptions,
-    } = props;
-    return viewEntity
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getInitialFormData = ({ viewEntity, users, measures, recommendationsByFw, parentOptions }) =>
+    viewEntity
       ? Map({
         id: viewEntity.get('id'),
         attributes: viewEntity.get('attributes').mergeWith(
@@ -140,10 +133,8 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       // TODO allow single value for singleSelect
       })
       : Map();
-  }
 
-  getHeaderMainFields = (entity, parentOptions, parentTaxonomy) => {
-    const { intl } = this.context;
+  getHeaderMainFields = (entity, parentOptions, parentTaxonomy, intl) => {
     const groups = [];
     groups.push({ // fieldGroup
       fields: [
@@ -167,8 +158,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   };
 
 
-  getHeaderAsideFields = (entity) => {
-    const { intl } = this.context;
+  getHeaderAsideFields = (entity, intl) => {
     const fields = []; // fieldGroups
     fields.push({
       fields: [
@@ -188,7 +178,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       });
     }
     return fields;
-  }
+  };
 
   getBodyMainFields = (
     entity,
@@ -197,8 +187,8 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     measures,
     onCreateOption,
     userOnly,
+    intl,
   ) => {
-    const { intl } = this.context;
     const fields = [];
     fields.push({
       fields: [getMarkdownFormField({ formatMessage: intl.formatMessage })],
@@ -239,8 +229,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     return fields;
   };
 
-  getBodyAsideFields = (entity, users, isAdmin) => {
-    const { intl } = this.context;
+  getBodyAsideFields = (entity, users, isAdmin, intl) => {
     const fields = []; // fieldGroups
     if (isAdmin && !!entity.getIn(['taxonomy', 'attributes', 'has_manager'])) {
       fields.push({
@@ -256,10 +245,10 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     fields.push({
       fields: [
         entity.getIn(['taxonomy', 'attributes', 'has_date'])
-          && getDateField(
-            intl.formatMessage,
-            'date',
-          ),
+        && getDateField({
+          formatMessage: intl.formatMessage,
+          attribute: 'date',
+        }),
         getFormField({
           formatMessage: intl.formatMessage,
           controlType: 'url',
@@ -268,12 +257,11 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       ],
     });
     return fields;
-  }
+  };
 
-  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+  getTaxTitle = (id) => this.props.intl.formatMessage(appMessages.entities.taxonomies[id].single);
 
   render() {
-    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -287,6 +275,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       onCreateOption,
       parentOptions,
       parentTaxonomy,
+      intl,
     } = this.props;
     const reference = this.props.params.id;
     const {
@@ -325,7 +314,11 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('categoryEdit.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }] : null
             }
           />
@@ -362,9 +355,9 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           {viewEntity && dataReady && !deleteSending
             && (
               <EntityForm
-                model="categoryEdit.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   measures,
@@ -373,7 +366,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
-                handleUpdate={this.props.handleUpdate}
                 handleDelete={canUserDeleteEntities(highestRole)
                   ? () => this.props.handleDelete(viewEntity.getIn(['attributes', 'taxonomy_id']))
                   : null
@@ -384,8 +376,9 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                       viewEntity,
                       parentOptions,
                       parentTaxonomy,
+                      intl,
                     ),
-                    aside: this.getHeaderAsideFields(viewEntity),
+                    aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
@@ -394,9 +387,10 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                       recommendationsByFw,
                       measures,
                       onCreateOption,
-                      viewDomain.getIn(['form', 'data', 'attributes', 'user_only']),
+                      viewEntity.getIn(['attributes', 'user_only']),
+                      intl,
                     ),
-                    aside: this.getBodyAsideFields(viewEntity, users, isAdmin),
+                    aside: this.getBodyAsideFields(viewEntity, users, isAdmin, intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -415,12 +409,9 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 CategoryEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  initialiseForm: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
@@ -438,9 +429,6 @@ CategoryEdit.propTypes = {
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func,
-};
-
-CategoryEdit.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -467,10 +455,6 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(CATEGORY_ADMIN_MIN_ROLE));
     },
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
     },
@@ -480,10 +464,8 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, measures, recommendationsByFw, viewEntity) => {
+    handleSubmit: (formValues, measures, recommendationsByFw, viewEntity) => {
+      const formData = fromJS(formValues);
       const taxonomy = viewEntity.get('taxonomy');
       let saveData = formData;
       if (taxonomy.getIn(['attributes', 'tags_measures'])) {
@@ -554,9 +536,6 @@ function mapDispatchToProps(dispatch, props) {
     handleCancel: (reference) => {
       dispatch(updatePath(`${ROUTES.CATEGORIES}/${reference}`, { replace: true }));
     },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
-    },
     handleDelete: (taxonomyId) => {
       dispatch(deleteEntity({
         path: 'categories',
@@ -570,4 +549,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoryEdit);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(CategoryEdit));

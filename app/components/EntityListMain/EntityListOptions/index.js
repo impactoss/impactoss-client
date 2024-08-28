@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { List } from 'immutable';
@@ -73,8 +73,8 @@ export class EntityListOptions extends React.Component { // eslint-disable-line 
       expandable,
       groupOptions,
       subgroupOptions,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     return (
       <Styled>
         {groupOptions.size > 0
@@ -129,10 +129,7 @@ EntityListOptions.propTypes = {
   onExpand: PropTypes.func,
   expanded: PropTypes.bool,
   expandable: PropTypes.bool,
-};
-
-EntityListOptions.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default EntityListOptions;
+export default injectIntl(EntityListOptions);

@@ -9,10 +9,8 @@ import {
 
 import { prepareTaxonomiesMultiple } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
-export const selectDomain = createSelector(
-  (state) => state.get('measureNew'),
-  (substate) => substate
-);
+
+export const selectDomain = (state) => state.get('measureNew');
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import DebounceInput from 'react-debounce-input';
 
 import ButtonFlatWithIcon from 'components/buttons/ButtonFlatWithIcon';
@@ -90,9 +90,8 @@ class BookmarkForm extends React.PureComponent { // eslint-disable-line react/pr
 
   render() {
     const {
-      bookmark, handleUpdateTitle, handleDelete, handleCancel, isNew,
+      bookmark, handleUpdateTitle, handleDelete, handleCancel, isNew, intl,
     } = this.props;
-    const { intl } = this.context;
 
     return (
       <Styled>
@@ -183,11 +182,7 @@ BookmarkForm.propTypes = {
   handleDelete: PropTypes.func,
   handleCancel: PropTypes.func,
   isNew: PropTypes.bool,
-};
-
-BookmarkForm.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-
-export default BookmarkForm;
+export default injectIntl(BookmarkForm);

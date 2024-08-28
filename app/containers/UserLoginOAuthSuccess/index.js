@@ -6,7 +6,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 
@@ -23,7 +23,7 @@ export class UserLoginOAuthSuccess extends React.PureComponent { // eslint-disab
   }
 
   render() {
-    const { intl } = this.context;
+    const { intl } = this.props;
 
     return (
       <div>
@@ -50,9 +50,6 @@ export class UserLoginOAuthSuccess extends React.PureComponent { // eslint-disab
 UserLoginOAuthSuccess.propTypes = {
   handleForward: PropTypes.func.isRequired,
   path: PropTypes.string,
-};
-
-UserLoginOAuthSuccess.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -64,4 +61,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(null, mapDispatchToProps)(UserLoginOAuthSuccess);
+export default injectIntl(connect(null, mapDispatchToProps)(UserLoginOAuthSuccess));

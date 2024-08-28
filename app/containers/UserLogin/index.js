@@ -6,17 +6,15 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import styled from 'styled-components';
-import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
   getEmailFormField,
   getPasswordField,
 } from 'utils/forms';
-
 
 import ButtonHero from 'components/buttons/ButtonHero';
 import Messages from 'components/Messages';
@@ -36,6 +34,7 @@ import messages from './messages';
 
 import { login, loginWithAzure } from './actions';
 import { selectDomain } from './selectors';
+import { FORM_INITIAL } from './constants';
 
 const BottomLinks = styled.div`
   padding: 2em 0;
@@ -48,12 +47,9 @@ const AzureButton = styled(ButtonHero)`
 
 
 export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  UNSAFE_componentWillMount() {
-    this.props.initialiseForm();
-  }
 
   render() {
-    const { intl } = this.context;
+    const { intl } = this.props;
     const { authError, authSending } = this.props.viewDomain.get('page').toJS();
 
     const {
@@ -108,21 +104,17 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
           }
           {!ENABLE_AZURE && (
             <>
-              {this.props.viewDomain.get('form')
-                && (
-                  <AuthForm
-                    model="userLogin.form.data"
-                    sending={authSending}
-                    handleSubmit={(formData) => handleSubmit(formData)}
-                    handleCancel={handleCancel}
-                    labels={{ submit: intl.formatMessage(messages.submit) }}
-                    fields={[
-                      getEmailFormField(intl.formatMessage, '.email'),
-                      getPasswordField(intl.formatMessage, '.password'),
-                    ]}
-                  />
-                )
-              }
+              <AuthForm
+                sending={authSending}
+                handleSubmit={(formData) => handleSubmit(formData)}
+                handleCancel={handleCancel}
+                initialValues={FORM_INITIAL}
+                labels={{ submit: intl.formatMessage(messages.submit) }}
+                fields={[
+                  getEmailFormField(intl.formatMessage),
+                  getPasswordField(intl.formatMessage),
+                ]}
+              />
               <BottomLinks>
                 <p>
                   <FormattedMessage {...messages.registerLinkBefore} />
@@ -176,12 +168,8 @@ UserLogin.propTypes = {
   handleSubmitWithAzure: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
-  initialiseForm: PropTypes.func,
   onDismissQueryMessages: PropTypes.func,
   queryMessages: PropTypes.object,
-};
-
-UserLogin.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -192,11 +180,8 @@ const mapStateToProps = (state) => ({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('userLogin.form.data'));
-    },
     handleSubmit: (formData) => {
-      dispatch(login(formData.toJS()));
+      dispatch(login(formData));
       dispatch(dismissQueryMessages());
     },
     handleSubmitWithAzure: () => {
@@ -214,4 +199,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserLogin);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserLogin));

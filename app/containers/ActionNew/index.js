@@ -8,14 +8,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
 import { Map, List, fromJS } from 'immutable';
 
 import {
+  taxonomyOptions,
+  entityOptions,
   getConnectionUpdatesFromFormData,
   getTitleFormField,
-  getReferenceFormField,
   getStatusField,
   getMarkdownFormField,
   renderIndicatorControl,
@@ -23,6 +24,7 @@ import {
   getDateField,
   getTextareaField,
   renderTaxonomyControl,
+  getReferenceFormField,
 } from 'utils/forms';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
@@ -37,7 +39,6 @@ import {
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   openNewEntityModal,
   submitInvalid,
   saveErrorDismiss,
@@ -74,11 +75,11 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('measureNew.form.data', FORM_INITIAL);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -94,9 +95,20 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     }
   }
 
-  getHeaderMainFields = (existingReferences) => {
-    const { intl } = this.context;
-    return ([ // fieldGroups
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getInitialFormData = ({ taxonomies, recommendationsByFw, indicators }) =>
+    FORM_INITIAL
+      .set('associatedTaxonomies', taxonomyOptions(taxonomies))
+      .set('associatedRecommendationsByFw', recommendationsByFw
+        ? recommendationsByFw.map((recs) => entityOptions(recs, true))
+        : Map())
+      .set('associatedIndicators', entityOptions(indicators, true));
+
+  getHeaderMainFields = (existingReferences, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getReferenceFormField({
@@ -108,26 +120,23 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
         ],
       },
     ]);
-  };
 
-  getHeaderAsideFields = () => {
-    const { intl } = this.context;
-    return ([
+  getHeaderAsideFields = (intl) =>
+    ([
       {
         fields: [
           getStatusField(intl.formatMessage),
         ],
       },
     ]);
-  }
 
   getBodyMainFields = (
     connectedTaxonomies,
     indicators,
     recommendationsByFw,
     onCreateOption,
+    intl,
   ) => {
-    const { intl } = this.context;
     const groups = [];
     groups.push(
       {
@@ -177,12 +186,11 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
-    const { intl } = this.context;
-    return ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) => 
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getDateField(intl.formatMessage, 'target_date'),
+          getDateField({ formatMessage: intl.formatMessage, attribute: 'target_date' }),
           getTextareaField(intl.formatMessage, 'target_date_comment'),
         ],
       },
@@ -196,10 +204,8 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
         }),
       },
     ]);
-  }
 
   render() {
-    const { intl } = this.context;
     const {
       dataReady,
       viewDomain,
@@ -210,7 +216,9 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
       onCreateOption,
       existingReferences,
       canUserAdministerCategories,
+      intl,
     } = this.props;
+
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     return (
       <div>
@@ -236,7 +244,11 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('measureNew.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }] : null
             }
           />
@@ -264,17 +276,16 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           {dataReady
             && (
               <EntityForm
-                model="measureNew.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
-                handleUpdate={this.props.handleUpdate}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(existingReferences),
-                    aside: this.getHeaderAsideFields(),
+                    main: this.getHeaderMainFields(existingReferences, intl),
+                    aside: this.getHeaderAsideFields(intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
@@ -282,11 +293,13 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                       indicators,
                       recommendationsByFw,
                       onCreateOption,
+                      intl,
                     ),
                     aside: this.getBodyAsideFields(
                       taxonomies,
                       onCreateOption,
                       canUserAdministerCategories,
+                      intl,
                     ),
                   },
                 }}
@@ -306,11 +319,9 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
 ActionNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
@@ -318,15 +329,11 @@ ActionNew.propTypes = {
   recommendationsByFw: PropTypes.object,
   indicators: PropTypes.object,
   onCreateOption: PropTypes.func,
-  initialiseForm: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   existingReferences: PropTypes.array,
   canUserAdministerCategories: PropTypes.bool,
-};
-
-ActionNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -334,7 +341,7 @@ const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   authReady: selectReadyForAuthCheck(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  taxonomies: selectMeasureTaxonomies(state, { includeParents: false }),
+  taxonomies: selectMeasureTaxonomies(state),
   indicators: selectEntities(state, 'indicators'),
   recommendationsByFw: selectRecommendationsByFw(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
@@ -344,10 +351,6 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
@@ -363,12 +366,9 @@ function mapDispatchToProps(dispatch) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, recommendationsByFw) => {
+    handleSubmit: (formValues, recommendationsByFw) => {
+      const formData = fromJS(formValues);
       let saveData = formData;
-
       // measureCategories
       if (formData.get('associatedTaxonomies')) {
         saveData = saveData.set(
@@ -419,14 +419,10 @@ function mapDispatchToProps(dispatch) {
             })),
         }));
       }
-
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
       dispatch(updatePath(ROUTES.MEASURES), { replace: true });
-    },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
     },
     onCreateOption: (args) => {
       dispatch(openNewEntityModal(args));
@@ -434,4 +430,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(ActionNew));

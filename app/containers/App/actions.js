@@ -56,7 +56,6 @@ import {
   UPDATE_ROUTE_QUERY,
   UPDATE_PATH,
   AUTHENTICATE_FORWARD,
-  UPDATE_ENTITY_FORM,
   DUEDATE_ASSIGNED,
   DUEDATE_UNASSIGNED,
   RESET_PASSWORD,
@@ -470,13 +469,6 @@ export function updatePath(path, args) {
 export function forwardOnAuthenticationChange() {
   return {
     type: AUTHENTICATE_FORWARD,
-  };
-}
-
-export function updateEntityForm(data) {
-  return {
-    type: UPDATE_ENTITY_FORM,
-    data,
   };
 }
 

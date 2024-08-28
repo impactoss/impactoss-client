@@ -7,7 +7,6 @@ import { updatePasswordRequest } from 'utils/entities-update';
 
 import { ROUTES } from 'containers/App/constants';
 import { updatePath } from 'containers/App/actions';
-import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
   passwordSending,
@@ -22,15 +21,14 @@ export function* save({ data }) {
     yield put(passwordSending());
     yield call(updatePasswordRequest, {
       id: data.id,
-      current_password: data.attributes.password,
-      password: data.attributes.passwordNew,
-      password_confirmation: data.attributes.passwordConfirmation,
+      current_password: data.password,
+      password: data.passwordNew,
+      password_confirmation: data.passwordConfirmation,
     });
 
     yield put(passwordSuccess());
 
     yield put(updatePath(`${ROUTES.USERS}/${data.id}`));
-    yield put(formActions.reset('userPassword.form.data'));
   } catch (error) {
     error.response.json = yield error.response.json();
     yield put(passwordError(error));

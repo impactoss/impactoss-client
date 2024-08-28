@@ -147,13 +147,11 @@ export const selectConnectedTaxonomies = createSelector(
   }
 );
 
-const selectMeasuresNestedQ = createSelector(
-  (state, locationQuery) => selectMeasuresSearchQuery(state, {
+const selectMeasuresNestedQ = (state, locationQuery) =>
+  selectMeasuresSearchQuery(state, {
     searchAttributes: CONFIG.search || ['title', 'reference'],
     locationQuery,
-  }),
-  (entities) => entities
-);
+  });
 
 // nest category ids
 const selectMeasuresNestedWithCategories = createSelector(

@@ -1,13 +1,15 @@
+/* eslint-disable react/no-children-prop */
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import ReactMarkdown from 'react-markdown';
+import rehypeExternalLinks from 'rehype-external-links';
+
 import { FormattedMessage } from 'react-intl';
 
 import FieldWrap from 'components/fields/FieldWrap';
 import Label from 'components/fields/Label';
 // import appMessages from 'containers/App/messages';
-
 const Markdown = styled(ReactMarkdown)`
   font-size: ${(props) => props.theme.text.mediumTall.size};
   line-height: ${(props) => props.theme.text.mediumTall.height};
@@ -44,9 +46,9 @@ function MarkdownField({ field }) {
                 )
       }
       <Markdown
-        source={field.value}
-        linkTarget="_blank"
+        children={field.value}
         className="react-markdown"
+        rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
       />
     </FieldWrap>
   );
