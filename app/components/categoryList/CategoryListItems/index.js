@@ -59,8 +59,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       )
     );
 
-  getHeaderAttributes = (taxonomy, frameworkId) => {
-    const { intl } = this.context;
+  getHeaderAttributes = (taxonomy, frameworkId, intl) => {
     // figure out if tagged directly or via child category
     const tagsRecs = this.getTagsTax(taxonomy, 'tags_recommendations');
     const tagsMeasures = this.getTagsTax(taxonomy, 'tags_measures');
