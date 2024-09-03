@@ -7,6 +7,8 @@ import { Map, List } from 'immutable';
 import asList from 'utils/as-list';
 import { COLUMN_WIDTHS } from 'themes/config';
 
+import { Box } from 'grommet';
+
 import Messages from 'components/Messages';
 import Component from 'components/styled/Component';
 
@@ -51,9 +53,13 @@ const MainWrapper = styled(Component)`
     width: ${(props) => props.expandable ? COLUMN_WIDTHS.MAIN * 100 : 100}%;
   }
 `;
-const MainInnerWrapper = styled(Component)`
+const MainInnerWrapper = styled(Box)`
   display: table;
   width: 100%;
+  padding: 4px;
+  @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
+    padding: 0px;
+  }
 `;
 
 class EntityListItem extends React.Component { // eslint-disable-line react/prefer-stateless-function

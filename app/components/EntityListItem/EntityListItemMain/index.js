@@ -7,6 +7,8 @@ import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
 import { qe } from 'utils/quasi-equals';
 
+import { Box } from 'grommet';
+
 import Component from 'components/styled/Component';
 import SkipContent from 'components/styled/SkipContent';
 import { USER_ROLES, PROGRESS_TAXONOMY_ID, SUPPORT_LEVELS } from 'themes/config';
@@ -16,16 +18,8 @@ import EntityListItemMainTop from './EntityListItemMainTop';
 import EntityListItemMainTitle from './EntityListItemMainTitle';
 import EntityListItemMainBottom from './EntityListItemMainBottom';
 
-const Styled = styled(Component)`
-  position: relative;
-  padding-left: 0;
+const StyledBox = styled((p) => <Box {...p} />)`
   box-shadow: ${({ isConnection }) => isConnection ? '0px 0px 6px 0px rgba(0,0,0,0.2)' : 'none'};
-  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
-    padding-left: ${(props) => (!props.theme.sizes || props.isManager)
-    ? 0
-    : props.theme.sizes.mainListItem.paddingHorizontal
-}px;
-  }
   @media print {
     box-shadow: none;
     padding-left: 0;
@@ -262,13 +256,19 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       onEntityClick,
       taxonomies,
       skipTargetId,
+      isManager,
+      isConnection,
     } = this.props;
 
     const entity = this.mapToEntityListItem(this.props);
 
     const bottomTaxonomies = taxonomies && taxonomies.filter((tax) => !qe(tax.get('id'), PROGRESS_TAXONOMY_ID));
+
     return (
-      <Styled isManager={this.props.isManager} isConnection={this.props.isConnection}>
+      <StyledBox
+        isConnection={isConnection}
+        pad={{ left: !isManager || isConnection ? 'small' : 0 }}
+      >
         <Wrapper>
           <EntityListItemMainTitleWrap
             id={`list-item-${entity.id}`}
@@ -311,7 +311,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             )
           }
         </Wrapper>
-      </Styled>
+      </StyledBox>
     );
   }
 }
