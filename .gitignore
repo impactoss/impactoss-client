@@ -13,3 +13,6 @@ npm-debug.log
 .idea
 
 nbproject/
+
+*storybook.log
+storybook-static
