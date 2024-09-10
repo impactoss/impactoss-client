@@ -22,6 +22,7 @@ import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 import EntityListPrintKey from 'components/EntityListPrintKey';
 import EntityListMain from 'components/EntityListMain';
 import EntityListDownload from 'components/EntityListDownload';
+import Footer from 'containers/Footer';
 import PrintOnly from 'components/styled/PrintOnly';
 
 import {
@@ -297,6 +298,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               config={this.props.config}
               locationQuery={this.props.locationQuery}
             />
+            <Footer hasBorder />
           </PrintOnly>
         )}
         {(progress !== null && progress < 100)
