@@ -23,6 +23,7 @@ import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
 import PrintOnly from 'components/styled/PrintOnly';
 import Footer from 'containers/Footer';
+import PrintHide from 'components/styled/PrintHide';
 
 import { CONTENT_LIST, PARAMS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -324,7 +325,9 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
             )}
           </StyledContent>
         </Container>
-        <Footer hasBorder />
+        <PrintHide>
+          <Footer hasBorder />
+        </PrintHide>
       </ContainerWrapperSidebar>
     );
   }
