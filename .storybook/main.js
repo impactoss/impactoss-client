@@ -7,7 +7,6 @@ const config = {
   stories: [
     '../stories/**/*.mdx',
     '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
-    // '../app/components/buttons/ButtonDefault/*.@(js|md)'
   ],
   addons: [
     '@storybook/addon-webpack5-compiler-swc',
