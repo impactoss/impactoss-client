@@ -12,7 +12,6 @@ import globalReducer from 'containers/App/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import entityNewReducer from 'containers/EntityNew/reducer';
 import entityListReducer from 'containers/EntityList/reducer';
-import entityListFormReducer from 'containers/EntityListForm/reducer';
 
 /*
  * routeReducer
@@ -37,12 +36,12 @@ function routeReducer(state = routeInitialState, action) {
     case LOGOUT_SUCCESS:
       return routeInitialState;
     case LOCATION_CHANGE: {
-      return state.merge({
+      return state.merge(fromJS({
         locationBeforeTransitions: {
           ...action.payload,
           pathnamePrevious: state.getIn(['locationBeforeTransitions', 'pathname']),
         },
-      });
+      }));
     }
     default:
       return state;
@@ -59,7 +58,6 @@ export default function createReducer(asyncReducers) {
     language: languageProviderReducer,
     entityNew: entityNewReducer,
     entityList: entityListReducer,
-    entityListForm: entityListFormReducer,
     ...asyncReducers,
   });
 }

@@ -9,8 +9,6 @@ import { fromJS } from 'immutable';
 import { checkResponseError } from 'utils/request';
 
 import { combineReducers } from 'redux-immutable';
-import { combineForms } from 'react-redux-form/immutable';
-
 
 import {
   RECOVER_SENDING,
@@ -47,13 +45,6 @@ function passwordRecoverReducer(state = initialState, action) {
   }
 }
 
-const formData = fromJS({
-  email: '',
-});
-
 export default combineReducers({
   page: passwordRecoverReducer,
-  form: combineForms({
-    data: formData,
-  }, 'userPasswordRecover.form'),
 });

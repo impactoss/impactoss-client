@@ -3,8 +3,8 @@ import { toLower as loCase } from 'lodash/string';
 import { lowerCase } from 'utils/string';
 import {
   testEntityCategoryAssociation,
-  attributesEqual,
 } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 import isNumber from 'utils/is-number';
 import { getEntitySortComparator } from 'utils/sort';
 
@@ -22,14 +22,14 @@ export const groupEntities = (
   frameworks,
 ) => subgroupSelectValue
   ? makeEntityGroups(
-      entities,
-      taxonomies,
-      connectedTaxonomies,
-      config,
-      groupSelectValue,
-      contextIntl,
-      frameworks,
-    )
+    entities,
+    taxonomies,
+    connectedTaxonomies,
+    config,
+    groupSelectValue,
+    contextIntl,
+    frameworks,
+  )
     .map((group) => group
       .set(
         'entityGroups',
@@ -43,8 +43,7 @@ export const groupEntities = (
           frameworks,
         )
       )
-      .delete('entities')
-    )
+      .delete('entities'))
   : makeEntityGroups(
     entities,
     taxonomies,
@@ -70,8 +69,7 @@ const makeEntityGroups = (
   }
   return List().push(Map({ entities }));
 };
-const getCategoryLabel = (cat) =>
-  cat.getIn(['attributes', 'reference'])
+const getCategoryLabel = (cat) => cat.getIn(['attributes', 'reference'])
   ? `${cat.getIn(['attributes', 'reference'])} ${cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name'])}`
   : cat.getIn(['attributes', 'title']) || cat.getIn(['attributes', 'name']);
 
@@ -83,18 +81,17 @@ export const makeTaxonomyGroups = (entities, taxonomy, contextIntl, frameworks) 
     let hasTaxCategory = false;
     // if entity has taxonomies
     const checkFrameworks = (
-      frameworks &&
-      taxonomy.get('frameworkIds') &&
-      !!entity.getIn(['attributes', 'framework_id'])
+      frameworks
+      && taxonomy.get('frameworkIds')
+      && !!entity.getIn(['attributes', 'framework_id'])
     );
-    const taxNotApplicable =
-      checkFrameworks &&
-      !taxonomy.get('frameworkIds').find(
-        (id) => attributesEqual(id, entity.getIn(['attributes', 'framework_id'])),
+    const taxNotApplicable = checkFrameworks
+      && !taxonomy.get('frameworkIds').find(
+        (id) => qe(id, entity.getIn(['attributes', 'framework_id'])),
       );
     if (
-      !taxNotApplicable &&
-      entity.get('categories')
+      !taxNotApplicable
+      && entity.get('categories')
     ) {
       // add categories from entities if not present otherwise increase count
       taxonomy.get('categories').forEach((cat, catId) => {
@@ -149,7 +146,7 @@ export const makeTaxonomyGroups = (entities, taxonomy, contextIntl, frameworks) 
         }));
       }
     }
-  });  // for each entities
+  }); // for each entities
   return groups.sortBy(
     (group) => group.get('order'),
     (a, b) => getEntitySortComparator(a, b, 'asc')

@@ -6,12 +6,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
+import HelmetCanonical from 'components/HelmetCanonical';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import ReactMarkdown from 'react-markdown';
+import rehypeExternalLinks from 'rehype-external-links';
+
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
-import Grid from 'grid-styled';
+import { Box } from 'grommet';
 import Row from 'components/styled/Row';
 import Container from 'components/styled/Container';
 
@@ -25,59 +27,62 @@ import Loading from 'components/Loading';
 import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 import {
   SHOW_HOME_TITLE,
   SHOW_BRAND_ON_HOME,
-  HEADER_PATTERN_HEIGHT,
-  SHOW_HEADER_PATTERN_HOME_GRAPHIC,
 } from 'themes/config';
 
 import { DEPENDENCIES } from './constants';
 
 import messages from './messages';
 
+/* eslint-disable react/no-children-prop */
+
+const StyledRow = styled(Row)`
+  display: flex;
+`;
 const GraphicHomeWrapper = styled.div`
   width: 100%;
   padding-top: ${(props) => props.hasBrand
     ? props.theme.sizes.header.banner.heightMobile
     : 0
-  }px;
+}px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-top: ${(props) => props.hasBrand
-      ? props.theme.sizes.header.banner.height
-      : 0
-    }px;
+    ? props.theme.sizes.header.banner.height
+    : 0
+}px;
   }
-  background-image: ${(props) => (props.showPattern && props.theme.backgroundImages.header)
-    ? props.theme.backgroundImages.header
-    : 'none'
-  };
-  background-repeat: repeat;
-  background-size: ${HEADER_PATTERN_HEIGHT}px auto;
 `;
 
 const GraphicHome = styled(NormalImg)`
   width: 100%;
-  max-width: 1200px;
+  max-width: 600px;
 `;
 
 const SectionTop = styled.div`
-  min-height: ${(props) => props.hasBrand ? 0 : '100vH'};
-  display: ${(props) => props.hasBrand ? 'static' : 'table'};
+  min-height: ${(props) => props.hasBrand ? 0 : '80vH'};
+  display: ${(props) => props.hasBrand ? 'block' : 'table'};
   width: ${(props) => props.hasBrand ? 'auto' : '100%'};
   background-color: ${palette('home', 0)};
   color: ${palette('homeIntro', 0)};
   text-align: center;
+  @media print {
+    background-color: transparent;
+    color: ${palette('text', 0)};
+    display: block;
+    min-height: auto;
+  }
 `;
 
 const SectionWrapper = styled.div`
-  display: ${(props) => props.hasBrand ? 'static' : 'table-cell'};
+  display: ${(props) => props.hasBrand ? 'block' : 'table-cell'};
   vertical-align: ${(props) => props.hasBrand ? 'baseline' : 'middle'};
-  padding-bottom: 3em;
+  padding-bottom: 2em;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding-bottom: 6em;
+    padding-bottom: 3em;
   }
 `;
 
@@ -87,30 +92,21 @@ const HomeActions = styled.div`
     padding-top: 2em;
   }
 `;
-const Title = styled.h1`
-  color:${palette('headerBrand', 0)};
-  font-family: ${(props) => props.theme.fonts.title};
-  font-size: ${(props) => props.theme.sizes.home.text.titleMobile};
-  margin-top: 0.5em;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    font-size: ${(props) => props.theme.sizes.home.text.title};
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    margin-top: 1em;
-  }
-`;
 
-const Claim = styled.p`
-  color: ${palette('headerBrand', 1)};
+const Claim = styled.h2`
+  color: ${palette('headerBrand', 0)};
   font-family: ${(props) => props.theme.fonts.claim};
   font-size: ${(props) => props.theme.sizes.home.text.claimMobile};
-  font-weight: 100;
   margin-left: auto;
   margin-right: auto;
   line-height: 1.3;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.theme.sizes.home.text.claim};
-    margin-bottom: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.home.print.claim};
+    color: ${palette('primary', 0)}
   }
 `;
 
@@ -125,132 +121,200 @@ const Intro = styled(ReactMarkdown)`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     font-size: 1.25em;
   }
-`;
-const GridSpace = styled(Grid)`
-  display: none !important;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    display: inline-block;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
   }
 `;
-const StyledButtonHero = styled(ButtonHero)`
-  max-width: 250px;
+const GridSpace = styled((p) => <Box {...p} />)`
+  @media (min-width: 0px) {
+    display: none !important;
+  }
+  @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
+    display: inline-block !important;
+    flex-basis: ${({ flexBasis }) => flexBasis || '15'}%;
+  }
+`;
+const StyledBox = styled((p) => <Box {...p} />)`
+  display: inline-block;
+  vertical-align: top;
+  padding-left: 32px;
+  padding-right: 32px;
+  @media (min-width: 0px) {
+    flex-basis: 100%;
+  }
+  @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
+    flex-basis: 70%;
+  }
+`;
+
+const FrameworkButtonGrid = styled(Box)`
+  display: inline-block !important;
+  width: auto !important;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: flex !important;
+    width: 100% !important;
+    justify-content: center;
+  }
+`;
+
+const FrameworkButton = styled(ButtonHero)`
+  max-width: ${({ single }) => single ? 'auto' : '250px'};
+  width: 100%;
+  display: block;
+  margin-bottom: 10px;
+  min-width: auto;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: inline-block;
+    margin-bottom: 0;
+    min-width: auto;
+    width: ${({ single }) => single ? 'auto' : '250px'};
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.small};
+    color: ${palette('primary', 0)};
+    background: transparent;
+    border: 1px solid ${palette('light', 3)};
+    border-radius: 10px;
+    max-width: ${({ count }) => count ? ((100 / count) - 2) : 100}%;
+    min-width: auto;
+    margin: 0 1%;
+  }
 `;
 
 const StyledButtonFlat = styled(ButtonFlat)`
   color: ${palette('homeIntro', 0)};
+  @media print {
+    color: ${palette('text', 1)};
+    text-decoration: underline;
+  }
+`;
+const FrameworkHint = styled.div`
+  font-size: ${({ theme }) => theme.sizes.text.small};
 `;
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
   render() {
-    const { theme, frameworks, onSelectFramework, onPageLink, signingIn, dataReady } = this.props;
-    const appTitle = `${this.context.intl.formatMessage(appMessages.app.title)} - ${this.context.intl.formatMessage(appMessages.app.claim)}`;
+    const {
+      theme, frameworks, onSelectFramework, onPageLink, signingIn, dataReady, intl,
+    } = this.props;
+    const appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
     return (
       <div>
-        <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+        <HelmetCanonical
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
-          <SectionWrapper hasBrand={SHOW_BRAND_ON_HOME}>
-            <GraphicHomeWrapper
-              hasBrand={SHOW_BRAND_ON_HOME}
-              showPattern={SHOW_HEADER_PATTERN_HOME_GRAPHIC}
-            >
-              <GraphicHome src={theme.media.graphicHome} alt={this.context.intl.formatMessage(appMessages.app.title)} />
-            </GraphicHomeWrapper>
-            { !SHOW_HOME_TITLE &&
-              <GraphicHome src={theme.media.titleHome} alt={appTitle} />
-            }
-            <Container noPaddingBottom >
-              { SHOW_HOME_TITLE &&
-                <Row>
-                  <GridSpace lg={1 / 8} />
-                  <Grid lg={3 / 4} sm={1}>
-                    <Title>
-                      <FormattedMessage {...appMessages.app.title} />
-                    </Title>
+        <Container noPaddingBottom>
+          <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
+            <SectionWrapper hasBrand={SHOW_BRAND_ON_HOME}>
+              <GraphicHomeWrapper
+                hasBrand={SHOW_BRAND_ON_HOME}
+              >
+                <GraphicHome src={theme.media.graphicHome} alt={intl.formatMessage(appMessages.app.title)} />
+              </GraphicHomeWrapper>
+              { !SHOW_HOME_TITLE
+                && <GraphicHome src={theme.media.titleHome} alt={appTitle} />
+              }
+              {SHOW_HOME_TITLE && (
+                <StyledRow>
+                  <GridSpace flexBasis="12.5" />
+                  <StyledBox>
                     <Claim>
                       <FormattedMessage {...appMessages.app.claim} />
                     </Claim>
-                  </Grid>
-                </Row>
-              }
-              <Row>
-                <GridSpace lg={1 / 6} sm={1 / 8} />
-                <Grid lg={2 / 3} sm={3 / 4} xs={1}>
-                  <Intro source={this.context.intl.formatMessage(messages.intro)} />
-                </Grid>
-              </Row>
+                  </StyledBox>
+                </StyledRow>
+              )}
+              <StyledRow>
+                <GridSpace />
+                <StyledBox>
+                  <Intro
+                    children={intl.formatMessage(messages.intro)}
+                    rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
+                  />
+                </StyledBox>
+              </StyledRow>
               <HomeActions>
                 {(signingIn || !dataReady) && (
-                  <Row space>
-                    <GridSpace lg={1 / 6} sm={1 / 8} />
-                    <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                  <StyledRow>
+                    <GridSpace />
+                    <StyledBox>
                       <Loading />
-                    </Grid>
-                  </Row>
+                    </StyledBox>
+                  </StyledRow>
                 )}
                 {(signingIn || !dataReady) && (
-                  <Row space>
-                    <GridSpace lg={1 / 6} sm={1 / 8} />
-                    <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                  <StyledRow>
+                    <GridSpace />
+                    <StyledBox>
                       {signingIn && (
                         <FormattedMessage {...messages.signingIn} />
                       )}
                       {!signingIn && (
                         <FormattedMessage {...messages.loading} />
                       )}
-                    </Grid>
-                  </Row>
+                    </StyledBox>
+                  </StyledRow>
                 )}
                 {dataReady && !signingIn && frameworks.size > 1 && (
-                  <span>
-                    <Row>
-                      <GridSpace lg={1 / 6} sm={1 / 8} />
-                      <Grid lg={2 / 3} sm={3 / 4} xs={1}>
-                        <FormattedMessage {...messages.selectFramework} />
-                      </Grid>
-                    </Row>
-                    <Row space>
-                      <Grid lg={1} sm={1} xs={1}>
+                  <span role="navigation" aria-label="Primary">
+                    <StyledRow>
+                      <GridSpace />
+                      <StyledBox>
+                        <FrameworkHint>
+                          <FormattedMessage {...messages.selectFramework} />
+                        </FrameworkHint>
+                      </StyledBox>
+                    </StyledRow>
+                    <StyledRow>
+                      <FrameworkButtonGrid>
                         {frameworks.entrySeq().map(([key, fw]) => (
-                          <StyledButtonHero space key={key} onClick={() => onSelectFramework(fw.get('id'))}>
+                          <FrameworkButton
+                            space
+                            key={key}
+                            onClick={() => onSelectFramework(fw.get('id'))}
+                            count={frameworks.size}
+                          >
                             <FormattedMessage {...appMessages.frameworks[fw.get('id')]} />
-                          </StyledButtonHero>
+                          </FrameworkButton>
                         ))}
-                      </Grid>
-                    </Row>
-                    <Row space>
-                      <GridSpace lg={1 / 6} sm={1 / 8} />
-                      <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                      </FrameworkButtonGrid>
+                    </StyledRow>
+                    <StyledRow>
+                      <GridSpace />
+                      <StyledBox>
                         <StyledButtonFlat onClick={() => onSelectFramework('all')}>
                           <FormattedMessage {...messages.exploreAllFrameworks} />
                         </StyledButtonFlat>
-                      </Grid>
-                    </Row>
+                      </StyledBox>
+                    </StyledRow>
                   </span>
                 )}
                 {dataReady && !signingIn && frameworks.size === 1 && (
-                  <Row space>
-                    <GridSpace lg={1 / 6} sm={1 / 8} />
-                    <Grid lg={2 / 3} sm={3 / 4} xs={1}>
-                      <ButtonHero onClick={() => onPageLink(PATHS.OVERVIEW)}>
+                  <StyledRow>
+                    <GridSpace />
+                    <StyledBox role="navigation" aria-label="Primary">
+                      <FrameworkButton
+                        single
+                        onClick={() => onPageLink(ROUTES.OVERVIEW)}
+                        count={1}
+                      >
                         <FormattedMessage {...messages.explore} />
-                      </ButtonHero>
-                    </Grid>
-                  </Row>
+                      </FrameworkButton>
+                    </StyledBox>
+                  </StyledRow>
                 )}
               </HomeActions>
-            </Container>
-          </SectionWrapper>
-        </SectionTop>
-        <Footer />
+            </SectionWrapper>
+          </SectionTop>
+        </Container>
+        <Footer fill />
       </div>
     );
   }
@@ -264,9 +328,6 @@ HomePage.propTypes = {
   frameworks: PropTypes.object,
   signingIn: PropTypes.bool,
   dataReady: PropTypes.bool,
-};
-
-HomePage.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -286,7 +347,7 @@ function mapDispatchToProps(dispatch) {
     },
     onSelectFramework: (framework) => {
       dispatch(updatePath(
-        PATHS.OVERVIEW,
+        ROUTES.OVERVIEW,
         {
           query: {
             arg: 'fw',
@@ -301,4 +362,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 // Wrap the component to inject dispatch and state into it
-export default connect(mapStateToProps, mapDispatchToProps)(withTheme(HomePage));
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(withTheme(HomePage)));

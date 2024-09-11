@@ -7,52 +7,61 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
-import { Map, fromJS } from 'immutable';
-import { FormattedMessage } from 'react-intl';
+import { fromJS } from 'immutable';
+import { FormattedMessage, injectIntl } from 'react-intl';
+import { Box, Text } from 'grommet';
+import { FormUp, FormDown } from 'grommet-icons';
+import ReactMarkdown from 'react-markdown';
 
 import { startsWith } from 'utils/string';
+import qe from 'utils/quasi-equals';
 
-import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded,
+  updatePath,
+  showSettingsModal,
+} from 'containers/App/actions';
+
 import {
   selectReady,
+  selectSettingsConfig,
+  selectSettingsFromQuery,
 } from 'containers/App/selectors';
-import { CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
+
+import { CONTENT_LIST } from 'containers/App/constants';
+import { SEARCH } from 'themes/config';
 
 import Button from 'components/buttons/Button';
-import ContainerWithSidebar from 'components/styled/Container/ContainerWithSidebar';
-import Container from 'components/styled/Container';
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
-import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 import TagSearch from 'components/TagSearch';
-import Scrollable from 'components/styled/Scrollable';
-import Sidebar from 'components/styled/Sidebar';
-import SidebarHeader from 'components/styled/SidebarHeader';
-import SidebarGroupLabel from 'components/styled/SidebarGroupLabel';
-import SupTitle from 'components/SupTitle';
-import Component from 'components/styled/Component';
+import EntityListItem from 'components/EntityListItem';
+import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
+import Container from 'components/styled/Container';
+import A from 'components/styled/A';
 import Content from 'components/styled/Content';
+import Description from 'components/styled/Description';
 
-
-// import EntityListItem from 'components/EntityListItem';
-import EntityListHeader from 'components/EntityListMain/EntityListGroups/EntityListHeader';
-import EntityListItemWrapper from 'components/EntityListMain/EntityListGroups/EntityListItems/EntityListItemWrapper';
+import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
-// import { PATHS } from 'containers/App/constants';
 
 import { DEPENDENCIES } from './constants';
-import { selectEntitiesByQuery } from './selectors';
+
+import {
+  selectEntitiesByQuery,
+  selectPathQuery,
+} from './selectors';
+
 import {
   updateQuery,
   resetSearchQuery,
   updateSortBy,
   updateSortOrder,
 } from './actions';
-// import { selectConnections, selectMeasures, selectConnectedTaxonomies } from './selectors';
 
 import messages from './messages';
 
@@ -60,84 +69,28 @@ const EntityListSearch = styled.div`
   padding: 0 0 2em;
 `;
 
-const Group = styled.div`
-  border-bottom: ${(props) => props.hasBorder ? '1px solid' : 0};
-  border-color: ${(props) => props.expanded ? palette('aside', 0) : palette('light', 2)};
-  &:last-child {
-    border-bottom: 0;
-  }
-`;
-
-const ScrollableWrapper = styled(Scrollable)`
-  background-color: ${palette('aside', 0)};
-`;
-
-// TODO compare EntityListSidebarOption
 const Target = styled(Button)`
   display: table;
   width: 100%;
-  padding: 0.3em 8px 0.3em 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+  padding: 0 12px;
   text-align: left;
-  color:  ${(props) => {
-    if (props.disabled) {
-      return props.active ? palette('asideListItem', 1) : palette('dark', 4);
-    }
-    return props.active ? palette('asideListItem', 1) : palette('asideListItem', 0);
-  }};
-  background-color: ${(props) => props.active ? palette('asideListItem', 3) : palette('asideListItem', 2)};
-  border-bottom: 1px solid ${palette('asideListItem', 4)};
+  color: ${palette('asideListGroup', 0)};
+  background-color: ${palette('light', 1)};
   &:hover {
-    color: ${(props) => {
-      if (props.disabled) {
-        return props.active ? palette('asideListItem', 1) : palette('dark', 4);
-      }
-      return props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0);
-    }};
-    background-color: ${(props) => {
-      if (props.disabled) {
-        return props.active ? palette('asideListItem', 3) : palette('asideListItem', 2);
-      }
-      return props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2);
-    }};
-    border-bottom-color: ${palette('asideListItemHover', 4)}
+    color: ${palette('text', 0)};
+    background-color: ${palette('light', 2)};
   }
-  &:last-child {
-    border-bottom: 0;
+  border-bottom: 1px solid ${palette('asideListGroup', 1)};
+  margin-bottom: 8px;
+  @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
+    font-size: 0.85em;
   }
-  font-size: 0.85em;
-  font-weight: ${(props) => props.active ? 'bold' : 'normal'};
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding: 0.4em 20px 0.4em 24px
+  @media print {
+    font-size: ${({ theme }) => theme.sizes.print.smaller};
   }
-`;
-
-const TargetTitle = styled.div`
-  vertical-align: middle;
-  display: table-cell;
-  width: 99%;
-`;
-// font-size: ${(props) => props.theme.sizes.text.aaLargeBold};
-const TargetCount = styled.div`
-  padding-left: 5px;
-  width: 32px;
-  display: table-cell;
-  vertical-align: middle;
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding-right: 5px;
-  }
-`;
-
-const Count = styled.div`
-  color:  ${(props) => (props.active || props.disabled) ? 'inherit' : palette('dark', 3)};
-  background-color: ${(props) => {
-    if (props.active) return 'inherit';
-    return props.disabled ? 'transparent' : palette('light', 0);
-  }};
-  border-radius: 999px;
-  padding: 3px;
-  font-size: 0.85em;
-  text-align: center;
-  min-width: 32px;
+  cursor: ${({ disabled }) => disabled ? 'default' : 'pointer'};
 `;
 
 const ListHint = styled.div`
@@ -145,101 +98,50 @@ const ListHint = styled.div`
   padding-bottom: 10px;
 `;
 const ListWrapper = styled.div``;
-const ListEntitiesMain = styled.div`
-  padding-top: 0.5em;
-`;
-const TargetsMobile = styled.div`
-  padding-bottom: 20px;
+
+const SettingsLink = styled(A)`
+  color: #ba5d03;
+  &:hover {
+    color: #ba5d03;
+    text-decoration: underline;
+  }
 `;
 
-const STATE_INITIAL = {
-  viewport: null,
-};
+const Markdown = styled(ReactMarkdown)`
+  font-size: 1em;
+  display: inline;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
+`;
+
 
 export class Search extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor(props) {
-    super(props);
-    this.state = STATE_INITIAL;
-  }
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  componentDidMount() {
-    this.updateViewport();
-    window.addEventListener('resize', this.resize);
-  }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
   }
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.resize);
-  }
 
-  getTargetTitle = (target) => {
+  getTargetTitle = (target, isSingle, intl) => {
     if (startsWith(target.get('path'), 'taxonomies')) {
-      return appMessages.entities.taxonomies[target.get('taxId')];
+      return intl.formatMessage(
+        appMessages.entities.taxonomies[target.get('taxId')][isSingle ? 'single' : 'plural']
+      );
     }
-    return appMessages.entities[target.get('path')];
-  }
-  updateViewport() {
-    let viewport = VIEWPORTS.MOBILE;
-    if (window.innerWidth >= parseInt(this.props.theme.breakpoints.large, 10)) {
-      viewport = VIEWPORTS.LARGE;
-    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.medium, 10)) {
-      viewport = VIEWPORTS.MEDIUM;
-    } else if (window.innerWidth >= parseInt(this.props.theme.breakpoints.small, 10)) {
-      viewport = VIEWPORTS.SMALL;
-    }
-    this.setState({ viewport });
-  }
-  resize = () => {
-    // reset
-    this.setState(STATE_INITIAL);
-    this.updateViewport();
-    this.forceUpdate();
+    return intl.formatMessage(
+      appMessages.entities[target.get('path')][isSingle ? 'single' : 'plural']
+    );
   };
 
-  renderSearchTargets = (includeEmpty = true) => (
-    <div>
-      { this.props.entities && this.props.entities.map((group) => (
-        <Group key={group.get('group')} hasBorder={includeEmpty}>
-          { includeEmpty &&
-            <SidebarGroupLabel>
-              <FormattedMessage {...messages.groups[group.get('group')]} />
-            </SidebarGroupLabel>
-          }
-          <div>
-            {
-              group.get('targets') && group.get('targets').entrySeq().map(([i, target]) =>
-                (includeEmpty || target.get('results').size > 0 || target.get('active')) && (
-                  <Target
-                    key={i}
-                    onClick={(evt) => {
-                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                      this.props.onTargetSelect(target.get('path'));
-                    }}
-                    active={target.get('active')}
-                    disabled={target.get('results').size === 0}
-                  >
-                    <TargetTitle>
-                      {this.getTargetTitle(target) && this.context.intl.formatMessage(this.getTargetTitle(target).pluralLong || this.getTargetTitle(target).plural)}
-                    </TargetTitle>
-                    <TargetCount>
-                      <Count active={target.get('active')} disabled={target.get('results').size === 0}>
-                        {target.get('results').size}
-                      </Count>
-                    </TargetCount>
-                  </Target>
-              ))
-            }
-          </div>
-        </Group>
-      ))}
-    </div>
-  );
+  focusResults = () => {
+    if (this.searchResults) this.searchResults.focus();
+  };
 
   render() {
     const {
@@ -249,150 +151,248 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
       onClear,
       entities,
       onEntityClick,
-      onSortOrder,
-      onSortBy,
+      activeTargetPath,
+      onShowSettingsModal,
+      settings,
+      settingsFromQuery,
+      intl,
     } = this.props;
-    const activeTarget = entities.reduce((memo, group) =>
-        group.get('targets').find((target) => target.get('active')) || memo
-      , Map());
+    const hasQuery = !!location.query.search;
+    const countResults = dataReady && hasQuery && entities && entities.reduce(
+      (memo, group) => group.get('targets').reduce(
+        (memo2, target) => target.get('results')
+          ? memo2 + target.get('results').size
+          : memo2,
+        memo,
+      ),
+      0
+    );
+    const countTargets = dataReady && hasQuery && entities && entities.reduce(
+      (memo, group) => group.get('targets').reduce(
+        (memo2, target) => {
+          if (target.get('results') && target.get('results').size > 0) {
+            return memo2 + 1;
+          }
+          return memo2;
+        },
+        memo,
+      ),
+      0,
+    );
+    const hasEntry = location.query && location.query.search;
+    const noEntry = !hasEntry;
 
-    const hasResults = location.query.search
-      && activeTarget.get('results')
-      && activeTarget.get('results').size > 0;
+    const hasResults = hasEntry
+      && entities.reduce(
+        (memo, group) => group.get('targets').find(
+          (target) => target.get('results') && target.get('results').size > 0
+        ) || memo,
+        false,
+      );
+    const isQueryMinLength = hasEntry
+      && location.query.search.length > SEARCH.MIN_LENGTH;
 
-    const noResults = location.query.search
-      && (!activeTarget.get('results') || activeTarget.get('results').size === 0);
+    const noResults = isQueryMinLength && !hasResults;
 
-    const noResultsNoAlternative = noResults
-      && !entities.reduce((memo, group) =>
-        group.get('targets').find((target) =>
-          target.get('results') && target.get('results').size > 0
-        ) || memo
-      , false);
+    const headerButtons = [{
+      type: 'icon',
+      onClick: () => window.print(),
+      title: intl.formatMessage(appMessages.buttons.printTitle),
+      icon: 'print',
+    }];
 
-    const noEntry = !location.query.search;
+    // check if there are any settings available
+    const availableSettings = dataReady
+      && settings
+      && settings.filter((option) => !!option.get('available'));
+
+    // prepare a markdown message from available settings
+    const settingsHintContent = dataReady
+      && availableSettings
+      && availableSettings.reduce((memo, option, key) => {
+        const message = intl.formatMessage(
+          messages[key],
+          { active: settingsFromQuery[key] },
+        );
+        if (memo.length === 0) {
+          return `**${message}**`;
+        }
+        // TODO consider comma instead of and when not last item
+        return `${memo} ${intl.formatMessage(messages.and)} **${message}**`;
+      }, '');
 
     return (
       <div>
-        <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+        <HelmetCanonical
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        { !dataReady &&
-          <EntityListSidebarLoading responsiveSmall />
-        }
-        { dataReady && this.state.viewport && this.state.viewport !== VIEWPORTS.MOBILE &&
-          <div>
-            <Sidebar responsiveSmall >
-              <ScrollableWrapper>
-                <Component>
-                  <SidebarHeader responsiveSmall>
-                    <SupTitle title={this.context.intl.formatMessage(messages.sidebarTitle)} />
-                  </SidebarHeader>
-                  {
-                    this.renderSearchTargets(true)
-                  }
-                </Component>
-              </ScrollableWrapper>
-            </Sidebar>
-          </div>
-        }
-        <ContainerWithSidebar sidebarResponsiveSmall>
+        <ContainerWrapper>
           <Container>
             <Content>
               <ContentHeader
                 type={CONTENT_LIST}
-                supTitle={this.context.intl.formatMessage(messages.pageTitle)}
-                title={this.context.intl.formatMessage(messages.search)}
+                supTitle={intl.formatMessage(messages.pageTitle)}
+                title={intl.formatMessage(messages.search)}
                 icon="search"
+                buttons={headerButtons}
               />
-              { !dataReady &&
-                <Loading />
-              }
-              { dataReady &&
+              {!dataReady && <Loading />}
+              {dataReady && (
                 <div>
+                  {availableSettings && availableSettings.size > 0 && (
+                    <Description as="div">
+                      <Markdown
+                        className="react-markdown react-markdown-search"
+                        disallowedTypes={['paragraph']}
+                        unwrapDisallowed
+                        source={intl.formatMessage(messages.settingsHint, { settingsHintContent })}
+                      />
+                      {' '}
+                      <FormattedMessage
+                        {...messages.settingsHint2}
+                        values={{
+                          settingsLink: (
+                            <SettingsLink
+                              onClick={() => onShowSettingsModal()}
+                            >
+                              <FormattedMessage {...messages.settingsLinkAnchor} />
+                            </SettingsLink>
+                          ),
+                        }}
+                      />
+                    </Description>
+                  )}
                   <EntityListSearch>
                     <TagSearch
                       filters={[]}
-                      placeholder={this.context.intl.formatMessage(messages.placeholder)}
+                      placeholder={intl.formatMessage(messages.placeholder)}
                       searchQuery={location.query.search || ''}
                       onSearch={onSearch}
                       onClear={() => onClear(['search'])}
+                      focusOnMount
+                      resultsId="search-results"
+                      onSkipToResults={() => {
+                        this.focusResults();
+                      }}
                     />
                   </EntityListSearch>
-                  <ListWrapper>
-                    {
-                      noEntry && (
+                  <ListWrapper
+                    id="search-results"
+                    ref={(el) => { this.searchResults = el; }}
+                    tabindex="0"
+                  >
+                    {!isQueryMinLength && hasEntry && !hasResults && (
+                      <ListHint>
+                        <FormattedMessage {...messages.hints.minLength} />
+                      </ListHint>
+                    )}
+                    {noResults && !noEntry && (
+                      <ListHint>
+                        <FormattedMessage {...messages.hints.noResults} />
+                      </ListHint>
+                    )}
+                    {hasResults && (
+                      <Box>
                         <ListHint>
-                          <FormattedMessage {...messages.hints.noEntry} />
+                          <Text>
+                            {`${intl.formatMessage(messages.hints.resultsFound, { count: countResults })}`}
+                            {countTargets > 1
+                              && ` ${intl.formatMessage(messages.hints.hasCountTargets)}`
+                            }
+                          </Text>
                         </ListHint>
-                      )
-                    }
-                    {
-                      noResultsNoAlternative && (
-                        <ListHint>
-                          <FormattedMessage {...messages.hints.noResultsNoAlternative} />
-                        </ListHint>
-                      )
-                    }
-                    {
-                      noResults && !noResultsNoAlternative && (
-                        <ListHint>
-                          <FormattedMessage {...messages.hints.noResults} />
-                        </ListHint>
-                      )
-                    }
-                    { !noEntry && this.state.viewport && this.state.viewport === VIEWPORTS.MOBILE &&
-                      <TargetsMobile>
-                        { !noResults &&
-                          <ListHint>
-                            <FormattedMessage {...messages.hints.targetMobile} />
-                          </ListHint>
-                        }
-                        {
-                          this.renderSearchTargets(false)
-                        }
-                      </TargetsMobile>
-                    }
-                    { hasResults &&
-                      <div>
-                        { this.state.viewport && this.state.viewport === VIEWPORTS.MOBILE &&
-                          <ListHint>
-                            <FormattedMessage {...messages.hints.resultsMobile} />
-                          </ListHint>
-                        }
-                        <EntityListHeader
-                          entitiesTotal={activeTarget.get('results').size}
-                          entityTitle={{
-                            single: this.context.intl.formatMessage(this.getTargetTitle(activeTarget).singleLong || this.getTargetTitle(activeTarget).single),
-                            plural: this.context.intl.formatMessage(this.getTargetTitle(activeTarget).pluralLong || this.getTargetTitle(activeTarget).plural),
-                          }}
-                          sortOptions={activeTarget.get('sorting') && activeTarget.get('sorting').toJS()}
-                          sortBy={location.query.sort}
-                          sortOrder={location.query.order}
-                          onSortBy={onSortBy}
-                          onSortOrder={onSortOrder}
-                        />
-                        <ListEntitiesMain>
-                          { activeTarget.get('results').map((entity, key) =>
-                            <EntityListItemWrapper
-                              key={key}
-                              entity={entity}
-                              entityPath={activeTarget.get('clientPath') || activeTarget.get('path')}
-                              onEntityClick={onEntityClick}
-                            />
-                          )}
-                        </ListEntitiesMain>
-                      </div>
-                    }
+                        {entities.map(
+                          (group, id) => {
+                            const hasGroupResults = group.get('targets').some(
+                              (target) => target.get('results') && target.get('results').size > 0
+                            );
+                            if (hasGroupResults) {
+                              return (
+                                <Box key={id} margin={{ vertical: 'medium' }}>
+                                  {group.get('group') !== 'entities' && (
+                                    <Box margin={{ bottom: 'xsmall' }}>
+                                      <Text size="small">
+                                        <FormattedMessage {...messages.groups[group.get('group')]} />
+                                      </Text>
+                                    </Box>
+                                  )}
+                                  <Box>
+                                    {group.get('targets') && group.get('targets').valueSeq().map(
+                                      (target) => {
+                                        const hasTargetResults = target.get('results') && target.get('results').size > 0;
+                                        if (hasTargetResults) {
+                                          const count = target.get('results').size;
+                                          const title = this.getTargetTitle(target, count === 1, this.props.intl);
+                                          const otherTargets = countTargets > 1;
+                                          const active = qe(target.get('path'), activeTargetPath) || !otherTargets;
+                                          return (
+                                            <Box key={target.get('path')}>
+                                              <Box gap="xsmall">
+                                                <Target
+                                                  onClick={(evt) => {
+                                                    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                                                    if (active) {
+                                                      this.props.onTargetSelect('');
+                                                    } else {
+                                                      this.props.onTargetSelect(target.get('path'));
+                                                    }
+                                                  }}
+                                                  active={active}
+                                                  disabled={!otherTargets}
+                                                >
+                                                  <Box direction="row" gap="small" align="center" justify="between">
+                                                    <Box direction="row" gap="xsmall" pad={{ vertical: 'xsmall' }}>
+                                                      <Text size="large">{count}</Text>
+                                                      <Text size="large">{title}</Text>
+                                                    </Box>
+                                                    {otherTargets && active && (
+                                                      <FormUp size="medium" />
+                                                    )}
+                                                    {otherTargets && !active && (
+                                                      <FormDown size="medium" />
+                                                    )}
+                                                  </Box>
+                                                </Target>
+                                              </Box>
+                                              {
+                                                (active || !otherTargets) && (
+                                                  <Box margin={{ bottom: 'large' }} gap="xsmall">
+                                                    {target.get('results').toList().map((entity, key) => (
+                                                      <EntityListItem
+                                                        key={key}
+                                                        entity={entity}
+                                                        entityPath={target.get('clientPath') || target.get('path')}
+                                                        onEntityClick={onEntityClick}
+                                                      />
+                                                    ))}
+                                                  </Box>
+                                                )
+                                              }
+                                            </Box>
+                                          );
+                                        }
+                                        return null;
+                                      }
+                                    )}
+                                  </Box>
+                                </Box>
+                              );
+                            }
+                            return null;
+                          }
+                        )}
+                      </Box>
+                    )}
                   </ListWrapper>
                 </div>
-              }
+              )}
             </Content>
           </Container>
-        </ContainerWithSidebar>
+          <Footer fill hasBorder />
+        </ContainerWrapper>
       </div>
     );
   }
@@ -409,16 +409,20 @@ Search.propTypes = {
   onEntityClick: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
   onSortBy: PropTypes.func.isRequired,
+  activeTargetPath: PropTypes.string,
   theme: PropTypes.object,
-};
-
-Search.contextTypes = {
+  onShowSettingsModal: PropTypes.func,
+  settings: PropTypes.object, // Map
+  settingsFromQuery: PropTypes.object,
   intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   entities: selectEntitiesByQuery(state, fromJS(props.location.query)),
+  activeTargetPath: selectPathQuery(state, fromJS(props.location.query)),
+  settings: selectSettingsConfig(state),
+  settingsFromQuery: selectSettingsFromQuery(state),
 });
 function mapDispatchToProps(dispatch) {
   return {
@@ -426,7 +430,6 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     onSearch: (value) => {
-      // console.log('onSearch')
       dispatch(updateQuery(fromJS([
         {
           query: 'search',
@@ -440,7 +443,6 @@ function mapDispatchToProps(dispatch) {
       dispatch(resetSearchQuery(values));
     },
     onTargetSelect: (value) => {
-      // console.log('onTargetSelect')
       dispatch(updateQuery(fromJS([
         {
           query: 'path',
@@ -459,7 +461,10 @@ function mapDispatchToProps(dispatch) {
     onSortBy: (sort) => {
       dispatch(updateSortBy(sort));
     },
+    onShowSettingsModal: () => {
+      dispatch(showSettingsModal(true));
+    },
   };
 }
 
-export default withTheme(connect(mapStateToProps, mapDispatchToProps)(Search));
+export default injectIntl(withTheme(connect(mapStateToProps, mapDispatchToProps)(Search)));

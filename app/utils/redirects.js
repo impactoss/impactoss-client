@@ -1,5 +1,5 @@
-import { USER_ROLES } from 'themes/config';
-import { PATHS, PARAMS } from 'containers/App/constants';
+import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
+import { ROUTES, PARAMS } from 'containers/App/constants';
 import {
   selectIsSignedIn,
   selectSessionUserRoles,
@@ -10,12 +10,12 @@ import checkStore from './checkStore';
 
 export function replaceIfNotSignedIn(redirectOnAuthSuccess, replace, info = PARAMS.NOT_SIGNED_IN, replacePath) {
   return replacePath
-  ? replace(replacePath)
-  : replace({ pathname: PATHS.LOGIN, query: { redirectOnAuthSuccess, info } });
+    ? replace(replacePath)
+    : replace({ pathname: ROUTES.LOGIN, query: { redirectOnAuthSuccess, info } });
 }
 
 export function replaceUnauthorised(replace, replacePath) {
-  return replace(replacePath || PATHS.UNAUTHORISED);
+  return replace(replacePath || ROUTES.UNAUTHORISED);
 }
 
 export function replaceAlreadySignedIn(replace, info = PARAMS.ALREADY_SIGNED_IN) {
@@ -29,8 +29,10 @@ export function hasRoleRequired(roleIds, roleRequired) {
 }
 
 function redirectIfSignedIn(store) {
-  return (nextState, replace) =>
-    selectIsSignedIn(store.getState()) && replaceAlreadySignedIn(replace);
+  return (nextState, replace) => selectIsSignedIn(store.getState()) && replaceAlreadySignedIn(replace);
+}
+function redirectIfAzureEnabled() {
+  return (nextState, replace) => ENABLE_AZURE && replace({ pathname: '/' });
 }
 
 function redirectIfNotSignedIn(store, info = PARAMS.NOT_SIGNED_IN) {
@@ -59,6 +61,7 @@ export function getRedirects(store) {
 
   return {
     redirectIfSignedIn: (info) => redirectIfSignedIn(store, info),
+    redirectIfAzureEnabled: () => redirectIfAzureEnabled(),
     redirectIfNotSignedIn: (info) => redirectIfNotSignedIn(store, info),
     redirectIfNotPermitted: (roleRequired, replacePath) => redirectIfNotPermitted(store, roleRequired, replacePath),
   };

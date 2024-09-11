@@ -7,13 +7,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
-import { actions as formActions } from 'react-redux-form/immutable';
+import HelmetCanonical from 'components/HelmetCanonical';
+import { injectIntl } from 'react-intl';
 
 import {
   getTitleFormField,
   getMenuTitleFormField,
-  getMarkdownField,
+  getMarkdownFormField,
   getStatusField,
   getMenuOrderFormField,
 } from 'utils/forms';
@@ -21,14 +21,13 @@ import {
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 
 import {
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   submitInvalid,
   saveErrorDismiss,
 } from 'containers/App/actions';
@@ -52,17 +51,15 @@ import { DEPENDENCIES, FORM_INITIAL } from './constants';
 export class PageNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('pageNew.form.data', FORM_INITIAL);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -70,53 +67,61 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer.current);
     }
   }
 
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getTitleFormField(this.context.intl.formatMessage),
-        getMenuTitleFormField(this.context.intl.formatMessage),
-        getMenuOrderFormField(this.context.intl.formatMessage),
-      ],
-    },
-  ]);
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
 
-  getHeaderAsideFields = () => ([{
-    fields: [getStatusField(this.context.intl.formatMessage)],
-  }]);
+  getHeaderMainFields = (intl) =>
+    ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getTitleFormField(intl.formatMessage),
+          getMenuTitleFormField(intl.formatMessage),
+          getMenuOrderFormField(intl.formatMessage),
+        ],
+      },
+    ]);
 
-  getBodyMainFields = () => ([{
-    fields: [getMarkdownField(this.context.intl.formatMessage, 'content')],
-  }]);
+  getHeaderAsideFields = (intl) =>
+    ([
+      {
+        fields: [getStatusField(intl.formatMessage)],
+      },
+    ]);
+
+  getBodyMainFields = (intl) =>
+    ([
+      {
+        fields: [getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'content',
+        })],
+      },
+    ]);
 
   render() {
-    const { viewDomain, dataReady } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const { viewDomain, dataReady, intl } = this.props;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
     return (
       <div>
-        <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+        <HelmetCanonical
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
-        <Content
-          innerRef={(node) => {
-            if (!this.state.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="categories"
             buttons={
@@ -127,50 +132,59 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('pageNew.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }] : null
             }
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {(saveSending || !dataReady) &&
-            <Loading />
+          {(saveSending || !dataReady)
+            && <Loading />
           }
-          {dataReady &&
-            <EntityForm
-              model="pageNew.form.data"
-              formData={viewDomain.form.data}
-              saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
-              handleSubmitFail={this.props.handleSubmitFail}
-              handleCancel={this.props.handleCancel}
-              handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(),
-                },
-                body: {
-                  main: this.getBodyMainFields(),
-                },
-              }}
-              scrollContainer={this.state.scrollContainer}
-            />
+          {dataReady
+            && (
+              <EntityForm
+                formData={FORM_INITIAL}
+                saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
+                handleSubmit={(formData) => this.props.handleSubmit(formData)}
+                handleSubmitFail={this.props.handleSubmitFail}
+                handleCancel={this.props.handleCancel}
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(intl),
+                    aside: this.getHeaderAsideFields(intl),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(intl),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
-          { saveSending &&
-            <Loading />
+          { saveSending
+            && <Loading />
           }
         </Content>
       </div>
@@ -181,20 +195,14 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
 PageNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func.isRequired,
   redirectIfNotPermitted: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
-  initialiseForm: PropTypes.func,
-};
-
-PageNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -206,10 +214,6 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
@@ -225,19 +229,13 @@ function mapDispatchToProps(dispatch) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
     handleSubmit: (formData) => {
-      dispatch(save(formData.toJS()));
+      dispatch(save(formData));
     },
     handleCancel: () => {
-      dispatch(updatePath(PATHS.PAGES, { replace: true }));
-    },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
+      dispatch(updatePath(ROUTES.PAGES, { replace: true }));
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PageNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(PageNew));

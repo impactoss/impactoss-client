@@ -6,11 +6,13 @@ import { connect } from 'react-redux';
 import { startsWith } from 'utils/string';
 import { updatePath } from 'containers/App/actions';
 import { getNextQueryString } from 'containers/App/sagas';
-import { selectFrameworkQuery } from 'containers/App/selectors';
+import { selectCurrentFrameworkId } from 'containers/App/selectors';
 
 // const A = styled.a``;
 
-const Link = ({ to, children, onClick, frameworkId, args, ...p }) => {
+const Link = ({
+  to, children, onClick, frameworkId, args, ...p
+}) => {
   const external = !startsWith(to, '/');
   // make sure to set the fw query for href default link (i.e. open in new tab)
   const query = (args && args.query) || {};
@@ -48,7 +50,7 @@ Link.propTypes = {
 
 
 const mapStateToProps = (state) => ({
-  frameworkId: selectFrameworkQuery(state),
+  frameworkId: selectCurrentFrameworkId(state),
 });
 
 function mapDispatchToProps(dispatch) {

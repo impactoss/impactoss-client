@@ -7,8 +7,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { Map, List, fromJS } from 'immutable';
+import { injectIntl } from 'react-intl';
 
 import {
   loadEntitiesIfNeeded,
@@ -32,12 +33,11 @@ import { selectUsers } from './selectors';
 import messages from './messages';
 
 export class UserList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -48,18 +48,18 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
-    const { dataReady } = this.props;
+    const { dataReady, intl } = this.props;
     const headerOptions = {
-      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      supTitle: intl.formatMessage(messages.pageTitle),
       icon: 'users',
     };
 
     return (
       <div>
-        <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+        <HelmetCanonical
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <EntityList
@@ -70,8 +70,8 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
-            single: this.context.intl.formatMessage(appMessages.entities.users.single),
-            plural: this.context.intl.formatMessage(appMessages.entities.users.plural),
+            single: intl.formatMessage(appMessages.entities.users.single),
+            plural: intl.formatMessage(appMessages.entities.users.plural),
           }}
           locationQuery={fromJS(this.props.location.query)}
         />
@@ -89,9 +89,6 @@ UserList.propTypes = {
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   location: PropTypes.object,
-};
-
-UserList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -113,4 +110,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserList);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserList));

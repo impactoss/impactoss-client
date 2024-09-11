@@ -10,6 +10,7 @@
  */
 
 export const REDIRECT_IF_NOT_PERMITTED = 'impactoss/App/REDIRECT_IF_NOT_PERMITTED';
+export const REDIRECT_NOT_PERMITTED = 'impactoss/App/REDIRECT_NOT_PERMITTED';
 export const LOAD_ENTITIES_IF_NEEDED = 'impactoss/App/LOAD_ENTITIES_IF_NEEDED';
 export const LOADING_ENTITIES = 'impactoss/App/LOADING_ENTITIES';
 export const LOAD_ENTITIES_SUCCESS = 'impactoss/App/LOAD_ENTITIES_SUCCESS';
@@ -20,12 +21,12 @@ export const RESET_PROGRESS = 'impactoss/App/RESET_PROGRESS';
 
 export const AUTHENTICATE_SENDING = 'impactoss/App/AUTHENTICATE_SENDING';
 export const AUTHENTICATE = 'impactoss/App/AUTHENTICATE';
+export const AUTHENTICATE_AZURE = 'impactoss/App/AUTHENTICATE_AZURE';
 export const RESET_PASSWORD = 'impactoss/App/RESET_PASSWORD';
 export const RECOVER_PASSWORD = 'impactoss/App/RECOVER_PASSWORD';
 export const AUTHENTICATE_SUCCESS = 'impactoss/App/AUTHENTICATE_SUCCESS';
 export const AUTHENTICATE_ERROR = 'impactoss/App/AUTHENTICATE_ERROR';
 export const SET_AUTHENTICATION_STATE = 'impactoss/App/SET_AUTHENTICATION_STATE';
-export const OPEN_BOOKMARK = 'impactoss/App/OPEN_BOOKMARK';
 export const LOGOUT = 'impactoss/App/LOGOUT';
 export const LOGOUT_SUCCESS = 'impactoss/App/LOGOUT_SUCCESS';
 export const LOGOUT_ERROR = 'impactoss/App/LOGOUT_ERROR';
@@ -39,10 +40,12 @@ export const UPDATE_ENTITIES = 'impactoss/App/UPDATE_ENTITIES';
 export const UPDATE_CONNECTIONS = 'impactoss/App/UPDATE_CONNECTIONS';
 
 export const SAVE_ENTITY = 'impactoss/App/SAVE_ENTITY';
+export const SAVE_MULTIPLE_ENTITIES = 'impactoss/App/SAVE_MULTIPLE_ENTITIES';
 export const NEW_ENTITY = 'impactoss/App/NEW_ENTITY';
+export const NEW_MULTIPLE_ENTITIES = 'impactoss/App/NEW_MULTIPLE_ENTITIES';
 export const DELETE_ENTITY = 'impactoss/App/DELETE_ENTITY';
+export const DELETE_MULTIPLE_ENTITIES = 'impactoss/App/DELETE_MULTIPLE_ENTITIES';
 export const SAVE_CONNECTIONS = 'impactoss/App/SAVE_CONNECTIONS';
-export const SAVE_ENTITIES = 'impactoss/App/SAVE_ENTITIES';
 export const DUEDATE_ASSIGNED = 'impactoss/App/DUEDATE_ASSIGNED';
 export const DUEDATE_UNASSIGNED = 'impactoss/App/DUEDATE_UNASSIGNED';
 
@@ -65,15 +68,19 @@ export const UPDATE_ROUTE_QUERY = 'impactoss/App/UPDATE_ROUTE_QUERY';
 export const UPDATE_PATH = 'impactoss/App/UPDATE_PATH';
 
 export const SAVE_ENTITY_FORM = 'impactoss/App/SAVE_ENTITY_FORM';
-export const UPDATE_ENTITY_FORM = 'impactoss/App/UPDATE_ENTITY_FORM';
 
 export const CLOSE_ENTITY = 'impactoss/App/CLOSE_ENTITY';
 
+export const OPEN_BOOKMARK = 'impactoss/App/OPEN_BOOKMARK';
 export const OPEN_NEW_ENTITY_MODAL = 'impactoss/App/OPEN_NEW_ENTITY_MODAL';
-export const SUBMIT_INVALID = 'impactoss/App/SUBMIT_INVALID';
+export const SHOW_SETTINGS_MODAL = 'impactoss/App/SHOW_SETTINGS_MODAL';
 
+export const SUBMIT_INVALID = 'impactoss/App/SUBMIT_INVALID';
 export const DISMISS_QUERY_MESSAGES = 'impactoss/App/DISMISS_QUERY_MESSAGES';
 export const SET_FRAMEWORK = 'impactoss/App/SET_FRAMEWORK';
+export const SET_LOAD_ARCHIVED = 'impactoss/App/SET_LOAD_ARCHIVED';
+export const SET_LOAD_NONCURRENT = 'impactoss/App/SET_LOAD_NONCURRENT';
+export const INITIALIZE_SETTINGS = 'impactoss/App/INITIALIZE_SETTINGS';
 
 export const FILTERS_PANEL = 'filters';
 export const EDIT_PANEL = 'edit';
@@ -87,10 +94,21 @@ export const DEPENDENCIES = [
   'user_roles',
   'pages',
   'frameworks',
+  'categories',
 ];
 export const SORT_ORDER_OPTIONS = [
-  { value: 'asc', icon: 'ascending', nextValue: 'desc', message: 'ui.sortOrderOptions.asc' },
-  { value: 'desc', icon: 'descending', nextValue: 'asc', message: 'ui.sortOrderOptions.desc' },
+  {
+    value: 'asc',
+    icon: 'ascending',
+    nextValue: 'desc',
+    message: 'ui.sortOrderOptions.asc',
+  },
+  {
+    value: 'desc',
+    icon: 'descending',
+    nextValue: 'asc',
+    message: 'ui.sortOrderOptions.desc',
+  },
 ];
 export const PARAMS = {
   GROUP_RESET: '0',
@@ -107,14 +125,13 @@ export const VIEWPORTS = {
   LARGE: 4,
 };
 
-export const PATHS = {
-  ID: '/:id',
-  NEW: '/new',
-  EDIT: '/edit',
-  IMPORT: '/import',
+export const ROUTES = {
+  INTRO: '/intro',
+  OVERVIEW: '/',
   PASSWORD: '/password',
-  OVERVIEW: '/overview',
   LOGIN: '/login',
+  LOGIN_OAUTH_SUCCESS: '/loginOAuthSuccess',
+  LOGIN_OAUTH_ERROR: '/loginOAuthError',
   BOOKMARKS: '/bookmarks',
   LOGOUT: '/logout',
   REGISTER: '/register',
@@ -130,4 +147,9 @@ export const PATHS = {
   CATEGORIES: '/category',
   PAGES: '/pages',
   SEARCH: '/search',
+  // PATHS
+  ID: '/:id',
+  NEW: '/new',
+  EDIT: '/edit',
+  IMPORT: '/import',
 };

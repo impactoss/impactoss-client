@@ -1,4 +1,6 @@
-import { takeLatest, take, put, cancel } from 'redux-saga/effects';
+import {
+  takeLatest, take, put, cancel,
+} from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import {
@@ -6,7 +8,7 @@ import {
   dueDateAssigned,
 } from 'containers/App/actions';
 
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 import { SAVE } from './constants';
 
@@ -15,7 +17,7 @@ export function* save({ data, dueDateIdUnchecked }) {
   yield put(saveEntity({
     path: 'progress_reports',
     entity: data,
-    redirect: `${PATHS.PROGRESS_REPORTS}/${data.id}`,
+    redirect: `${ROUTES.PROGRESS_REPORTS}/${data.id}`,
     invalidateEntitiesOnSuccess: dueDateIdUnchecked && 'due_dates',
   }));
   if (data.attributes.due_date_id) {

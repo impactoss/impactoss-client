@@ -1,4 +1,6 @@
-import { takeLatest, put, take, cancel, call } from 'redux-saga/effects';
+import {
+  takeLatest, put, take, cancel, call,
+} from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { authenticate } from 'containers/App/actions';
@@ -16,14 +18,14 @@ export function* register({ data }) {
   try {
     yield put(userRegisterSending());
     const userCreated = yield call(registerUserRequest, {
-      email: data.attributes.email,
-      password: data.attributes.password,
-      password_confirmation: data.attributes.passwordConfirmation,
-      name: data.attributes.name,
+      email: data.email,
+      password: data.password,
+      password_confirmation: data.passwordConfirmation,
+      name: data.name,
     });
     yield put(userRegisterSuccess());
     // login when successful
-    yield put(authenticate({ email: userCreated.data.email, password: data.attributes.password }));
+    yield put(authenticate({ email: userCreated.data.email, password: data.password }));
   } catch (error) {
     error.response.json = yield error.response.json();
     yield put(userRegisterError(error));

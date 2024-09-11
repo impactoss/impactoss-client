@@ -30,7 +30,7 @@ export const FORM_INITIAL = fromJS({
     title: '',
     description: '',
     reference: '',
-    accepted: 'false',
+    support_level: 'null',
     response: '',
     draft: '',
     framework_id: '',

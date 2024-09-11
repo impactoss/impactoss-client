@@ -1,4 +1,11 @@
-import { PUBLISH_STATUSES, USER_ROLES } from 'themes/config';
+import {
+  USER_ROLES,
+  PUBLISH_STATUSES,
+  IS_CURRENT_STATUSES,
+  IS_ARCHIVE_STATUSES,
+  ARCHIVE_MIN_ROLE,
+  SEE_DRAFT_MIN_ROLE,
+} from 'themes/config';
 
 export const DEPENDENCIES = [
   'user_roles',
@@ -21,6 +28,7 @@ export const DEPENDENCIES = [
 export const CONFIG = {
   serverPath: 'indicators',
   clientPath: 'indicators',
+  downloadCSV: true,
   search: ['title', 'reference'],
   sorting: [
     {
@@ -50,11 +58,6 @@ export const CONFIG = {
     search: true,
     connections: [
       {
-        path: 'recommendations', // filter by recommendation connection
-        message: 'entities.recommendations.plural',
-        key: 'recommendation_id',
-      },
-      {
         path: 'measures', // filter by recommendation connection
         message: 'entities.measures.plural',
         key: 'measure_id',
@@ -66,17 +69,6 @@ export const CONFIG = {
     options: [
       {
         search: true,
-        message: 'entities.recommendations_{fwid}.plural',
-        path: 'recommendations',
-        clientPath: 'recommendations',
-        key: 'recommendation_id',
-        connectPath: 'recommendation_indicators',
-        ownKey: 'indicator_id',
-        groupByFramework: true,
-        frameworkFilter: 'has_indicators',
-      },
-      {
-        search: true,
         message: 'entities.measures.plural',
         path: 'measures',
         clientPath: 'actions',
@@ -86,14 +78,14 @@ export const CONFIG = {
       },
     ],
   },
-  attributes: {  // filter by attribute value
+  attributes: { // filter by attribute value
     options: [
       {
         search: false,
         message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
-        role: USER_ROLES.CONTRIBUTOR.value,
+        role: SEE_DRAFT_MIN_ROLE,
       },
       {
         search: false,
@@ -104,8 +96,31 @@ export const CONFIG = {
         reference: {
           key: 'manager',
           label: 'name',
+          sublabel: 'domain',
           without: true,
         },
+      },
+      {
+        search: false,
+        message: 'attributes.is_archive',
+        attribute: 'is_archive',
+        options: IS_ARCHIVE_STATUSES,
+        editRole: ARCHIVE_MIN_ROLE,
+        forGlobalSettings: [{
+          arg: 'loadArchived',
+          value: true,
+        }],
+      },
+      {
+        search: false,
+        edit: false,
+        message: 'attributes.is_current',
+        attribute: 'is_current',
+        options: IS_CURRENT_STATUSES,
+        forGlobalSettings: [{
+          arg: 'loadNonCurrent',
+          value: true,
+        }],
       },
     ],
   },

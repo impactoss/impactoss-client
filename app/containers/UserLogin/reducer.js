@@ -6,9 +6,7 @@
 
 import { fromJS } from 'immutable';
 import { LOCATION_CHANGE } from 'react-router-redux';
-
 import { combineReducers } from 'redux-immutable';
-import { combineForms } from 'react-redux-form/immutable';
 
 import { checkResponseError } from 'utils/request';
 
@@ -46,14 +44,6 @@ function userLoginReducer(state = initialState, action) {
   }
 }
 
-const formData = fromJS({
-  email: '',
-  password: '',
-});
-
 export default combineReducers({
   page: userLoginReducer,
-  form: combineForms({
-    data: formData,
-  }, 'userLogin.form'),
 });

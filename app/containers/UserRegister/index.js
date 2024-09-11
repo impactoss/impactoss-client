@@ -6,15 +6,14 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import styled from 'styled-components';
-import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
   getNameField,
-  getEmailField,
+  getEmailFormField,
   getPasswordField,
   getPasswordConfirmationField,
 } from 'utils/forms';
@@ -30,7 +29,9 @@ import A from 'components/styled/A';
 import { selectQueryMessages } from 'containers/App/selectors';
 import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
+import { IS_PROD, SERVER } from 'themes/config';
+import { FORM_INITIAL } from './constants';
 
 import messages from './messages';
 
@@ -42,66 +43,73 @@ const BottomLinks = styled.div`
 `;
 
 export class UserRegister extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
-    this.props.initialiseForm();
-  }
   render() {
-    const { registerError, registerSending } = this.props.viewDomain.page;
+    const { intl, handleCancel, handleSubmit } = this.props;
+    const { registerError, registerSending } = this.props.viewDomain.get('page').toJS();
 
     return (
       <div>
-        <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+        <HelmetCanonical
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
         <ContentNarrow>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
           />
-          {this.props.queryMessages.info &&
+          {!IS_PROD && (
             <Messages
               type="info"
-              onDismiss={this.props.onDismissQueryMessages}
-              messageKey={this.props.queryMessages.info}
+              messageKey="registeringServer"
+              messageArgs={{ server: SERVER }}
             />
+          )}
+          {this.props.queryMessages.info
+            && (
+              <Messages
+                type="info"
+                onDismiss={this.props.onDismissQueryMessages}
+                messageKey={this.props.queryMessages.info}
+              />
+            )
           }
-          {registerError &&
-            <Messages
-              type="error"
-              messages={registerError.messages}
-            />
+          {registerError
+            && (
+              <Messages
+                type="error"
+                messages={registerError.messages}
+              />
+            )
           }
-          {registerSending &&
-            <Loading />
+          {registerSending
+            && <Loading />
           }
-          { this.props.viewDomain.form &&
-            <AuthForm
-              model="userRegister.form.data"
-              sending={registerSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
-              handleCancel={this.props.handleCancel}
-              labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
-              fields={[
-                getNameField(this.context.intl.formatMessage),
-                getEmailField(this.context.intl.formatMessage),
-                getPasswordField(this.context.intl.formatMessage),
-                getPasswordConfirmationField(this.context.intl.formatMessage),
-              ]}
-            />
-          }
+          <AuthForm
+            sending={registerSending}
+            handleSubmit={handleSubmit}
+            handleCancel={handleCancel}
+            labels={{ submit: intl.formatMessage(messages.submit) }}
+            initialValues={FORM_INITIAL}
+            fields={[
+              getNameField(intl.formatMessage),
+              getEmailFormField(intl.formatMessage),
+              getPasswordField(intl.formatMessage),
+              getPasswordConfirmationField(intl.formatMessage),
+            ]}
+          />
           <BottomLinks>
             <p>
               <FormattedMessage {...messages.loginLinkBefore} />
               <A
-                href={PATHS.LOGIN}
+                href={ROUTES.LOGIN}
                 onClick={(evt) => {
                   if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink(PATHS.LOGIN, { keepQuery: true });
+                  this.props.handleLink(ROUTES.LOGIN, { keepQuery: true });
                 }}
               >
                 <FormattedMessage {...messages.loginLink} />
@@ -120,27 +128,20 @@ UserRegister.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
-  initialiseForm: PropTypes.func,
   onDismissQueryMessages: PropTypes.func,
   queryMessages: PropTypes.object,
-};
-
-UserRegister.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   queryMessages: selectQueryMessages(state),
-});
+})
 
 export function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('userRegister.form.data'));
-    },
     handleSubmit: (formData) => {
-      dispatch(register(formData.toJS()));
+      dispatch(register(formData));
     },
     handleCancel: () => {
       dispatch(updatePath('/'));
@@ -154,4 +155,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserRegister);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserRegister));

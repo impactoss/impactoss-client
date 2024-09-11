@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { injectIntl } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -14,6 +15,9 @@ import ListLink from 'components/fields/ListLink';
 const StyledFieldWrap = styled(FieldWrap)`
   padding-top: 15px;
   font-size: 0.65em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const SmartLabel = styled.div`
@@ -38,10 +42,8 @@ const SmartIcon = styled.div`
 `;
 
 class SmartTaxonomyField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
-    const { field } = this.props;
-
+    const { field, intl } = this.props;
     return (
       <StyledFieldWrap>
         <ListInline>
@@ -58,14 +60,14 @@ class SmartTaxonomyField extends React.PureComponent { // eslint-disable-line re
                 <SmartIcon active={value.isSmart} pIndex={parseInt(field.id, 10)}>
                   <Icon
                     name={`smart_${i}`}
-                    title={`${value.label}: ${this.context.intl.formatMessage(value.isSmart ? appMessages.labels.smart.met : appMessages.labels.smart.notMet)}`}
+                    title={`${value.label}: ${intl.formatMessage(value.isSmart ? appMessages.labels.smart.met : appMessages.labels.smart.notMet)}`}
                     size="40px"
                     sizes={{ mobile: '30px' }}
                   />
                 </SmartIcon>
                 <SmartLabel>{value.label}</SmartLabel>
                 <SmartLabelMet>
-                  {this.context.intl.formatMessage(value.isSmart ? appMessages.labels.smart.met : appMessages.labels.smart.notMet)}
+                  {intl.formatMessage(value.isSmart ? appMessages.labels.smart.met : appMessages.labels.smart.notMet)}
                 </SmartLabelMet>
               </ListLink>
             </ListInlineItem>
@@ -78,9 +80,7 @@ class SmartTaxonomyField extends React.PureComponent { // eslint-disable-line re
 
 SmartTaxonomyField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-SmartTaxonomyField.contextTypes = {
-  intl: PropTypes.object,
+  intl: PropTypes.object.isRequired,
 };
 
-export default SmartTaxonomyField;
+export default injectIntl(SmartTaxonomyField);

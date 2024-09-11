@@ -12,18 +12,17 @@ const Button = styled.button`
   text-align: center;
   vertical-align: middle;
   line-height: 1.25;
-  -ms-touch-action: manipulation;
   touch-action: manipulation;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
   background-image: none;
   border: none;
   border-radius: 0;
-  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.small ? 0.9 : 1}em;
     padding: 6px 12px;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
   }
 `;
 

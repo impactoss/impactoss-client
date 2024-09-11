@@ -1,4 +1,11 @@
-import { USER_ROLES, PUBLISH_STATUSES } from 'themes/config';
+
+import {
+  PUBLISH_STATUSES,
+  IS_CURRENT_STATUSES,
+  IS_ARCHIVE_STATUSES,
+  ARCHIVE_MIN_ROLE,
+  SEE_DRAFT_MIN_ROLE,
+} from 'themes/config';
 
 export const DEPENDENCIES = [
   'user_roles',
@@ -20,13 +27,20 @@ export const DEPENDENCIES = [
 export const CONFIG = {
   serverPath: 'measures',
   clientPath: 'actions',
-  search: ['title'],
+  types: 'measures',
+  downloadCSV: true,
+  search: ['title', 'reference'],
   sorting: [
     {
       attribute: 'id', // proxy for created at
       type: 'number',
       order: 'desc',
       default: true,
+    },
+    {
+      attribute: 'reference',
+      type: 'string',
+      order: 'asc',
     },
     {
       attribute: 'title',
@@ -88,14 +102,36 @@ export const CONFIG = {
       },
     ],
   },
-  attributes: {  // filter by attribute value
+  attributes: { // filter by attribute value
     options: [
       {
         search: false,
         message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
-        role: USER_ROLES.CONTRIBUTOR.value,
+        role: SEE_DRAFT_MIN_ROLE,
+      },
+      {
+        search: false,
+        message: 'attributes.is_archive',
+        attribute: 'is_archive',
+        options: IS_ARCHIVE_STATUSES,
+        editRole: ARCHIVE_MIN_ROLE,
+        forGlobalSettings: [{
+          arg: 'loadArchived',
+          value: true,
+        }],
+      },
+      {
+        search: false,
+        edit: false,
+        message: 'attributes.is_current',
+        attribute: 'is_current',
+        options: IS_CURRENT_STATUSES,
+        forGlobalSettings: [{
+          arg: 'loadNonCurrent',
+          value: true,
+        }],
       },
     ],
   },

@@ -7,8 +7,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
-import { actions as formActions } from 'react-redux-form/immutable';
+import HelmetCanonical from 'components/HelmetCanonical';
+import { injectIntl } from 'react-intl';
 
 import {
   getPasswordField,
@@ -28,47 +28,46 @@ import messages from './messages';
 import { reset } from './actions';
 import { selectDomain } from './selectors';
 
+import { FORM_INITIAL } from './constants';
+
 export class UserPasswordReset extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
-    this.props.initialiseForm();
-  }
   render() {
-    const { resetSending, resetError } = this.props.viewDomain.page;
+    const { intl, handleCancel, handleSubmit } = this.props;
+    const { resetSending, resetError } = this.props.viewDomain.get('page').toJS();
 
     return (
       <div>
-        <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+        <HelmetCanonical
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
         <ContentNarrow>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
           />
-          {resetError &&
-            <Messages type="error" messages={resetError.messages} />
+          {resetError
+            && <Messages type="error" messages={resetError.messages} />
           }
-          {resetSending &&
-            <Loading />
+          {resetSending
+            && <Loading />
           }
-          { this.props.viewDomain.form &&
-            <AuthForm
-              model="userPasswordReset.form.data"
-              sending={resetSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
-              handleCancel={this.props.handleCancel}
-              labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
-              fields={[
-                getPasswordField(this.context.intl.formatMessage, '.password'),
-                getPasswordConfirmationField(this.context.intl.formatMessage, '.passwordConfirmation'),
-              ]}
-            />
-          }
+          <AuthForm
+            model="userPasswordReset.form.data"
+            sending={resetSending}
+            handleSubmit={handleSubmit}
+            handleCancel={handleCancel}
+            initialValues={FORM_INITIAL}
+            labels={{ submit: intl.formatMessage(messages.submit) }}
+            fields={[
+              getPasswordField(intl.formatMessage),
+              getPasswordConfirmationField(intl.formatMessage),
+            ]}
+          />
         </ContentNarrow>
       </div>
     );
@@ -79,10 +78,6 @@ UserPasswordReset.propTypes = {
   viewDomain: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  initialiseForm: PropTypes.func,
-};
-
-UserPasswordReset.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -92,11 +87,8 @@ const mapStateToProps = (state) => ({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('userPasswordReset.form.data'));
-    },
     handleSubmit: (formData) => {
-      dispatch(reset(formData.toJS()));
+      dispatch(reset(formData));
     },
     handleCancel: () => {
       dispatch(updatePath('/'));
@@ -104,4 +96,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserPasswordReset);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserPasswordReset));

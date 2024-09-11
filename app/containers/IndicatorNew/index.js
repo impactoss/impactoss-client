@@ -7,20 +7,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
-import { actions as formActions } from 'react-redux-form/immutable';
+import HelmetCanonical from 'components/HelmetCanonical';
+import { injectIntl } from 'react-intl';
 
 import { Map, List, fromJS } from 'immutable';
 
 import {
+  entityOptions,
+  userOptions,
   renderMeasureControl,
   renderRecommendationsByFwControl,
   renderUserControl,
   getTitleFormField,
   getReferenceFormField,
   getStatusField,
-  getMarkdownField,
+  getMarkdownFormField,
   getDateField,
+  modifyStartDateField,
   getFrequencyField,
   getCheckboxField,
   getConnectionUpdatesFromFormData,
@@ -31,10 +34,9 @@ import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 import validateDateAfterDate from 'components/forms/validators/validate-date-after-date';
-import validatePresenceConditional from 'components/forms/validators/validate-presence-conditional';
 import validateRequired from 'components/forms/validators/validate-required';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -42,7 +44,6 @@ import {
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   openNewEntityModal,
   submitInvalid,
   saveErrorDismiss,
@@ -52,6 +53,7 @@ import {
   selectReady,
   selectReadyForAuthCheck,
   selectMeasuresCategorised,
+  selectIndicatorReferences,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -74,17 +76,14 @@ import { DEPENDENCIES, FORM_INITIAL } from './constants';
 export class IndicatorNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('indicatorNew.form.data', FORM_INITIAL);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -92,58 +91,80 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer.current);
     }
   }
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
 
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getReferenceFormField(this.context.intl.formatMessage, false, true),
-        getTitleFormField(this.context.intl.formatMessage, 'titleText'),
-      ],
-    },
-  ]);
+  getInitialFormData = ({
+    measures, users, recommendationsByFw,
+  }) => FORM_INITIAL
+    .set('associatedMeasures', entityOptions(measures, true))
+    .set('associatedRecommendationsByFw', recommendationsByFw
+      ? recommendationsByFw.map((recs) => entityOptions(recs, true))
+      : Map())
+    .set('associatedUser', userOptions(users, null));
 
-  getHeaderAsideFields = () => ([
-    {
-      fields: [
-        getStatusField(this.context.intl.formatMessage),
-      ],
-    },
-  ]);
+  handleRepeatChange = (repeat) => this.setState({ repeat: repeat });
+
+  getHeaderMainFields = (existingReferences, intl) =>
+    ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getReferenceFormField({
+            formatMessage: intl.formatMessage,
+            required: true,
+            prohibitedValues: existingReferences,
+          }),
+          getTitleFormField(intl.formatMessage, 'titleText'),
+        ],
+      },
+    ]);
+
+  getHeaderAsideFields = (intl) =>
+    ([
+      {
+        fields: [
+          getStatusField(intl.formatMessage),
+        ],
+      },
+    ]);
 
   getBodyMainFields = (
     connectedTaxonomies,
     measures,
     recommendationsByFw,
     onCreateOption,
+    intl,
   ) => {
     const groups = [];
     groups.push({
-      fields: [getMarkdownField(this.context.intl.formatMessage)],
+      fields: [getMarkdownFormField({ formatMessage: intl.formatMessage })],
     });
     if (measures) {
       groups.push({
-        label: this.context.intl.formatMessage(appMessages.nav.measuresSuper),
+        label: intl.formatMessage(appMessages.nav.measuresSuper),
         icon: 'measures',
         fields: [
-          renderMeasureControl(measures, connectedTaxonomies, onCreateOption, this.context.intl),
+          renderMeasureControl(measures, connectedTaxonomies, onCreateOption, intl),
         ],
       });
     }
-    if (recommendationsByFw) {
+    if (recommendationsByFw && recommendationsByFw.size > 0) {
       const recConnections = renderRecommendationsByFwControl(
         recommendationsByFw,
         connectedTaxonomies,
         onCreateOption,
-        this.context.intl,
+        intl,
       );
-      if (recConnections) {
+
+      if (recConnections && recConnections.lenght > 0) {
         groups.push(
           {
-            label: this.context.intl.formatMessage(appMessages.nav.recommendations),
+            label: intl.formatMessage(appMessages.nav.recommendationsSuper),
             icon: 'recommendations',
             fields: recConnections,
           },
@@ -153,40 +174,50 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     return groups;
   };
 
-  getBodyAsideFields = (users, repeat) => ([ // fieldGroups
-    { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.due_dates.schedule),
-      icon: 'reminder',
-      fields: [
-        getDateField(
-          this.context.intl.formatMessage,
-          'start_date',
-          repeat,
-          repeat ? 'start_date' : 'start_date_only',
-          (model, value) => this.props.onStartDateChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
-        ),
-        getCheckboxField(
-          this.context.intl.formatMessage,
-          'repeat',
-          null,
-          (model, value) => this.props.onRepeatChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
-        ),
-        repeat ? getFrequencyField(this.context.intl.formatMessage) : null,
-        repeat ? getDateField(
-          this.context.intl.formatMessage,
-          'end_date',
-          repeat,
-          'end_date',
-          (model, value) => this.props.onEndDateChange(model, value, this.props.viewDomain.form.data, this.context.intl.formatMessage)
-        )
-        : null,
-        renderUserControl(
-          users,
-          this.context.intl.formatMessage(appMessages.attributes.manager_id.indicators),
-        ),
-      ],
-    },
-  ]);
+  getBodyAsideFields = (users, intl) => 
+    ([ // fieldGroups
+      { // fieldGroup
+        label: intl.formatMessage(appMessages.entities.due_dates.schedule),
+        icon: 'reminder',
+        fields: [
+          getDateField({
+            formatMessage: intl.formatMessage,
+            attribute: 'start_date',
+            label: 'start_date',
+            modifyFieldAttributes: (field, formData) =>
+              modifyStartDateField(
+                field,
+                this.props.isRepeat(formData),
+                this.props.intl,
+              ),
+          }),
+          getCheckboxField(
+            intl.formatMessage,
+            'repeat',
+            false),
+          getFrequencyField(
+            intl.formatMessage,
+            (formData) => !this.props.isRepeat(formData)
+          ),
+          getDateField({
+            formatMessage: intl.formatMessage,
+            attribute: 'end_date',
+            label: 'end_date',
+            dynamicValidators: (value, formData) =>
+              this.props.onEndDateChange(
+                value,
+                formData,
+                intl.formatMessage,
+              ),
+            isFieldDisabled: (formData) => !this.props.isRepeat(formData),
+          }),
+          renderUserControl(
+            users,
+            intl.formatMessage(appMessages.attributes.manager_id.indicators),
+          ),
+        ],
+      },
+    ]);
 
   render() {
     const {
@@ -197,29 +228,24 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       recommendationsByFw,
       users,
       onCreateOption,
+      existingReferences,
+      intl,
     } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
-
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     return (
       <div>
-        <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+        <HelmetCanonical
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
-        <Content
-          innerRef={(node) => {
-            if (!this.state.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="indicators"
             buttons={
@@ -230,56 +256,57 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('indicatorNew.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }] : null
             }
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {(saveSending || !dataReady) &&
-            <Loading />
+          {(saveSending || !dataReady)
+            && <Loading />
           }
-          {dataReady &&
-            <EntityForm
-              model="indicatorNew.form.data"
-              formData={viewDomain.form.data}
-              saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
-              handleSubmitFail={(formData) => this.props.handleSubmitFail(formData, this.context.intl.formatMessage)}
-              handleCancel={this.props.handleCancel}
-              handleUpdate={this.props.handleUpdate}
-              validators={{
-                '': {
-                  // Form-level validator
-                  endDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'end_date'])),
-                  startDatePresent: (vals) => validatePresenceConditional(vals.getIn(['attributes', 'repeat']), vals.getIn(['attributes', 'start_date'])),
-                  endDateAfterStartDate: (vals) => vals.getIn(['attributes', 'repeat']) ? validateDateAfterDate(vals.getIn(['attributes', 'end_date']), vals.getIn(['attributes', 'start_date'])) : true,
-                },
-              }}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(),
-                },
-                body: {
-                  main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption),
-                  aside: this.getBodyAsideFields(users, viewDomain.form.data.getIn(['attributes', 'repeat'])),
-                },
-              }}
-              scrollContainer={this.state.scrollContainer}
-            />
+          {dataReady
+            && (
+              <EntityForm
+                formData={this.getInitialFormData(this.props).toJS()}
+                saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
+                handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
+                handleSubmitFail={this.props.handleSubmitFail}
+                handleCancel={this.props.handleCancel}
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(existingReferences, intl),
+                    aside: this.getHeaderAsideFields(intl),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(connectedTaxonomies, measures, recommendationsByFw, onCreateOption, intl),
+                    aside: this.getBodyAsideFields(users, intl),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
         </Content>
       </div>
@@ -290,11 +317,8 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
 IndicatorNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
-  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
@@ -304,14 +328,10 @@ IndicatorNew.propTypes = {
   recommendationsByFw: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
-  initialiseForm: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
   onRepeatChange: PropTypes.func,
-  onStartDateChange: PropTypes.func,
   onEndDateChange: PropTypes.func,
-};
-
-IndicatorNew.contextTypes = {
+  existingReferences: PropTypes.array,
   intl: PropTypes.object.isRequired,
 };
 
@@ -325,78 +345,28 @@ const mapStateToProps = (state) => ({
   // all users, listing connection if any
   users: selectUsers(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
+  existingReferences: selectIndicatorReferences(state),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    onRepeatChange: (repeatModel, repeat, formData, formatMessage) => {
-      // reset repeat erros when repeat turned off
-      if (!repeat) {
-        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', {
-          required: false,
-          startDateAfterEndDateError: false,
-        }));
-        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', {
-          required: false,
-          endDateBeforeStartDateError: false,
-        }));
-      } else if (validateRequired(formData.getIn(['attributes', 'start_date']))
-        && validateRequired(formData.getIn(['attributes', 'end_date']))
-        && !validateDateAfterDate(formData.getIn(['attributes', 'end_date']), formData.getIn(['attributes', 'start_date']))
-      ) {
-        dispatch(formActions.setErrors(
-          'indicatorNew.form.data.attributes.start_date',
-          { startDateAfterEndDateError: formatMessage(appMessages.forms.startDateAfterEndDateError) }
-        ));
-        dispatch(formActions.setErrors(
-          'indicatorNew.form.data.attributes.end_date',
-          { endDateBeforeStartDateError: formatMessage(appMessages.forms.endDateBeforeStartDateError) }
-        ));
-      }
-      dispatch(formActions.change(repeatModel, repeat));
-    },
-    onStartDateChange: (dateModel, dateValue, formData, formatMessage) => {
-      // validateDateAfterDate if repeat and both dates present
+    isRepeat: (formData) => formData.attributes.repeat,
+    onEndDateChange: (endDate, formValues, formatMessage) => {
+      const formData = fromJS(formValues);
       if (formData.getIn(['attributes', 'repeat'])
-        && validateRequired(formData.getIn(['attributes', 'end_date']))
-        && validateRequired(dateValue)
-        && !validateDateAfterDate(formData.getIn(['attributes', 'end_date']), dateValue)
-      ) {
-        dispatch(formActions.setErrors(
-          'indicatorNew.form.data.attributes.start_date',
-          { startDateAfterEndDateError: formatMessage(appMessages.forms.startDateAfterEndDateError) }
-        ));
-      } else {
-        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', { startDateAfterEndDateError: false }));
-        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', { endDateBeforeStartDateError: false }));
-      }
-      dispatch(formActions.change(dateModel, dateValue));
-    },
-    onEndDateChange: (dateModel, dateValue, formData, formatMessage) => {
-      if (formData.getIn(['attributes', 'repeat'])
-        && validateRequired(dateValue)
+        && validateRequired(endDate)
         && validateRequired(formData.getIn(['attributes', 'start_date']))
-        && !validateDateAfterDate(dateValue, formData.getIn(['attributes', 'start_date']))
+        && !validateDateAfterDate(endDate, formData.getIn(['attributes', 'start_date']))
       ) {
-        dispatch(formActions.setErrors(
-          'indicatorNew.form.data.attributes.end_date',
-          { endDateBeforeStartDateError: formatMessage(appMessages.forms.endDateBeforeStartDateError) }
-        ));
-      } else {
-        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', { endDateBeforeStartDateError: false }));
-        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', { startDateAfterEndDateError: false }));
+        return formatMessage(appMessages.forms.endDateBeforeStartDateError);
       }
-      dispatch(formActions.change(dateModel, dateValue));
+      return null;
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
@@ -404,27 +374,11 @@ function mapDispatchToProps(dispatch) {
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
     },
-    handleSubmitFail: (formData, formatMessage) => {
-      if (formData.$form.errors.endDatePresent) {
-        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', {
-          required: true,
-        }));
-      }
-      if (formData.$form.errors.startDatePresent) {
-        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', {
-          required: true,
-        }));
-      }
-      if (formData.$form.validity.endDatePresent && formData.$form.validity.startDatePresent && formData.$form.errors.endDateAfterStartDate) {
-        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.start_date', formatMessage(appMessages.forms.startDateAfterEndDateError)));
-        dispatch(formActions.setErrors('indicatorNew.form.data.attributes.end_date', formatMessage(appMessages.forms.endDateBeforeStartDateError)));
-      }
+    handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, recommendationsByFw) => {
+    handleSubmit: (formValues, recommendationsByFw) => {
+      const formData = fromJS(formValues);
       let saveData = formData;
       // measures
       if (formData.get('associatedMeasures')) {
@@ -432,24 +386,22 @@ function mapDispatchToProps(dispatch) {
           .set('measureIndicators', Map({
             delete: List(),
             create: getCheckedValuesFromOptions(formData.get('associatedMeasures'))
-            .map((id) => Map({
-              measure_id: id,
-            })),
+              .map((id) => Map({
+                measure_id: id,
+              })),
           }));
       }
       if (formData.get('associatedRecommendationsByFw') && recommendationsByFw) {
         saveData = saveData.set(
           'recommendationIndicators',
           recommendationsByFw
-            .map((recs, fwid) =>
-              getConnectionUpdatesFromFormData({
-                formData,
-                connections: recs,
-                connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
-                createConnectionKey: 'recommendation_id',
-                createKey: 'indicator_id',
-              })
-            )
+            .map((recs, fwid) => getConnectionUpdatesFromFormData({
+              formData,
+              connections: recs,
+              connectionAttribute: ['associatedRecommendationsByFw', fwid.toString()],
+              createConnectionKey: 'recommendation_id',
+              createKey: 'indicator_id',
+            }))
             .reduce(
               (memo, deleteCreateLists) => {
                 const creates = memo.get('create').concat(deleteCreateLists.get('create'));
@@ -485,10 +437,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(saveData.toJS()));
     },
     handleCancel: () => {
-      dispatch(updatePath(PATHS.INDICATORS, { replace: true }));
-    },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
+      dispatch(updatePath(ROUTES.INDICATORS, { replace: true }));
     },
     onCreateOption: (args) => {
       dispatch(openNewEntityModal(args));
@@ -496,4 +445,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(IndicatorNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(IndicatorNew));

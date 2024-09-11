@@ -7,6 +7,9 @@ const ConnectionLabel = styled(ListLabel)`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 1.5em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.larger};
+  }
 `;
 
 export default ConnectionLabel;

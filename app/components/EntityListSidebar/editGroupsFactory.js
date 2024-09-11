@@ -1,8 +1,8 @@
 import { reduce } from 'lodash/collection';
 import { sortEntities } from 'utils/sort';
-import { attributesEqual } from 'utils/entities';
-
-export const makeEditGroups = (
+import { qe } from 'utils/quasi-equals';
+import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
+export const makeEditGroups = ({
   config,
   taxonomies,
   activeEditOption,
@@ -10,13 +10,52 @@ export const makeEditGroups = (
   messages,
   frameworks,
   selectedFrameworkIds,
-) => {
+}) => {
   const editGroups = {};
-  const selectedFrameworks = frameworks.filter(
-    (fw) => selectedFrameworkIds.find((id) => attributesEqual(id, fw.get('id'))),
+  const selectedFrameworks = frameworks && frameworks.filter(
+    (fw) => selectedFrameworkIds.find((id) => qe(id, fw.get('id'))),
   );
+
+  // attributes
+  if (config.attributes) {
+    // first prepare taxonomy options
+    editGroups.attributes = {
+      id: 'attributes', // filterGroupId
+      label: messages.attributes,
+      show: true,
+      options: reduce(
+        config.attributes.options,
+        (optionsMemo, option) => {
+          // check for frameworks
+          if (
+            option.frameworkFilter
+            && option.editForFrameworks
+            && frameworks
+            && !selectedFrameworks.every((fw) => fw.getIn(['attributes', option.frameworkFilter]))
+          ) {
+            return optionsMemo;
+          }
+          // check for user roles and settings
+          return (
+            (typeof option.edit === 'undefined' || option.edit)
+            && (typeof option.role === 'undefined' || hasUserRole[option.role])
+            && (typeof option.editRole === 'undefined' || hasUserRole[option.editRole])
+          )
+            ? optionsMemo.concat({
+              id: option.attribute, // filterOptionId
+              label: option.label,
+              message: option.message,
+              active: !!activeEditOption && activeEditOption.optionId === option.attribute,
+            })
+            : optionsMemo;
+        },
+        [],
+      ),
+    };
+  }
   // taxonomy option group
   if (config.taxonomies && taxonomies) {
+    const canCreateCategories = hasUserRole[CATEGORY_ADMIN_MIN_ROLE];
     // first prepare taxonomy options
     editGroups.taxonomies = {
       id: 'taxonomies', // filterGroupId
@@ -24,26 +63,23 @@ export const makeEditGroups = (
       show: true,
       icon: 'categories',
       options:
+        // all selectedFrameworkIds must be included in tax.frameworkIds
         sortEntities(taxonomies, 'asc', 'priority')
-        .filter(
-          (tax) =>
-            // all selectedFrameworkIds must be included in tax.frameworkIds
-            (
-              !config.taxonomies.editForFrameworks ||
-              selectedFrameworkIds.isSubset(tax.get('frameworkIds'))
-            ) &&
-            // not a parent
-            !taxonomies.some(
-              (otherTax) =>
-                attributesEqual(
-                  tax.get('id'),
-                  otherTax.getIn(['attributes', 'parent_id']),
-                )
+          .filter(
+            (tax) => (
+              !config.taxonomies.editForFrameworks
+              || selectedFrameworkIds.isSubset(tax.get('frameworkIds'))
             )
-        )
-        .reduce(
-          (memo, taxonomy) =>
-            taxonomy.get('tags')
+            // not a parent
+            && !taxonomies.some(
+              (otherTax) => qe(
+                tax.get('id'),
+                otherTax.getIn(['attributes', 'parent_id']),
+              )
+            )
+          )
+          .reduce(
+            (memo, taxonomy) => taxonomy.get('tags')
               ? memo.concat([
                 {
                   id: taxonomy.get('id'), // filterOptionId
@@ -52,15 +88,17 @@ export const makeEditGroups = (
                   key: config.taxonomies.key,
                   ownKey: config.taxonomies.ownKey,
                   active: !!activeEditOption && activeEditOption.optionId === taxonomy.get('id'),
-                  create: {
-                    path: 'categories',
-                    attributes: { taxonomy_id: taxonomy.get('id') },
-                  },
+                  create: canCreateCategories
+                    ? {
+                      path: 'categories',
+                      attributes: { taxonomy_id: taxonomy.get('id') },
+                    }
+                    : null,
                 },
               ])
               : memo,
-          [],
-        ),
+            [],
+          ),
     };
   }
 
@@ -76,18 +114,16 @@ export const makeEditGroups = (
         (optionsMemo, option) => {
           // exclude connections not applicabel for all frameworks
           if (
-            option.frameworkFilter &&
-            option.editForFrameworks &&
-            frameworks &&
-            !selectedFrameworks.every((fw) => fw.getIn(['attributes', option.frameworkFilter]))
+            option.frameworkFilter
+            && option.editForFrameworks
+            && frameworks
+            && !selectedFrameworks.every((fw) => fw.getIn(['attributes', option.frameworkFilter]))
           ) {
             return optionsMemo;
           }
           if (option.groupByFramework && frameworks) {
             return frameworks
-              .filter((fw) =>
-                !option.frameworkFilter || fw.getIn(['attributes', option.frameworkFilter])
-              )
+              .filter((fw) => !option.frameworkFilter || fw.getIn(['attributes', option.frameworkFilter]))
               .reduce(
                 (memo, fw) => {
                   const id = `${option.path}_${fw.get('id')}`;
@@ -122,41 +158,6 @@ export const makeEditGroups = (
               icon: option.path,
               active: !!activeEditOption && activeEditOption.optionId === option.path,
               create: { path: option.path },
-            })
-            : optionsMemo;
-        },
-        [],
-      ),
-    };
-  }
-
-  // attributes
-  if (config.attributes) {
-    // first prepare taxonomy options
-    editGroups.attributes = {
-      id: 'attributes', // filterGroupId
-      label: messages.attributes,
-      show: true,
-      options: reduce(
-        config.attributes.options,
-        (optionsMemo, option) => {
-          if (
-            option.frameworkFilter &&
-            option.editForFrameworks &&
-            frameworks &&
-            !selectedFrameworks.every((fw) => fw.getIn(['attributes', option.frameworkFilter]))
-          ) {
-            return optionsMemo;
-          }
-          return (
-            (typeof option.edit === 'undefined' || option.edit) &&
-            (typeof option.role === 'undefined' || hasUserRole[option.role])
-          )
-            ? optionsMemo.concat({
-              id: option.attribute, // filterOptionId
-              label: option.label,
-              message: option.message,
-              active: !!activeEditOption && activeEditOption.optionId === option.attribute,
             })
             : optionsMemo;
         },

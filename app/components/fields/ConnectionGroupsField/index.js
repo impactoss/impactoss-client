@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { injectIntl } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -17,25 +18,24 @@ const StyledFieldWrap = styled(FieldWrap)`
 
 class ConnectionGroupsField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { field } = this.props;
-    const size = field.groups && field.groups.reduce((sum, group) =>
-      group.get(field.entityPath)
-        ? sum + group.get(field.entityPath).size
-        : sum
-    , 0);
-    const label =
-      this.context.intl.formatMessage(
-        appMessages.fields.connectionsGrouped,
-        {
-          size,
-          type: this.context.intl.formatMessage(
-            size === 1
+    const { field, intl } = this.props;
+
+    const size = field.groups && field.groups.reduce((sum, group) => group.get(field.entityPath)
+      ? sum + group.get(field.entityPath).size
+      : sum,
+    0);
+    const label = intl.formatMessage(
+      appMessages.fields.connectionsGrouped,
+      {
+        size,
+        type: intl.formatMessage(
+          size === 1
             ? appMessages.entities[field.entityType].single
             : appMessages.entities[field.entityType].plural
-          ),
-          byType: this.context.intl.formatMessage(field.groupedBy),
-        }
-      );
+        ),
+        byType: intl.formatMessage(field.groupedBy),
+      }
+    );
 
     return (
       <StyledFieldWrap>
@@ -58,9 +58,7 @@ class ConnectionGroupsField extends React.PureComponent { // eslint-disable-line
 
 ConnectionGroupsField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-ConnectionGroupsField.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default ConnectionGroupsField;
+export default injectIntl(ConnectionGroupsField);

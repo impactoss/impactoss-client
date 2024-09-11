@@ -7,10 +7,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import { Map, List, fromJS } from 'immutable';
+import { injectIntl } from 'react-intl';
 
-import { getAcceptanceStatus } from 'utils/entities';
+import { getSupportLevel } from 'utils/entities';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
@@ -18,10 +19,11 @@ import {
   selectRecommendationTaxonomies,
   selectActiveFrameworks,
   selectIsUserManager,
+  selectIsSignedIn,
 } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 import EntityList from 'containers/EntityList';
 
@@ -30,11 +32,11 @@ import { selectRecommendations, selectConnectedTaxonomies, selectConnections } f
 import messages from './messages';
 
 export class RecommendationList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -49,6 +51,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     // console.log('test connections', isEqual(this.props.connections, nextProps.connections));
     // console.log('test connections', this.props.connections === nextProps.connections);
   }
+
   // shouldComponentUpdate(nextProps, nextState) {
   //   // console.log('EntityListSidebar.shouldComponentUpdate')
   //   // console.log('props isEqual', isEqual(this.props, nextProps))
@@ -60,40 +63,62 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
   //     || !isEqual(this.state, nextState);
   // }
   render() {
-    const { dataReady, frameworks, isManager } = this.props;
+    const {
+      dataReady,
+      frameworks,
+      isManager,
+      isUserSignedIn,
+      intl,
+    } = this.props;
     // console.log('RecList:render')
     const currentFramework = frameworks && frameworks.size === 1 && frameworks.first();
     const type = currentFramework
       ? `recommendations_${currentFramework.get('id')}`
       : 'recommendations';
     const headerOptions = {
-      supTitle: this.context.intl.formatMessage(messages.pageTitle),
+      supTitle: intl.formatMessage(messages.pageTitle),
       icon: type,
       actions: [],
+      actionsAdmin: [],
     };
-    if (isManager) {
+    if (isUserSignedIn) {
       headerOptions.actions.push({
+        type: 'bookmarker',
+        title: intl.formatMessage(appMessages.entities[type].plural),
+        entityType: type,
+      });
+    }
+    if (window.print) {
+      headerOptions.actions.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: intl.formatMessage(appMessages.buttons.printTitle),
+        icon: 'print',
+      });
+    }
+    if (CONFIG.downloadCSV) {
+      headerOptions.actions.push({
+        type: 'download',
+      });
+    }
+    if (isManager) {
+      headerOptions.actionsAdmin.push({
         type: 'text',
-        title: this.context.intl.formatMessage(appMessages.buttons.import),
+        title: intl.formatMessage(appMessages.buttons.import),
         onClick: () => this.props.handleImport(),
       });
-      headerOptions.actions.push({
+      headerOptions.actionsAdmin.push({
         type: 'add',
         title: [
-          this.context.intl.formatMessage(appMessages.buttons.add),
+          intl.formatMessage(appMessages.buttons.add),
           {
-            title: this.context.intl.formatMessage(appMessages.entities[type].single),
+            title: intl.formatMessage(appMessages.entities[type].single),
             hiddenSmall: true,
           },
         ],
         onClick: () => this.props.handleNew(),
       });
     }
-    headerOptions.actions.push({
-      type: 'bookmarker',
-      title: this.context.intl.formatMessage(appMessages.entities[type].plural),
-      entityType: type,
-    });
     // if (dataReady) {
     //   console.log(this.props.entities.toJS())
     //   console.log(this.props.connections.toJS())
@@ -103,10 +128,10 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
     // }
     return (
       <div>
-        <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+        <HelmetCanonical
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <EntityList
@@ -119,11 +144,11 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
           header={headerOptions}
           dataReady={dataReady}
           entityTitle={{
-            single: this.context.intl.formatMessage(appMessages.entities[type].single),
-            plural: this.context.intl.formatMessage(appMessages.entities[type].plural),
+            single: intl.formatMessage(appMessages.entities[type].single),
+            plural: intl.formatMessage(appMessages.entities[type].plural),
           }}
           entityIcon={(entity) => {
-            const status = getAcceptanceStatus(entity);
+            const status = getSupportLevel(entity);
             return status ? status.icon : null;
           }}
           locationQuery={fromJS(this.props.location.query)}
@@ -145,9 +170,7 @@ RecommendationList.propTypes = {
   connectedTaxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   location: PropTypes.object,
-};
-
-RecommendationList.contextTypes = {
+  isUserSignedIn: PropTypes.bool,
   intl: PropTypes.object.isRequired,
 };
 
@@ -159,6 +182,7 @@ const mapStateToProps = (state, props) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectActiveFrameworks(state),
   isManager: selectIsUserManager(state),
+  isUserSignedIn: selectIsSignedIn(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -167,12 +191,12 @@ function mapDispatchToProps(dispatch) {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     handleNew: () => {
-      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}${PATHS.NEW}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.RECOMMENDATIONS}${ROUTES.NEW}`, { replace: true }));
     },
     handleImport: () => {
-      dispatch(updatePath(`${PATHS.RECOMMENDATIONS}${PATHS.IMPORT}`));
+      dispatch(updatePath(`${ROUTES.RECOMMENDATIONS}${ROUTES.IMPORT}`));
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RecommendationList);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(RecommendationList));

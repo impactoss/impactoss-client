@@ -183,19 +183,23 @@ export default defineMessages({
       id: 'app.containers.App.buttons.import',
       defaultMessage: 'Import',
     },
-    hideSecondaryNavigation: {
-      id: 'app.containers.App.buttons.hideSecondaryNavigation',
-      defaultMessage: 'Hide top menu',
+    importTitle: {
+      id: 'app.containers.App.buttons.importTitle',
+      defaultMessage: 'Import multiple {type}',
     },
-    showSecondaryNavigation: {
-      id: 'app.containers.App.buttons.showSecondaryNavigation',
-      defaultMessage: 'Show top menu',
+    printTitle: {
+      id: 'app.containers.App.buttons.printTitle',
+      defaultMessage: 'Print current view or save as PDF',
     },
   },
   labels: {
     perPage: {
       id: 'app.containers.App.labels.perPage',
       defaultMessage: 'Per page',
+    },
+    groupedByTaxonomy: {
+      id: 'app.containers.App.labels.groupedByTaxonomy',
+      defaultMessage: ' (by {tax})',
     },
     smart: {
       met: {
@@ -206,6 +210,10 @@ export default defineMessages({
         id: 'app.containers.App.labels.smart.notMet',
         defaultMessage: 'Not met',
       },
+    },
+    settings: {
+      id: 'app.containers.App.labels.settings',
+      defaultMessage: 'Settings',
     },
   },
   fields: {
@@ -218,6 +226,10 @@ export default defineMessages({
     fieldRequired: {
       id: 'app.containers.App.forms.fieldRequired',
       defaultMessage: 'This field cannot be empty',
+    },
+    valueProhibited: {
+      id: 'app.containers.App.forms.valueProhibited',
+      defaultMessage: 'This value is not allowed',
     },
     dateFormatError: {
       id: 'app.containers.App.forms.dateFormatError',
@@ -264,6 +276,7 @@ export default defineMessages({
       defaultMessage: '"Reference" is required. ',
     },
   },
+
   hints: {
     autoReference: {
       id: 'app.containers.App.hints.autoReference',
@@ -280,6 +293,10 @@ export default defineMessages({
     fullRecommendation: {
       id: 'app.containers.App.hints.fullRecommendation',
       defaultMessage: 'Note: use only if title field does not already contain full text',
+    },
+    printListMore: {
+      id: 'app.containers.App.hints.printListMore',
+      defaultMessage: 'List only showing {no} items.',
     },
   },
   textValues: {
@@ -343,13 +360,21 @@ export default defineMessages({
       id: 'app.containers.App.importFields.fullRecommendation',
       defaultMessage: 'Full recommendation text',
     },
-    accepted: {
-      id: 'app.containers.App.importFields.accepted',
-      defaultMessage: 'Accepted',
+    comment: {
+      id: 'app.containers.App.importFields.comment',
+      defaultMessage: 'Comment',
+    },
+    fullMeasure: {
+      id: 'app.containers.App.importFields.fullMeasure',
+      defaultMessage: 'Full action text',
+    },
+    support_level: {
+      id: 'app.containers.App.importFields.support_level',
+      defaultMessage: 'Government response (support)',
     },
     response: {
       id: 'app.containers.App.importFields.response',
-      defaultMessage: 'Government response',
+      defaultMessage: 'Government response (text)',
     },
     outcome: {
       id: 'app.containers.App.importFields.outcome',
@@ -471,13 +496,21 @@ export default defineMessages({
       id: 'app.containers.App.attributes.fullRecommendation',
       defaultMessage: 'Full recommendation text',
     },
+    fullMeasure: {
+      id: 'app.containers.App.attributes.fullMeasure',
+      defaultMessage: 'Full action text',
+    },
+    comment: {
+      id: 'app.containers.App.attributes.comment',
+      defaultMessage: 'Comment',
+    },
     content: {
       id: 'app.containers.App.attributes.content',
       defaultMessage: 'Content',
     },
-    accepted: {
-      id: 'app.containers.App.attributes.accepted',
-      defaultMessage: 'Government response',
+    support_level: {
+      id: 'app.containers.App.attributes.support_level',
+      defaultMessage: 'Government response (level of support)',
     },
     response: {
       id: 'app.containers.App.attributes.response',
@@ -535,6 +568,10 @@ export default defineMessages({
       id: 'app.containers.App.attributes.email',
       defaultMessage: 'Email address',
     },
+    domain: {
+      id: 'app.containers.App.attributes.domain',
+      defaultMessage: 'Domain (from Email)',
+    },
     status: {
       id: 'app.containers.App.attributes.status',
       defaultMessage: 'Status',
@@ -570,6 +607,10 @@ export default defineMessages({
     repeat: {
       id: 'app.containers.App.attributes.repeat',
       defaultMessage: 'Repeat?',
+    },
+    date_empty: {
+      id: 'app.containers.App.attributes.date_empty',
+      defaultMessage: 'No date set',
     },
     target_date_empty: {
       id: 'app.containers.App.attributes.target_date_empty',
@@ -621,27 +662,45 @@ export default defineMessages({
         defaultMessage: 'No indicator reporter assigned',
       },
     },
-    meta: {
-      title: {
-        id: 'app.containers.App.attributes.meta.title',
-        defaultMessage: 'Meta',
-      },
-      updated_by: {
-        id: 'app.containers.App.attributes.meta.updated_by',
-        defaultMessage: 'Updated by',
-      },
-      updated_at: {
-        id: 'app.containers.App.attributes.meta.updated_at',
-        defaultMessage: 'Last updated',
-      },
-      created_at: {
-        id: 'app.containers.App.attributes.meta.created_at',
-        defaultMessage: 'Created',
-      },
+    metaTitle: {
+      id: 'app.containers.App.attributes.metaTitle',
+      defaultMessage: 'Meta',
+    },
+    updated_by_id: {
+      id: 'app.containers.App.attributes.updated_by_id',
+      defaultMessage: 'Updated by',
+    },
+    updated_at: {
+      id: 'app.containers.App.attributes.updated_at',
+      defaultMessage: 'Last updated',
+    },
+    relationship_updated_by_id: {
+      id: 'app.containers.App.attributes.relationship_updated_by_id',
+      defaultMessage: 'Connection last updated by',
+    },
+    relationship_updated_at: {
+      id: 'app.containers.App.attributes.relationship_updated_at',
+      defaultMessage: 'Connection last updated',
+    },
+    created_by_id: {
+      id: 'app.containers.App.attributes.created_by_id',
+      defaultMessage: 'Created by',
+    },
+    created_at: {
+      id: 'app.containers.App.attributes.created_at',
+      defaultMessage: 'Created',
     },
     framework_id: {
       id: 'app.containers.App.attributes.framework_id',
       defaultMessage: 'Framework',
+    },
+    is_archive: {
+      id: 'app.containers.App.attributes.is_archive',
+      defaultMessage: 'Archived/active',
+    },
+    is_current: {
+      id: 'app.containers.App.attributes.is_current',
+      defaultMessage: 'Latest/previous cycle',
     },
   },
   nav: {
@@ -1310,6 +1369,32 @@ export default defineMessages({
           defaultMessage: 'About tax 10',
         },
       },
+      11: {
+        single: {
+          id: 'app.containers.App.entities.taxonomies.11.single',
+          defaultMessage: 'Taxonomy 10',
+        },
+        plural: {
+          id: 'app.containers.App.entities.taxonomies.11.plural',
+          defaultMessage: 'Taxonomy 10s',
+        },
+        empty: {
+          id: 'app.containers.App.entities.taxonomies.11.empty',
+          defaultMessage: 'No Taxonomy 10 assigned yet',
+        },
+        shortSingle: {
+          id: 'app.containers.App.entities.taxonomies.11.shortSingle',
+          defaultMessage: 'Taxonomy 10',
+        },
+        shortPlural: {
+          id: 'app.containers.App.entities.taxonomies.11.shortPlural',
+          defaultMessage: 'Taxonomy 10s',
+        },
+        description: {
+          id: 'app.containers.App.entities.taxonomies.11.description',
+          defaultMessage: 'About tax 10',
+        },
+      },
     },
     due_dates: {
       single: {
@@ -1407,6 +1492,14 @@ export default defineMessages({
       id: 'app.containers.App.messages.createdAsGuest',
       defaultMessage: '{entityType} created successfully. It will become publicly available once verified and published by an authorised user.',
     },
+    signingInServer: {
+      id: 'app.containers.App.messages.signingInServer',
+      defaultMessage: 'Note: signing in to {server} database',
+    },
+    registeringServer: {
+      id: 'app.containers.App.messages.registeringServer',
+      defaultMessage: 'Note: registering for {server} database',
+    },
   },
   ui: {
     userRoles: {
@@ -1447,14 +1540,42 @@ export default defineMessages({
         defaultMessage: 'Private',
       },
     },
-    acceptedStatuses: {
-      accepted: {
-        id: 'app.containers.App.ui.acceptedStatuses.accepted',
-        defaultMessage: 'Accepted',
+    supportLevels: {
+      supported: {
+        id: 'app.containers.App.ui.supportLevels.supported',
+        defaultMessage: 'Supported',
+      },
+      supportedInPart: {
+        id: 'app.containers.App.ui.supportLevels.supportedInPart',
+        defaultMessage: 'Supported in part',
       },
       noted: {
-        id: 'app.containers.App.ui.acceptedStatuses.noted',
-        defaultMessage: 'Not accepted',
+        id: 'app.containers.App.ui.supportLevels.noted',
+        defaultMessage: 'Noted',
+      },
+      null: {
+        id: 'app.containers.App.ui.supportLevels.null',
+        defaultMessage: 'Not applicable',
+      },
+    },
+    archiveStatuses: {
+      archived: {
+        id: 'app.containers.App.ui.archiveStatuses.archived',
+        defaultMessage: 'Archived',
+      },
+      notArchived: {
+        id: 'app.containers.App.ui.archiveStatuses.notArchived',
+        defaultMessage: 'Active',
+      },
+    },
+    currentStatuses: {
+      current: {
+        id: 'app.containers.App.ui.currentStatuses.current',
+        defaultMessage: 'Latest cycle',
+      },
+      notCurrent: {
+        id: 'app.containers.App.ui.currentStatuses.notCurrent',
+        defaultMessage: 'Previous cycle',
       },
     },
     reportFrequencies: {
@@ -1484,6 +1605,42 @@ export default defineMessages({
         id: 'app.containers.App.ui.sortOrderOptions.desc',
         defaultMessage: 'Descending',
       },
+    },
+    pageItemOptions: {
+      all: {
+        id: 'app.containers.App.ui.pageItemOptions.all',
+        defaultMessage: 'All',
+      },
+    },
+  },
+  screenreader: {
+    hideSecondaryNavigation: {
+      id: 'app.containers.App.buttons.hideSecondaryNavigation',
+      defaultMessage: 'Hide top menu',
+    },
+    showSecondaryNavigation: {
+      id: 'app.containers.App.buttons.showSecondaryNavigation',
+      defaultMessage: 'Show top menu',
+    },
+    skipToContent: {
+      id: 'app.containers.App.screenreader.skipToContent',
+      defaultMessage: 'Skip to content',
+    },
+    skipBackToContent: {
+      id: 'app.containers.App.screenreader.skipBackToContent',
+      defaultMessage: 'Skip back to content',
+    },
+    skipToListFilter: {
+      id: 'app.containers.App.screenreader.skipToListFilter',
+      defaultMessage: 'Skip to list filter options',
+    },
+    skipToListFilterEdit: {
+      id: 'app.containers.App.screenreader.skipToListFilterEdit',
+      defaultMessage: 'Skip to list filter and batch edit options',
+    },
+    skipToCategorySelect: {
+      id: 'app.containers.App.screenreader.skipToCategorySelect',
+      defaultMessage: 'Skip to category group options',
     },
   },
 });

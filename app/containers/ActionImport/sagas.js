@@ -1,4 +1,6 @@
-import { take, put, cancel, takeEvery } from 'redux-saga/effects';
+import {
+  take, put, cancel, takeEvery,
+} from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { newEntity } from 'containers/App/actions';

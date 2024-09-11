@@ -1,8 +1,10 @@
-import { take, put, cancel, takeLatest } from 'redux-saga/effects';
+import {
+  take, put, cancel, takeLatest,
+} from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { newEntity } from 'containers/App/actions';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 import { SAVE } from './constants';
 
@@ -10,8 +12,8 @@ export function* save({ data }) {
   yield put(newEntity({
     path: 'indicators',
     entity: data,
-    redirect: PATHS.INDICATORS,
-    invalidateEntitiesOnSuccess: 'due_dates',    // force due_date reload to get newly generated due_dates
+    redirect: ROUTES.INDICATORS,
+    invalidateEntitiesOnSuccess: 'due_dates', // force due_date reload to get newly generated due_dates
   }));
 }
 

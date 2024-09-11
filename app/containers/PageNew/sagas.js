@@ -1,8 +1,10 @@
-import { take, put, cancel, takeLatest } from 'redux-saga/effects';
+import {
+  take, put, cancel, takeLatest,
+} from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { newEntity } from 'containers/App/actions';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 import { SAVE } from './constants';
 
@@ -10,7 +12,7 @@ export function* save({ data }) {
   yield put(newEntity({
     path: 'pages',
     entity: data,
-    redirect: PATHS.PAGES,
+    redirect: ROUTES.PAGES,
   }));
 }
 

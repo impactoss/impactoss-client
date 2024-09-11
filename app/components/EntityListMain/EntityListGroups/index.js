@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 
@@ -20,7 +20,6 @@ import { getPager } from './pagination';
 import messages from './messages';
 
 const ListEntitiesMain = styled.div`
-  padding-top: 0.5em;
 `;
 const ListEntitiesEmpty = styled.div``;
 const ListEntitiesGroup = styled.div`
@@ -42,16 +41,15 @@ const ListEntitiesSubGroup = styled.div`
 const PAGE_SIZE = 20;
 const PAGE_SIZE_MAX = 100;
 
-const countEntities = (entityGroups) =>
-  entityGroups.reduce((memo, group) => {
-    if (group.get('entities')) {
-      return memo + group.get('entities').size;
-    }
-    if (group.get('entityGroups')) {
-      return memo + countEntities(group.get('entityGroups'));
-    }
-    return memo;
-  }, 0);
+const countEntities = (entityGroups) => entityGroups.reduce((memo, group) => {
+  if (group.get('entities')) {
+    return memo + group.get('entities').size;
+  }
+  if (group.get('entityGroups')) {
+    return memo + countEntities(group.get('entityGroups'));
+  }
+  return memo;
+}, 0);
 
 const sliceGroup = (group, pager, groupStartIndex, groupEndIndex, formatMessage) => {
   // group wholly contained
@@ -122,15 +120,13 @@ const pageEntityGroups = (entityGroups, pager, formatMessage) => {
 
 
 export class EntityListGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  transformMessage = (msg, entityId, intl) =>
+    intl
+      ? intl.formatMessage(messages.entityNoLongerPresent, { entityId })
+      : msg;
 
-  transformMessage = (msg, entityId) => this.context.intl
-  ? this.context.intl.formatMessage(messages.entityNoLongerPresent, { entityId })
-  : msg;
-
-  hasLocationQueryFilters = (locationQuery) =>
-    locationQuery.reduce((hasFilters, value, arg) =>
-      hasFilters || ['items', 'page', 'group', 'subgroup', 'sort', 'order'].indexOf(arg) === -1
-    , false);
+  hasLocationQueryFilters = (locationQuery) => locationQuery.reduce((hasFilters, value, arg) => hasFilters || ['items', 'page', 'group', 'subgroup', 'sort', 'order'].indexOf(arg) === -1,
+    false);
 
   render() {
     // console.log('error EntityListGroups.render')
@@ -149,15 +145,26 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       locationQuery,
       groupSelectValue,
       subgroupSelectValue,
+      groupTaxonomyTitle,
+      subgroupTaxonomyTitle,
       entities,
       errors,
       entityGroups,
+      intl,
     } = this.props;
-
-    const pageSize = Math.min(
-      (locationQuery.get('items') && parseInt(locationQuery.get('items'), 10)) || PAGE_SIZE,
-      PAGE_SIZE_MAX
-    );
+    let pageSize = PAGE_SIZE_MAX;
+    if (locationQuery.get('items')) {
+      if (locationQuery.get('items') === 'all') {
+        pageSize = entities.size;
+      } else {
+        pageSize = Math.min(
+          (locationQuery.get('items') && parseInt(locationQuery.get('items'), 10)),
+          PAGE_SIZE_MAX
+        );
+      }
+    } else {
+      pageSize = Math.min(PAGE_SIZE, PAGE_SIZE_MAX);
+    }
     let entityIdsOnPage;
     let entityGroupsPaged;
     let pager;
@@ -175,17 +182,16 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
           pageSize
         );
         // pick only entities within oage range while preserving hierarchical groups shape
-        entityGroupsPaged = pageEntityGroups(entityGroups, pager, this.context.intl ? this.context.intl.formatMessage : null);
+        entityGroupsPaged = pageEntityGroups(entityGroups, pager, intl ? intl.formatMessage : null);
         // flatten entities for select all
         entityIdsOnPage = entityGroupsPaged.map((group) => group.get('entityGroups')
           ? group.get('entityGroups').map((subgroup) => subgroup.get('entities').map((entity) => entity.get('id'))).flatten(1)
-          : group.get('entities').map((entity) => entity.get('id'))
-        ).flatten(1);
+          : group.get('entities').map((entity) => entity.get('id'))).flatten(1);
       } else {
         entityIdsOnPage = entities.map((entity) => entity.get('id'));
         entityGroupsPaged = entityGroups;
       }
-    // no grouping required, paging required
+      // no grouping required, paging required
     } else if (entities.size > pageSize) {
       // get new pager object for specified page
       pager = getPager(
@@ -202,10 +208,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       entityGroupsPaged = List().push(Map({ entities }));
     }
 
-    const errorsWithoutEntities = errors && errors.filter((error, id) =>
-      !entities.find((entity) => entity.get('id') === id)
-    );
-
+    const errorsWithoutEntities = errors && errors.filter((error, id) => !entities.find((entity) => entity.get('id') === id));
     return (
       <div>
         <EntityListHeader
@@ -225,59 +228,85 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
           onSortBy={this.props.onSortBy}
           onSortOrder={this.props.onSortOrder}
           onSelect={(checked) => {
-            onEntitySelectAll(checked ? entityIdsOnPage.toArray() : []);
+            onEntitySelectAll(checked ? entityIdsOnPage.valueSeq().toArray() : []);
           }}
           onSelectAll={() => {
-            onEntitySelectAll(entities.map((entity) => entity.get('id')).toArray());
+            onEntitySelectAll(
+              entities.map((entity) => entity.get('id')).valueSeq().toArray(),
+            );
           }}
         />
-        <ListEntitiesMain>
-          { entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0) &&
-            <ListEntitiesEmpty>
-              <FormattedMessage {...messages.listEmptyAfterQuery} />
-            </ListEntitiesEmpty>
+        <ListEntitiesMain id="entity-list-main">
+          {entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0)
+            && (
+              <ListEntitiesEmpty>
+                <FormattedMessage {...messages.listEmptyAfterQuery} />
+              </ListEntitiesEmpty>
+            )
           }
-          { entityIdsOnPage.size === 0 && !this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0) &&
-            <ListEntitiesEmpty>
-              <FormattedMessage {...messages.listEmpty} />
-            </ListEntitiesEmpty>
+          {entityIdsOnPage.size === 0 && !this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0)
+            && (
+              <ListEntitiesEmpty>
+                <FormattedMessage {...messages.listEmpty} />
+              </ListEntitiesEmpty>
+            )
           }
-          { entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery)
+          {entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery)
             && errorsWithoutEntities && errorsWithoutEntities.size > 0
             && errors && errors.size > 0
-            &&
-            <ListEntitiesEmpty>
-              <FormattedMessage {...messages.listEmptyAfterQueryAndErrors} />
-            </ListEntitiesEmpty>
+            && (
+              <ListEntitiesEmpty>
+                <FormattedMessage {...messages.listEmptyAfterQueryAndErrors} />
+              </ListEntitiesEmpty>
+            )
           }
-          { errorsWithoutEntities && errorsWithoutEntities.size > 0 && !this.hasLocationQueryFilters(locationQuery) &&
-            errorsWithoutEntities.map((entityErrors, entityId) => (
+          {errorsWithoutEntities && errorsWithoutEntities.size > 0 && !this.hasLocationQueryFilters(locationQuery)
+            && errorsWithoutEntities.map((entityErrors, entityId) => (
               entityErrors.map((updateError, i) => (
                 <Messages
                   key={i}
                   type="error"
-                  messages={updateError.getIn(['error', 'messages']).map((msg) => this.transformMessage(msg, entityId)).toArray()}
+                  messages={updateError
+                    .getIn(['error', 'messages'])
+                    .map((msg) => this.transformMessage(msg, entityId, intl))
+                    .valueSeq()
+                    .toArray()
+                  }
                   onDismiss={() => this.props.onDismissError(updateError.get('key'))}
                   preMessage={false}
                 />
               ))
             )).toList()
           }
-          { entityGroupsPaged.size > 0 &&
+          {entityGroupsPaged.size > 0 && (
             <div>
-              {
-                entityGroupsPaged.map((entityGroup, i) => (
-                  <ListEntitiesGroup key={i}>
-                    { groupSelectValue && entityGroup.get('label') &&
-                      <EntityListGroupHeader group={entityGroup} level={1} />
-                    }
-                    {
-                      entityGroup.get('entityGroups') &&
-                      entityGroup.get('entityGroups').toList().map((entitySubGroup, j) => (
+              {entityGroupsPaged.map((entityGroup, index, list) => {
+                let skipGroupTargetId = null;
+                if (list.size > index + 1) {
+                  const nextGroup = list.get(index + 1);
+                  skipGroupTargetId = nextGroup
+                    ? `#list-group-${nextGroup.get('id')}`
+                    : null;
+                }
+                return (
+                  <ListEntitiesGroup key={index}>
+                    {groupSelectValue && entityGroup.get('label') && (
+                      <EntityListGroupHeader
+                        group={entityGroup}
+                        level={1}
+                        groupTypeTitle={groupTaxonomyTitle}
+                      />
+                    )}
+                    {entityGroup.get('entityGroups') && entityGroup.get('entityGroups').toList().map(
+                      (entitySubGroup, j) => (
                         <ListEntitiesSubGroup key={j}>
-                          { subgroupSelectValue && entitySubGroup.get('label') &&
-                            <EntityListGroupHeader group={entitySubGroup} level={2} />
-                          }
+                          {subgroupSelectValue && entitySubGroup.get('label') && (
+                            <EntityListGroupHeader
+                              group={entitySubGroup}
+                              groupTypeTitle={subgroupTaxonomyTitle}
+                              level={2}
+                            />
+                          )}
                           <EntityListItems
                             taxonomies={this.props.taxonomies}
                             connections={this.props.connections}
@@ -292,13 +321,13 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             onEntitySelect={onEntitySelect}
                             expandNo={expandNo}
                             onExpand={onExpand}
-                            scrollContainer={this.props.scrollContainer}
                             onDismissError={this.props.onDismissError}
+                            skipGroupTargetId={skipGroupTargetId}
                           />
                         </ListEntitiesSubGroup>
-                      ))
-                    }
-                    { entityGroup.get('entities') && !entityGroup.get('entityGroups') &&
+                      )
+                    )}
+                    {entityGroup.get('entities') && !entityGroup.get('entityGroups') && (
                       <EntityListItems
                         taxonomies={this.props.taxonomies}
                         connections={this.props.connections}
@@ -313,24 +342,24 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                         onEntitySelect={onEntitySelect}
                         expandNo={expandNo}
                         onExpand={onExpand}
-                        scrollContainer={this.props.scrollContainer}
                         onDismissError={this.props.onDismissError}
+                        skipGroupTargetId={skipGroupTargetId}
                       />
-                    }
+                    )}
                   </ListEntitiesGroup>
-                ))
-              }
+                );
+              })}
             </div>
-          }
+          )}
         </ListEntitiesMain>
-        { entityGroupsPaged.size > 0 &&
+        {entityGroupsPaged.size > 0 && (
           <EntityListFooter
-            pageSize={pageSize}
+            pageSize={locationQuery.get('items') === 'all' ? 'all' : pageSize}
             pager={pager}
             onPageSelect={this.props.onPageSelect}
             onPageItemsSelect={this.props.onPageItemsSelect}
           />
-        }
+        )}
       </div>
     );
   }
@@ -359,19 +388,11 @@ EntityListGroups.propTypes = {
   onSortBy: PropTypes.func.isRequired,
   onSortOrder: PropTypes.func.isRequired,
   onDismissError: PropTypes.func.isRequired,
-  scrollContainer: PropTypes.object,
   groupSelectValue: PropTypes.string,
   subgroupSelectValue: PropTypes.string,
+  groupTaxonomyTitle: PropTypes.string,
+  subgroupTaxonomyTitle: PropTypes.string,
+  intl: PropTypes.object.isRequired,
 };
 
-EntityListGroups.defaultProps = {
-  sortBy: 'id',
-  sortOrder: 'desc',
-};
-
-EntityListGroups.contextTypes = {
-  intl: PropTypes.object,
-};
-
-
-export default EntityListGroups;
+export default injectIntl(EntityListGroups);

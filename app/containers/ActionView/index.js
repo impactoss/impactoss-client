@@ -7,10 +7,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
+import HelmetCanonical from 'components/HelmetCanonical';
+import { injectIntl } from 'react-intl';
 
 import {
+  getReferenceField,
   getTitleField,
   getStatusField,
   getMetaField,
@@ -21,20 +22,23 @@ import {
   hasTaxonomyCategories,
   getDateField,
   getTextField,
-  getIdField,
+  getSmartTaxonomyField,
 } from 'utils/fields';
 
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
+import { getEntityTitleTruncated, getEntityReference } from 'utils/entities';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
+import { lowerCase } from 'utils/string';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, IS_ARCHIVE_STATUSES, IS_CURRENT_STATUSES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
+import NotFoundEntity from 'containers/NotFoundEntity';
 
 import {
   selectReady,
@@ -58,11 +62,11 @@ import {
 import { DEPENDENCIES } from './constants';
 
 export class ActionView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -72,7 +76,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
   getHeaderMainFields = (entity, isManager) => ([ // fieldGroups
     { // fieldGroup
       fields: [
-        getIdField(entity, isManager),
+        getReferenceField(entity, isManager, true),
         getTitleField(entity, isManager),
       ],
     },
@@ -82,6 +86,22 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     {
       fields: [
         getStatusField(entity),
+        !entity.getIn(['attributes', 'draft'])
+        && getStatusField(
+          entity,
+          'is_current',
+          IS_CURRENT_STATUSES,
+          appMessages.attributes.is_current,
+          true,
+        ),
+        entity.getIn(['attributes', 'is_archive'])
+        && getStatusField(
+          entity,
+          'is_archive',
+          IS_ARCHIVE_STATUSES,
+          appMessages.attributes.is_archive,
+          false,
+        ),
         getMetaField(entity),
       ],
     },
@@ -90,6 +110,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
 
   getBodyMainFields = (
     entity,
+    taxonomies,
     indicators,
     indicatorConnections,
     recommendationsByFw,
@@ -98,18 +119,26 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     frameworks,
     onEntityClick,
   ) => {
-    const fields = [];
+    const groups = [];
+    const smartTaxonomy = taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
+    if (smartTaxonomy) {
+      groups.push({ // fieldGroup
+        type: 'smartTaxonomy',
+        label: appMessages.entities.taxonomies[smartTaxonomy.get('id')].plural,
+        fields: [getSmartTaxonomyField(smartTaxonomy)],
+      });
+    }
     // own attributes
-    fields.push({
+    groups.push({
       fields: [
-        getMarkdownField(entity, 'description', true),
-        // getMarkdownField(entity, 'outcome', true),
+        getMarkdownField(entity, 'description', true, 'fullMeasure'),
+        getMarkdownField(entity, 'outcome', true, 'comment'),
         // getMarkdownField(entity, 'indicator_summary', true),
       ],
     });
     // indicators
     if (indicators) {
-      fields.push({
+      groups.push({
         label: appMessages.nav.indicatorsSuper,
         icon: 'indicators',
         fields: [
@@ -121,7 +150,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     if (recommendationsByFw) {
       const recConnections = [];
       recommendationsByFw.forEach((recs, fwid) => {
-        const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+        const framework = frameworks.find((fw) => qe(fw.get('id'), fwid));
         const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
         recConnections.push(
           getRecommendationConnectionField(
@@ -134,13 +163,13 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           ),
         );
       });
-      fields.push({
-        label: appMessages.nav.recommendations,
+      groups.push({
+        label: appMessages.nav.recommendationsSuper,
         icon: 'recommendations',
         fields: recConnections,
       });
     }
-    return fields;
+    return groups;
   };
 
   getBodyAsideFields = (viewEntity, taxonomies) => {
@@ -152,15 +181,23 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
         getTextField(viewEntity, 'target_date_comment'),
       ],
     });
-    if (hasTaxonomyCategories(taxonomies)) {
+    // exclude smart taxonomy
+    let taxonomiesFiltered = taxonomies.filter((tax) => !tax.getIn(['attributes', 'is_smart']));
+    taxonomiesFiltered = taxonomiesFiltered.map(
+      (tax) => tax.set('categories', tax.get('categories').filter(
+        (cat) => cat.get('associated')
+      ))
+    );
+    if (hasTaxonomyCategories(taxonomiesFiltered)) {
       fields.push({ // fieldGroup
         label: appMessages.entities.taxonomies.plural,
         icon: 'categories',
-        fields: getTaxonomyFields(taxonomies),
+        fields: getTaxonomyFields(taxonomiesFiltered),
       });
     }
     return fields;
   };
+
   render() {
     const {
       viewEntity,
@@ -174,72 +211,90 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       recConnections,
       indicatorConnections,
       frameworks,
+      intl,
     } = this.props;
     const isManager = hasUserRole[USER_ROLES.MANAGER.value];
-    const buttons = isManager
-    ? [
-      {
-        type: 'edit',
-        onClick: () => this.props.handleEdit(this.props.params.id),
-      },
-      {
-        type: 'close',
-        onClick: this.props.handleClose,
-      },
-    ]
-    : [{
-      type: 'close',
-      onClick: this.props.handleClose,
-    }];
+    let buttons = [];
+    if (dataReady) {
+      buttons.push({
+        type: 'icon',
+        onClick: () => window.print(),
+        title: intl.formatMessage(appMessages.buttons.printTitle),
+        icon: 'print',
+      });
+      buttons = (isManager && viewEntity)
+        ? buttons.concat([
+          {
+            type: 'edit',
+            onClick: () => this.props.handleEdit(this.props.params.id),
+          },
+          {
+            type: 'close',
+            onClick: this.props.handleClose,
+          },
+        ])
+        : buttons.concat([{
+          type: 'close',
+          onClick: this.props.handleClose,
+        }]);
+    }
+    const pageTitle = intl.formatMessage(messages.pageTitle);
+    const metaTitle = viewEntity
+      ? `${pageTitle} ${getEntityReference(viewEntity)}: ${getEntityTitleTruncated(viewEntity)}`
+      : `${pageTitle} ${this.props.params.id}`;
 
     return (
       <div>
-        <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+        <HelmetCanonical
+          title={metaTitle}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={pageTitle}
             type={CONTENT_SINGLE}
             icon="measures"
             buttons={buttons}
           />
-          { !dataReady &&
-            <Loading />
+          { !dataReady
+            && <Loading />
           }
-          { !viewEntity && dataReady &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
-          }
-          { viewEntity && dataReady &&
-            <EntityView
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(viewEntity, isManager),
-                  aside: isManager && this.getHeaderAsideFields(viewEntity),
-                },
-                body: {
-                  main: this.getBodyMainFields(
-                    viewEntity,
-                    indicators,
-                    indicatorConnections,
-                    recommendationsByFw,
-                    recTaxonomies,
-                    recConnections,
-                    frameworks,
-                    onEntityClick,
-                  ),
-                  aside: this.getBodyAsideFields(
-                    viewEntity,
-                    taxonomies,
-                  ),
-                },
-              }}
+          {!viewEntity && dataReady && (
+            <NotFoundEntity
+              id={this.props.params.id}
+              type={lowerCase(intl.formatMessage(appMessages.entities.measures.single))}
             />
+          )}
+          { viewEntity && dataReady
+            && (
+              <EntityView
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(viewEntity, isManager),
+                    aside: isManager && this.getHeaderAsideFields(viewEntity),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(
+                      viewEntity,
+                      taxonomies,
+                      indicators,
+                      indicatorConnections,
+                      recommendationsByFw,
+                      recTaxonomies,
+                      recConnections,
+                      frameworks,
+                      onEntityClick,
+                    ),
+                    aside: this.getBodyAsideFields(
+                      viewEntity,
+                      taxonomies,
+                    ),
+                  },
+                }}
+              />
+            )
           }
         </Content>
       </div>
@@ -263,12 +318,8 @@ ActionView.propTypes = {
   indicatorConnections: PropTypes.object,
   params: PropTypes.object,
   frameworks: PropTypes.object,
-};
-
-ActionView.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
-
 
 const mapStateToProps = (state, props) => ({
   hasUserRole: selectHasUserRole(state),
@@ -292,12 +343,12 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: (measureId) => {
-      dispatch(updatePath(`${PATHS.MEASURES}${PATHS.EDIT}/${measureId}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.MEASURES}${ROUTES.EDIT}/${measureId}`, { replace: true }));
     },
     handleClose: () => {
-      dispatch(closeEntity(PATHS.MEASURES));
+      dispatch(closeEntity(ROUTES.MEASURES));
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionView);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(ActionView));

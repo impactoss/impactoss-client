@@ -34,4 +34,12 @@ export default defineMessages({
     id: 'app.containers.UserLogin.submit',
     defaultMessage: 'Sign in',
   },
+  signInWithAzureDescription: {
+    id: 'app.containers.UserLogin.signInWithAzureDescription',
+    defaultMessage: 'Sign in with your Microsoft account',
+  },
+  submitWithAzure: {
+    id: 'app.containers.UserLogin.submitWithAzure',
+    defaultMessage: 'Sign in with your Microsoft account',
+  },
 });

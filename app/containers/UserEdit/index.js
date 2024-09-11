@@ -7,17 +7,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
-import { actions as formActions } from 'react-redux-form/immutable';
-import { Map, List } from 'immutable';
+import HelmetCanonical from 'components/HelmetCanonical';
+import { FormattedMessage, injectIntl } from 'react-intl';
+import { Map, List, fromJS } from 'immutable';
 
 import {
   taxonomyOptions,
   renderTaxonomyControl,
   getCategoryUpdatesFromFormData,
   getTitleFormField,
-  getEmailField,
+  getEmailFormField,
   getHighestUserRoleId,
   getRoleFormField,
 } from 'utils/forms';
@@ -25,33 +24,42 @@ import {
 import {
   getMetaField,
   getRoleField,
+  getTitleField,
+  getEmailField,
 } from 'utils/fields';
+import { canUserManageUsers, canUserSeeMeta } from 'utils/permissions';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import qe from 'utils/quasi-equals';
 
 import {
   loadEntitiesIfNeeded,
   updatePath,
-  updateEntityForm,
   submitInvalid,
   saveErrorDismiss,
   openNewEntityModal,
+  redirectNotPermitted,
 } from 'containers/App/actions';
 
 import {
   selectReady,
   selectSessionUserHighestRoleId,
+  selectReadyForAuthCheck,
+  selectSessionUserId,
+  selectCanUserAdministerCategories,
 } from 'containers/App/selectors';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
 
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+
+import appMessages from 'containers/App/messages';
 
 import {
   selectDomain,
@@ -62,41 +70,43 @@ import {
 
 import { save } from './actions';
 import messages from './messages';
+
 import { DEPENDENCIES, FORM_INITIAL } from './constants';
 
 export class UserEdit extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.viewEntity) {
-      this.props.initialiseForm('userEdit.form.data', this.getInitialFormData());
-    }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.initialiseForm('userEdit.form.data', this.getInitialFormData(nextProps));
+    if (nextProps.dataReady && nextProps.authReady && nextProps.viewEntity) {
+      const canEdit = canUserManageUsers(nextProps.sessionUserHighestRoleId)
+        || (nextProps.viewEntity.get('id') === nextProps.sessionUserId && !ENABLE_AZURE);
+      if (!canEdit) {
+        this.props.onRedirectNotPermitted();
+      }
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer.current);
     }
   }
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const { taxonomies, roles, viewEntity } = props;
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
 
-    return Map({
+  getInitialFormData = ({ taxonomies, roles, viewEntity }) => 
+    Map({
       id: viewEntity.get('id'),
       attributes: viewEntity.get('attributes').mergeWith(
         (oldVal, newVal) => oldVal === null ? newVal : oldVal,
@@ -105,74 +115,106 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedRole: getHighestUserRoleId(roles),
     });
-  }
 
-  getHeaderMainFields = () => ([{ // fieldGroup
-    fields: [getTitleFormField(this.context.intl.formatMessage, 'title', 'name')],
-  }]);
+  getHeaderMainFields = (entity, isManager, intl) => {
+    if (!ENABLE_AZURE) {
+      return ([{ // fieldGroup
+        fields: [getTitleFormField(intl.formatMessage, 'title', 'name')],
+      }]);
+    }
+    return ([{ // fieldGroup
+      fields: [getTitleField(entity, isManager, 'name', appMessages.attributes.name)],
+    }]);
+  };
 
-  getHeaderAsideFields = (entity, roles) => ([
-    {
-      fields: (roles && roles.size > 0) ? [
-        getRoleFormField(this.context.intl.formatMessage, roles),
-        getMetaField(entity),
-      ]
-      : [
+  getHeaderAsideFields = (entity, roles, userId, highestRole, intl) => {
+    let fields = [];
+    const canSeeRole = canUserManageUsers(highestRole)
+      || qe(entity.get('id'), userId);
+    if (!ENABLE_AZURE && canUserManageUsers(highestRole)) {
+      fields = [
+        getRoleFormField(intl.formatMessage, roles),
+      ];
+    } else if (canSeeRole) {
+      fields = [
         getRoleField(entity),
-        getMetaField(entity),
-      ],
-    },
-  ]);
+      ];
+    }
+    if (canUserSeeMeta(highestRole)) {
+      fields = [...fields, getMetaField(entity)];
+    }
 
-  getBodyMainFields = () => ([{
-    fields: [getEmailField(this.context.intl.formatMessage)],
-  }]);
+    return ([{ fields }]);
+  };
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => ([ // fieldGroups
-    { // fieldGroup
-      fields: renderTaxonomyControl(taxonomies, onCreateOption, this.context.intl),
-    },
-  ]);
+  getBodyMainFields = (entity, intl) => {
+    if (!ENABLE_AZURE) {
+      return ([{
+        fields: [getEmailFormField(intl.formatMessage)],
+      }]);
+    }
+    return ([{
+      fields: [getEmailField(entity)],
+    }]);
+  };
+
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) =>
+    ([ // fieldGroups
+      { // fieldGroup
+        fields: renderTaxonomyControl({
+          taxonomies,
+          onCreateOption: canCreateCategories ? onCreateOption : null,
+          contextIntl: intl,
+        }),
+      },
+    ]);
 
   getEditableUserRoles = (roles, sessionUserHighestRoleId) => {
     if (roles) {
       const userHighestRoleId = getHighestUserRoleId(roles);
-        // roles are editable by the session user (logged on user) if
-        // unless the session user is an ADMIN
-        // the session user can only assign roles "lower" (that is higher id) than his/her own role
-        // and when the session user has a "higher" (lower id) role than the user profile being edited
+      // roles are editable by the session user (logged on user) if
+      // unless the session user is an ADMIN
+      // the session user can only assign roles "lower" (that is higher id) than his/her own role
+      // and when the session user has a "higher" (lower id) role than the user profile being edited
       return roles
         .filter((role) => sessionUserHighestRoleId === USER_ROLES.ADMIN.value
-          || (sessionUserHighestRoleId < userHighestRoleId && sessionUserHighestRoleId < parseInt(role.get('id'), 10))
-        );
+          || (sessionUserHighestRoleId < userHighestRoleId && sessionUserHighestRoleId < parseInt(role.get('id'), 10)));
     }
     return Map();
-  }
+  };
 
   render() {
-    const { viewEntity, dataReady, viewDomain, taxonomies, roles, sessionUserHighestRoleId, onCreateOption } = this.props;
+    const {
+      sessionUserId,
+      viewEntity,
+      dataReady,
+      viewDomain,
+      taxonomies,
+      roles,
+      sessionUserHighestRoleId,
+      onCreateOption,
+      canUserAdministerCategories,
+      intl,
+    } = this.props;
+    const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
+    const isAdmin = sessionUserHighestRoleId <= USER_ROLES.ADMIN.value;
+
     const reference = this.props.params.id;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
     const editableRoles = this.getEditableUserRoles(roles, sessionUserHighestRoleId);
 
     return (
       <div>
-        <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${reference}`}
+        <HelmetCanonical
+          title={`${intl.formatMessage(messages.pageTitle)}: ${reference}`}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Content
-          innerRef={(node) => {
-            if (!this.state.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
             type={CONTENT_SINGLE}
             icon="users"
             buttons={
@@ -183,60 +225,83 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('userEdit.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }]
             }
           />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {(saveSending || !dataReady) &&
-            <Loading />
+          {(saveSending || !dataReady)
+            && <Loading />
           }
-          {!viewEntity && dataReady && !saveError &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
+          {!viewEntity && dataReady && !saveError
+            && (
+              <div>
+                <FormattedMessage {...messages.notFound} />
+              </div>
+            )
           }
-          {viewEntity && dataReady &&
-            <EntityForm
-              model="userEdit.form.data"
-              formData={viewDomain.form.data}
-              saving={saveSending}
-              handleSubmit={(formData) => this.props.handleSubmit(
-                formData,
-                taxonomies,
-                roles,
-              )}
-              handleSubmitFail={this.props.handleSubmitFail}
-              handleCancel={() => this.props.handleCancel(reference)}
-              handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(viewEntity, editableRoles),
-                },
-                body: {
-                  main: this.getBodyMainFields(),
-                  aside: (sessionUserHighestRoleId <= USER_ROLES.MANAGER.value) && this.getBodyAsideFields(taxonomies, onCreateOption),
-                },
-              }}
-              scrollContainer={this.state.scrollContainer}
-            />
+          {viewEntity && dataReady
+            && (
+              <EntityForm
+                formData={this.getInitialFormData(this.props).toJS()}
+                saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
+                handleSubmit={(formData) => this.props.handleSubmit(
+                  formData,
+                  taxonomies,
+                  roles,
+                  viewEntity,
+                )}
+                handleSubmitFail={this.props.handleSubmitFail}
+                handleCancel={() => this.props.handleCancel(reference)}
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(viewEntity, isManager, intl),
+                    aside: this.getHeaderAsideFields(
+                      viewEntity,
+                      editableRoles,
+                      sessionUserId,
+                      sessionUserHighestRoleId,
+                      intl,
+                    ),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(viewEntity, intl),
+                    aside: isAdmin && this.getBodyAsideFields(
+                      taxonomies,
+                      onCreateOption,
+                      canUserAdministerCategories,
+                      intl,
+                    ),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
-          { saveSending &&
-            <Loading />
+          { saveSending
+            && <Loading />
           }
         </Content>
       </div>
@@ -246,12 +311,9 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
 
 UserEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  initialiseForm: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   roles: PropTypes.object,
@@ -262,9 +324,10 @@ UserEdit.propTypes = {
   onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
-};
-
-UserEdit.contextTypes = {
+  onRedirectNotPermitted: PropTypes.func,
+  // authReady: PropTypes.bool,
+  sessionUserId: PropTypes.string, // used in nextProps
+  canUserAdministerCategories: PropTypes.bool,
   intl: PropTypes.object.isRequired,
 };
 
@@ -272,9 +335,12 @@ const mapStateToProps = (state, props) => ({
   sessionUserHighestRoleId: selectSessionUserHighestRoleId(state),
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
   roles: selectRoles(state, props.params.id),
+  sessionUserId: selectSessionUserId(state),
+  canUserAdministerCategories: selectCanUserAdministerCategories(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -282,9 +348,8 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
+    onRedirectNotPermitted: () => {
+      dispatch(redirectNotPermitted());
     },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
@@ -295,10 +360,8 @@ function mapDispatchToProps(dispatch) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, taxonomies, roles) => {
+    handleSubmit: (formValues, taxonomies, roles, viewEntity) => {
+      const formData = fromJS(formValues)
       let saveData = formData
         .set(
           'userCategories',
@@ -316,34 +379,33 @@ function mapDispatchToProps(dispatch) {
       // store all higher roles
       const newRoleIds = newHighestRole === USER_ROLES.DEFAULT.value
         ? List()
-        : roles.reduce((memo, role) =>
-          newHighestRole <= parseInt(role.get('id'), 10)
-            ? memo.push(role.get('id'))
-            : memo
-        , List());
+        : roles.reduce((memo, role) => newHighestRole <= parseInt(role.get('id'), 10)
+          ? memo.push(role.get('id'))
+          : memo,
+        List());
 
       saveData = saveData.set('userRoles', Map({
-        delete: roles.reduce((memo, role) =>
-          role.get('associated')
+        delete: roles.reduce((memo, role) => role.get('associated')
             && !newRoleIds.includes(role.get('id'))
             && !newRoleIds.includes(parseInt(role.get('id'), 10))
-              ? memo.push(role.getIn(['associated', 'id']))
-              : memo
-          , List()),
-        create: newRoleIds.reduce((memo, id) =>
-          roles.find((role) => role.get('id') === id && !role.get('associated'))
-            ? memo.push(Map({ role_id: id, user_id: formData.get('id') }))
-            : memo
-        , List()),
+          ? memo.push(role.getIn(['associated', 'id']))
+          : memo,
+        List()),
+        create: newRoleIds.reduce((memo, id) => roles.find((role) => role.get('id') === id && !role.get('associated'))
+          ? memo.push(Map({ role_id: id, user_id: formData.get('id') }))
+          : memo,
+        List()),
       }));
+
+      // check if attributes have changed
+      if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
+        saveData = saveData.set('skipAttributes', true);
+      }
 
       dispatch(save(saveData.toJS()));
     },
     handleCancel: (reference) => {
-      dispatch(updatePath(`${PATHS.USERS}/${reference}`, { replace: true }));
-    },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
+      dispatch(updatePath(`${ROUTES.USERS}/${reference}`, { replace: true }));
     },
     onCreateOption: (args) => {
       dispatch(openNewEntityModal(args));
@@ -351,4 +413,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserEdit);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserEdit));

@@ -6,17 +6,17 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
+import HelmetCanonical from 'components/HelmetCanonical';
 import styled from 'styled-components';
-import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
-  getEmailField,
+  getEmailFormField,
   getPasswordField,
 } from 'utils/forms';
 
+import ButtonHero from 'components/buttons/ButtonHero';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Icon from 'components/Icon';
@@ -28,94 +28,134 @@ import A from 'components/styled/A';
 import { selectQueryMessages } from 'containers/App/selectors';
 import { updatePath, dismissQueryMessages } from 'containers/App/actions';
 
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
+import { ENABLE_AZURE, IS_PROD, SERVER } from 'themes/config';
 import messages from './messages';
 
-import { login } from './actions';
+import { login, loginWithAzure } from './actions';
 import { selectDomain } from './selectors';
+import { FORM_INITIAL } from './constants';
 
 const BottomLinks = styled.div`
   padding: 2em 0;
 `;
 
+const AzureButton = styled(ButtonHero)`
+  margin-top: 10px;
+  width: 100%;
+`;
+
+
 export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
-    this.props.initialiseForm();
-  }
+
   render() {
-    const { authError, authSending } = this.props.viewDomain.page;
+    const { intl } = this.props;
+    const { authError, authSending } = this.props.viewDomain.get('page').toJS();
+
+    const {
+      handleSubmit,
+      handleCancel,
+      onDismissQueryMessages,
+      queryMessages,
+      handleSubmitWithAzure,
+    } = this.props;
 
     return (
       <div>
-        <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+        <HelmetCanonical
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
         <ContentNarrow>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
           />
-          {this.props.queryMessages.info &&
+          {!IS_PROD && (
             <Messages
               type="info"
-              onDismiss={this.props.onDismissQueryMessages}
-              messageKey={this.props.queryMessages.info}
+              messageKey="signingInServer"
+              messageArgs={{ server: SERVER }}
             />
+          )}
+          {queryMessages.info
+            && (
+              <Messages
+                type="info"
+                onDismiss={onDismissQueryMessages}
+                messageKey={queryMessages.info}
+              />
+            )
           }
-          {authError &&
-            <Messages
-              type="error"
-              messages={authError.messages}
-            />
+          {authError
+            && (
+              <Messages
+                type="error"
+                messages={authError.messages}
+              />
+            )
           }
-          {authSending &&
-            <Loading />
+          {!ENABLE_AZURE && authSending
+            && <Loading />
           }
-          { this.props.viewDomain.form &&
-            <AuthForm
-              model="userLogin.form.data"
-              sending={authSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData)}
-              handleCancel={this.props.handleCancel}
-              labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
-              fields={[
-                getEmailField(this.context.intl.formatMessage, '.email'),
-                getPasswordField(this.context.intl.formatMessage, '.password'),
-              ]}
-            />
-          }
-          <BottomLinks>
-            <p>
-              <FormattedMessage {...messages.registerLinkBefore} />
-              <A
-                href={PATHS.REGISTER}
-                onClick={(evt) => {
-                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink(PATHS.REGISTER, { keepQuery: true });
-                }}
-              >
-                <FormattedMessage {...messages.registerLink} />
-                <Icon name="arrowRight" text size="1.5em" sizes={{ mobile: '1em' }} />
-              </A>
-            </p>
-            <p>
-              <A
-                href={PATHS.RECOVER_PASSWORD}
-                onClick={(evt) => {
-                  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                  this.props.handleLink(PATHS.RECOVER_PASSWORD, { keepQuery: true });
-                }}
-              >
-                <FormattedMessage {...messages.recoverPasswordLink} />
-                <Icon name="arrowRight" text size="1.5em" sizes={{ mobile: '1em' }} />
-              </A>
-            </p>
-          </BottomLinks>
+          {!ENABLE_AZURE && (
+            <>
+              <AuthForm
+                sending={authSending}
+                handleSubmit={(formData) => handleSubmit(formData)}
+                handleCancel={handleCancel}
+                initialValues={FORM_INITIAL}
+                labels={{ submit: intl.formatMessage(messages.submit) }}
+                fields={[
+                  getEmailFormField(intl.formatMessage),
+                  getPasswordField(intl.formatMessage),
+                ]}
+              />
+              <BottomLinks>
+                <p>
+                  <FormattedMessage {...messages.registerLinkBefore} />
+                  <A
+                    href={ROUTES.REGISTER}
+                    onClick={(evt) => {
+                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                      this.props.handleLink(ROUTES.REGISTER, { keepQuery: true });
+                    }}
+                  >
+                    <FormattedMessage {...messages.registerLink} />
+                    <Icon name="arrowRight" text size="1.5em" sizes={{ mobile: '1em' }} />
+                  </A>
+                </p>
+                <p>
+                  <A
+                    href={ROUTES.RECOVER_PASSWORD}
+                    onClick={(evt) => {
+                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                      this.props.handleLink(ROUTES.RECOVER_PASSWORD, { keepQuery: true });
+                    }}
+                  >
+                    <FormattedMessage {...messages.recoverPasswordLink} />
+                    <Icon name="arrowRight" text size="1.5em" sizes={{ mobile: '1em' }} />
+                  </A>
+                </p>
+              </BottomLinks>
+            </>
+          )}
+          {ENABLE_AZURE && (
+            <>
+              <div>
+                {!authSending && (
+                  <AzureButton onClick={() => handleSubmitWithAzure()}>
+                    <FormattedMessage {...messages.submitWithAzure} />
+                  </AzureButton>
+                )}
+                {authSending && <Loading />}
+              </div>
+            </>
+          )}
         </ContentNarrow>
       </div>
     );
@@ -125,14 +165,11 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
 UserLogin.propTypes = {
   viewDomain: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
+  handleSubmitWithAzure: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
-  initialiseForm: PropTypes.func,
   onDismissQueryMessages: PropTypes.func,
   queryMessages: PropTypes.object,
-};
-
-UserLogin.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -143,12 +180,12 @@ const mapStateToProps = (state) => ({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('userLogin.form.data'));
-    },
     handleSubmit: (formData) => {
-      dispatch(login(formData.toJS()));
+      dispatch(login(formData));
       dispatch(dismissQueryMessages());
+    },
+    handleSubmitWithAzure: () => {
+      dispatch(loginWithAzure());
     },
     handleCancel: () => {
       dispatch(updatePath('/'));
@@ -162,4 +199,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserLogin);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserLogin));

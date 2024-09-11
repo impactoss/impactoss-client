@@ -7,44 +7,50 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
-import { actions as formActions } from 'react-redux-form/immutable';
+import HelmetCanonical from 'components/HelmetCanonical';
+import { injectIntl } from 'react-intl';
 
-import { Map } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 import {
   getTitleFormField,
   getDueDateOptionsField,
-  getDocumentStatusField,
   getStatusField,
-  getMarkdownField,
+  getMarkdownFormField,
   getUploadField,
+  getDocumentStatusField,
   getDueDateDateOptions,
 } from 'utils/forms';
 
 import { getStatusField as getStatusInfoField } from 'utils/fields';
 
-import { attributesEqual } from 'utils/entities';
+import qe from 'utils/quasi-equals';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import {
+  canUserPublishReports,
+  canUserCreateOrEditReports,
+  canUserBeAssignedToReports,
+  canUserSeeDraftContent,
+} from 'utils/permissions';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
   loadEntitiesIfNeeded,
   updatePath,
-  updateEntityForm,
   submitInvalid,
   saveErrorDismiss,
+  redirectNotPermitted,
 } from 'containers/App/actions';
 
 import {
   selectReady,
-  selectIsUserContributor,
-  selectIsUserManager,
+  selectReadyForAuthCheck,
   selectSessionUserId,
+  selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -66,121 +72,131 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   constructor(props) {
     super(props);
     this.state = {
-      scrollContainer: null,
-      guestDismissed: false,
+      draftNoteDismissed: false,
     };
+    this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.indicator) {
-      this.props.initialiseForm('reportNew.form.data', this.getInitialFormData());
-    }
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.indicator) {
-      this.props.initialiseForm('reportNew.form.data', this.getInitialFormData(nextProps));
+    if (nextProps.dataAndAuthReady && nextProps.indicator) {
+      // to allow creating it requires
+      // user to have CONTRIBUTOR_MIN_ROLE
+      // OR
+      //    user to have CONTRIBUTOR_MIN_ROLE_ASSIGNED
+      //    AND
+      //    user to be assigned
+      //
+      // otherwise redirect to unauthorised
+      const hasUserMinimumRole = canUserCreateOrEditReports(nextProps.highestRole);
+      const isUserAssigned = canUserBeAssignedToReports(nextProps.highestRole)
+        && qe(nextProps.indicator.getIn(['attributes', 'manager_id']), nextProps.userId);
+      const canCreate = hasUserMinimumRole || isUserAssigned;
+      if (!canCreate) {
+        this.props.onRedirectNotPermitted();
+      }
     }
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer.current);
     }
   }
-  getHeaderMainFields = () => ([ // fieldGroups
-    { // fieldGroup
-      fields: [
-        getTitleFormField(this.context.intl.formatMessage),
-      ],
-    },
-  ]);
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const { indicator } = props;
-    return Map(FORM_INITIAL.setIn(
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getHeaderMainFields = (intl) =>
+    ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getTitleFormField(intl.formatMessage),
+        ],
+      },
+    ]);
+
+  getInitialFormData = ({ indicator }) =>
+    Map(FORM_INITIAL.setIn(
       ['attributes', 'due_date_id'],
       indicator.get('dates')
         ? getDueDateDateOptions(indicator.get('dates'))[0].value
         : '0'
     ));
-  }
 
-  getHeaderAsideFields = (canUserPublish) => ([{
-    fields: [
-      canUserPublish
-      ? getStatusField(this.context.intl.formatMessage)
-      : getStatusInfoField(),
-    ],
-  }]);
+  getHeaderAsideFields = (canUserPublish, intl) =>
+    ([
+      {
+        fields: [
+          canUserPublish
+            ? getStatusField(intl.formatMessage)
+            : getStatusInfoField(),
+        ],
+      },
+    ]);
 
-  getBodyMainFields = () => ([
-    {
-      fields: [
-        getMarkdownField(this.context.intl.formatMessage),
-        getUploadField(this.context.intl.formatMessage),
-        getDocumentStatusField(this.context.intl.formatMessage),
-      ],
-    },
-  ]);
 
-  getBodyAsideFields = (indicator) => ([ // fieldGroups
-    { // fieldGroup
-      label: this.context.intl.formatMessage(appMessages.entities.due_dates.single),
-      icon: 'calendar',
-      fields: indicator &&
-        [getDueDateOptionsField(
-          this.context.intl.formatMessage,
-          getDueDateDateOptions(
-            indicator.get('dates'),
-            this.context.intl.formatMessage,
-            this.context.intl.formatDate
-          )
-        )],
-    },
-  ]);
+  getBodyMainFields = (intl) =>
+    ([
+      {
+        fields: [
+          getMarkdownFormField({ formatMessage: intl.formatMessage }),
+          getUploadField(intl.formatMessage),
+          getDocumentStatusField(intl.formatMessage),
+        ],
+      },
+    ]);
 
-  dismissGuestMessage = (evt) => {
+  getBodyAsideFields = (indicator, intl) =>
+    ([ // fieldGroups
+      { // fieldGroup
+        label: intl.formatMessage(appMessages.entities.due_dates.single),
+        icon: 'calendar',
+        fields: indicator
+          && [getDueDateOptionsField(
+            intl.formatMessage,
+            getDueDateDateOptions(
+              indicator.get('dates'),
+              intl.formatMessage,
+              intl.formatDate
+            )
+          )],
+      },
+    ]);
+
+  dismissDraftNote = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    this.setState({ guestDismissed: true });
-  }
-
-  canUserPublish = (isUserContributor, isUserManager, userId, indicator) =>
-    isUserManager || (isUserContributor && attributesEqual(userId, indicator.getIn(['attributes', 'manager_id'])));
+    this.setState({ draftNoteDismissed: true });
+  };
 
   render() {
-    const { dataReady, indicator, viewDomain, isUserContributor, isUserManager, userId } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const {
+      dataReady, indicator, viewDomain, highestRole, intl,
+    } = this.props;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const indicatorReference = this.props.params.id;
-    const canUserPublish = dataReady && this.canUserPublish(
-      isUserContributor,
-      isUserManager,
-      userId,
-      indicator
-    );
+    const canUserPublish = dataReady && canUserPublishReports(highestRole);
 
-    const pageTitle = this.context.intl.formatMessage(messages.pageTitle, { indicatorReference });
+    const pageTitle = intl.formatMessage(messages.pageTitle, { indicatorReference });
 
     return (
       <div>
-        <Helmet
+        <HelmetCanonical
           title={pageTitle}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
-        <Content
-          innerRef={(node) => {
-            if (!this.state.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
-        >
+        <Content ref={this.scrollContainer}>
           <ContentHeader
             title={pageTitle}
             type={CONTENT_SINGLE}
@@ -193,68 +209,77 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => {
-                  this.dismissGuestMessage();
-                  this.props.handleSubmitRemote('reportNew.form.data');
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.dismissDraftNote();
+                    this.remoteSubmitForm(e);
+                  }
                 },
               }] : null
             }
           />
-          { !canUserPublish && !this.state.guestDismissed && dataReady && !saveError && !!submitValid &&
-            <Messages
-              type="info"
-              message={this.context.intl.formatMessage(messages.guestNote)}
-              onDismiss={this.dismissGuestMessage}
-            />
+          { !canUserPublish && !this.state.draftNoteDismissed && dataReady && !saveError && !!submitValid
+            && (
+              <Messages
+                type="info"
+                message={intl.formatMessage(messages.draftNote)}
+                onDismiss={this.dismissDraftNote}
+              />
+            )
           }
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
-            />
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {(saveSending || !dataReady) &&
-            <Loading />
+          {(saveSending || !dataReady)
+            && <Loading />
           }
-          {dataReady &&
-            <EntityForm
-              model="reportNew.form.data"
-              formData={viewDomain.form.data}
-              saving={saveSending}
-              handleSubmit={(formData) => {
-                this.dismissGuestMessage();
-                this.props.handleSubmit(
-                  formData,
-                  indicatorReference,
-                  canUserPublish
-                );
-              }}
-              handleSubmitFail={this.props.handleSubmitFail}
-              handleCancel={() => this.props.handleCancel(indicatorReference)}
-              handleUpdate={this.props.handleUpdate}
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(),
-                  aside: this.getHeaderAsideFields(canUserPublish),
-                },
-                body: {
-                  main: this.getBodyMainFields(),
-                  aside: canUserPublish && this.getBodyAsideFields(indicator),
-                },
-              }}
-              scrollContainer={this.state.scrollContainer}
-            />
+          {dataReady
+            && (
+              <EntityForm
+                formData={this.getInitialFormData(this.props).toJS()}
+                saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
+                handleSubmit={(formData) => {
+                  this.dismissDraftNote();
+                  this.props.handleSubmit(
+                    formData,
+                    indicatorReference,
+                    highestRole
+                  );
+                }}
+                handleSubmitFail={this.props.handleSubmitFail}
+                handleCancel={() => this.props.handleCancel(indicatorReference)}
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(intl),
+                    aside: this.getHeaderAsideFields(canUserPublish, intl),
+                  },
+                  body: {
+                    main: this.getBodyMainFields(intl),
+                    aside: this.getBodyAsideFields(indicator, intl),
+                  },
+                }}
+                scrollContainer={this.scrollContainer.current}
+              />
+            )
           }
-          { saveSending &&
-            <Loading />
+          { saveSending
+            && <Loading />
           }
         </Content>
       </div>
@@ -264,42 +289,35 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
 
 ReportNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
+  onRedirectNotPermitted: PropTypes.func,
   indicator: PropTypes.object,
   params: PropTypes.object,
-  initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
-  isUserContributor: PropTypes.bool,
-  isUserManager: PropTypes.bool,
-  userId: PropTypes.string,
-};
-
-ReportNew.contextTypes = {
+  highestRole: PropTypes.number,
+  // userId: PropTypes.string, // used in nextProps
+  // dataAndAuthReady: PropTypes.bool, // used in nextProps
   intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
+  dataAndAuthReady:
+    selectReady(state, { path: DEPENDENCIES })
+    && selectReadyForAuthCheck(state),
   indicator: selectIndicator(state, props.params.id),
-  isUserContributor: selectIsUserContributor(state),
-  isUserManager: selectIsUserManager(state),
   userId: selectSessionUserId(state),
+  highestRole: selectSessionUserHighestRoleId(state),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
@@ -309,13 +327,14 @@ function mapDispatchToProps(dispatch) {
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
     },
+    onRedirectNotPermitted: () => {
+      dispatch(redirectNotPermitted());
+    },
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, indicatorReference, canUserPublish) => {
+    handleSubmit: (formValues, indicatorReference, highestRole) => {
+      const formData = fromJS(formValues);
       let saveData = formData;
 
       saveData = saveData.setIn(['attributes', 'indicator_id'], indicatorReference);
@@ -327,17 +346,14 @@ function mapDispatchToProps(dispatch) {
 
       dispatch(save(
         saveData.toJS(),
-        canUserPublish ? PATHS.PROGRESS_REPORTS : `${PATHS.INDICATORS}/${indicatorReference}`,
-        !canUserPublish // createAsGuest: do not append created id to redirect, do not create locally
+        canUserSeeDraftContent(highestRole) ? ROUTES.PROGRESS_REPORTS : `${ROUTES.INDICATORS}/${indicatorReference}`,
+        !canUserSeeDraftContent(highestRole) // createAsGuest: do not append created id to redirect, do not create locally
       ));
     },
     handleCancel: (indicatorReference) => {
-      dispatch(updatePath(`${PATHS.INDICATORS}/${indicatorReference}`, { replace: true }));
-    },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
+      dispatch(updatePath(`${ROUTES.INDICATORS}/${indicatorReference}`, { replace: true }));
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ReportNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(ReportNew));

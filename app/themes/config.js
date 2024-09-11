@@ -11,11 +11,31 @@
 
 // Language and date settings ********************
 // Note: you may also set the locales in i18n.js
+import { version } from '../../package.json';
+
+export const SERVER = (process && process.env && process.env.SERVER) || 'development';
+const SERVER_ENDPOINTS = {
+  production: 'https://nz-api.impactoss.org',
+  UAT: 'https://nz-dev-api.impactoss.org',
+  development: 'https://nz-dev-6568bd13e406.herokuapp.com',
+};
+export const SERVER_ENDPOINT = SERVER_ENDPOINTS[SERVER];
+// used for redirect and canonical tag
+
+export const CLIENT_URL = 'https://uat.humanrights.govt.nz';
+export const IS_PROD = SERVER === 'production';
+export const IS_TEST = SERVER === 'UAT';
+// const IS_DEV = SERVER === 'development';
+const version_text = IS_PROD ? '' : ` [${SERVER}]`;
+export const VERSION = `${version}${version_text}`;
+
+// enable azure for test and prod environments but not for dev
+export const ENABLE_AZURE = IS_PROD || IS_TEST;
 
 // default language locale
-export const DEFAULT_LOCALE = 'en-GB';
+export const DEFAULT_LOCALE = 'en-NZ';
 // date format - change to format according to locale, only used for form error message
-export const DATE_FORMAT = 'dd/mm/yyyy';
+export const DATE_FORMAT = 'dd/MM/yyyy';
 export const NODE_ENV = sessionStorage.NODE_ENV || 'production';
 
 // UI settings ************************
@@ -28,7 +48,7 @@ export const SHOW_HEADER_TITLE = false;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.header
-export const SHOW_HEADER_PATTERN = true;
+export const SHOW_HEADER_PATTERN = false;
 export const HEADER_PATTERN_HEIGHT = 254;
 
 // show header pattern
@@ -42,53 +62,78 @@ export const SHOW_SIDEBAR_HEADER_PATTERN = false;
 export const SHOW_HOME_TITLE = true;
 
 export const SHOW_BRAND_ON_HOME = true;
-export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = true;
+export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
 
 // show footer logo section
 export const FOOTER = {
-  PARTNERS: true,
-  LINK_TARGET_INTERNAL: false,
-  LINK_TARGET_INTERNAL_ID: 1,
+  INTERNAL_LINKS: [
+    1, // copyright (page db id as generated in seed file)
+    2, // disclaimer
+    3, // privacy
+  ],
 };
 
+export const ABOUT_PAGE_ID = 4;
+
 // entitylists items-per-page options
-export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100];
+// export const PAGE_ITEM_OPTIONS = [10, 20, 50, 100, 'all'];
+export const PAGE_ITEM_OPTIONS = [
+  {
+    value: 10,
+  },
+  {
+    value: 20,
+  },
+  {
+    value: 50,
+  },
+  {
+    value: 100,
+  },
+  {
+    value: 'all',
+    message: 'ui.pageItemOptions.all',
+  },
+];
 
 export const TEXT_TRUNCATE = {
   CONNECTION_TAG: 20,
   ATTRIBUTE_TAG: 10,
-  ENTITY_TAG: 10,
+  ENTITY_TAG: 7,
   CONNECTION_POPUP: 80,
   LINK_FIELD: 30,
+  FW_SELECT: 32,
+  GRACE: 2,
+  META_TITLE: 20,
 };
 
-export const PROGRESS_TAXONOMY_ID = 10;
+export const PROGRESS_TAXONOMY_ID = 9;
+// categories where "is_current" is relevant
+export const CURRENT_TAXONOMY_IDS = [
+  2, // reporting cycles
+];
 
 // WARNING: references as assigned by user
-export const PROGRESS_CATEGORY_REFERENCES = {
-  ONGOING: 1,
-  COMPLETED: 2,
+export const PROGRESS_CATEGORY_ID = {
+  COMPLETED: 8,
 };
 
 export const CYCLE_TAXONOMY_ID = 2;
 
 /**
  * Server settings
- **/
+ * */
 
 // General ********************
 
 export const ENDPOINTS = {
-  API: (
-    NODE_ENV === 'production'
-    ? 'https://impactoss-dev.herokuapp.com/'
-    : 'https://impactoss-dev.herokuapp.com/'
-  ), // server API endpoint
-  SIGNING_URL: '/s3/sign', // server AWS S3 signing url endpoint
+  API: SERVER_ENDPOINTS[SERVER], // server API endpoint
+  SIGNING_URL: 's3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
   PASSWORD: 'auth/password',
   VALIDATE_TOKEN: 'auth/validate_token',
+  SIGN_IN_AZURE: 'auth/azure_activedirectory_v2',
 };
 
 // API request Authentification keys
@@ -102,7 +147,7 @@ export const KEYS = {
 };
 
 // database date format
-export const DB_DATE_FORMAT = 'YYYY-MM-DD';
+export const DB_DATE_FORMAT = 'yyyy-MM-dd';
 
 
 // Map server messages *********************************
@@ -138,9 +183,20 @@ export const DOC_PUBLISH_STATUSES = [
   { value: false, message: 'ui.docPublishStatuses.private' },
 ];
 // Recommendation statuses
-export const ACCEPTED_STATUSES = [
-  { value: true, icon: 'recommendationAccepted', message: 'ui.acceptedStatuses.accepted' },
-  { value: false, icon: 'recommendationNoted', message: 'ui.acceptedStatuses.noted' },
+export const SUPPORT_LEVELS = [
+  { value: 'null', icon: '', message: 'ui.supportLevels.null' },
+  { value: 0, icon: 'recommendationNoted', message: 'ui.supportLevels.noted' },
+  { value: 1, icon: 'recommendationSupported', message: 'ui.supportLevels.supportedInPart' },
+  { value: 2, icon: 'recommendationSupported', message: 'ui.supportLevels.supported' },
+];
+// "current" statuses
+export const IS_CURRENT_STATUSES = [
+  { value: true, message: 'ui.currentStatuses.current' },
+  { value: false, message: 'ui.currentStatuses.notCurrent' },
+];
+export const IS_ARCHIVE_STATUSES = [
+  { value: true, message: 'ui.archiveStatuses.archived' },
+  { value: false, message: 'ui.archiveStatuses.notArchived' },
 ];
 // Report frequencies
 export const REPORT_FREQUENCIES = [
@@ -151,6 +207,20 @@ export const REPORT_FREQUENCIES = [
 ];
 
 export const DEFAULT_FRAMEWORK = 1;
+export const ENABLE_SDGS = false;
+// set to min role required or null to disable
+export const DELETE_MIN_ROLE = null;
+export const PAGE_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value;
+export const USER_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value;
+export const CATEGORY_MANAGER_MIN_ROLE = USER_ROLES.MANAGER.value; // can be assigned to category
+export const CONTRIBUTOR_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create
+export const CATEGORY_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value; // can edit or create categories
+export const CONTRIBUTOR_MIN_ROLE_PUBLISH = USER_ROLES.MANAGER.value; // publish
+export const CONTRIBUTOR_MIN_ROLE_ASSIGNED = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
+export const SEE_DRAFT_MIN_ROLE = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
+export const SEE_ARCHIVED_MIN_ROLE = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
+export const SEE_META_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create when assigned
+export const ARCHIVE_MIN_ROLE = USER_ROLES.ADMIN.value; // archive content
 
 // Map server database tables **************************
 export const DB_TABLES = [
@@ -173,7 +243,251 @@ export const DB_TABLES = [
   'due_dates',
   'frameworks',
   'framework_taxonomies',
-  'framework_frameworks',
   'recommendation_indicators',
-  'recommendation_recommendations',
 ];
+export const DB_TABLES_CURRENT = [
+  'indicators',
+  'measures',
+  'recommendations',
+];
+export const DB_TABLES_ARCHIVED = [
+  'users',
+  'pages',
+  'categories',
+  'indicators',
+  'measures',
+  'recommendations',
+];
+
+export const COLUMN_WIDTHS = {
+  FULL: 1,
+  HALF: 0.5,
+  MAIN: 0.72,
+  OTHER: 0.28,
+};
+
+export const SEARCH = {
+  MIN_LENGTH: 1,
+};
+
+export const ENTITY_FIELDS = {
+  measures: {
+    ATTRIBUTES: {
+      draft: {
+        defaultValue: true,
+        type: 'bool',
+        skipImport: true,
+        exportRequired: true,
+        roleExport: USER_ROLES.CONTRIBUTOR.value,
+        exportColumn: 'public',
+        exportFlip: true,
+      },
+      title: {
+        type: 'text',
+        exportDefault: true,
+      },
+      description: {
+        type: 'markdown',
+      },
+      outcome: {
+        type: 'markdown',
+      },
+      reference: {
+        type: 'markdown',
+      },
+      indicator_summary: {
+        type: 'markdown',
+      },
+      target_date: {
+        type: 'date',
+      },
+      target_date_comment: {
+        type: 'text',
+      },
+      created_at: {
+        type: 'date',
+        roleExport: USER_ROLES.MANAGER.value,
+      },
+      created_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'created_by',
+      },
+      updated_at: {
+        type: 'date',
+        roleExport: USER_ROLES.MANAGER.value,
+      },
+      updated_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'updated_by',
+      },
+      relationship_updated_at: {
+        skipImport: true,
+        type: 'datetime',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'connection_updated_at',
+      },
+      relationship_updated_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'connection_updated_by',
+      },
+    },
+  },
+  indicators: {
+    ATTRIBUTES: {
+      draft: {
+        defaultValue: true,
+        type: 'bool',
+        skipImport: true,
+        exportRequired: true,
+        roleExport: USER_ROLES.CONTRIBUTOR.value,
+        exportColumn: 'public',
+        exportFlip: true,
+      },
+      title: {
+        type: 'text',
+        exportDefault: true,
+      },
+      description: {
+        type: 'markdown',
+      },
+      start_date: {
+        type: 'date',
+      },
+      end_date: {
+        type: 'date',
+      },
+      frequency_months: {
+        type: 'int',
+      },
+      reference: {
+        type: 'text',
+      },
+      repeat: {
+        defaultValue: false,
+        type: 'bool',
+      },
+      created_at: {
+        type: 'date',
+        roleExport: USER_ROLES.MANAGER.value,
+      },
+      created_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'created_by',
+      },
+      updated_at: {
+        type: 'date',
+        roleExport: USER_ROLES.MANAGER.value,
+      },
+      updated_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'updated_by',
+      },
+      relationship_updated_at: {
+        skipImport: true,
+        type: 'datetime',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'connection_updated_at',
+      },
+      relationship_updated_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'connection_updated_by',
+      },
+    },
+  },
+  recommendations: {
+    ATTRIBUTES: {
+      draft: {
+        defaultValue: true,
+        type: 'bool',
+        skipImport: true,
+        exportRequired: true,
+        roleExport: USER_ROLES.CONTRIBUTOR.value,
+        exportColumn: 'public',
+        exportFlip: true,
+      },
+      title: {
+        type: 'text',
+        exportDefault: true,
+      },
+      description: {
+        type: 'text',
+      },
+      reference: {
+        type: 'text',
+      },
+      response: {
+        type: 'text',
+      },
+      support_level: {
+        type: 'int',
+      },
+      created_at: {
+        type: 'date',
+        roleExport: USER_ROLES.MANAGER.value,
+      },
+      created_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'created_by',
+      },
+      updated_at: {
+        type: 'date',
+        roleExport: USER_ROLES.MANAGER.value,
+      },
+      updated_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'updated_by',
+      },
+      relationship_updated_at: {
+        skipImport: true,
+        type: 'datetime',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'connection_updated_at',
+      },
+      relationship_updated_by_id: {
+        skipImport: true,
+        type: 'key',
+        table: 'users',
+        roleExport: USER_ROLES.MANAGER.value,
+        exportColumn: 'connection_updated_by',
+      },
+    },
+  },
+};
+
+export const KEEP_QUERY_ARGS = ['fw', 'loadNonCurrent', 'loadArchived'];
+
+export const SETTINGS = {
+  loadNonCurrent: {
+    available: null,
+    value: false,
+  },
+  loadArchived: { // key also query arg
+    available: null, // will only be set once, once data is loaded
+    value: false, // default value
+    minRole: SEE_ARCHIVED_MIN_ROLE,
+  },
+};

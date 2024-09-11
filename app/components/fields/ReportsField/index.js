@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import appMessages from 'containers/App/messages';
@@ -31,18 +31,19 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
       showAllReports: false,
     };
   }
-  getReportReference = (report) => {
+
+  getReportReference = (report, intl) => {
     if (report.dueDate) {
-      return this.context.intl.formatDate(report.dueDate);
+      return intl.formatDate(report.dueDate);
     }
-    const unscheduledShort = this.context.intl.formatMessage(appMessages.entities.progress_reports.unscheduled_short);
+    const unscheduledShort = intl.formatMessage(appMessages.entities.progress_reports.unscheduled_short);
     return report.createdAt
-      ? `${unscheduledShort} (${this.context.intl.formatDate(new Date(report.createdAt))})`
+      ? `${unscheduledShort} (${intl.formatDate(new Date(report.createdAt))})`
       : unscheduledShort;
-  }
+  };
 
   render() {
-    const { field } = this.props;
+    const { field, intl } = this.props;
 
     return (
       <StyledFieldWrap>
@@ -50,51 +51,61 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
           <ConnectionLabel>
             <FormattedMessage {...appMessages.entities.progress_reports.plural} />
           </ConnectionLabel>
-          { field.button &&
-            <ButtonWrap>
-              <ButtonFactory button={field.button} />
-            </ButtonWrap>
+          { field.button
+            && (
+              <ButtonWrap>
+                <ButtonFactory button={field.button} />
+              </ButtonWrap>
+            )
           }
         </ConnectionLabelWrap>
-        { (field.values && field.values.length > 0) &&
-          <div>
-            { field.values.map((report, i) => (this.state.showAllReports || i < REPORTSMAX) && (
-              <ReportListItem key={i}>
-                <EntityListItemMainTop
-                  entity={{
-                    reference: this.getReportReference(report),
-                    entityIcon: 'report',
-                    draft: report.draft,
-                  }}
-                />
-                <Clear />
-                <ReportListTitleLink to={report.linkTo}>
-                  <EntityListItemMainTitle>
-                    {report.label}
-                  </EntityListItemMainTitle>
-                </ReportListTitleLink>
-              </ReportListItem>
-            ))}
-            { field.values && field.values.length > REPORTSMAX &&
-              <ToggleAllItems
-                onClick={() =>
-                  this.setState({ showAllReports: !this.state.showAllReports })
-                }
-              >
-                { this.state.showAllReports &&
-                  <FormattedMessage {...appMessages.entities.progress_reports.showLess} />
-                }
-                { !this.state.showAllReports &&
-                  <FormattedMessage {...appMessages.entities.progress_reports.showAll} />
-                }
-              </ToggleAllItems>
-            }
-          </div>
+        { (field.values && field.values.length > 0)
+          && (
+            <div>
+              { field.values.map((report, i) => (this.state.showAllReports || i < REPORTSMAX) && (
+                <ReportListItem key={i}>
+                  <EntityListItemMainTop
+                    entity={{
+                      reference: this.getReportReference(report, intl),
+                      entityIcon: 'report',
+                      ...report,
+                    }}
+                  />
+                  <Clear />
+                  <ReportListTitleLink to={report.linkTo}>
+                    <EntityListItemMainTitle>
+                      {report.label}
+                    </EntityListItemMainTitle>
+                  </ReportListTitleLink>
+                </ReportListItem>
+              ))}
+              { field.values && field.values.length > REPORTSMAX
+              && (
+                <ToggleAllItems
+                  onClick={() => this.setState(
+                    (prevState) => (
+                      { showAllReports: !prevState.showAllReports }
+                    )
+                  )}
+                >
+                  { this.state.showAllReports
+                  && <FormattedMessage {...appMessages.entities.progress_reports.showLess} />
+                  }
+                  { !this.state.showAllReports
+                  && <FormattedMessage {...appMessages.entities.progress_reports.showAll} />
+                  }
+                </ToggleAllItems>
+              )
+              }
+            </div>
+          )
         }
-        { (!field.values || field.values.length === 0) &&
-          <EmptyHint>
-            <FormattedMessage {...appMessages.entities.progress_reports.empty} />
-          </EmptyHint>
+        { (!field.values || field.values.length === 0)
+          && (
+            <EmptyHint>
+              <FormattedMessage {...appMessages.entities.progress_reports.empty} />
+            </EmptyHint>
+          )
         }
       </StyledFieldWrap>
     );
@@ -103,10 +114,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
 
 ReportsField.propTypes = {
   field: PropTypes.object.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
-ReportsField.contextTypes = {
-  intl: PropTypes.object,
-};
-
-export default ReportsField;
+export default injectIntl(ReportsField);

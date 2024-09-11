@@ -18,15 +18,19 @@ class DownloadField extends React.PureComponent { // eslint-disable-line react/p
         <LabelLarge>
           <FormattedMessage {...(field.label || appMessages.attributes.document_url)} />
         </LabelLarge>
-        { field.value &&
-          <DocumentWrap>
-            <DocumentView url={field.value} isManager={field.isManager} status={field.public} />
-          </DocumentWrap>
+        { field.value
+          && (
+            <DocumentWrap>
+              <DocumentView url={field.value} isManager={field.isManager} status={field.public} />
+            </DocumentWrap>
+          )
         }
-        { !field.value && field.showEmpty &&
-          <EmptyHint>
-            <FormattedMessage {...field.showEmpty} />
-          </EmptyHint>
+        { !field.value && field.showEmpty
+          && (
+            <EmptyHint>
+              <FormattedMessage {...field.showEmpty} />
+            </EmptyHint>
+          )
         }
       </FieldWrap>
     );
@@ -36,7 +40,5 @@ class DownloadField extends React.PureComponent { // eslint-disable-line react/p
 DownloadField.propTypes = {
   field: PropTypes.object.isRequired,
 };
-DownloadField.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
+
 export default DownloadField;

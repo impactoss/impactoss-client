@@ -7,8 +7,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
+import HelmetCanonical from 'components/HelmetCanonical';
+import { injectIntl } from 'react-intl';
 
 import {
   getReferenceField,
@@ -23,20 +23,32 @@ import {
   getReportsField,
 } from 'utils/fields';
 
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
+import { getEntityTitleTruncated, getEntityReference } from 'utils/entities';
+import {
+  canUserCreateOrEditReports,
+  canUserBeAssignedToReports,
+} from 'utils/permissions';
+import { lowerCase } from 'utils/string';
 
-import { loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded, updatePath, closeEntity, dismissQueryMessages,
+} from 'containers/App/actions';
 
-import { PATHS, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { IS_ARCHIVE_STATUSES, IS_CURRENT_STATUSES } from 'themes/config';
 
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
+import NotFoundEntity from 'containers/NotFoundEntity';
 
 import {
   selectReady,
+  selectSessionUserId,
+  selectSessionUserHighestRoleId,
   selectIsUserContributor,
   selectIsUserManager,
   selectMeasureTaxonomies,
@@ -61,11 +73,11 @@ import {
 import { DEPENDENCIES } from './constants';
 
 export class IndicatorView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  componentWillReceiveProps(nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
@@ -81,27 +93,43 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     },
   ]);
 
-  getHeaderAsideFields = (entity, isContributor) => isContributor &&
-    ([{
-      fields: [
-        getStatusField(entity),
-        getMetaField(entity),
-      ],
-    }]);
+  getHeaderAsideFields = (entity) => ([{
+    fields: [
+      getStatusField(entity),
+      !entity.getIn(['attributes', 'draft'])
+      && getStatusField(
+        entity,
+        'is_current',
+        IS_CURRENT_STATUSES,
+        appMessages.attributes.is_current,
+        true,
+      ),
+      entity.getIn(['attributes', 'is_archive'])
+      && getStatusField(
+        entity,
+        'is_archive',
+        IS_ARCHIVE_STATUSES,
+        appMessages.attributes.is_archive,
+        false,
+      ),
+      getMetaField(entity),
+    ],
+  }]);
 
-  getBodyMainFields = (
+  getBodyMainFields = ({
     entity,
     measures,
     reports,
     measureTaxonomies,
-    isContributor,
     onEntityClick,
     measureConnections,
     recommendationsByFw,
     recommendationTaxonomies,
     recommendationConnections,
     frameworks,
-  ) => {
+    canCreateReports,
+    intl,
+  }) => {
     const fields = [];
     // own attributes
     fields.push({
@@ -109,11 +137,13 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
         getMarkdownField(entity, 'description', true),
         getReportsField(
           reports,
-          {
-            type: 'add',
-            title: this.context.intl.formatMessage(messages.addReport),
-            onClick: this.props.handleNewReport,
-          }
+          canCreateReports
+            ? {
+              type: 'add',
+              title: intl.formatMessage(messages.addReport),
+              onClick: this.props.handleNewReport,
+            }
+            : null
         ),
       ],
     });
@@ -136,7 +166,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     if (recommendationsByFw) {
       const recConnections = [];
       recommendationsByFw.forEach((recs, fwid) => {
-        const framework = frameworks.find((fw) => attributesEqual(fw.get('id'), fwid));
+        const framework = frameworks.find((fw) => qe(fw.get('id'), fwid));
         const hasResponse = framework && framework.getIn(['attributes', 'has_response']);
         recConnections.push(
           getRecommendationConnectionField(
@@ -150,7 +180,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
         );
       });
       fields.push({
-        label: appMessages.nav.recommendations,
+        label: appMessages.nav.recommendationsSuper,
         icon: 'recommendations',
         fields: recConnections,
       });
@@ -190,95 +220,126 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
       recommendationTaxonomies,
       recommendationConnections,
       frameworks,
+      userId,
+      highestRole,
+      intl,
     } = this.props;
+    let buttons = [];
 
-    const buttons = isManager
-    ? [
-      {
-        type: 'text',
-        title: this.context.intl.formatMessage(messages.addReport),
-        onClick: this.props.handleNewReport,
-      },
-      {
-        type: 'edit',
-        onClick: this.props.handleEdit,
-      },
-      {
-        type: 'close',
-        onClick: this.props.handleClose,
-      },
-    ]
-    : [
-      {
-        type: 'text',
-        title: this.context.intl.formatMessage(messages.addReport),
-        onClick: this.props.handleNewReport,
-      },
-      {
-        type: 'close',
-        onClick: this.props.handleClose,
-      },
-    ];
+    const hasUserMinimumRole = dataReady && canUserCreateOrEditReports(highestRole);
+    const isUserAssigned = dataReady && viewEntity && canUserBeAssignedToReports(highestRole)
+      && qe(viewEntity.getIn(['attributes', 'manager_id']), userId);
+    const canCreateReports = hasUserMinimumRole || isUserAssigned;
+
+    if (dataReady) {
+      buttons = [
+        ...buttons,
+        {
+          type: 'icon',
+          onClick: () => window.print(),
+          title: intl.formatMessage(appMessages.buttons.printTitle),
+          icon: 'print',
+        },
+      ];
+
+      if (canCreateReports) {
+        buttons = [
+          ...buttons,
+          {
+            type: 'text',
+            title: intl.formatMessage(messages.addReport),
+            onClick: this.props.handleNewReport,
+          },
+        ];
+      }
+      if (isManager && viewEntity) {
+        buttons = [
+          ...buttons,
+          {
+            type: 'edit',
+            onClick: () => this.props.handleEdit(this.props.params.id),
+          },
+        ];
+      }
+      buttons = [
+        ...buttons,
+        {
+          type: 'close',
+          onClick: this.props.handleClose,
+        },
+      ];
+    }
+
+    const pageTitle = intl.formatMessage(messages.pageTitle);
+    const metaTitle = viewEntity
+      ? `${pageTitle} ${getEntityReference(viewEntity)}: ${getEntityTitleTruncated(viewEntity)}`
+      : `${pageTitle} ${this.props.params.id}`;
 
     return (
       <div>
-        <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
+        <HelmetCanonical
+          title={metaTitle}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <Content>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={pageTitle}
             type={CONTENT_SINGLE}
             icon="indicators"
             buttons={buttons}
           />
-          { !viewEntity && dataReady &&
-            <div>
-              <FormattedMessage {...messages.notFound} />
-            </div>
-          }
-          {this.props.queryMessages.info && appMessages.entities[this.props.queryMessages.infotype] &&
-            <Messages
-              spaceMessage
-              type="success"
-              onDismiss={this.props.onDismissQueryMessages}
-              messageKey={this.props.queryMessages.info}
-              messageArgs={{
-                entityType: this.context.intl.formatMessage(appMessages.entities[this.props.queryMessages.infotype].single),
-              }}
+          {!viewEntity && dataReady && (
+            <NotFoundEntity
+              id={this.props.params.id}
+              type={lowerCase(intl.formatMessage(appMessages.entities.indicators.single))}
             />
+          )}
+          {this.props.queryMessages.info && appMessages.entities[this.props.queryMessages.infotype]
+            && (
+              <Messages
+                spaceMessage
+                type="success"
+                onDismiss={this.props.onDismissQueryMessages}
+                messageKey={this.props.queryMessages.info}
+                messageArgs={{
+                  entityType: intl.formatMessage(appMessages.entities[this.props.queryMessages.infotype].single),
+                }}
+              />
+            )
           }
-          { !dataReady &&
-            <Loading />
+          { !dataReady
+            && <Loading />
           }
-          { viewEntity && dataReady &&
-            <EntityView
-              fields={{
-                header: {
-                  main: this.getHeaderMainFields(viewEntity, isContributor),
-                  aside: this.getHeaderAsideFields(viewEntity, isContributor),
-                },
-                body: {
-                  main: this.getBodyMainFields(
-                    viewEntity,
-                    measures,
-                    reports,
-                    measureTaxonomies,
-                    isContributor,
-                    onEntityClick,
-                    measureConnections,
-                    recommendationsByFw,
-                    recommendationTaxonomies,
-                    recommendationConnections,
-                    frameworks,
-                  ),
-                  aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
-                },
-              }}
-            />
+          { viewEntity && dataReady
+            && (
+              <EntityView
+                fields={{
+                  header: {
+                    main: this.getHeaderMainFields(viewEntity, isContributor),
+                    aside: isManager && this.getHeaderAsideFields(viewEntity),
+                  },
+                  body: {
+                    main: this.getBodyMainFields({
+                      entity: viewEntity,
+                      measures,
+                      reports,
+                      measureTaxonomies,
+                      onEntityClick,
+                      measureConnections,
+                      recommendationsByFw,
+                      recommendationTaxonomies,
+                      recommendationConnections,
+                      frameworks,
+                      canCreateReports,
+                      intl,
+                    }),
+                    aside: isContributor ? this.getBodyAsideFields(viewEntity, dates) : null,
+                  },
+                }}
+              />
+            )
           }
         </Content>
       </div>
@@ -308,12 +369,10 @@ IndicatorView.propTypes = {
   recommendationConnections: PropTypes.object,
   recommendationsByFw: PropTypes.object,
   frameworks: PropTypes.object,
-};
-
-IndicatorView.contextTypes = {
+  highestRole: PropTypes.number,
+  userId: PropTypes.string,
   intl: PropTypes.object.isRequired,
 };
-
 
 const mapStateToProps = (state, props) => ({
   isContributor: selectIsUserContributor(state),
@@ -330,6 +389,8 @@ const mapStateToProps = (state, props) => ({
   recommendationConnections: selectRecommendationConnections(state),
   queryMessages: selectQueryMessages(state),
   frameworks: selectActiveFrameworks(state),
+  userId: selectSessionUserId(state),
+  highestRole: selectSessionUserHighestRoleId(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -341,13 +402,13 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(updatePath(`/${path}/${id}`));
     },
     handleEdit: () => {
-      dispatch(updatePath(`${PATHS.INDICATORS}${PATHS.EDIT}/${props.params.id}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.INDICATORS}${ROUTES.EDIT}/${props.params.id}`, { replace: true }));
     },
     handleNewReport: () => {
-      dispatch(updatePath(`${PATHS.PROGRESS_REPORTS}${PATHS.NEW}/${props.params.id}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.PROGRESS_REPORTS}${ROUTES.NEW}/${props.params.id}`, { replace: true }));
     },
     handleClose: () => {
-      dispatch(closeEntity(PATHS.INDICATORS));
+      dispatch(closeEntity(ROUTES.INDICATORS));
       // TODO should be "go back" if history present or to indicators list when not
     },
     onDismissQueryMessages: () => {
@@ -356,4 +417,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(IndicatorView);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(IndicatorView));

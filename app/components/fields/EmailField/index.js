@@ -30,8 +30,5 @@ class EmailField extends React.PureComponent { // eslint-disable-line react/pref
 EmailField.propTypes = {
   field: PropTypes.object.isRequired,
 };
-EmailField.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
 
 export default EmailField;

@@ -3,13 +3,11 @@
  * PageNew constants
  *
  */
-import { fromJS } from 'immutable';
-
 export const SAVE = 'impactoss/PageNew/SAVE';
 
 export const DEPENDENCIES = ['user_roles'];
 
-export const FORM_INITIAL = fromJS({
+export const FORM_INITIAL = {
   attributes: {
     title: '',
     content: '',
@@ -17,4 +15,4 @@ export const FORM_INITIAL = fromJS({
     draft: true,
     order: '',
   },
-});
+};

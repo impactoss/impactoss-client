@@ -5,10 +5,12 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { reduce } from 'lodash/collection';
+import { Box } from 'grommet';
 
 import appMessage from 'utils/app-message';
 import { lowerCase } from 'utils/string';
@@ -18,161 +20,347 @@ import Button from 'components/buttons/Button';
 import ButtonTagFilter from 'components/buttons/ButtonTagFilter';
 import ButtonTagFilterInverse from 'components/buttons/ButtonTagFilterInverse';
 import DebounceInput from 'react-debounce-input';
+import PrintOnly from 'components/styled/PrintOnly';
+import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 
+import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 const Search = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
-  background-color: ${palette('background', 0)};
-  color: ${palette('dark', 2)};
-  padding: ${(props) => props.small ? '2px 7px' : '7px'};
-  border: 1px solid ${(props) => props.active ? palette('light', 4) : palette('light', 2)};
-  box-shadow: 0 0 3px 0 ${(props) => props.active ? palette('dark', 2) : 'transparent'};
-  min-height: ${(props) => props.small ? 30 : 36}px;
-  border-radius: 5px;
+  height: 100%;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  background-color: ${palette('primary', 3)};
+  border: 1px solid ${palette('light', 3)};
+  color: ${palette('dark', 1)};
+  border-radius: 22px;
+  min-height: ${(props) => props.small ? 30 : 40}px;
   position: relative;
-`;
-const SearchInput = styled(DebounceInput)`
-  background-color: ${palette('background', 0)};
-  border: none;
-  padding: 3px;
-  &:focus {
-    outline: none;
+  outline: ${({ hasFocus }) => hasFocus ? 2 : 0}px solid ${palette('primary', 0)};
+  cursor: text;
+  @media print {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    display: ${({ hidePrint }) => hidePrint ? 'none' : 'block'};
   }
+  padding: 4px 4px 4px 12px;
+`;
+const SearchInput = styled((p) => <DebounceInput {...p} />)`
+  margin: 2px 0;
   flex: 1;
   font-size: 0.85em;
+  &:focus-visible, &:focus {
+    outline: 0;
+  }
+  @media print {
+    display: none;
+  }
 `;
-const Tags = styled.div`
-  margin-top: -2px;
-  margin-bottom: -2px;
+const Tags = styled((p) => <Box direction="row" align="center" wrap {...p} />)``;
+
+const ButtonTagSearch = styled(Button)`
+  color: ${palette('dark', 1)};
+  background-color: transparent;
+  border-radius: 999px;
+  &:hover, &:focus-visible {
+    color: ${palette('primary', 0)};
+    background-color: ${palette('background', 1)};
+  }
+  &:focus-visible {
+    outline: 1px solid ${palette('primary', 0)};
+  }
+  width: 30px;
+  height: 30px;
+  padding: 6px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+  }
+  @media print {
+    display: none;
+  }
 `;
 
-const Clear = styled(Button)`
-  padding: ${(props) => props.small ? '4px 6px' : '8px 6px'};
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: ${palette('background', 4)};
+const LabelPrint = styled(PrintOnly)`
+  margin-top: 10px;
+  font-size: ${(props) => props.theme.sizes.print.smaller};
 `;
+const SearchValuePrint = styled(PrintOnly)`
+  font-size: ${(props) => props.theme.sizes.print.default};
+  font-weight: bold;
+`;
+// const ButtonTagSearch = styled.div``;
+const StyledLabel = styled.label``;
 
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor() {
     super();
     this.state = {
       active: false,
+      hasFocus: false,
     };
   }
+
+  componentDidMount() {
+    if (this.input && this.props.focusOnMount) {
+      this.input.focus();
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.filters.length !== this.props.filters.length) {
+      if (this.props.filters.length > 0) {
+        this.focusLastFilter();
+      } else if (this.input) {
+        this.input.focus();
+      }
+    }
+  }
+
+  getLabels = (labels) => reduce(labels, (memo, label) => {
+    if (!label.label) return memo;
+    let labelValue = label.appMessage ? appMessage(this.props.intl, label.label) : label.label;
+    labelValue = label.postfix ? `${labelValue}${label.postfix}` : labelValue;
+    return `${memo}${label.lowerCase ? lowerCase(labelValue) : labelValue} `;
+  }, '').trim();
+
   getFilterLabel = (filter) => {
+    const { intl } = this.props;
     // not used I think?
     if (filter.message) {
       return filter.messagePrefix
-        ? `${filter.messagePrefix} ${lowerCase(appMessage(this.context.intl, filter.message))}`
-        : appMessage(this.context.intl, filter.message);
+        ? `${filter.messagePrefix} ${lowerCase(appMessage(intl, filter.message))}`
+        : appMessage(intl, filter.message);
     }
     if (filter.labels) {
-      return reduce(filter.labels, (memo, label) => {
-        if (!label.label) return memo;
-        let labelValue = label.appMessage ? appMessage(this.context.intl, label.label) : label.label;
-        labelValue = label.postfix ? `${labelValue}${label.postfix}` : labelValue;
-        return `${memo}${label.lowerCase ? lowerCase(labelValue) : labelValue} `;
-      }, '').trim();
+      return this.getLabels(filter.labels);
     }
     return filter.label;
-  }
+  };
+
+  getFilterTitle = (filter) => {
+    let title = '';
+    if (filter.titleLabels) {
+      title = this.getLabels(filter.titleLabels);
+    } else {
+      title = filter.title || this.getFilterLabel(filter);
+    }
+    return this.props.intl.formatMessage(messages.removeTag, { title });
+  };
+
+  focusLastFilter = () => {
+    if (this.lastFilter) this.lastFilter.focus();
+  };
+
   render() {
     const {
       filters,
       searchQuery,
       onSearch,
       placeholder,
+      onClear,
+      resultsId,
+      searchAttributes,
+      placeholderMessageId,
+      intl,
     } = this.props;
-    // TODO set focus to input when clicking wrapper
-    //  see https://github.com/nkbt/react-debounce-input/issues/65
-    //  https://github.com/yannickcr/eslint-plugin-react/issues/678
-    // for now this works all right thanks to flex layout
-    // onClick={() => {
-    //   this.inputNode.focus()
-    // }}
+    const searchHasFilters = (searchQuery || filters.length > 0);
+    let inputPlaceholder;
+    if (placeholder) {
+      inputPlaceholder = placeholder;
+    } else if (placeholderMessageId && messages[placeholderMessageId]) {
+      inputPlaceholder = intl.formatMessage(messages[placeholderMessageId]);
+    } else if (searchAttributes) {
+      const attLength = searchAttributes.length;
+      inputPlaceholder = intl.formatMessage(
+        messages.searchPlaceholderEntitiesAttributes,
+        {
+          attributes: searchAttributes.reduce(
+            (memo, att, position) => {
+              const value = intl.formatMessage(appMessages.attributes[att]);
+              if (position === 0) {
+                return value;
+              }
+              if (position + 1 === attLength) {
+                return `${memo} or ${value}`;
+              }
+              return `${memo}, ${value}`;
+            },
+            '',
+          ),
+        }
+      );
+    } else {
+      inputPlaceholder = intl.formatMessage(
+        this.props.multiselect
+          ? messages.searchPlaceholderMultiSelect
+          : messages.searchPlaceholderEntities
+      );
+    }
+
+    const inputId = this.props.multiselect ? 'ms-search' : 'search';
+
     return (
-      <Search active={this.state.active} small={this.props.multiselect}>
-        { filters.length > 0 &&
-          <Tags>
-            {
-              filters.map((filter, i) => filter.inverse
-                ? (
-                  <ButtonTagFilterInverse
-                    key={i}
-                    onClick={filter.onClick}
-                    palette={filter.type || 'attributes'}
-                    paletteHover={`${filter.type || 'attributes'}Hover`}
-                    pIndex={parseInt(filter.id, 10) || 0}
-                    disabled={!filter.onClick}
-                  >
-                    {this.getFilterLabel(filter)}
-                    { filter.onClick &&
-                      <Icon name="removeSmall" text textRight />
-                    }
-                  </ButtonTagFilterInverse>
-                )
-                : (
-                  <ButtonTagFilter
-                    key={i}
-                    onClick={filter.onClick}
-                    palette={filter.type || 'attributes'}
-                    paletteHover={`${filter.type || 'attributes'}Hover`}
-                    pIndex={parseInt(filter.id, 10) || 0}
-                    disabled={!filter.onClick}
-                  >
-                    {this.getFilterLabel(filter)}
-                    { filter.onClick &&
-                      <Icon name="removeSmall" text textRight />
-                    }
-                  </ButtonTagFilter>
-                )
-              )
-            }
-          </Tags>
-        }
-        <SearchInput
-          id="search"
-          minLength={1}
-          debounceTimeout={500}
-          value={searchQuery || ''}
-          onChange={(e) => onSearch(e.target.value)}
-          onFocus={() => this.setState({ active: true })}
-          onBlur={() => this.setState({ active: false })}
-          placeholder={placeholder || (this.context.intl.formatMessage(
-            this.props.multiselect
-            ? messages.searchPlaceholderMultiSelect
-            : messages.searchPlaceholderEntities
-          ))}
-        />
-        { (searchQuery || filters.length > 0) &&
-          <Clear
-            onClick={this.props.onClear}
-            small={this.props.multiselect}
+      <Search
+        active={this.state.active}
+        small={this.props.multiselect}
+        hidePrint={!searchHasFilters}
+        hasFocus={this.state.hasFocus}
+        onClick={() => this.input && this.input.focus()}
+      >
+        <ScreenReaderOnly>
+          <StyledLabel htmlFor={inputId}>
+            {inputPlaceholder}
+          </StyledLabel>
+        </ScreenReaderOnly>
+        {filters.length > 0 && (
+          <LabelPrint>
+            <FormattedMessage {...messages.labelPrintFilters} />
+          </LabelPrint>
+        )}
+        <Box direction="row" fill="horizontal" justify="between">
+          <Box
+            direction={filters && filters.length > 3 ? 'column' : 'row'}
+            gap="xsmall"
+            fill="horizontal"
           >
-            <Icon name="removeSmall" />
-          </Clear>
-        }
+            {filters.length > 0 && (
+              <Tags>
+                {filters.map((filter, i) => filter.inverse
+                  ? (
+                    <ButtonTagFilterInverse
+                      ref={(el) => { this.lastFilter = el; }}
+                      key={i}
+                      onClick={filter.onClick}
+                      palette={filter.type || 'attributes'}
+                      paletteHover={`${filter.type || 'attributes'}Hover`}
+                      pIndex={parseInt(filter.id, 10) || 0}
+                      disabled={!filter.onClick}
+                      title={this.getFilterTitle(filter)}
+                      onKeyDown={(e) => {
+                        const key = e.keyCode || e.charCode;
+                        if (filter.onClick && key === 8) {
+                          filter.onClick();
+                          this.focusLastFilter();
+                        }
+                      }}
+                    >
+                      {this.getFilterLabel(filter)}
+                      {filter.onClick
+                        && <Icon name="removeSmall" text textRight hidePrint />
+                      }
+                    </ButtonTagFilterInverse>
+                  )
+                  : (
+                    <ButtonTagFilter
+                      ref={(el) => { this.lastFilter = el; }}
+                      key={i}
+                      onClick={filter.onClick}
+                      palette={filter.type || 'attributes'}
+                      paletteHover={`${filter.type || 'attributes'}Hover`}
+                      pIndex={parseInt(filter.id, 10) || 0}
+                      disabled={!filter.onClick}
+                      title={this.getFilterTitle(filter)}
+                      onKeyDown={(e) => {
+                        const key = e.keyCode || e.charCode;
+                        if (filter.onClick && key === 8) {
+                          filter.onClick();
+                          this.focusLastFilter();
+                        }
+                      }}
+                    >
+                      {this.getFilterLabel(filter)}
+                      {filter.onClick
+                        && <Icon name="removeSmall" text textRight hidePrint />
+                      }
+                    </ButtonTagFilter>
+                  ))
+                }
+              </Tags>
+            )}
+            <SearchInput
+              id={inputId}
+              placeholder={inputPlaceholder}
+              inputRef={(el) => { this.input = el; }}
+              minLength={1}
+              debounceTimeout={500}
+              value={searchQuery || ''}
+              onChange={(e) => onSearch(e.target.value)}
+              onFocus={() => this.setState({ active: true, hasFocus: true })}
+              onBlur={() => this.setState({ active: false, hasFocus: false })}
+              onKeyDown={(e) => {
+                const key = e.keyCode || e.charCode;
+                if (filters.length > 0 && (!searchQuery || searchQuery.length === 0)) {
+                  // backspace
+                  if (key === 8) {
+                    this.focusLastFilter();
+                  }
+                  // enter
+                } else if (this.props.onSkipToResults && key === 13) {
+                  this.props.onSkipToResults();
+                }
+              }}
+            />
+          </Box>
+          <Box direction="row" align="center" fill="vertical" flex={{ shrink: 0 }}>
+            {searchHasFilters && (
+              <ButtonTagSearch
+                onClick={onClear}
+                small={this.props.multiselect}
+                title={this.props.intl.formatMessage(messages.removeAll)}
+              >
+                <Icon name="removeSmall" />
+              </ButtonTagSearch>
+            )}
+            {searchQuery && (
+              <LabelPrint>
+                <FormattedMessage {...messages.labelPrintKeywords} />
+              </LabelPrint>
+            )}
+            {searchQuery && (
+              <SearchValuePrint>
+                {searchQuery}
+              </SearchValuePrint>
+            )}
+            <ButtonTagSearch
+              as="a"
+              href={`#${resultsId}`}
+              title={this.props.intl.formatMessage(messages.skipToResults)}
+              isSearchIcon
+            >
+              <Icon name="search" size="1em" />
+            </ButtonTagSearch>
+          </Box>
+        </Box>
       </Search>
     );
   }
 }
 
-TagSearch.propTypes = {
-  filters: PropTypes.array,
-  searchQuery: PropTypes.string,
-  placeholder: PropTypes.string,
-  onSearch: PropTypes.func,
-  onClear: PropTypes.func,
-  multiselect: PropTypes.bool,
+TagSearch.defaultProps = {
+  resultsId: 'entity-list-main',
 };
 
-TagSearch.contextTypes = {
+TagSearch.propTypes = {
+  filters: PropTypes.array,
+  searchAttributes: PropTypes.array,
+  searchQuery: PropTypes.string,
+  placeholder: PropTypes.string,
+  placeholderMessageId: PropTypes.string,
+  resultsId: PropTypes.string,
+  onSearch: PropTypes.func,
+  onSkipToResults: PropTypes.func,
+  onClear: PropTypes.func,
+  multiselect: PropTypes.bool,
+  focusOnMount: PropTypes.bool,
   intl: PropTypes.object.isRequired,
 };
 
-export default TagSearch;
+export default injectIntl(TagSearch);

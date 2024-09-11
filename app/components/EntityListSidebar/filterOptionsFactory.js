@@ -14,9 +14,8 @@ import {
   getEntityTitle,
   getEntityReference,
   getEntityParentId,
-  attributesEqual,
 } from 'utils/entities';
-
+import { qe } from 'utils/quasi-equals';
 import { makeTagFilterGroups } from 'utils/forms';
 
 import {
@@ -93,6 +92,7 @@ export const makeActiveFilterOptions = (
 export const makeAttributeFilterOptions = (entities, config, activeOptionId, locationQueryValue, messages) => {
   const filterOptions = {
     groupId: 'attributes',
+    optionId: activeOptionId,
     options: {},
     multiple: true,
     required: false,
@@ -141,6 +141,9 @@ export const makeAttributeFilterOptions = (entities, config, activeOptionId, loc
           } else if (option.reference && !!entity.get(option.reference.key)) {
             filterOptions.options[value] = {
               label: entity.getIn([option.reference.key, 'attributes', option.reference.label]),
+              sublabel: option.reference.sublabel
+                ? entity.getIn([option.reference.key, 'attributes', option.reference.sublabel])
+                : null,
               showCount: true,
               value: queryValue,
               count: 1,
@@ -179,7 +182,7 @@ export const makeAttributeFilterOptions = (entities, config, activeOptionId, loc
             };
           }
         }
-      });  // for each entities
+      }); // for each entities
     } // if (entities.length === 0) {
   } // if option
   return filterOptions;
@@ -194,11 +197,12 @@ export const makeFrameworkFilterOptions = (
   entities,
   config,
   frameworks,
-  activeTaxId,
+  activeOptionId,
   locationQuery,
 ) => {
   const filterOptions = {
     groupId: 'frameworks',
+    optionId: activeOptionId,
     search: false,
     options: {},
     multiple: false,
@@ -233,7 +237,7 @@ export const makeFrameworkFilterOptions = (
           // add categories from entities if not present otherwise increase count
           frameworks.forEach((framework, fwId) => {
             // if entity has category of active taxonomy
-            if (attributesEqual(entity.getIn(['attributes', 'framework_id']), fwId)) {
+            if (qe(entity.getIn(['attributes', 'framework_id']), fwId)) {
               fwIds.push(fwId);
               // if category already added
               if (filterOptions.options[fwId]) {
@@ -251,7 +255,7 @@ export const makeFrameworkFilterOptions = (
             }
           });
         }
-      });  // for each entities
+      }); // for each entities
     }
   }
   return filterOptions;
@@ -268,6 +272,7 @@ export const makeTaxonomyFilterOptions = (
 ) => {
   const filterOptions = {
     groupId: 'taxonomies',
+    optionId: activeTaxId,
     search: config.search,
     options: {},
     multiple: true,
@@ -368,7 +373,7 @@ export const makeTaxonomyFilterOptions = (
             };
           }
         }
-      });  // for each entities
+      }); // for each entities
     }
   }
   return filterOptions;
@@ -389,6 +394,7 @@ export const makeConnectionFilterOptions = (
 ) => {
   const filterOptions = {
     groupId: 'connections',
+    optionId: activeOptionId,
     options: {},
     multiple: true,
     required: false,
@@ -406,16 +412,17 @@ export const makeConnectionFilterOptions = (
   );
   // if option active
   if (option) {
-    const fwid = option.groupByFramework && activeOptionId.split('_')[1];
+    const fwid = option.groupByFramework
+      && activeOptionId.indexOf('_') > -1
+      && parseInt(activeOptionId.split('_')[1], 10);
     // the option path
     const path = activeOptionId;
     filterOptions.messagePrefix = messages.titlePrefix;
-    filterOptions.message =
-      (fwid && option.message && option.message.indexOf('{fwid}') > -1)
+    filterOptions.message = (fwid && option.message && option.message.indexOf('{fwid}') > -1)
       ? option.message.replace('{fwid}', fwid)
       : option.message;
     filterOptions.search = option.search;
-    const query = config.query;
+    const { query } = config;
     let locationQueryValue = locationQuery.get(query);
     // if no entities found show any active options
     if (entities.size === 0) {
@@ -506,9 +513,9 @@ export const makeConnectionFilterOptions = (
               messagePrefix: messages.without,
               label: option.label,
               message: (
-                option.groupByFramework &&
-                option.message &&
-                option.message.indexOf('{fwid}') > -1
+                option.groupByFramework
+                && option.message
+                && option.message.indexOf('{fwid}') > -1
               )
                 ? option.message.replace('{fwid}', fwid)
                 : option.message,
@@ -521,7 +528,7 @@ export const makeConnectionFilterOptions = (
             };
           }
         }
-      });  // for each entities
+      }); // for each entities
     }
   }
   filterOptions.tagFilterGroups = option && makeTagFilterGroups(connectedTaxonomies, contextIntl);
@@ -540,6 +547,7 @@ export const makeConnectedTaxonomyFilterOptions = (
 ) => {
   const filterOptions = {
     groupId: 'connectedTaxonomies',
+    optionId: activeOptionId,
     search: config.connectedTaxonomies.search,
     options: {},
     multiple: true,
@@ -557,7 +565,7 @@ export const makeConnectedTaxonomyFilterOptions = (
       filterOptions.groups = parent.get('categories').map((cat) => getEntityTitle(cat));
     }
     filterOptions.title = `${messages.titlePrefix} ${lowerCase(getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl))}`;
-    const query = config.connectedTaxonomies.query;
+    const { query } = config.connectedTaxonomies;
     const locationQueryValue = locationQuery.get(query);
     if (entities.size === 0) {
       if (locationQueryValue) {

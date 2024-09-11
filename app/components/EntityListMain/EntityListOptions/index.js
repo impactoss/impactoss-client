@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { List } from 'immutable';
@@ -14,6 +14,8 @@ import { isEqual } from 'lodash/lang';
 
 import { PARAMS } from 'containers/App/constants';
 import Button from 'components/buttons/Button';
+import ScreenReaderHide from 'components/styled/ScreenReaderHide';
+
 import EntityListGroupBy from './EntityListGroupBy';
 
 import messages from './messages';
@@ -38,19 +40,27 @@ const ListEntitiesHeaderOptionLink = styled(Button)`
     font-weight: 500;
     padding: 0 0.5em;
     color: ${palette('buttonFlat', 0)};
-    &:hover {
+    &:hover, &:focus-visible {
       color: ${palette('buttonFlatHover', 0)};
+    }
+    &:focus-visible {
+      outline: none;
+      text-decoration: underline;
     }
     &:last-child {
       padding: 0 0 0 0.5em;
     }
   }
+  @media print {
+    display: none;
+  }
 `;
 
-export class EntityListOptions extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class EntityListOptions extends React.Component { // eslint-disable-line react/prefer-stateless-function
   shouldComponentUpdate(nextProps) {
     return !isEqual(this.props, nextProps);
   }
+
   render() {
     // console.log('EntityListOptions.render')
 
@@ -63,42 +73,47 @@ export class EntityListOptions extends React.PureComponent { // eslint-disable-l
       expandable,
       groupOptions,
       subgroupOptions,
+      intl,
     } = this.props;
     return (
       <Styled>
-        { groupOptions.size > 0 &&
-          <EntityListGroupBy
-            value={groupSelectValue}
-            options={groupOptions &&
-              groupOptions.filter((option) => option.get('value') !== subgroupSelectValue).toJS()
-            }
-            onChange={onGroupSelect}
-          />
+        {groupOptions.size > 0
+          && (
+            <EntityListGroupBy
+              value={groupSelectValue}
+              options={groupOptions
+                && groupOptions.filter((option) => option.get('value') !== subgroupSelectValue).toJS()
+              }
+              onChange={onGroupSelect}
+            />
+          )
         }
-        { groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET && subgroupOptions.size > 0 &&
-          <EntityListGroupBy
-            value={subgroupSelectValue}
-            options={subgroupOptions &&
-              subgroupOptions.filter((option) => option.get('value') !== groupSelectValue).toJS()
-            }
-            onChange={onSubgroupSelect}
-            isSubgroup
-          />
+        {groupSelectValue && groupSelectValue !== PARAMS.GROUP_RESET && subgroupOptions.size > 0
+          && (
+            <EntityListGroupBy
+              value={subgroupSelectValue}
+              options={subgroupOptions
+                && subgroupOptions.filter((option) => option.get('value') !== groupSelectValue).toJS()
+              }
+              onChange={onSubgroupSelect}
+              isSubgroup
+            />
+          )
         }
-        { (expandable) &&
+        {(expandable) && (
           <ListEntitiesHeaderOptionLink
             onClick={this.props.onExpand}
+            title={!expanded
+              ? intl.formatMessage(messages.expandTitle)
+              : intl.formatMessage(messages.collapseTitle)
+            }
           >
-            {
-              !expanded &&
-              <FormattedMessage {...messages.expand} />
-            }
-            {
-              expanded &&
-              <FormattedMessage {...messages.collapse} />
-            }
+            <ScreenReaderHide>
+              {!expanded && <FormattedMessage {...messages.expand} />}
+              {expanded && <FormattedMessage {...messages.collapse} />}
+            </ScreenReaderHide>
           </ListEntitiesHeaderOptionLink>
-        }
+        )}
       </Styled>
     );
   }
@@ -114,6 +129,7 @@ EntityListOptions.propTypes = {
   onExpand: PropTypes.func,
   expanded: PropTypes.bool,
   expandable: PropTypes.bool,
+  intl: PropTypes.object.isRequired,
 };
 
-export default EntityListOptions;
+export default injectIntl(EntityListOptions);

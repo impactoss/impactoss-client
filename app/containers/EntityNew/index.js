@@ -7,13 +7,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { actions as formActions } from 'react-redux-form/immutable';
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
+
+import { Box } from 'grommet';
 
 import { getEntityAttributeFields } from 'utils/forms';
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import { injectIntl } from 'react-intl';
 
 import {
   newEntity,
@@ -23,8 +25,11 @@ import {
 
 import {
   selectEntity,
-  selectFrameworkQuery,
+  selectCurrentFrameworkId,
   selectActiveFrameworks,
+  selectRecommendationReferences,
+  selectMeasureReferences,
+  selectIndicatorReferences,
 } from 'containers/App/selectors';
 import { selectParentOptions, selectParentTaxonomy } from 'containers/CategoryNew/selectors';
 
@@ -48,33 +53,31 @@ import messages from './messages';
 export class EntityNew extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {
-      scrollContainer: null,
-    };
+    this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
-  componentWillMount() {
-    this.props.initialiseForm('entityNew.form.data', this.getInitialFormData());
-  }
-  componentWillReceiveProps(nextProps) {
-    if (hasNewError(nextProps, this.props) && this.state.scrollContainer) {
-      scrollToTop(this.state.scrollContainer);
-    }
-    if (!this.props.frameworkId && nextProps.frameworkId) {
-      this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData(nextProps));
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (hasNewError(nextProps, this.props) && this.scrollContainer) {
+      scrollToTop(this.scrollContainer.current);
     }
   }
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const { frameworkId } = props;
-    return Map(FORM_INITIAL.setIn(
+
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getInitialFormData = ({ frameworkId }) =>
+    Map(FORM_INITIAL.setIn(
       ['attributes', 'framework_id'],
       (frameworkId && frameworkId !== 'all')
         ? frameworkId
         : DEFAULT_FRAMEWORK,
     ));
-  }
 
-  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+  /* eslint-disable react/destructuring-assignment */
+  getTaxTitle = (id) => this.props.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+  /* eslint-enable react/destructuring-assignment */
 
   render() {
     const {
@@ -88,102 +91,111 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
       frameworks,
       framework,
       frameworkId,
+      recommendationReferences,
+      measureReferences,
+      indicatorReferences,
+      intl,
     } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.page;
+    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
     let pageTitle;
     let hasResponse;
     let fwSpecified;
     let icon = path;
     if (path === 'categories' && taxonomy && taxonomy.get('attributes')) {
-      pageTitle = this.context.intl.formatMessage(messages[path].pageTitleTaxonomy, {
+      pageTitle = intl.formatMessage(messages[path].pageTitleTaxonomy, {
         taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
     } else if (path === 'recommendations') {
       // figure out framework id from form if not set
-      const currentFrameworkId =
-        (framework && framework.get('id')) ||
-        frameworkId ||
-        viewDomain.form.data.getIn(['attributes', 'framework_id']) ||
-        DEFAULT_FRAMEWORK;
+      const currentFrameworkId = (framework && framework.get('id'))
+        || frameworkId
+        || viewDomain.getIn(['form', 'data', 'attributes', 'framework_id'])
+        || DEFAULT_FRAMEWORK;
       // check if single framework set
       fwSpecified = (currentFrameworkId && currentFrameworkId !== 'all');
       // get current framework
-      const currentFramework =
-        framework ||
-        (
-          fwSpecified &&
-          frameworks &&
-          frameworks.find((fw) => attributesEqual(fw.get('id'), currentFrameworkId))
+      const currentFramework = framework
+        || (
+          fwSpecified
+          && frameworks
+          && frameworks.find((fw) => qe(fw.get('id'), currentFrameworkId))
         );
       // check if response is required
       hasResponse = currentFramework && currentFramework.getIn(['attributes', 'has_response']);
       // figure out title and icon
-      pageTitle = this.context.intl.formatMessage(
+      pageTitle = intl.formatMessage(
         messages[path].pageTitle,
         {
-          type: this.context.intl.formatMessage(
+          type: intl.formatMessage(
             appMessages.entities[fwSpecified ? `${path}_${currentFrameworkId}` : path].single
           ),
-        });
+        }
+      );
       icon = fwSpecified ? `${path}_${currentFrameworkId}` : path;
     } else {
-      pageTitle = this.context.intl.formatMessage(messages[path].pageTitle);
+      pageTitle = intl.formatMessage(messages[path].pageTitle);
     }
 
     return (
       <div>
         <Content
-          innerRef={(node) => {
-            if (!this.state.scrollContainer) {
-              this.setState({ scrollContainer: node });
-            }
-          }}
+          ref={this.scrollContainer}
           inModal={inModal}
         >
-          <ContentHeader
-            title={pageTitle}
-            type={CONTENT_MODAL}
-            icon={icon}
-            buttons={[{
-              type: 'cancel',
-              onClick: this.props.onCancel,
-            },
-            {
-              type: 'save',
-              disabled: saveSending,
-              onClick: () => this.props.handleSubmitRemote('entityNew.form.data'),
-            }]}
-          />
-          {!submitValid &&
-            <Messages
-              type="error"
-              messageKey="submitInvalid"
-              onDismiss={this.props.onErrorDismiss}
+          <Box margin={{ left: 'medium' }}>
+            <ContentHeader
+              title={pageTitle}
+              type={CONTENT_MODAL}
+              icon={icon}
+              buttons={[{
+                type: 'cancel',
+                onClick: this.props.onCancel,
+              },
+              {
+                type: 'save',
+                disabled: saveSending,
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
+              }]}
             />
+          </Box>
+          {!submitValid
+            && (
+              <Messages
+                type="error"
+                messageKey="submitInvalid"
+                onDismiss={this.props.onErrorDismiss}
+              />
+            )
           }
-          {saveError &&
-            <Messages
-              type="error"
-              messages={saveError.messages}
-              onDismiss={this.props.onServerErrorDismiss}
-            />
+          {saveError
+            && (
+              <Messages
+                type="error"
+                messages={saveError.messages}
+                onDismiss={this.props.onServerErrorDismiss}
+              />
+            )
           }
-          {(saveSending) &&
-            <Loading />
+          {(saveSending)
+            && <Loading />
           }
           <EntityForm
-            model="entityNew.form.data"
-            formData={viewDomain.form.data}
+            formData={this.getInitialFormData(this.props).toJS()}
             inModal={inModal}
             saving={saveSending}
+            bindHandleSubmit={this.bindHandleSubmit}
             handleSubmit={(formData) => this.props.handleSubmit(
               formData,
               attributes
             )}
             handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}
-            scrollContainer={this.state.scrollContainer}
+            scrollContainer={this.scrollContainer.current}
             fields={getEntityAttributeFields(
               path,
               {
@@ -195,13 +207,20 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
                 recommendations: {
                   frameworks: !fwSpecified ? frameworks : null,
                   hasResponse,
+                  existingReferences: recommendationReferences,
+                },
+                measures: {
+                  existingReferences: measureReferences,
+                },
+                indicators: {
+                  existingReferences: indicatorReferences,
                 },
               },
-              this.context.intl,
+              intl,
             )}
           />
-          {saveSending &&
-            <Loading />
+          {saveSending
+            && <Loading />
           }
         </Content>
       </div>
@@ -215,22 +234,20 @@ EntityNew.propTypes = {
   taxonomy: PropTypes.object,
   parentTaxonomy: PropTypes.object,
   categoryParentOptions: PropTypes.object,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   inModal: PropTypes.bool,
   // onSaveSuccess: PropTypes.func,
   viewDomain: PropTypes.object,
-  initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   framework: PropTypes.object,
   frameworks: PropTypes.object,
   frameworkId: PropTypes.string,
-};
-
-EntityNew.contextTypes = {
+  recommendationReferences: PropTypes.array,
+  measureReferences: PropTypes.array,
+  indicatorReferences: PropTypes.array,
   intl: PropTypes.object.isRequired,
 };
 
@@ -246,7 +263,7 @@ const mapStateToProps = (state, { path, attributes }) => ({
     ? selectParentTaxonomy(state, attributes.get('taxonomy_id'))
     : null,
   frameworkId: path === 'recommendations'
-    ? selectFrameworkQuery(state)
+    ? selectCurrentFrameworkId(state)
     : null,
   frameworks: path === 'recommendations'
     ? selectActiveFrameworks(state)
@@ -254,14 +271,13 @@ const mapStateToProps = (state, { path, attributes }) => ({
   framework: path === 'recommendations' && attributes && attributes.get('framework_id')
     ? selectEntity(state, { path: 'frameworks', id: attributes.get('framework_id') })
     : null,
+  recommendationReferences: selectRecommendationReferences(state),
+  measureReferences: selectMeasureReferences(state),
+  indicatorReferences: selectIndicatorReferences(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
   return {
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
     },
@@ -271,10 +287,8 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, attributes) => {
+    handleSubmit: (formValues, attributes) => {
+      const formData = fromJS(formValues)
       let saveData = attributes
         ? formData.mergeIn(['attributes'], attributes)
         : formData;
@@ -282,9 +296,8 @@ function mapDispatchToProps(dispatch, props) {
       // saveData = saveData.setIn(['attributes', 'taxonomy_id'], taxonomy.get('id'));
 
       if (props.path === 'categories') {
-        const formCategoryIds =
-          formData.get('associatedCategory') &&
-          getCheckedValuesFromOptions(formData.get('associatedCategory'));
+        const formCategoryIds = formData.get('associatedCategory')
+          && getCheckedValuesFromOptions(formData.get('associatedCategory'));
         if (List.isList(formCategoryIds) && formCategoryIds.size) {
           saveData = saveData.setIn(['attributes', 'parent_id'], formCategoryIds.first());
         } else {
@@ -301,4 +314,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EntityNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(EntityNew));

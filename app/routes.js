@@ -5,8 +5,14 @@
 import { getAsyncInjectors } from 'utils/asyncInjectors';
 import { getRedirects } from 'utils/redirects';
 
-import { PATHS } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { ROUTES } from 'containers/App/constants';
+import {
+  CATEGORY_ADMIN_MIN_ROLE,
+  USER_ROLES,
+  PAGE_ADMIN_MIN_ROLE,
+  USER_ADMIN_MIN_ROLE,
+  CONTRIBUTOR_MIN_ROLE_ASSIGNED,
+} from 'themes/config';
 
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
@@ -21,13 +27,14 @@ export default function createRoutes(store) {
   const { injectReducer, injectSagas } = getAsyncInjectors(store); // eslint-disable-line no-unused-vars
   const {
     redirectIfSignedIn,
+    redirectIfAzureEnabled,
     redirectIfNotSignedIn,
     redirectIfNotPermitted,
   } = getRedirects(store);
 
   return [
     {
-      path: '/',
+      path: ROUTES.INTRO,
       name: 'home',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -43,7 +50,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.OVERVIEW,
+      path: ROUTES.OVERVIEW,
       name: 'overview',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -59,7 +66,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.LOGOUT,
+      path: ROUTES.LOGOUT,
       name: 'userLogout',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -75,7 +82,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.LOGIN,
+      path: ROUTES.LOGIN,
       name: 'userLogin',
       onEnter: redirectIfSignedIn(),
       getComponent(nextState, cb) {
@@ -96,9 +103,26 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.RECOVER_PASSWORD,
-      name: 'userPasswordRecover',
+      path: ROUTES.LOGIN_OAUTH_SUCCESS,
+      name: 'userLoginOAuthSuccess',
       onEnter: redirectIfSignedIn(),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserLoginOAuthSuccess'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: ROUTES.RECOVER_PASSWORD,
+      name: 'userPasswordRecover',
+      onEnter: redirectIfAzureEnabled(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserPasswordRecover/reducer'),
@@ -117,9 +141,9 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.RESET_PASSWORD,
+      path: ROUTES.RESET_PASSWORD,
       name: 'userPasswordReset',
-      onEnter: redirectIfSignedIn(),
+      onEnter: redirectIfAzureEnabled(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserPasswordReset/reducer'),
@@ -138,9 +162,9 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.REGISTER,
+      path: ROUTES.REGISTER,
       name: 'userRegister',
-      onEnter: redirectIfSignedIn(),
+      onEnter: redirectIfAzureEnabled(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserRegister/reducer'),
@@ -159,9 +183,9 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.USERS,
+      path: ROUTES.USERS,
       name: 'userList',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
+      onEnter: redirectIfNotPermitted(USER_ADMIN_MIN_ROLE),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserList'),
@@ -176,7 +200,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.BOOKMARKS,
+      path: ROUTES.BOOKMARKS,
       name: 'bookmarkList',
       onEnter: redirectIfNotSignedIn(),
       getComponent(nextState, cb) {
@@ -195,7 +219,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.USERS}${PATHS.ID}`,
+      path: `${ROUTES.USERS}${ROUTES.ID}`,
       name: 'userView',
       onEnter: redirectIfNotSignedIn(),
       getComponent(nextState, cb) {
@@ -212,7 +236,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.USERS}${PATHS.EDIT}${PATHS.ID}`,
+      path: `${ROUTES.USERS}${ROUTES.EDIT}${ROUTES.ID}`,
       name: 'userEdit',
       onEnter: redirectIfNotSignedIn(),
       getComponent(nextState, cb) {
@@ -233,7 +257,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.USERS}${PATHS.PASSWORD}${PATHS.ID}`,
+      path: `${ROUTES.USERS}${ROUTES.PASSWORD}${ROUTES.ID}`,
       name: 'userPassword',
       onEnter: redirectIfNotSignedIn(),
       getComponent(nextState, cb) {
@@ -254,7 +278,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.MEASURES,
+      path: ROUTES.MEASURES,
       name: 'actionList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -270,7 +294,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.MEASURES}${PATHS.NEW}`,
+      path: `${ROUTES.MEASURES}${ROUTES.NEW}`,
       name: 'actionNew',
       onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
@@ -291,7 +315,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.MEASURES}${PATHS.IMPORT}`,
+      path: `${ROUTES.MEASURES}${ROUTES.IMPORT}`,
       name: 'actionImport',
       onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
@@ -312,7 +336,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.MEASURES}${PATHS.ID}`,
+      path: `${ROUTES.MEASURES}${ROUTES.ID}`,
       name: 'actionView',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -328,7 +352,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.MEASURES}${PATHS.EDIT}${PATHS.ID}`,
+      path: `${ROUTES.MEASURES}${ROUTES.EDIT}${ROUTES.ID}`,
       name: 'actionEdit',
       onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
@@ -349,7 +373,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.RECOMMENDATIONS,
+      path: ROUTES.RECOMMENDATIONS,
       name: 'recommendationList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -365,7 +389,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.RECOMMENDATIONS}${PATHS.NEW}`,
+      path: `${ROUTES.RECOMMENDATIONS}${ROUTES.NEW}`,
       name: 'recommendationNew',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -385,7 +409,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.RECOMMENDATIONS}${PATHS.IMPORT}`,
+      path: `${ROUTES.RECOMMENDATIONS}${ROUTES.IMPORT}`,
       name: 'recommendationImport',
       onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
@@ -406,7 +430,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.RECOMMENDATIONS}${PATHS.ID}`,
+      path: `${ROUTES.RECOMMENDATIONS}${ROUTES.ID}`,
       name: 'recommendationView',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -422,7 +446,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.RECOMMENDATIONS}${PATHS.EDIT}${PATHS.ID}`,
+      path: `${ROUTES.RECOMMENDATIONS}${ROUTES.EDIT}${ROUTES.ID}`,
       name: 'recommendationEdit',
       onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
@@ -443,7 +467,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.INDICATORS,
+      path: ROUTES.INDICATORS,
       name: 'indicatorList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -459,7 +483,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.INDICATORS}${PATHS.NEW}`,
+      path: `${ROUTES.INDICATORS}${ROUTES.NEW}`,
       name: 'indicatorNew',
       onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
@@ -480,7 +504,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.INDICATORS}${PATHS.IMPORT}`,
+      path: `${ROUTES.INDICATORS}${ROUTES.IMPORT}`,
       name: 'indicatorImport',
       onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
@@ -501,7 +525,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.INDICATORS}${PATHS.ID}`,
+      path: `${ROUTES.INDICATORS}${ROUTES.ID}`,
       name: 'indicatorView',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -517,7 +541,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.INDICATORS}${PATHS.EDIT}${PATHS.ID}`,
+      path: `${ROUTES.INDICATORS}${ROUTES.EDIT}${ROUTES.ID}`,
       name: 'indicatorEdit',
       onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
       getComponent(nextState, cb) {
@@ -538,9 +562,9 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.PROGRESS_REPORTS}${PATHS.NEW}${PATHS.ID}`, // the indicator id
+      path: `${ROUTES.PROGRESS_REPORTS}${ROUTES.NEW}${ROUTES.ID}`, // the indicator id
       name: 'reportNew',
-      onEnter: redirectIfNotSignedIn('signInGuestReport'),
+      onEnter: redirectIfNotPermitted(CONTRIBUTOR_MIN_ROLE_ASSIGNED),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ReportNew/reducer'),
@@ -559,7 +583,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.PROGRESS_REPORTS}${PATHS.ID}`, // the report id
+      path: `${ROUTES.PROGRESS_REPORTS}${ROUTES.ID}`, // the report id
       name: 'reportView',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -575,9 +599,9 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.PROGRESS_REPORTS}${PATHS.EDIT}${PATHS.ID}`,
+      path: `${ROUTES.PROGRESS_REPORTS}${ROUTES.EDIT}${ROUTES.ID}`,
       name: 'reportEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR.value),
+      onEnter: redirectIfNotPermitted(CONTRIBUTOR_MIN_ROLE_ASSIGNED),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/ReportEdit/reducer'),
@@ -596,11 +620,11 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     // }, {
-    //   path: PATHS.TAXONOMIES,
+    //   path: ROUTES.TAXONOMIES,
     //   name: 'taxonomies',
-    //   onEnter: (nextState, replace) => replace(`${PATHS.TAXONOMIES}/1`),
+    //   onEnter: (nextState, replace) => replace(`${ROUTES.TAXONOMIES}/1`),
     }, {
-      path: `${PATHS.TAXONOMIES}${PATHS.ID}`, // the taxonomy id
+      path: `${ROUTES.TAXONOMIES}${ROUTES.ID}`, // the taxonomy id
       name: 'categoryList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -618,9 +642,9 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.TAXONOMIES}${PATHS.ID}${PATHS.NEW}`, // the taxonomy id
+      path: `${ROUTES.TAXONOMIES}${ROUTES.ID}${ROUTES.NEW}`, // the taxonomy id
       name: 'categoryNew',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
+      onEnter: redirectIfNotPermitted(CATEGORY_ADMIN_MIN_ROLE),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/CategoryNew/reducer'),
@@ -639,7 +663,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.CATEGORIES}${PATHS.ID}`,
+      path: `${ROUTES.CATEGORIES}${ROUTES.ID}`,
       name: 'categoryView',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -655,9 +679,9 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.CATEGORIES}${PATHS.EDIT}${PATHS.ID}`,
+      path: `${ROUTES.CATEGORIES}${ROUTES.EDIT}${ROUTES.ID}`,
       name: 'categoryEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
+      onEnter: redirectIfNotPermitted(CATEGORY_ADMIN_MIN_ROLE),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/CategoryEdit/reducer'),
@@ -676,9 +700,9 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.PAGES,
+      path: ROUTES.PAGES,
       name: 'pageList',
-      onEnter: redirectIfNotPermitted(USER_ROLES.CONTRIBUTOR.value),
+      onEnter: redirectIfNotPermitted(PAGE_ADMIN_MIN_ROLE),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/PageList'),
@@ -693,9 +717,9 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.PAGES}${PATHS.NEW}`,
+      path: `${ROUTES.PAGES}${ROUTES.NEW}`,
       name: 'pageNew',
-      onEnter: redirectIfNotPermitted(USER_ROLES.ADMIN.value),
+      onEnter: redirectIfNotPermitted(PAGE_ADMIN_MIN_ROLE),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/PageNew/reducer'),
@@ -714,7 +738,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.PAGES}${PATHS.ID}`,
+      path: `${ROUTES.PAGES}${ROUTES.ID}`,
       name: 'pageView',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -730,9 +754,9 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: `${PATHS.PAGES}${PATHS.EDIT}${PATHS.ID}`,
+      path: `${ROUTES.PAGES}${ROUTES.EDIT}${ROUTES.ID}`,
       name: 'pageEdit',
-      onEnter: redirectIfNotPermitted(USER_ROLES.ADMIN.value),
+      onEnter: redirectIfNotPermitted(PAGE_ADMIN_MIN_ROLE),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/PageEdit/reducer'),
@@ -751,7 +775,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.SEARCH,
+      path: ROUTES.SEARCH,
       name: 'indicatorList',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -769,7 +793,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: PATHS.UNAUTHORISED,
+      path: ROUTES.UNAUTHORISED,
       name: 'unauthorised',
       getComponent(nextState, cb) {
         import('containers/Unauthorised')

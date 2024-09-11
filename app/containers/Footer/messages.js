@@ -10,6 +10,10 @@ export default defineMessages({
     id: 'app.containers.Footer.disclaimer',
     defaultMessage: 'Every care has been taken to ensure the accuracy of this data and information. Please send any feedback to ',
   },
+  disclaimer2: {
+    id: 'app.containers.Footer.disclaimer2',
+    defaultMessage: 'Every care has been taken to ensure the accuracy of this data and information.',
+  },
   contact: {
     email: {
       id: 'app.containers.Footer.contact.email',
@@ -19,6 +23,18 @@ export default defineMessages({
       id: 'app.containers.Footer.contact.anchor',
       defaultMessage: 'contact@project.url',
     },
+  },
+  govLinkHref: {
+    id: 'app.containers.Footer.govLinkHref',
+    defaultMessage: 'https://www.govt.nz',
+  },
+  govLinkAnchor: {
+    id: 'app.containers.Footer.govLinkAnchor',
+    defaultMessage: 'www.govt.nz',
+  },
+  contactUs: {
+    id: 'app.containers.Footer.contactUs',
+    defaultMessage: 'Contact Us',
   },
   responsible: {
     text: {
@@ -31,7 +47,7 @@ export default defineMessages({
     },
     url: {
       id: 'app.containers.Footer.responsible.url',
-      defaultMessage: 'https://www.publisher.org/',
+      defaultMessage: '//www.publisher.org/',
     },
     anchor: {
       id: 'app.containers.Footer.responsible.anchor',
@@ -41,69 +57,70 @@ export default defineMessages({
   project: {
     text: {
       id: 'app.containers.Footer.project.text',
-      defaultMessage: '[Project] is powered by ',
+      defaultMessage: 'Powered by ',
     },
     url: {
       id: 'app.containers.Footer.project.url',
-      defaultMessage: 'http://impactoss.org',
+      defaultMessage: '//impactoss.org',
     },
     anchor: {
       id: 'app.containers.Footer.project.anchor',
       defaultMessage: 'IMPACT OSS',
     },
   },
-  partners: {
+  agencies: {
     note: {
-      id: 'app.containers.Footer.partners.note',
-      defaultMessage: 'With kind support of',
+      id: 'app.containers.Footer.agencies.note',
+      defaultMessage: 'agency 1',
     },
     title1: {
-      id: 'app.containers.Footer.partners.title1',
-      defaultMessage: 'Partner 1',
+      id: 'app.containers.Footer.agencies.title1',
+      defaultMessage: 'agency 1',
     },
     title2: {
-      id: 'app.containers.Footer.partners.title2',
-      defaultMessage: 'Partner 2',
+      id: 'app.containers.Footer.agencies.title2',
+      defaultMessage: 'agency 2',
     },
     title3: {
-      id: 'app.containers.Footer.partners.title3',
-      defaultMessage: 'Partner 3',
+      id: 'app.containers.Footer.agencies.title3',
+      defaultMessage: 'agency 3',
     },
     title4: {
-      id: 'app.containers.Footer.partners.title4',
-      defaultMessage: 'Partner 4',
+      id: 'app.containers.Footer.agencies.title4',
+      defaultMessage: 'agency 4',
     },
     title5: {
-      id: 'app.containers.Footer.partners.title5',
-      defaultMessage: 'Partner 5',
+      id: 'app.containers.Footer.agencies.title5',
+      defaultMessage: 'agency 5',
     },
     title6: {
-      id: 'app.containers.Footer.partners.title6',
-      defaultMessage: 'Partner 6',
+      id: 'app.containers.Footer.agencies.title6',
+      defaultMessage: 'agency 6',
     },
     url1: {
-      id: 'app.containers.Footer.partners.url1',
-      defaultMessage: 'http://www.partner1.org',
+      id: 'app.containers.Footer.agencies.url1',
+      defaultMessage: '//www.agency1.org',
     },
     url2: {
-      id: 'app.containers.Footer.partners.url2',
-      defaultMessage: 'http://www.partner2.org',
+      id: 'app.containers.Footer.agencies.url2',
+      defaultMessage: '//www.agency2.org',
     },
     url3: {
-      id: 'app.containers.Footer.partners.url3',
-      defaultMessage: 'http://www.partner3.org',
+      id: 'app.containers.Footer.agencies.url3',
+      defaultMessage: '//www.agency3.org',
     },
     url4: {
-      id: 'app.containers.Footer.partners.url4',
-      defaultMessage: 'http://www.partner4.org',
+      id: 'app.containers.Footer.agencies.url4',
+      defaultMessage: '//www.agency4.org',
     },
     url5: {
-      id: 'app.containers.Footer.partners.url5',
-      defaultMessage: 'http://www.partner5.org',
+      id: 'app.containers.Footer.agencies.url5',
+      defaultMessage: '//www.agency5.org',
     },
     url6: {
-      id: 'app.containers.Footer.partners.url6',
-      defaultMessage: 'http://www.partner6.org',
+      id: 'app.containers.Footer.agencies.url6',
+      defaultMessage: '//www.agency6.org',
     },
+
   },
 });

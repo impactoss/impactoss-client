@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import Close from './Close';
+
+import ButtonFactory from '../../buttons/ButtonFactory';
 
 const Styled = styled.div`
   display: table;
@@ -11,10 +12,11 @@ const Styled = styled.div`
   background-color: ${palette('multiSelectHeader', 1)};
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
   z-index: 1;
-  height: 40px;
+  height: 80px;
+  padding: 16px;
   padding-left: 0.75em;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    height: 60px;
+    height: 80px;
     padding-left: 1em;
   }
 `;
@@ -24,22 +26,20 @@ const Title = styled.div`
   display: table-cell;
   width: 99%;
   vertical-align: middle;
-`;
-const CloseWrap = styled.div`
-  display: table-cell;
-  width: 48px;
-  vertical-align: middle;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 
 const Header = (props) => (
   <Styled>
     <Title>
-      { props.title }
+      {props.title}
     </Title>
-    { props.onCancel &&
-      <CloseWrap>
-        <Close onCancel={props.onCancel} />
-      </CloseWrap>
+    {props.onCancel
+      && (
+        <ButtonFactory button={{ onClick: props.onCancel, type: 'close' }} />
+      )
     }
   </Styled>
 );

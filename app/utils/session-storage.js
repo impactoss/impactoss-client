@@ -1,4 +1,4 @@
-const localStorage = global.window.localStorage;
+const { localStorage } = global.window;
 
 export function get(key) {
   return localStorage.getItem(key);

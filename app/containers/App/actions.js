@@ -18,11 +18,13 @@
 import {
   AUTHENTICATE_SENDING,
   AUTHENTICATE,
+  AUTHENTICATE_AZURE,
   AUTHENTICATE_SUCCESS,
   AUTHENTICATE_ERROR,
   SET_AUTHENTICATION_STATE,
   LOAD_ENTITIES_IF_NEEDED,
   REDIRECT_IF_NOT_PERMITTED,
+  REDIRECT_NOT_PERMITTED,
   LOADING_ENTITIES,
   LOAD_ENTITIES_SUCCESS,
   LOAD_ENTITIES_ERROR,
@@ -37,8 +39,11 @@ import {
   UPDATE_CONNECTIONS,
   REMOVE_ENTITY,
   NEW_ENTITY,
+  NEW_MULTIPLE_ENTITIES,
   DELETE_ENTITY,
+  DELETE_MULTIPLE_ENTITIES,
   SAVE_ENTITY,
+  SAVE_MULTIPLE_ENTITIES,
   INVALIDATE_ENTITIES,
   SAVE_SENDING,
   SAVE_SUCCESS,
@@ -48,11 +53,9 @@ import {
   DELETE_SUCCESS,
   DELETE_ERROR,
   SAVE_CONNECTIONS,
-  SAVE_ENTITIES,
   UPDATE_ROUTE_QUERY,
   UPDATE_PATH,
   AUTHENTICATE_FORWARD,
-  UPDATE_ENTITY_FORM,
   DUEDATE_ASSIGNED,
   DUEDATE_UNASSIGNED,
   RESET_PASSWORD,
@@ -67,6 +70,10 @@ import {
   DISMISS_QUERY_MESSAGES,
   SET_FRAMEWORK,
   OPEN_BOOKMARK,
+  SET_LOAD_ARCHIVED,
+  SET_LOAD_NONCURRENT,
+  SHOW_SETTINGS_MODAL,
+  INITIALIZE_SETTINGS,
 } from './constants';
 
 export function submitInvalid(valid) {
@@ -171,6 +178,12 @@ export function redirectIfNotPermitted(role) {
     role,
   };
 }
+export function redirectNotPermitted(role) {
+  return {
+    type: REDIRECT_NOT_PERMITTED,
+    role,
+  };
+}
 /**
  * Load the entities, this action is fired when we being loading entities
  *
@@ -222,11 +235,25 @@ export function deleteEntity(data) {
     data,
   };
 }
+export function deleteMultipleEntities(path, data) {
+  return {
+    type: DELETE_MULTIPLE_ENTITIES,
+    path,
+    data,
+  };
+}
 
 // server side
 export function saveEntity(data) {
   return {
     type: SAVE_ENTITY,
+    data,
+  };
+}
+export function saveMultipleEntities(path, data) {
+  return {
+    type: SAVE_MULTIPLE_ENTITIES,
+    path,
     data,
   };
 }
@@ -238,19 +265,17 @@ export function newEntity(data) {
     data,
   };
 }
-
+export function newMultipleEntities(path, data) {
+  return {
+    type: NEW_MULTIPLE_ENTITIES,
+    path,
+    data,
+  };
+}
 // server side
 export function saveConnections(data) {
   return {
     type: SAVE_CONNECTIONS,
-    data,
-  };
-}
-
-// server side
-export function saveEntities(data) {
-  return {
-    type: SAVE_ENTITIES,
     data,
   };
 }
@@ -353,6 +378,11 @@ export function authenticate(data) {
     data,
   };
 }
+export function authenticateWithAzure() {
+  return {
+    type: AUTHENTICATE_AZURE,
+  };
+}
 
 export function resetPassword(data) {
   return {
@@ -442,13 +472,6 @@ export function forwardOnAuthenticationChange() {
   };
 }
 
-export function updateEntityForm(data) {
-  return {
-    type: UPDATE_ENTITY_FORM,
-    data,
-  };
-}
-
 export function dueDateAssigned(id) {
   return {
     type: DUEDATE_ASSIGNED,
@@ -489,9 +512,33 @@ export function setFramework(framework) {
     framework,
   };
 }
+export function setLoadArchived(loadArchived) {
+  return {
+    type: SET_LOAD_ARCHIVED,
+    loadArchived,
+  };
+}
+export function setLoadNonCurrent(loadNonCurrent) {
+  return {
+    type: SET_LOAD_NONCURRENT,
+    loadNonCurrent,
+  };
+}
 export function openBookmark(bookmark) {
   return {
     type: OPEN_BOOKMARK,
     bookmark,
+  };
+}
+export function showSettingsModal(open = true) {
+  return {
+    type: SHOW_SETTINGS_MODAL,
+    open,
+  };
+}
+export function initializeSettings(settings) { // Immutable Map
+  return {
+    type: INITIALIZE_SETTINGS,
+    settings,
   };
 }

@@ -4,96 +4,128 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin"); 
 
 module.exports = (options) => ({
+  mode: options.mode,
   entry: options.entry,
-  output: Object.assign({ // Compile into js/build.js
-    path: path.resolve(process.cwd(), 'build'),
-    publicPath: '/',
-  }, options.output), // Merge with env dependent settings
+  output: Object.assign(
+    {
+      // Compile into js/build.js
+      path: path.resolve(process.cwd(), 'build'),
+      publicPath: '/',
+    },
+    options.output,
+  ), // Merge with env dependent settings
   module: {
-    loaders: [{
-      test: /\.js$/, // Transform all .js files required somewhere with Babel
-      loader: 'babel-loader',
-      exclude: /node_modules/,
-      query: options.babelQuery,
-    }, {
-      // Do not transform vendor's CSS with CSS-modules
-      // The point is that they remain in global scope.
-      // Since we require these CSS files in our JS or CSS files,
-      // they will be a part of our compilation either way.
-      // So, no need for ExtractTextPlugin here.
-      test: /\.css$/,
-      include: /node_modules/,
-      loaders: ['style-loader', 'css-loader'],
-    }, {
-      test: /\.(eot|svg|ttf|woff|woff2)$/,
-      loader: 'file-loader',
-    }, {
-      test: /\.(jpg|png|gif)$/,
-      loaders: [
-        'file-loader',
-        {
-          loader: 'image-webpack-loader',
-          query: {
-            progressive: true,
-            optimizationLevel: 7,
-            interlaced: false,
-            pngquant: {
-              quality: '65-90',
-              speed: 4,
-            },
-          },
+    rules: [
+      {
+        test: /\.jsx?$/, // Transform all .js and .jsx files required somewhere with Babel
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: options.babelQuery,
         },
-      ],
-    }, {
-      test: /\.html$/,
-      loader: 'html-loader',
-    }, {
-      test: /\.json$/,
-      loader: 'json-loader',
-    }, {
-      test: /\.(mp4|webm)$/,
-      loader: 'url-loader',
-      query: {
-        limit: 10000,
       },
-    }],
+      {
+        // Preprocess our own .css files
+        // This is the place to add your own loaders (e.g. sass/less etc.)
+        // for a list of loaders, see https://webpack.js.org/loaders/#styling
+        test: /\.css$/,
+        exclude: /node_modules/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        // Preprocess 3rd party .css files located in node_modules
+        test: /\.css$/,
+        include: /node_modules/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.(eot|otf|ttf|woff|woff2)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: "[name].[ext]",
+        },
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        type: 'asset',
+      },
+      {
+        test: /\.html$/,
+        use: 'html-loader',
+      },
+      {
+        test: /\.(mp4|webm)$/,
+        type: 'asset',
+      },
+    ],
   },
-  plugins: options.plugins.concat([
+  plugins: [
+    ...options.plugins,
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: options.mode,
+      SERVER: options.mode,
+    }),
+    new NodePolyfillPlugin(),
     new webpack.ProvidePlugin({
-      // make fetch available
-      fetch: 'exports-loader?self.fetch!whatwg-fetch',
+      process: 'process/browser',
     }),
-
-    // Always expose NODE_ENV to webpack, in order to use `process.env.NODE_ENV`
-    // inside your code for any environment checks; UglifyJS will automatically
-    // drop any unreachable code.
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-      },
-    }),
-    new webpack.NamedModulesPlugin(),
-  ]),
+  ],
   resolve: {
-    modules: ['app', 'node_modules'],
-    extensions: [
-      '.js',
-      '.jsx',
-      '.react.js',
-    ],
-    mainFields: [
-      'browser',
-      'jsnext:main',
-      'main',
-    ],
+    modules: ['node_modules', 'app'],
+    extensions: ['.js', '.jsx', '.react.js'],
+    mainFields: ['browser', 'jsnext:main', 'main'],
+    fallback: {
+      fs: false,
+      child_process: false,
+      process: require.resolve('process/browser'),
+    },
   },
   devtool: options.devtool,
   target: 'web', // Make web variables accessible to webpack, e.g. window
   performance: options.performance || {},
-  node: {
-    fs: 'empty',
-    child_process: 'empty',
+  optimization: {
+    ...options.optimization,
+    minimizer: [
+      new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            // Lossless optimization with custom option
+            plugins: [
+              ["gifsicle", { interlaced: true }],
+              ["jpegtran", { progressive: true }],
+              ["optipng", { optimizationLevel: 7 }],
+              // Svgo configuration here https://github.com/svg/svgo#configuration
+              [
+                "svgo",
+                {
+                  plugins: [
+                    {
+                      name: "preset-default",
+                      params: {
+                        overrides: {
+                          removeViewBox: false,
+                          addAttributesToSVGElement: {
+                            params: {
+                              attributes: [
+                                { xmlns: "http://www.w3.org/2000/svg" },
+                              ],
+                            },
+                          },
+                        },
+                      },
+                    },
+                  ],
+                },
+              ],
+            ],
+          },
+        },
+      }),
+    ],
   },
 });

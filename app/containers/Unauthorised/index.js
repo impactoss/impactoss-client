@@ -4,8 +4,8 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
+import HelmetCanonical from 'components/HelmetCanonical';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 
 import ContentHeader from 'components/ContentHeader';
@@ -21,18 +21,19 @@ const ViewContainer = styled(Container)`
 
 export class Unauthorised extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
+    const { intl } = this.props;
     return (
       <div>
-        <Helmet
-          title={this.context.intl.formatMessage(messages.pageTitle)}
+        <HelmetCanonical
+          title={intl.formatMessage(messages.pageTitle)}
           meta={[
-            { name: 'description', content: this.context.intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
         <ContainerWrapper>
           <ViewContainer>
             <ContentHeader
-              title={this.context.intl.formatMessage(messages.pageTitle)}
+              title={intl.formatMessage(messages.pageTitle)}
             />
             <p>
               <FormattedMessage {...messages.info} />
@@ -45,8 +46,8 @@ export class Unauthorised extends React.PureComponent { // eslint-disable-line r
   }
 }
 
-Unauthorised.contextTypes = {
+Unauthorised.propTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default Unauthorised;
+export default injectIntl(Unauthorised);

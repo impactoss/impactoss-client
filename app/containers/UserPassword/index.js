@@ -7,8 +7,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Helmet from 'react-helmet';
-import { actions as formActions } from 'react-redux-form/immutable';
+import HelmetCanonical from 'components/HelmetCanonical';
+import { injectIntl } from 'react-intl';
 
 import {
   getPasswordCurrentField,
@@ -24,55 +24,51 @@ import AuthForm from 'components/forms/AuthForm';
 
 import { updatePath } from 'containers/App/actions';
 
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 import messages from './messages';
+import { FORM_INITIAL } from './constants';
 
 import { save } from './actions';
 import userPasswordSelector from './selectors';
 
 export class UserPassword extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  componentWillMount() {
-    this.props.initialiseForm();
-  }
   render() {
-    const { passwordSending, passwordError } = this.props.userPassword.page;
+    const { intl, handleCancel, handleSubmit } = this.props;
+    const { passwordSending, passwordError } = this.props.userPassword.get('page').toJS();
     const reference = this.props.params.id;
-
     return (
       <div>
-        <Helmet
-          title={`${this.context.intl.formatMessage(messages.pageTitle)}`}
+        <HelmetCanonical
+          title={`${intl.formatMessage(messages.pageTitle)}`}
           meta={[
             {
               name: 'description',
-              content: this.context.intl.formatMessage(messages.metaDescription),
+              content: intl.formatMessage(messages.metaDescription),
             },
           ]}
         />
         <ContentNarrow>
           <ContentHeader
-            title={this.context.intl.formatMessage(messages.pageTitle)}
+            title={intl.formatMessage(messages.pageTitle)}
           />
-          {passwordError &&
-            <Messages type="error" messages={passwordError.messages} />
+          {passwordError
+            && <Messages type="error" messages={passwordError.messages} />
           }
-          {passwordSending &&
-            <Loading />
+          {passwordSending
+            && <Loading />
           }
-          { this.props.userPassword.form &&
-            <AuthForm
-              model="userPassword.form.data"
-              sending={passwordSending}
-              handleSubmit={(formData) => this.props.handleSubmit(formData, reference)}
-              handleCancel={() => this.props.handleCancel(reference)}
-              labels={{ submit: this.context.intl.formatMessage(messages.submit) }}
-              fields={[
-                getPasswordCurrentField(this.context.intl.formatMessage),
-                getPasswordNewField(this.context.intl.formatMessage),
-                getPasswordConfirmationField(this.context.intl.formatMessage),
-              ]}
-            />
-          }
+          <AuthForm
+            sending={passwordSending}
+            handleSubmit={(formData, actions) => handleSubmit(formData, reference, actions)}
+            handleCancel={() => handleCancel(reference)}
+            labels={{ submit: intl.formatMessage(messages.submit) }}
+            initialValues={FORM_INITIAL}
+            fields={[
+              getPasswordCurrentField(intl.formatMessage),
+              getPasswordNewField(intl.formatMessage),
+              getPasswordConfirmationField(intl.formatMessage),
+            ]}
+          />
         </ContentNarrow>
       </div>
     );
@@ -84,10 +80,6 @@ UserPassword.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   params: PropTypes.object,
-  initialiseForm: PropTypes.func,
-};
-
-UserPassword.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -97,20 +89,18 @@ const mapStateToProps = (state) => ({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('userPassword.form.data'));
-    },
-    handleSubmit: (formData, userId) => {
+    handleSubmit: (formData, userId, { resetForm }) => {
       const saveData = {
-        ...formData.toJS(),
+        ...formData,
         id: userId,
       };
       dispatch(save(saveData));
+      resetForm();
     },
     handleCancel: (userId) => {
-      dispatch(updatePath(`${PATHS.USERS}/${userId}`, { replace: true }));
+      dispatch(updatePath(`${ROUTES.USERS}/${userId}`, { replace: true }));
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserPassword);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserPassword));

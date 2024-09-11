@@ -15,11 +15,10 @@ class InputComponent extends React.Component {
   focus = () => {
     this.input.focus();
   }
-
   render() {
     return (
       <StyledInput
-        innerRef={(node) => { this.input = node; }}
+        ref={(node) => { this.input = node; }}
         {...this.props}
       />
     );

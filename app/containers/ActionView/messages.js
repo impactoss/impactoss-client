@@ -18,8 +18,4 @@ export default defineMessages({
     id: 'app.containers.ActionView.header',
     defaultMessage: 'Action',
   },
-  notFound: {
-    id: 'app.containers.ActionView.notFound',
-    defaultMessage: 'Sorry no action found',
-  },
 });

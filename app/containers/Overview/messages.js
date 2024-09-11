@@ -18,22 +18,34 @@ export default defineMessages({
     id: 'app.containers.Overview.description',
     defaultMessage: 'Start exploring by selecting a category group from the sidebar or one of the subjects from the diagram below.',
   },
+  moreLink: {
+    id: 'app.containers.Overview.moreLink',
+    defaultMessage: 'See About page.',
+  },
   buttons: {
     draft: {
       id: 'app.containers.Overview.buttons.draft',
       defaultMessage: '({count} draft)',
     },
-    recommendations: {
-      id: 'app.containers.Overview.buttons.recommendations',
-      defaultMessage: '{count} {type}',
+    title: {
+      id: 'app.containers.Overview.buttons.title',
+      defaultMessage: '{label} in database. Select to navigate to list view',
+    },
+    titleCategoryIcon: {
+      id: 'app.containers.Overview.buttons.titleCategoryIcon',
+      defaultMessage: '{label}. Select to navigate to category group view',
     },
     measures: {
       id: 'app.containers.Overview.buttons.measures',
       defaultMessage: '{count} Government actions',
     },
-    indicators: {
-      id: 'app.containers.Overview.buttons.indicators',
-      defaultMessage: '{count} Indicators',
+    measuresTitle: {
+      id: 'app.containers.Overview.buttons.measuresTitle',
+      defaultMessage: 'Implementation plan',
+    },
+    measuresAdditional: {
+      id: 'app.containers.Overview.buttons.measuresAdditional',
+      defaultMessage: '{count} Government actions',
     },
   },
   diagram: {

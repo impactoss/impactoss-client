@@ -1,10 +1,12 @@
-import { takeLatest, put, take, cancel, select, call } from 'redux-saga/effects';
+import {
+  takeLatest, put, take, cancel, select, call,
+} from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { selectLocation } from 'containers/App/selectors';
 import { updatePath } from 'containers/App/actions';
 
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 import { ENDPOINTS, KEYS } from 'themes/config';
 
 import apiRequest from 'utils/api-request';
@@ -40,7 +42,7 @@ export function* reset({ data }) {
       }
     );
     yield put(passwordResetSuccess());
-    yield put(updatePath(PATHS.LOGIN));
+    yield put(updatePath(ROUTES.LOGIN));
   } catch (error) {
     error.response.json = yield error.response.json();
     yield put(passwordResetError(error));

@@ -18,8 +18,4 @@ export default defineMessages({
     id: 'app.containers.RecommendationEdit.header',
     defaultMessage: 'Edit {type}',
   },
-  notFound: {
-    id: 'app.containers.RecommendationEdit.notFound',
-    defaultMessage: 'Sorry no objective found',
-  },
 });

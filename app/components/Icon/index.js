@@ -7,7 +7,23 @@ import SVG from './SVG';
 
 class Icon extends React.PureComponent {
   render() {
-    const { name, title, size, sizes, palette, paletteIndex, color, iconSize, text, textRight, textLeft, stroke } = this.props;
+    const {
+      name,
+      title,
+      size,
+      sizes,
+      palette,
+      paletteIndex,
+      color,
+      iconSize,
+      text,
+      textRight,
+      textLeft,
+      hasStroke,
+      hidePrint,
+      hideScreenreader,
+      isPresentation,
+    } = this.props;
     const icon = icons[name];
 
     if (icon) {
@@ -17,7 +33,9 @@ class Icon extends React.PureComponent {
         <SVG
           viewBox={`0 0 ${iSize} ${iSize}`}
           preserveAspectRatio="xMidYMid meet"
-          role="img"
+          role={isPresentation ? 'presentation' : 'img'}
+          aria-hidden={hideScreenreader}
+          focusable="false"
           palette={palette}
           paletteIndex={paletteIndex}
           size={size || `${iSize}px`}
@@ -25,10 +43,13 @@ class Icon extends React.PureComponent {
           text={text}
           textLeft={textLeft}
           textRight={textRight}
-          stroke={stroke}
+          hasStroke={hasStroke}
           sizes={sizes}
+          hidePrint={hidePrint}
         >
-          <title>{title || `Icon: ${name}`}</title>
+          {!isPresentation && (
+            <title>{title || `Icon: ${name}`}</title>
+          )}
           <path d={asArray(iconPaths).reduce((memo, path) => `${memo}${path}`, '')}></path>
         </SVG>
       );
@@ -48,14 +69,19 @@ Icon.propTypes = {
   text: PropTypes.bool,
   textLeft: PropTypes.bool,
   textRight: PropTypes.bool,
-  stroke: PropTypes.bool,
+  hasStroke: PropTypes.bool,
   sizes: PropTypes.object,
+  hidePrint: PropTypes.bool,
+  hideScreenreader: PropTypes.bool,
+  isPresentation: PropTypes.bool,
 };
 Icon.defaultProps = {
   name: 'placeholder',
   iconSize: 24,
   textLeft: false,
   textRight: false,
+  hideScreenreader: true,
+  isPresentation: true,
 };
 
 

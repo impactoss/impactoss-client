@@ -70,6 +70,7 @@ class FieldFactory extends React.PureComponent { // eslint-disable-line react/pr
         return (<TextField field={field} />);
     }
   };
+
   render() {
     const { field, nested } = this.props;
     return ((typeof field.value !== 'undefined' && field.value !== null)
@@ -79,12 +80,12 @@ class FieldFactory extends React.PureComponent { // eslint-disable-line react/pr
       ))
       || (typeof field.fields !== 'undefined' && field.fields.length > 0)
       || typeof field.showEmpty !== 'undefined')
-    ? (
-      <Field nested={nested} noPadding={field.type === 'smartTaxonomy'}>
-        {this.renderField(field)}
-      </Field>
-    )
-    : null;
+      ? (
+        <Field nested={nested} noPadding={field.type === 'smartTaxonomy'}>
+          {this.renderField(field)}
+        </Field>
+      )
+      : null;
   }
 }
 FieldFactory.propTypes = {

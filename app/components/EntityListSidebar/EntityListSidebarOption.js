@@ -6,6 +6,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -23,18 +24,21 @@ const Styled = styled(Button)`
   width: 100%;
   font-weight: bold;
   padding: ${(props) => props.small ? '0.5em 8px 0.5em 36px' : '0.75em 8px 0.75em 16px'};
-  width: 100%;
   text-align: left;
-  color:  ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
+  color: ${(props) => props.active ? palette('asideListItem', 1) : palette('asideListItem', 0)};
   background-color: ${(props) => props.active ? palette('asideListItem', 3) : palette('asideListItem', 2)};
   border-bottom: 1px solid ${palette('asideListItem', 4)};
-  &:hover {
-    color: ${(props) => props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0)};
+  &:hover, &:focus-visible {
+    color: ${(props) => props.active ? palette('taxonomiesHover', 1) : palette('asideListItemHover', 0)};
     background-color: ${(props) => props.active ? palette('asideListItemHover', 3) : palette('asideListItemHover', 2)};
-    border-bottom-color: ${palette('asideListItemHover', 4)}
+    border-bottom-color: ${palette('asideListItemHover', 4)};
+    outline: none;
   }
   &:last-child {
     border-bottom: 0;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: ${(props) => props.small ? '0.5em 8px 0.5em 36px' : '0.75em 8px 0.75em 16px'};
   }
 `;
 const Label = styled.div`
@@ -66,62 +70,70 @@ const DotWrapper = styled.div`
 `;
 
 class EntityListSidebarOption extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   renderDot = (groupId, color, active) => {
     switch (groupId) {
       case 'taxonomies':
       case 'connectedTaxonomies':
         return (<Dot palette="taxonomies" pIndex={parseInt(color, 10)} active={active} />);
       case 'frameworks':
-        return (<Dot palette={color} pIndex={0} round active={active} />);
+        return (<Dot palette={color} pIndex={0} active={active} />);
       case 'connections':
         return (<Dot palette={color} pIndex={0} round active={active} />);
       default:
         return null;
     }
-  }
-  render() {
-    const { option, onShowForm, groupId, groupType } = this.props;
+  };
 
+  render() {
+    const {
+      option, onShowForm, groupId, groupType, formOptions, intl,
+    } = this.props;
     return (
-      <Styled
-        active={option.get('active')}
-        small={option.get('nested')}
-        onClick={() => onShowForm({
-          group: groupType || groupId,
-          optionId: option.get('id'),
-          path: option.get('path'),
-          connection: option.get('connection'),
-          key: option.get('key'),
-          ownKey: option.get('ownKey'),
-          active: option.get('active'),
-          create: option.get('create') && option.get('create').toJS(),
-        })}
-        title={this.context.intl.formatMessage(
-          option.get('active') ? messages.groupOptionSelect.hide : messages.groupOptionSelect.show
-        )}
-      >
-        <Label>
-          { option.get('message')
-            ? appMessage(this.context.intl, option.get('message'))
-            : option.get('label')
-          }
-        </Label>
-        { option.get('icon') &&
-          <IconWrapper>
-            <Icon name={option.get('icon')} />
-          </IconWrapper>
-        }
-        <DotWrapper small={option.get('nested')}>
-          {
-            this.renderDot(
-              groupType || groupId,
-              option.get('color') || option.get('id'),
-              option.get('active'),
+      <div>
+        <Styled
+          active={option.get('active')}
+          small={option.get('nested')}
+          onClick={() => onShowForm({
+            group: groupType || groupId,
+            optionId: option.get('id'),
+            path: option.get('path'),
+            connection: option.get('connection'),
+            key: option.get('key'),
+            ownKey: option.get('ownKey'),
+            active: option.get('active'),
+            create: option.get('create') && option.get('create').toJS(),
+          })}
+          title={intl.formatMessage(
+            option.get('active') ? messages.groupOptionSelect.hide : messages.groupOptionSelect.show
+          )}
+        >
+          <Label>
+            {option.get('message')
+              ? appMessage(intl, option.get('message'))
+              : option.get('label')
+            }
+          </Label>
+          {option.get('icon')
+            && (
+              <IconWrapper>
+                <Icon name={option.get('icon')} />
+              </IconWrapper>
             )
           }
-        </DotWrapper>
-      </Styled>
+          {(!option.get('nested') || option.get('nested') === false) && (
+            <DotWrapper>
+              {
+                this.renderDot(
+                  groupType || groupId,
+                  option.get('color') || option.get('id'),
+                  option.get('active'),
+                )
+              }
+            </DotWrapper>
+          )}
+        </Styled>
+        {option.get('active') && formOptions}
+      </div>
     );
   }
 }
@@ -131,11 +143,9 @@ EntityListSidebarOption.propTypes = {
   groupId: PropTypes.string.isRequired,
   groupType: PropTypes.string,
   onShowForm: PropTypes.func.isRequired,
-};
-
-
-EntityListSidebarOption.contextTypes = {
+  formOptions: PropTypes.node,
   intl: PropTypes.object.isRequired,
 };
 
-export default EntityListSidebarOption;
+
+export default injectIntl(EntityListSidebarOption);

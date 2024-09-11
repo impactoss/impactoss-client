@@ -2,21 +2,28 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { injectIntl } from 'react-intl';
 
 import { getBookmarkForSaving, generateBookmarkTitle } from 'utils/bookmark';
 
-import { loadEntitiesIfNeeded, deleteEntity, saveEntity, newEntity } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded, deleteEntity, saveEntity, newEntity,
+} from 'containers/App/actions';
 import { selectReady, selectLocation, selectEntities } from 'containers/App/selectors';
 import Icon from 'components/Icon';
-import Button from 'components/buttons/Button';
+import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
+
+import messages from './messages';
 
 import BookmarkForm from './BookmarkForm';
 import { DEPENDENCIES } from './constants';
 import { selectBookmarkForLocation } from './selectors';
 
 const BookmarkerContainer = styled.div`
-  position: relative;
   z-index: 10;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    position: relative;
+  }
 `;
 
 class Bookmarker extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -28,19 +35,11 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
-  //
-  // const { dataReady, bookmark } = this.props;
-  //
-  // if (dataReady && bookmark && this.state.title === null) {
-    //   this.setState({ title: bookmark.getIn(['attributes', 'title']) });
-    // } else {
-      //   this.setState({ title: '' });
-      // }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
@@ -57,12 +56,18 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
       bookmarks,
       viewTitle,
       type,
+      intl,
     } = this.props;
 
     if (dataReady) {
       return (
         <BookmarkerContainer>
-          <Button
+          <ButtonFlatIconOnly
+            subtle
+            title={bookmark
+              ? intl.formatMessage(messages.editBookmark)
+              : intl.formatMessage(messages.newBookmark)
+            }
             onClick={
               () => {
                 if (!bookmark) {
@@ -80,17 +85,19 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
                     type,
                   );
                 } else {
-                  this.setState({
-                    new: false,
-                    open: !this.state.open,
-                  });
+                  this.setState(
+                    (prevState) => ({
+                      new: false,
+                      open: !prevState.open,
+                    })
+                  );
                 }
               }
             }
           >
             {bookmark && <Icon name="bookmark_active" />}
             {!bookmark && <Icon name="bookmark_inactive" />}
-          </Button>
+          </ButtonFlatIconOnly>
           {this.state.open && bookmark && (
             <BookmarkForm
               bookmark={bookmark}
@@ -117,7 +124,6 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
     }
     return null;
   }
-
 }
 
 Bookmarker.propTypes = {
@@ -131,6 +137,7 @@ Bookmarker.propTypes = {
   location: PropTypes.object,
   viewTitle: PropTypes.string,
   type: PropTypes.string,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -177,4 +184,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Bookmarker);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(Bookmarker));

@@ -1,10 +1,10 @@
 import { truncateText } from 'utils/string';
 import { sortEntities, sortCategories } from 'utils/sort';
-import { filterTaxonomies, getAcceptanceStatus } from 'utils/entities';
+import { filterTaxonomies, getSupportLevel } from 'utils/entities';
 import { USER_ROLES, TEXT_TRUNCATE } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
-import { PATHS } from 'containers/App/constants';
+import { ROUTES } from 'containers/App/constants';
 
 export const getIdField = (entity, isManager) => ({
   controlType: 'info',
@@ -29,8 +29,7 @@ export const getReferenceField = (entity, isManager, defaultToId) => {
   }
   return false;
 };
-const getLinkAnchor = (url) =>
-  truncateText(url.replace(/^https?:\/\//i, ''), TEXT_TRUNCATE.LINK_FIELD);
+const getLinkAnchor = (url) => truncateText(url.replace(/^https?:\/\//i, ''), TEXT_TRUNCATE.LINK_FIELD);
 
 export const getLinkField = (entity) => ({
   type: 'link',
@@ -47,6 +46,7 @@ export const getEntityLinkField = (entity, path, label, labelFormatted) => ({
 });
 
 export const getTitleField = (entity, isManager, attribute = 'title', label) => ({
+  controlType: 'info',
   type: 'title',
   value: entity.getIn(['attributes', attribute]),
   isManager,
@@ -62,9 +62,9 @@ export const getStatusField = (entity, attribute = 'draft', options, label, defa
   controlType: 'info',
   type: 'status',
   value: (
-    entity &&
-    entity.getIn(['attributes', attribute]) !== null &&
-    typeof entity.getIn(['attributes', attribute]) !== 'undefined'
+    entity
+    && entity.getIn(['attributes', attribute]) !== null
+    && typeof entity.getIn(['attributes', attribute]) !== 'undefined'
   )
     ? entity.getIn(['attributes', attribute])
     : defaultValue,
@@ -73,10 +73,8 @@ export const getStatusField = (entity, attribute = 'draft', options, label, defa
 });
 
 // only show the highest rated role (lower role ids means higher)
-const getHighestUserRoleId = (roles) =>
-roles.reduce((memo, role) =>
-    role.get('id') < memo ? role.get('id') : memo
-  , USER_ROLES.DEFAULT.value);
+const getHighestUserRoleId = (roles) => roles.reduce((memo, role) => role.get('id') < memo ? role.get('id') : memo,
+  USER_ROLES.DEFAULT.value);
 
 export const getRoleField = (entity) => ({
   controlType: 'info',
@@ -85,22 +83,91 @@ export const getRoleField = (entity) => ({
   options: Object.values(USER_ROLES),
 });
 
-export const getMetaField = (entity) => {
+// export const getMetaField = (entity) => {
+//   const fields = [];
+//   if (entity.get('user') && entity.getIn(['user', 'attributes', 'name'])) {
+//     fields.push({
+//       label: appMessages.attributes.meta.updated_by,
+//       value: entity.get('user') && entity.getIn(['user', 'attributes', 'name']),
+//     });
+//   }
+//   fields.push({
+//     label: appMessages.attributes.meta.updated_at,
+//     value: entity.getIn(['attributes', 'updated_at']),
+//     date: true,
+//     time: true,
+//   });
+//   fields.push({
+//     label: appMessages.attributes.meta.created_at,
+//     value: entity.getIn(['attributes', 'created_at']),
+//     date: true,
+//   });
+//   return {
+//     controlType: 'info',
+//     type: 'meta',
+//     fields,
+//   };
+// };
+export const getMetaField = (entity, includeRelationshipUpdatedAt = true) => {
   const fields = [];
-  if (entity.get('user') && entity.getIn(['user', 'attributes', 'name'])) {
+  // updated
+  const updated = entity.getIn(['attributes', 'updated_at']);
+  const updatedRelationship = entity.getIn(['attributes', 'relationship_updated_at']);
+  const hasUpdated = updated && updated.trim() !== '';
+  const hasUpdatedRelationship = updatedRelationship && updatedRelationship.trim() !== '';
+
+  let useUpdated = false;
+  let useUpdatedRelationship = false;
+  if (hasUpdated && !hasUpdatedRelationship) {
+    useUpdated = true;
+  } else if (includeRelationshipUpdatedAt && !hasUpdated && hasUpdatedRelationship) {
+    useUpdatedRelationship = true;
+  } else if (includeRelationshipUpdatedAt && hasUpdated && hasUpdatedRelationship) {
+    const updatedEarlier = new Date(updatedRelationship) < new Date(updated);
+    if (updatedEarlier) {
+      useUpdated = true;
+    } else {
+      useUpdatedRelationship = true;
+    }
+  }
+
+  if (useUpdated) {
+    if (entity.get('user') && entity.getIn(['user', 'attributes', 'name'])) {
+      fields.push({
+        label: appMessages.attributes.updated_by_id,
+        value: entity.getIn(['user', 'attributes', 'name']),
+      });
+    }
     fields.push({
-      label: appMessages.attributes.meta.updated_by,
-      value: entity.get('user') && entity.getIn(['user', 'attributes', 'name']),
+      label: appMessages.attributes.updated_at,
+      value: entity.getIn(['attributes', 'updated_at']),
+      date: true,
+      time: true,
+    });
+  } else if (useUpdatedRelationship) {
+    // updated connections
+    if (entity.get('userRelationship') && entity.getIn(['userRelationship', 'attributes', 'name'])) {
+      fields.push({
+        label: appMessages.attributes.updated_by_id,
+        value: entity.getIn(['userRelationship', 'attributes', 'name']),
+      });
+    }
+    fields.push({
+      label: appMessages.attributes.updated_at,
+      value: entity.getIn(['attributes', 'relationship_updated_at']),
+      date: true,
+      time: true,
+    });
+  }
+  // creation
+  if (entity.get('creator') && entity.getIn(['creator', 'attributes', 'name'])) {
+    fields.push({
+      label: appMessages.attributes.created_by_id,
+      value: entity.getIn(['creator', 'attributes', 'name']),
     });
   }
   fields.push({
-    label: appMessages.attributes.meta.updated_at,
-    value: entity.getIn(['attributes', 'updated_at']),
-    date: true,
-    time: true,
-  });
-  fields.push({
-    label: appMessages.attributes.meta.created_at,
+    label: appMessages.attributes.created_at,
     value: entity.getIn(['attributes', 'created_at']),
     date: true,
   });
@@ -111,40 +178,36 @@ export const getMetaField = (entity) => {
   };
 };
 
-export const getMarkdownField = (entity, attribute, hasLabel = true, label) =>
-  !!entity.getIn(['attributes', attribute]) &&
-  (entity.getIn(['attributes', attribute]).trim().length > 0) &&
-  ({
+export const getMarkdownField = (entity, attribute, hasLabel = true, label) => !!entity.getIn(['attributes', attribute])
+  && (entity.getIn(['attributes', attribute]).trim().length > 0)
+  && ({
     type: 'markdown',
     value: entity.getIn(['attributes', attribute]),
     label: hasLabel && (appMessages.attributes[label || attribute]),
   });
 
-export const getDateField = (entity, attribute, showEmpty, emptyMessage) =>
-  (showEmpty || (
-    !!entity.getIn(['attributes', attribute]) &&
-    (entity.getIn(['attributes', attribute]).trim().length > 0)
-  )) &&
-  ({
+export const getDateField = (entity, attribute, showEmpty, emptyMessage) => (showEmpty || (
+  !!entity.getIn(['attributes', attribute])
+    && (entity.getIn(['attributes', attribute]).trim().length > 0)
+))
+  && ({
     type: 'date',
     value: !!entity.getIn(['attributes', attribute]) && entity.getIn(['attributes', attribute]),
     label: appMessages.attributes[attribute],
     showEmpty: showEmpty && (emptyMessage || appMessages.attributes[`${attribute}_empty`]),
   });
 
-export const getDateRelatedField = (value, attribute, showEmpty, emptyMessage) =>
-  (showEmpty || (!!value && (value.trim().length > 0))) &&
-  ({
+export const getDateRelatedField = (value, attribute, showEmpty, emptyMessage) => (showEmpty || (!!value && (value.trim().length > 0)))
+  && ({
     type: 'date',
     value: !!value && value,
     label: appMessages.attributes[attribute],
     showEmpty: showEmpty && (emptyMessage || appMessages.attributes[`${attribute}_empty`]),
   });
 
-export const getTextField = (entity, attribute) =>
-  !!entity.getIn(['attributes', attribute]) &&
-  (entity.getIn(['attributes', attribute]).trim().length > 0) &&
-  ({
+export const getTextField = (entity, attribute) => !!entity.getIn(['attributes', attribute])
+  && (entity.getIn(['attributes', attribute]).trim().length > 0)
+  && ({
     type: 'text',
     value: entity.getIn(['attributes', attribute]),
     label: appMessages.attributes[attribute],
@@ -156,25 +219,25 @@ const mapCategoryOptions = (categories, taxId) => categories
       label: cat.getIn(['attributes', 'title']),
       reference: cat.getIn(['attributes', 'reference']) || null,
       draft: cat.getIn(['attributes', 'draft']) || null,
-      linkTo: `${PATHS.CATEGORIES}/${cat.get('id')}`,
+      linkTo: `${ROUTES.CATEGORIES}/${cat.get('id')}`,
     }))
-    .toArray()
+    .valueSeq().toArray()
   : [];
 
 const mapSmartCategoryOptions = (categories) => categories
   ? sortEntities(
-      categories,
-      'asc',
-      'referenceThenTitle',
-    )
+    categories,
+    'asc',
+    'referenceThenTitle',
+  )
     .map((cat) => ({
       label: cat.getIn(['attributes', 'title']),
-      isSmart: cat.get('associated') && cat.get('associated').size > 0,
+      isSmart: !!cat.get('associated'),
       reference: cat.getIn(['attributes', 'reference']) || null,
       draft: cat.getIn(['attributes', 'draft']) || null,
-      linkTo: `${PATHS.CATEGORIES}/${cat.get('id')}`,
+      linkTo: `${ROUTES.CATEGORIES}/${cat.get('id')}`,
     }))
-    .toArray()
+    .valueSeq().toArray()
   : [];
 
 const mapReports = (reports) => reports
@@ -184,9 +247,11 @@ const mapReports = (reports) => reports
     updatedAt: report.getIn(['attributes', 'updated_at']),
     createdAt: report.getIn(['attributes', 'created_at']),
     draft: report.getIn(['attributes', 'draft']),
-    linkTo: `${PATHS.PROGRESS_REPORTS}/${report.get('id')}`,
+    is_archive: report.getIn(['attributes', 'is_archive']),
+    is_current: report.getIn(['attributes', 'is_current']),
+    linkTo: `${ROUTES.PROGRESS_REPORTS}/${report.get('id')}`,
     updatedBy: report.get('user') && report.getIn(['user', 'attributes']).toJS(),
-  })).toArray()
+  })).valueSeq().toArray()
   : [];
 
 export const getReportsField = (reports, button) => ({
@@ -201,22 +266,29 @@ const mapDates = (dates) => dates
     date: date.getIn(['attributes', 'due_date']),
     due: date.getIn(['attributes', 'due']),
     overdue: date.getIn(['attributes', 'overdue']),
-  })).toArray()
+  })).valueSeq().toArray()
   : [];
 
 export const getScheduleField = (dates) => ({
   type: 'schedule',
   values: mapDates(dates),
+  showEmpty: true,
 });
 
-export const getTaxonomyFields = (taxonomies) =>
-  taxonomies && sortEntities(taxonomies, 'asc', 'priority').map((taxonomy) => ({
-    type: 'taxonomy',
-    label: appMessages.entities.taxonomies[taxonomy.get('id')].plural,
-    entityType: 'taxonomies',
-    id: taxonomy.get('id'),
-    values: mapCategoryOptions(taxonomy.get('categories'), taxonomy.get('id')),
-  })).toArray();
+export const getTaxonomyFields = (taxonomies) => taxonomies
+  && sortEntities(
+    taxonomies,
+    'asc',
+    'priority',
+  ).map(
+    (taxonomy) => ({
+      type: 'taxonomy',
+      label: appMessages.entities.taxonomies[taxonomy.get('id')].plural,
+      entityType: 'taxonomies',
+      id: taxonomy.get('id'),
+      values: mapCategoryOptions(taxonomy.get('categories'), taxonomy.get('id')),
+    })
+  ).valueSeq().toArray();
 
 export const getSmartTaxonomyField = (taxonomy) => ({
   type: 'smartTaxonomy',
@@ -225,8 +297,7 @@ export const getSmartTaxonomyField = (taxonomy) => ({
   values: mapSmartCategoryOptions(taxonomy.get('categories')),
 });
 
-export const hasTaxonomyCategories = (taxonomies) =>
-  taxonomies
+export const hasTaxonomyCategories = (taxonomies) => taxonomies
   ? taxonomies.reduce((memo, taxonomy) => memo || (taxonomy.get('categories') && taxonomy.get('categories').size > 0), false)
   : false;
 
@@ -268,20 +339,20 @@ const getConnectionField = ({
   showEmpty: appMessages.entities[entityType].empty,
   connectionOptions: connectionOptions.map((option) => ({
     label: appMessages.entities[option].plural,
+    groupByFramework: option === 'recommendations',
     path: option,
     clientPath: option === 'measures' ? 'actions' : option,
   })),
 });
 
-export const getIndicatorConnectionField = (entities, connections, onEntityClick) =>
-  getConnectionField({
-    entities: sortEntities(entities, 'asc', 'reference'),
-    taxonomies: null,
-    connections,
-    connectionOptions: ['measures', 'recommendations'],
-    entityType: 'indicators',
-    onEntityClick,
-  });
+export const getIndicatorConnectionField = (entities, connections, onEntityClick) => getConnectionField({
+  entities: sortEntities(entities, 'asc', 'reference'),
+  taxonomies: null,
+  connections,
+  connectionOptions: ['measures', 'recommendations'],
+  entityType: 'indicators',
+  onEntityClick,
+});
 
 export const getRecommendationConnectionField = (
   entities,
@@ -290,31 +361,29 @@ export const getRecommendationConnectionField = (
   onEntityClick,
   fwid, // framework id
   hasResponse,
-) =>
-  getConnectionField({
-    entities: sortEntities(entities, 'asc', 'reference'),
-    taxonomies: filterTaxonomies(taxonomies, 'tags_recommendations'),
-    connections,
-    connectionOptions: ['measures', 'indicators'],
-    entityType: fwid ? `recommendations_${fwid}` : 'recommendations',
-    entityPath: 'recommendations',
-    onEntityClick,
-    entityIcon: (entity) => {
-      if (!hasResponse) return null;
-      const status = getAcceptanceStatus(entity);
-      return status ? status.icon : null;
-    },
-  });
-export const getMeasureConnectionField = (entities, taxonomies, connections, onEntityClick) =>
-  getConnectionField({
-    entities: sortEntities(entities, 'asc', 'id'),
-    taxonomies: filterTaxonomies(taxonomies, 'tags_measures'),
-    connections,
-    connectionOptions: ['indicators', 'recommendations'],
-    entityType: 'measures',
-    entityPath: 'actions',
-    onEntityClick,
-  });
+) => getConnectionField({
+  entities: sortEntities(entities, 'asc', 'reference'),
+  taxonomies: filterTaxonomies(taxonomies, 'tags_recommendations'),
+  connections,
+  connectionOptions: ['measures', 'indicators'],
+  entityType: fwid ? `recommendations_${fwid}` : 'recommendations',
+  entityPath: 'recommendations',
+  onEntityClick,
+  entityIcon: (entity) => {
+    if (!hasResponse) return null;
+    const status = getSupportLevel(entity);
+    return status ? status.icon : null;
+  },
+});
+export const getMeasureConnectionField = (entities, taxonomies, connections, onEntityClick) => getConnectionField({
+  entities: sortEntities(entities, 'asc', 'id'),
+  taxonomies: filterTaxonomies(taxonomies, 'tags_measures'),
+  connections,
+  connectionOptions: ['indicators', 'recommendations'],
+  entityType: 'measures',
+  entityPath: 'actions',
+  onEntityClick,
+});
 
 const getConnectionGroupsField = ({
   entityGroups,
@@ -351,41 +420,38 @@ export const getRecommendationConnectionGroupsField = (
   onEntityClick,
   fwid, // framework id
   hasResponse,
-) =>
-  getConnectionGroupsField({
-    entityGroups,
-    groupedBy,
-    taxonomies: filterTaxonomies(taxonomies, 'tags_recommendations'),
-    connections,
-    connectionOptions: ['measures'],
-    entityType: fwid ? `recommendations_${fwid}` : 'recommendations',
-    entityPath: 'recommendations',
-    onEntityClick,
-    entityIcon: (entity) => {
-      if (!hasResponse) return null;
-      const status = getAcceptanceStatus(entity);
-      return status ? status.icon : null;
-    },
-  });
-export const getMeasureConnectionGroupsField = (entityGroups, groupedBy, taxonomies, connections, onEntityClick) =>
-  getConnectionGroupsField({
-    entityGroups,
-    groupedBy,
-    taxonomies: filterTaxonomies(taxonomies, 'tags_measures'),
-    connections,
-    connectionOptions: ['indicators', 'recommendations'],
-    entityType: 'measures',
-    entityPath: 'actions',
-    onEntityClick,
-  });
+) => getConnectionGroupsField({
+  entityGroups,
+  groupedBy,
+  taxonomies: filterTaxonomies(taxonomies, 'tags_recommendations'),
+  connections,
+  connectionOptions: ['measures'],
+  entityType: fwid ? `recommendations_${fwid}` : 'recommendations',
+  entityPath: 'recommendations',
+  onEntityClick,
+  entityIcon: (entity) => {
+    if (!hasResponse) return null;
+    const status = getSupportLevel(entity);
+    return status ? status.icon : null;
+  },
+});
+export const getMeasureConnectionGroupsField = (entityGroups, groupedBy, taxonomies, connections, onEntityClick) => getConnectionGroupsField({
+  entityGroups,
+  groupedBy,
+  taxonomies: filterTaxonomies(taxonomies, 'tags_measures'),
+  connections,
+  connectionOptions: ['indicators', 'recommendations'],
+  entityType: 'measures',
+  entityPath: 'actions',
+  onEntityClick,
+});
 
-export const getManagerField = (entity, messageLabel, messageEmpty) =>
-  ({
-    label: messageLabel,
-    type: 'manager',
-    value: entity.get('manager') && entity.getIn(['manager', 'attributes', 'name']),
-    showEmpty: messageEmpty,
-  });
+export const getManagerField = (entity, messageLabel, messageEmpty) => ({
+  label: messageLabel,
+  type: 'manager',
+  value: entity.get('manager') && entity.getIn(['manager', 'attributes', 'name']),
+  showEmpty: messageEmpty,
+});
 
 export const getDownloadField = (entity, isManager) => ({
   type: 'download',
@@ -396,6 +462,7 @@ export const getDownloadField = (entity, isManager) => ({
 });
 
 export const getEmailField = (entity) => ({
+  controlType: 'info',
   type: 'email',
   value: entity.getIn(['attributes', 'email']),
 });

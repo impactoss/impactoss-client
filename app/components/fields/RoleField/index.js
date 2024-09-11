@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { find } from 'lodash/collection';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import appMessage from 'utils/app-message';
 
@@ -15,7 +15,7 @@ import Status from 'components/fields/Status';
 
 class RoleField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { field } = this.props;
+    const { field, intl } = this.props;
 
     const role = find(field.options || USER_ROLES, { value: parseInt(field.value, 10) });
 
@@ -26,7 +26,7 @@ class RoleField extends React.PureComponent { // eslint-disable-line react/prefe
         </Label>
         <Status>
           { role && role.message
-            ? appMessage(this.context.intl, role.message)
+            ? appMessage(intl, role.message)
             : ((role && role.label) || field.value)
           }
         </Status>
@@ -37,9 +37,7 @@ class RoleField extends React.PureComponent { // eslint-disable-line react/prefe
 
 RoleField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-RoleField.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default RoleField;
+export default injectIntl(RoleField);

@@ -12,11 +12,15 @@ const Styled = styled.div`
   background-color: ${palette('light', 1)};
   display: table;
   table-layout: fixed;
+  margin-bottom: 20px;
+  @media print {
+    margin-bottom: 15px;
+  }
 `;
 
 
 const Column = styled(ColumnHeader)`
-  width:${(props) => props.colWidth}%;
+  position: relative;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-right: 30px;
   }
@@ -42,15 +46,21 @@ const SortWrapper = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     padding: 6px 2px 0 0;
   }
+  @media print {
+    padding-top: 0;
+    background-color: transparent;
+  }
 `;
 const SortButton = styled(ButtonFlatIconOnly)`
   color: inherit;
   padding: 0;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding: 0;
+  }
 `;
 
 
 class CategoryListHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const { columns } = this.props;
 
@@ -61,17 +71,20 @@ class CategoryListHeader extends React.PureComponent { // eslint-disable-line re
             <Column key={i} colWidth={col.width}>
               <Title>
                 {col.header}
-                {col.via &&
+                {col.via && (
                   <Via>{` ${col.via}`}</Via>
-                }
+                )}
+                {col.by && (
+                  <span>{col.by}</span>
+                )}
               </Title>
-              {col.onClick &&
+              {col.onClick && (
                 <SortWrapper>
-                  <SortButton onClick={col.onClick}>
-                    <Icon name={col.sortIcon} />
+                  <SortButton onClick={col.onClick} title={col.sortTitle || 'Sort'}>
+                    <Icon name={col.sortIcon} hidePrint={!col.active} />
                   </SortButton>
                 </SortWrapper>
-              }
+              )}
             </Column>
           ))
         }

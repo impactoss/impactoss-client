@@ -18,10 +18,6 @@ export default defineMessages({
     id: 'app.containers.IndicatorView.header',
     defaultMessage: 'Indicator',
   },
-  notFound: {
-    id: 'app.containers.IndicatorView.notFound',
-    defaultMessage: 'Sorry no indicator found',
-  },
   addReport: {
     id: 'app.containers.IndicatorView.addReport',
     defaultMessage: 'Add report',

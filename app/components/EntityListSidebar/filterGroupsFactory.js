@@ -1,12 +1,12 @@
 import { reduce } from 'lodash/collection';
 import { sortEntities } from 'utils/sort';
-import { attributesEqual } from 'utils/entities';
+import { qe } from 'utils/quasi-equals';
+import asArray from 'utils/as-array';
 
-const checkFramework = (frameworks, attribute) =>
-  frameworks.some((fw) => fw.getIn(['attributes', attribute]));
+const checkFramework = (frameworks, attribute) => frameworks.some((fw) => fw.getIn(['attributes', attribute]));
 
 // figure out filter groups for filter panel
-export const makeFilterGroups = (
+export const makeFilterGroups = ({
   config,
   taxonomies,
   connectedTaxonomies,
@@ -14,7 +14,8 @@ export const makeFilterGroups = (
   hasUserRole,
   messages,
   frameworks,
-) => {
+  globalSettings,
+}) => {
   const filterGroups = {};
 
   // taxonomy option group
@@ -32,18 +33,65 @@ export const makeFilterGroups = (
       }],
     };
   }
+
+  // attributes
+  if (config.attributes) {
+    // first prepare taxonomy options
+    filterGroups.attributes = {
+      id: 'attributes', // filterGroupId
+      label: messages.attributes,
+      show: true,
+      options: reduce(
+        config.attributes.options,
+        (options, option) => {
+          const passSettings = option.forGlobalSettings === 'undefined'
+            || asArray(option.forGlobalSettings).reduce(
+              (memo, setting) => {
+                if (!setting) return memo;
+                const { arg, value } = setting;
+                if (typeof globalSettings[arg] !== 'undefined' && !qe(globalSettings[arg], value)) {
+                  return false;
+                }
+                return memo;
+              },
+              true,
+            );
+          return (
+            // check for role
+            (
+              typeof option.role === 'undefined'
+              || (hasUserRole && hasUserRole[option.role])
+            )
+            // check for frameworks
+            && (
+              typeof option.frameworkFilter === 'undefined'
+              || checkFramework(frameworks, option.frameworkFilter)
+            )
+            && passSettings
+          )
+            ? options.concat([{
+              id: option.attribute, // filterOptionId
+              label: option.label,
+              message: option.message,
+              active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
+            }])
+            : options;
+        },
+        [],
+      ),
+    };
+  }
   // taxonomy option group
   if (config.taxonomies && taxonomies) {
     // multi framework mode
     if (config.frameworks && frameworks && frameworks.size > 1) {
       // single framework taxonomy
       frameworks.forEach((fw) => {
-        const fwTaxonomies =
-          taxonomies.filter((tax) => {
-            const taxFwIds = tax.get('frameworkIds');
-            return taxFwIds.size === 1 &&
-              taxFwIds.find((fwid) => attributesEqual(fwid, fw.get('id')));
-          });
+        const fwTaxonomies = taxonomies.filter((tax) => {
+          const taxFwIds = tax.get('frameworkIds');
+          return taxFwIds.size === 1
+              && taxFwIds.find((fwid) => qe(fwid, fw.get('id')));
+        });
         filterGroups[`taxonomies_${fw.get('id')}`] = {
           id: `taxonomies_${fw.get('id')}`, // filterGroupId
           type: 'taxonomies',
@@ -52,9 +100,8 @@ export const makeFilterGroups = (
           icon: 'categories',
           options:
             sortEntities(fwTaxonomies, 'asc', 'priority')
-            .reduce(
-              (memo, taxonomy) =>
-                memo.concat([
+              .reduce(
+                (memo, taxonomy) => memo.concat([
                   {
                     id: taxonomy.get('id'), // filterOptionId
                     label: messages.taxonomies(taxonomy.get('id')),
@@ -62,15 +109,12 @@ export const makeFilterGroups = (
                     nested: taxonomy.getIn(['attributes', 'parent_id']),
                   },
                 ]),
-              [],
-            ),
+                [],
+              ),
         };
       });
-      const commonTaxonomies =
-        taxonomies.filter((tax) =>
-          tax.get('frameworkIds') &&
-          tax.get('frameworkIds').size > 1
-        );
+      const commonTaxonomies = taxonomies.filter((tax) => tax.get('frameworkIds')
+          && tax.get('frameworkIds').size > 1);
       filterGroups.taxonomies = {
         id: 'taxonomies', // filterGroupId
         label: messages.taxonomyGroupByFw('common'),
@@ -78,9 +122,8 @@ export const makeFilterGroups = (
         icon: 'categories',
         options:
           sortEntities(commonTaxonomies, 'asc', 'priority')
-          .reduce(
-            (memo, taxonomy) =>
-              memo.concat([
+            .reduce(
+              (memo, taxonomy) => memo.concat([
                 {
                   id: taxonomy.get('id'), // filterOptionId
                   label: messages.taxonomies(taxonomy.get('id')),
@@ -88,8 +131,8 @@ export const makeFilterGroups = (
                   nested: taxonomy.getIn(['attributes', 'parent_id']),
                 },
               ]),
-            [],
-          ),
+              [],
+            ),
       };
     } else {
       // first prepare taxonomy options
@@ -100,9 +143,8 @@ export const makeFilterGroups = (
         icon: 'categories',
         options:
           sortEntities(taxonomies, 'asc', 'priority')
-          .reduce(
-            (memo, taxonomy) =>
-              memo.concat([
+            .reduce(
+              (memo, taxonomy) => memo.concat([
                 {
                   id: taxonomy.get('id'), // filterOptionId
                   label: messages.taxonomies(taxonomy.get('id')),
@@ -110,8 +152,8 @@ export const makeFilterGroups = (
                   nested: taxonomy.getIn(['attributes', 'parent_id']),
                 },
               ]),
-            [],
-          ),
+              [],
+            ),
       };
     }
   }
@@ -126,10 +168,9 @@ export const makeFilterGroups = (
       icon: 'connectedCategories',
       options:
         sortEntities(connectedTaxonomies, 'asc', 'priority')
-        .reduce(
-          (taxOptionsMemo, taxonomy) =>
-            (config.connectedTaxonomies.exclude &&
-            taxonomy.getIn(['attributes', config.connectedTaxonomies.exclude]))
+          .reduce(
+            (taxOptionsMemo, taxonomy) => (config.connectedTaxonomies.exclude
+            && taxonomy.getIn(['attributes', config.connectedTaxonomies.exclude]))
               ? taxOptionsMemo
               : taxOptionsMemo.concat([
                 {
@@ -139,8 +180,8 @@ export const makeFilterGroups = (
                   nested: taxonomy.getIn(['attributes', 'parent_id']),
                 },
               ]),
-          [],
-        ),
+            [],
+          ),
     };
   }
 
@@ -156,9 +197,7 @@ export const makeFilterGroups = (
         (optionsMemo, option) => {
           if (option.groupByFramework && frameworks) {
             return frameworks
-              .filter((fw) =>
-                !option.frameworkFilter || fw.getIn(['attributes', option.frameworkFilter])
-              )
+              .filter((fw) => !option.frameworkFilter || fw.getIn(['attributes', option.frameworkFilter]))
               .reduce(
                 (memo, fw) => {
                   const id = `${option.path}_${fw.get('id')}`;
@@ -186,32 +225,6 @@ export const makeFilterGroups = (
         },
         [],
       ),
-    };
-  }
-
-  // attributes
-  if (config.attributes) {
-    // first prepare taxonomy options
-    filterGroups.attributes = {
-      id: 'attributes', // filterGroupId
-      label: messages.attributes,
-      show: true,
-      options: reduce(
-        config.attributes.options,
-        (options, option) =>
-          (
-            (typeof option.role === 'undefined' || hasUserRole[option.role]) &&
-            (typeof option.frameworkFilter === 'undefined' || checkFramework(frameworks, option.frameworkFilter))
-          )
-            ? options.concat([{
-              id: option.attribute, // filterOptionId
-              label: option.label,
-              message: option.message,
-              active: !!activeFilterOption && activeFilterOption.optionId === option.attribute,
-            }])
-            : options,
-          [],
-        ),
     };
   }
 

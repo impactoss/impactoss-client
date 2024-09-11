@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { map } from 'lodash/collection';
 
+import asArray from 'utils/as-array';
+
 import ButtonDefault from 'components/buttons/ButtonDefault';
 import Icon from 'components/Icon';
 
@@ -18,10 +20,17 @@ const Button = styled(ButtonDefault)`
   font-size: 0.85em;
   min-width: 80px;
   min-height: 2.2em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: 0.85em;
+    padding: 0.3em 1em 0.2em;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     min-width: 90px;
     min-height: 3em;
     padding: 0.3em 1.5em 0.2em;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
   }
 `;
 
@@ -29,27 +38,23 @@ const Word = styled.span`
   display: ${(props) => props.hiddenSmall ? 'none' : 'inline'};
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     display: ${(props) => {
-      if (props.hiddenMedium) return 'none';
-      if (props.visibleSmall) return 'none';
-      return 'inline';
-    }};
+    if (props.hiddenMedium) return 'none';
+    if (props.visibleSmall) return 'none';
+    return 'inline';
+  }};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     display: ${(props) => {
-      if (props.hiddenLarge) return 'none';
-      if (props.visibleSmall) return 'none';
-      if (props.visibleMedium) return 'none';
-      return 'inline';
-    }};
+    if (props.hiddenLarge) return 'none';
+    if (props.visibleSmall) return 'none';
+    if (props.visibleMedium) return 'none';
+    return 'inline';
+  }};
   }
-  ${(props) => props.iconRight
-    ? '&:after { content: " "; }'
-    : '&:before { content: " "; }'
-  }
+  ${(props) => props.iconRight ? '&::after { content: " "; }' : '&::before { content: " "; }'}
 `;
 
 class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   renderTitle = (title, iconRight) => {
     if (typeof title === 'string') return <Word iconRight={iconRight}>{title}</Word>;
     if (Array.isArray(title)) {
@@ -81,8 +86,25 @@ class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line
     }
     return '';
   }
+
+  renderButtonTitle = (title) => asArray(title).reduce((memo, label) => {
+    let value = '';
+    if (
+      typeof label === 'object'
+      && label.title
+    ) {
+      value = label.title;
+    } else if (typeof label === 'string') {
+      value = label;
+    }
+    return memo === '' ? value : `${memo} ${value}`;
+  }, '');
+
   render() {
-    const { icon, title, onClick, iconRight, fullWidth, disabled, inactive, align, strong, border, outline } = this.props;
+    const {
+      icon, title, onClick, iconRight, fullWidth, disabled, inactive, align, strong, border, outline,
+    } = this.props;
+
     return (
       <Button
         onClick={onClick}
@@ -91,7 +113,7 @@ class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line
         inactive={inactive}
         align={align}
         strong={strong}
-        title={title}
+        title={this.renderButtonTitle(title)}
         border={border}
         outline={outline}
       >

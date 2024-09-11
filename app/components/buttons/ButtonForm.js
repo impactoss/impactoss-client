@@ -12,6 +12,9 @@ const ButtonForm = styled(Button)`
     font-size: 1em;
     padding: 1em 1.2em;
   }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 
 export default ButtonForm;

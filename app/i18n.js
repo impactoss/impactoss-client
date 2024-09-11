@@ -3,32 +3,38 @@
  *
  * This will setup the i18n language files and locale data for your app.
  *
+ *   IMPORTANT: This file is used by the internal build
+ *   script `extract-intl`, and must use CommonJS module syntax
+ *   You CANNOT use import/export in this file.
  */
-import { addLocaleData } from 'react-intl';
-import enLocaleData from 'react-intl/locale-data/en';
 
-import { DEFAULT_LOCALE } from 'themes/config'; // eslint-disable-line
-import enTranslationMessages from './translations/en-GB.json';
+const enTranslationMessages = require('./translations/en-NZ.json');
 
-export const appLocales = [
-  'en-GB',
+const DEFAULT_LOCALE = 'en-NZ';
+
+// prettier-ignore
+const appLocales = [
+  'en-NZ',
 ];
 
-addLocaleData(enLocaleData);
-
-export const formatTranslationMessages = (locale, messages) => {
+const formatTranslationMessages = (locale, messages) => {
   const defaultFormattedMessages = locale !== DEFAULT_LOCALE
     ? formatTranslationMessages(DEFAULT_LOCALE, enTranslationMessages)
     : {};
-  return Object.keys(messages).reduce((formattedMessages, key) => {
-    let message = messages[key];
-    if (!message && locale !== DEFAULT_LOCALE) {
-      message = defaultFormattedMessages[key];
-    }
-    return Object.assign(formattedMessages, { [key]: message });
-  }, {});
+  const flattenFormattedMessages = (formattedMessages, key) => {
+    const formattedMessage = !messages[key] && locale !== DEFAULT_LOCALE
+      ? defaultFormattedMessages[key]
+      : messages[key];
+    return Object.assign(formattedMessages, { [key]: formattedMessage });
+  };
+  return Object.keys(messages).reduce(flattenFormattedMessages, {});
 };
 
-export const translationMessages = {
-  'en-GB': formatTranslationMessages('en-GB', enTranslationMessages),
+const translationMessages = {
+  'en-NZ': formatTranslationMessages('en-NZ', enTranslationMessages),
 };
+
+exports.appLocales = appLocales;
+exports.formatTranslationMessages = formatTranslationMessages;
+exports.translationMessages = translationMessages;
+exports.DEFAULT_LOCALE = DEFAULT_LOCALE;

@@ -1,6 +1,1 @@
-import { createSelector } from 'reselect';
-
-export const selectDomain = createSelector(
-  (state) => state.get('userRegister'),
-  (substate) => substate.toJS()
-);
+export const selectDomain = (state) => state.get('userRegister');

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { injectIntl } from 'react-intl';
 // import Link from 'containers/Link';
 
 import { TEXT_TRUNCATE } from 'themes/config';
@@ -22,28 +23,34 @@ const Count = styled.span`
   top: 0;
   border-radius: 999px;
   font-size: 0.7em;
-  background-color: ${(props) => props.draft ? palette('buttonInverse', 1) : palette(props.pIndex, 0)};
-  color: ${(props) => props.draft ? palette(props.pIndex, 0) : palette('buttonDefault', 0)};
-  border: 1px solid ${(props) => palette(props.pIndex, 0)};
+  background-color: ${({ paletteDefault, paletteDefaultIndex }) => palette(paletteDefault, paletteDefaultIndex)};
+  color: ${({ fontColor, fontColorIndex }) => palette(fontColor, fontColorIndex)};
+  border: 1px solid ${({ paletteBorder }) => palette(paletteBorder, 0)};
   height: 1.8em;
   min-width: 1.8em;
   text-align: center;
-  vertical-align: middle;
   line-height: 1.7;
   padding: 0 0.25em;
+  @media print {
+    color: ${palette('text', 1)};
+    background: transparent;
+  }
 `;
 
 const PopupWrapper = styled.div`
   display: inline-block;
   cursor: pointer;
   font-size: 1em;
-  text-align: center;
-  vertical-align: middle;
-  -ms-touch-action: manipulation;
   touch-action: manipulation;
   position: relative;
   margin-right: 5px;
   text-align: left;
+  &:last-child {
+    margin-right: 0;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
+  }
 `;
 
 const POPUP_WIDTH_PX = `${POPUP_WIDTH}px`;
@@ -63,6 +70,9 @@ const Popup = styled.div`
   z-index: 1;
   padding-bottom: 4px;
   font-size: 0.8em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 const PopupInner = styled.div`
   width: 100%;
@@ -77,13 +87,13 @@ const TriangleBottom = styled.div`
    position: relative;
    overflow: hidden;
    left: ${(props) => {
-     if (props.align === 'right') return '95';
-     if (props.align === 'left') return '5';
-     return '50';
-   }}%;
+    if (props.align === 'right') return '95';
+    if (props.align === 'left') return '5';
+    return '50';
+  }}%;
    margin-left: -10px;
 
-   &:after {
+   &::after {
       content: "";
       position: absolute;
       width: 20px;
@@ -114,6 +124,9 @@ const PopupContent = styled.div`
 const Id = styled.span`
   color: ${palette('text', 1)};
   font-size: 0.8em;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
 `;
 const IdSpacer = styled.span`
   padding-left: 0.25em;
@@ -129,7 +142,7 @@ const ListItem = styled.div`
 
 const ListItemLink = styled(Link)`
   color: ${palette('mainListItem', 0)};
-  &:hover {
+  &:hover, &:focus-visible {
     color: ${palette('mainListItemHover', 0)};
   }
 `;
@@ -154,7 +167,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
       return 'left';
     }
     return 'center';
-  }
+  };
 
   calcHeight = () => {
     let height = 1;
@@ -162,7 +175,7 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
     if (this.state.listItem_1) height += this.state.listItem_1.clientHeight;
     if (this.state.listItem_2) height += this.state.listItem_2.clientHeight;
     return height;
-  }
+  };
 
   openPopup() {
     this.setState({ popupOpen: true });
@@ -173,67 +186,81 @@ export class ConnectionPopup extends React.PureComponent { // eslint-disable-lin
   }
 
   render() {
-    const { entities, option, wrapper, draft } = this.props;
-
+    const {
+      entities, option, wrapper, draft, intl,
+    } = this.props;
     const entitiesTotal = entities ? entities.size : 0;
-
     return (
       <PopupWrapper
-        onFocus={false}
         onMouseOver={() => this.openPopup()}
         onMouseLeave={() => this.closePopup()}
+        onFocus={() => this.openPopup()}
+        onBlur={() => null}
         onClick={() => this.state.popupOpen ? this.closePopup() : this.openPopup()}
-        innerRef={(node) => {
+        ref={(node) => {
           if (!this.state.popupRef) {
             this.setState({ popupRef: node });
           }
         }}
       >
-        <Count pIndex={option.style} draft={draft}>{entitiesTotal}</Count>
-        {this.state.popupOpen &&
-          <Popup
-            align={this.getPopupAlign(wrapper, this.state.popupRef)}
-            total={entitiesTotal}
-          >
-            <PopupInner>
-              <PopupHeader>
-                <PopupHeaderMain>
-                  {`${entitiesTotal} ${option.label(entitiesTotal)}`}
-                </PopupHeaderMain>
-                { draft &&
+        <Count
+          paletteBorder={option.style}
+          paletteDefault={draft ? 'buttonInverse' : option.style}
+          paletteDefaultIndex={draft ? 1 : 0}
+          fontColor={`${option.style}ConnectionText`}
+          fontColorIndex={draft ? 1 : 0}
+        >
+          {entitiesTotal}
+        </Count>
+        {this.state.popupOpen
+          && (
+            <Popup
+              align={this.getPopupAlign(wrapper, this.state.popupRef)}
+              total={entitiesTotal}
+            >
+              <PopupInner>
+                <PopupHeader>
                   <PopupHeaderMain>
-                    {` (${this.context.intl && this.context.intl.formatMessage(messages.draft)})`}
+                    {`${entitiesTotal} ${option.label(entitiesTotal)}`}
                   </PopupHeaderMain>
-                }
-              </PopupHeader>
-              <PopupContent height={this.calcHeight()}>
-                {
-                  sortEntities(entities, 'asc', 'reference')
-                  .toList()
-                  .map((entity, i) => {
-                    const ref = entity.getIn(['attributes', 'reference']) || entity.get('id');
-                    return (
-                      <ListItem
-                        key={i}
-                        innerRef={(node) => i < 3 && this.setState({ [`listItem_${i}`]: node })}
-                      >
-                        <ListItemLink to={`/${option.path}/${entity.get('id')}`} >
-                          { entity.getIn(['attributes', 'draft']) &&
-                            <ItemStatus draft />
-                          }
-                          <Id>{ref}</Id>
-                          <IdSpacer />
-                          <ItemContent>
-                            {truncateText(entity.getIn(['attributes', 'title']), TEXT_TRUNCATE.CONNECTION_POPUP - ref.length)}</ItemContent>
-                        </ListItemLink>
-                      </ListItem>
-                    );
-                  })
-                }
-              </PopupContent>
-            </PopupInner>
-            <TriangleBottom align={this.getPopupAlign(wrapper, this.state.popupRef)} />
-          </Popup>
+                  {draft
+                    && (
+                      <PopupHeaderMain>
+                        {` (${intl && intl.formatMessage(messages.draft)})`}
+                      </PopupHeaderMain>
+                    )
+                  }
+                </PopupHeader>
+                <PopupContent height={this.calcHeight()}>
+                  {
+                    sortEntities(entities, 'asc', 'reference')
+                      .toList()
+                      .map((entity, i) => {
+                        const ref = entity.getIn(['attributes', 'reference']) || entity.get('id');
+                        return (
+                          <ListItem
+                            key={i}
+                            ref={(node) => i < 3 && this.setState({ [`listItem_${i}`]: node })}
+                          >
+                            <ListItemLink to={`/${option.path}/${entity.get('id')}`}>
+                              {entity.getIn(['attributes', 'draft'])
+                                && <ItemStatus draft />
+                              }
+                              <Id>{ref}</Id>
+                              <IdSpacer />
+                              <ItemContent>
+                                {truncateText(entity.getIn(['attributes', 'title']), TEXT_TRUNCATE.CONNECTION_POPUP - ref.length)}
+                              </ItemContent>
+                            </ListItemLink>
+                          </ListItem>
+                        );
+                      })
+                  }
+                </PopupContent>
+              </PopupInner>
+              <TriangleBottom align={this.getPopupAlign(wrapper, this.state.popupRef)} />
+            </Popup>
+          )
         }
       </PopupWrapper>
     );
@@ -245,10 +272,7 @@ ConnectionPopup.propTypes = {
   option: PropTypes.object,
   wrapper: PropTypes.object,
   draft: PropTypes.bool,
-};
-ConnectionPopup.contextTypes = {
-  intl: PropTypes.object,
+  intl: PropTypes.object.isRequired,
 };
 
-
-export default ConnectionPopup;
+export default injectIntl(ConnectionPopup);

@@ -1,57 +1,81 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Map } from 'immutable';
 
 import Component from 'components/styled/Component';
-import Icon from 'components/Icon';
 
 import ItemStatus from 'components/ItemStatus';
 import ItemRole from 'components/ItemRole';
 import ItemProgress from 'components/ItemProgress';
+import ItemSupport from 'components/ItemSupport';
+
+import {
+  PUBLISH_STATUSES,
+  IS_CURRENT_STATUSES,
+  IS_ARCHIVE_STATUSES,
+} from 'themes/config';
 
 import EntityListItemMainTopReference from './EntityListItemMainTopReference';
-import EntityListItemMainTopIcon from './EntityListItemMainTopIcon';
-import EntityListItemMainTaxonomies from './EntityListItemMainTaxonomies';
+import EntityListItemMainTargetDate from './EntityListItemMainTargetDate';
+import EntityListItemMainUser from './EntityListItemMainUser';
+
 
 export default class EntityListItemMainTop extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   static propTypes = {
     entity: PropTypes.object.isRequired,
-    categories: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
-    taxonomies: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
-    onEntityClick: PropTypes.func,
   };
 
   render() {
-    const { categories, taxonomies, onEntityClick, entity } = this.props;
-    const smartTaxonomy = taxonomies && taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
-
+    const { entity } = this.props;
     return (
       <Component>
-        { entity.draft &&
-          <ItemStatus draft={entity.draft} float="left" />
-        }
+        {entity.draft && (
+          <ItemStatus
+            value={entity.draft.toString()}
+            float="left"
+            options={PUBLISH_STATUSES}
+          />
+        )}
+        {entity.is_archive && (
+          <ItemStatus
+            value={entity.is_archive.toString()}
+            float="left"
+            options={IS_ARCHIVE_STATUSES}
+          />
+        )}
+        {typeof entity.is_current !== 'undefined' && !entity.is_current && (
+          <ItemStatus
+            value={entity.is_current ? entity.is_current.toString() : 'false'}
+            float="left"
+            options={IS_CURRENT_STATUSES}
+          />
+        )}
         <EntityListItemMainTopReference>
           {entity.reference}
         </EntityListItemMainTopReference>
-        { entity.entityIcon &&
-          <EntityListItemMainTopIcon>
-            <Icon name={entity.entityIcon} text />
-          </EntityListItemMainTopIcon>
+        { entity.targetDate
+          && (
+            <EntityListItemMainTargetDate
+              targetDate={entity.targetDate}
+            />
+          )
         }
-        { entity.role &&
-          <ItemRole role={entity.role} />
-        }
-        { categories && (categories.size > 0 || smartTaxonomy) &&
-          <EntityListItemMainTaxonomies
-            categories={categories}
-            taxonomies={taxonomies}
-            onEntityClick={onEntityClick}
-          />
+        { entity.assignedUser
+          && (
+            <EntityListItemMainUser
+              user={entity.assignedUser}
+            />
+          )
         }
         {
-          entity.progressCategory &&
-          <ItemProgress status={entity.progressCategory} />
+          entity.progressCategory
+          && <ItemProgress status={entity.progressCategory} />
+        }
+        {
+          entity.support
+          && <ItemSupport supportLevel={entity.support} />
+        }
+        { entity.role
+          && <ItemRole role={entity.role} />
         }
       </Component>
     );

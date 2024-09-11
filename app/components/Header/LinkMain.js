@@ -6,23 +6,36 @@ import Link from './Link';
 export default styled(Link)`
   display: inline-block;
   vertical-align: top;
-  color: ${palette('headerNavMainItem', 0)};
-  &:hover {
-    color:${palette('headerNavMainItemHover', 0)};
+  color: ${({ active }) => active ? palette('text', 2) : palette('dark', 3)};
+  background:  ${({ active }) => active ? palette('primary', 0) : 'transparent'};
+  &:hover, &:focus-visible {
+    color:${({ active }) => active ? palette('text', 2) : palette('headerNavMainItemHover', 0)};
+  }
+  &:focus-visible {
+    background:  ${({ active }) => active ? palette('primary', 1) : 'inherit'};
   }
   font-size: 0.8em;
   padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
   height: ${(props) => props.theme.sizes.header.nav.heightMobile - 1}px;
+  border-left: 1px solid ${palette('dark', 3)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    border-left: 1px solid;
-    min-width: 200px;
+    min-width: 120px;
     font-size: 0.9em;
-    padding: 8px ${(props) => props.theme.sizes.header.paddingLeft.small}px;
+    padding: 5px ${(props) => props.theme.sizes.header.paddingLeft.small}px;
     height: ${(props) => props.theme.sizes.header.nav.height - 1}px;
   }
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    min-width: 160px;
+    padding-top: 4px;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    min-width: 200px;
     font-size: 1em;
+    padding-top: 4px;
     padding-left: ${(props) => props.theme.sizes.header.paddingLeft.large}px;
     padding-right: ${(props) => props.theme.sizes.header.paddingLeft.large}px;
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.default};
   }
 `;

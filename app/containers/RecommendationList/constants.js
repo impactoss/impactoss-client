@@ -1,4 +1,11 @@
-import { USER_ROLES, PUBLISH_STATUSES, ACCEPTED_STATUSES } from 'themes/config';
+import {
+  PUBLISH_STATUSES,
+  IS_CURRENT_STATUSES,
+  IS_ARCHIVE_STATUSES,
+  ARCHIVE_MIN_ROLE,
+  SEE_DRAFT_MIN_ROLE,
+  SUPPORT_LEVELS,
+} from 'themes/config';
 
 export const DEPENDENCIES = [
   'user_roles',
@@ -14,25 +21,24 @@ export const DEPENDENCIES = [
   'measure_categories',
   'frameworks',
   'framework_taxonomies',
-  'framework_frameworks',
-  'recommendation_recommendations',
 ];
 
 export const CONFIG = {
   serverPath: 'recommendations',
   clientPath: 'recommendations',
-  search: ['reference', 'title', 'description'],
+  search: ['reference', 'title', 'description', 'response'],
+  downloadCSV: true,
   sorting: [
     {
       attribute: 'id', // proxy for created at
       type: 'number',
       order: 'desc',
-      default: true,
     },
     {
       attribute: 'reference',
       type: 'string',
       order: 'asc',
+      default: true,
     },
     {
       attribute: 'title',
@@ -59,7 +65,6 @@ export const CONFIG = {
     // TODO better store in database join table framework_taxonomies
     defaultGroupsByFramework: {
       1: { 1: '1', 2: '2' }, // framework 1 recs are grouped by taxonomies 1 & 2
-      2: { 1: '7' }, // framework 2 recs are grouped by taxonomy 7
     },
     groupBy: 'framework_id',
     editForFrameworks: true,
@@ -78,26 +83,15 @@ export const CONFIG = {
         editForFrameworks: true,
         frameworkFilter: 'has_measures',
       },
-      {
-        search: true,
-        message: 'entities.indicators.plural',
-        path: 'indicators',
-        clientPath: 'indicators', // filter by recommendation connection
-        key: 'indicator_id',
-        connectPath: 'recommendation_indicators',
-        ownKey: 'recommendation_id',
-        editForFrameworks: true,
-        frameworkFilter: 'has_indicators',
-      },
     ],
   },
-  attributes: {  // filter by attribute value
+  attributes: { // filter by attribute value
     options: [
       {
         search: false,
-        message: 'attributes.accepted',
-        attribute: 'accepted',
-        options: ACCEPTED_STATUSES,
+        message: 'attributes.support_level',
+        attribute: 'support_level',
+        options: SUPPORT_LEVELS,
         editForFrameworks: true,
         frameworkFilter: 'has_response',
       },
@@ -106,7 +100,29 @@ export const CONFIG = {
         message: 'attributes.draft',
         attribute: 'draft',
         options: PUBLISH_STATUSES,
-        role: USER_ROLES.CONTRIBUTOR.value,
+        role: SEE_DRAFT_MIN_ROLE,
+      },
+      {
+        search: false,
+        message: 'attributes.is_archive',
+        attribute: 'is_archive',
+        options: IS_ARCHIVE_STATUSES,
+        editRole: ARCHIVE_MIN_ROLE,
+        forGlobalSettings: [{
+          arg: 'loadArchived',
+          value: true,
+        }],
+      },
+      {
+        search: false,
+        edit: false,
+        message: 'attributes.is_current',
+        attribute: 'is_current',
+        options: IS_CURRENT_STATUSES,
+        forGlobalSettings: [{
+          arg: 'loadNonCurrent',
+          value: true,
+        }],
       },
     ],
   },

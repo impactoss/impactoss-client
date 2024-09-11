@@ -6,14 +6,15 @@ import {
 } from 'containers/App/selectors';
 import { prepareTaxonomiesMultiple } from 'utils/entities';
 
-export const selectDomain = createSelector(
-  (state) => state.get('recommendationNew'),
-  (substate) => substate.toJS()
-);
+export const selectDomain = (state) => state.get('recommendationNew');
 
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectFWTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) =>
-    prepareTaxonomiesMultiple(taxonomies, categories, ['tags_measures'], false)
+  (taxonomies, categories) => prepareTaxonomiesMultiple(
+    taxonomies,
+    categories,
+    ['tags_measures'],
+    false,
+  )
 );
