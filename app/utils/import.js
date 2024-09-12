@@ -19,7 +19,8 @@ const getRelationshipColumnTitle = (field) => {
 };
 
 
-export const getImportFields = (shape, formatMessage) => {
+// export const getImportFields = ({ shape, type, formatMessage }) => {
+export const getImportFields = ({ shape, formatMessage }) => {
   let values = {};
   if (shape.fields) {
     const fields = filter(
@@ -29,13 +30,22 @@ export const getImportFields = (shape, formatMessage) => {
     values = reduce(
       fields,
       (memo, field) => {
-        const pre = field.required
+        let value = field.required
           ? formatMessage(appMessages.import.required)
           : formatMessage(appMessages.import.optional);
-        const value = `${pre}: ${field.hint || formatMessage(
+        if (field.unique) {
+          value = `${value}/${formatMessage(appMessages.import.unique)}`;
+        }
+        const typeInfo = formatMessage(
           appMessages.import[field.type],
           { format: DB_DATE_FORMAT },
-        )}`;
+        );
+        value = `${value}: ${typeInfo}`;
+        if (field.hint) {
+          value = `${value} ${field.hint}`;
+        } else if (appMessages.importFieldHints[field.attribute]) {
+          value = `${value} ${formatMessage(appMessages.importFieldHints[field.attribute])}`;
+        }
         return Object.assign(
           memo,
           { [getColumnTitle(field, formatMessage)]: value },

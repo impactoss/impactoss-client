@@ -17,6 +17,7 @@ import { USER_ROLES, API, ENTITY_FIELDS } from 'themes/config';
 import { getImportFields, getColumnAttribute } from 'utils/import';
 import qe from 'utils/quasi-equals';
 import { checkRecommendationAttribute } from 'utils/entities';
+import appMessage from 'utils/app-message';
 
 import {
   redirectIfNotPermitted,
@@ -87,6 +88,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
             attribute: key,
             type: val.type || 'text',
             required: !!val.required,
+            unique: !!val.unique,
             import: true,
           },
         ];
@@ -105,7 +107,9 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
         import: true,
         relationshipValue: val.attribute,
         separator: val.separator,
-        hint: val.hint,
+        hint: val.hintMessage
+          ? appMessage(intl, val.hintMessage)
+          : val.hint,
       };
     });
     return (
@@ -145,7 +149,14 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
             sending={this.props.sending}
             template={{
               filename: `${intl.formatMessage(messages.filename)}.csv`,
-              data: getImportFields({ fields, relationshipFields }, intl.formatMessage),
+              data: getImportFields({
+                shape: {
+                  fields,
+                  relationshipFields,
+                },
+                type: 'recommendations',
+                formatMessage: intl.formatMessage,
+              }),
             }}
           />
         </Content>

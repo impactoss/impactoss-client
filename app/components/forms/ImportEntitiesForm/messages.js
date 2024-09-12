@@ -89,4 +89,20 @@ export default defineMessages({
     id: 'app.components.ImportEntitiesForm.errorHintText',
     defaultMessage: 'When using the import feature to add the failed rows, please make sure to first remove the successful rows from your csv file - failure to do so will lead to duplicate entries. Alternatively you can add each failed row individually by manually entering each entry.',
   },
+  hideFieldOverview: {
+    id: 'app.components.ImportEntitiesForm.hideFieldOverview',
+    defaultMessage: 'Hide field/column overview',
+  },
+  showFieldOverview: {
+    id: 'app.components.ImportEntitiesForm.showFieldOverview',
+    defaultMessage: 'Show field/column overview',
+  },
+  fieldOverviewColumn: {
+    id: 'app.components.ImportEntitiesForm.fieldOverviewColumn',
+    defaultMessage: 'Field (column name)',
+  },
+  fieldOverviewInfo: {
+    id: 'app.components.ImportEntitiesForm.fieldOverviewInfo',
+    defaultMessage: 'Information (column description)',
+  },
 });

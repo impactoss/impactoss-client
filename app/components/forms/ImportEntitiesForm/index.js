@@ -6,17 +6,7 @@ import { Form } from 'react-redux-form/immutable';
 import CsvDownloader from 'react-csv-downloader';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import {
-  Text,
-  Box,
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableCell,
-  Accordion,
-  AccordionPanel,
-} from 'grommet';
+import { Text } from 'grommet';
 
 import { omit } from 'lodash/object';
 // import { map } from 'lodash/collection';
@@ -26,7 +16,6 @@ import { truncateText } from 'utils/string';
 
 import A from 'components/styled/A';
 import Field from 'components/fields/Field';
-import AccordionHeader from 'components/AccordionHeader';
 
 import ViewPanel from 'components/EntityView/ViewPanel';
 import Main from 'components/EntityView/Main';
@@ -47,6 +36,7 @@ import FormBody from '../FormBody';
 import FormFieldWrap from '../FormFieldWrap';
 import FormFooter from '../FormFooter';
 import FormFooterButtons from '../FormFooterButtons';
+import FieldOverview from './FieldOverview';
 
 import messages from './messages';
 
@@ -54,17 +44,7 @@ const StyledForm = styled(Form)`
   display: table;
   width: 100%;
 `;
-const StyledAccordion = styled(Accordion)`
-  button {
-  box-shadow: unset;
-  border-color: unset;
-  outline: unset;
-  &:focus-visible{
-    outline: 2px solid ${palette('primary', 0)};
-    outline-offset: 0px;
-    }
-  }
-`;
+
 const Importing = styled.div``;
 
 const ImportingText = styled.div`
@@ -139,13 +119,6 @@ const ErrorHintText = styled.p``;
 const nonControlProps = ['label', 'component', 'controlType', 'children', 'errorMessages'];
 
 export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor(props) {
-    super(props);
-    this.state = {
-      activePanels: [],
-    };
-  }
-
   getControlProps = (field) => omit(field, nonControlProps);
 
   render() {
@@ -367,61 +340,6 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
               </Main>
             </ViewPanel>
           </FormBody>
-          {progress === null && template.data && (
-            <Box margin="medium">
-              <StyledAccordion
-                onActive={(newActive) => this.setState({ activePanels: newActive })}
-                animate={false}
-              >
-                <AccordionPanel
-                  header={(
-                    <AccordionHeader
-                      title={this.state.activePanels.includes(0)
-                        ? 'Hide field/column overview'
-                        : 'Show field/column overview'
-                      }
-                      open={this.state.activePanels.includes(0)}
-                    />
-                  )}
-                >
-                  <Box
-                    background="light-1"
-                    pad="medium"
-                    margin={{
-                      top: '2px', // for focus-visible outline on panel header
-                    }}
-                  >
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableCell scope="col" border="bottom">
-                            <Text size="xsmall" weight={600}>Field/column name</Text>
-                          </TableCell>
-                          <TableCell scope="col" border="bottom">
-                            <Text size="xsmall" weight={600}>Content/info</Text>
-                          </TableCell>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {template.data && Object.keys(template.data).filter((d) => d.trim() !== '').map(
-                          (d, index) => (
-                            <TableRow key={index}>
-                              <TableCell scope="row">
-                                <Text size="xsmall">{d}</Text>
-                              </TableCell>
-                              <TableCell>
-                                <Text size="xsmall">{template.data[d]}</Text>
-                              </TableCell>
-                            </TableRow>
-                          )
-                        )}
-                      </TableBody>
-                    </Table>
-                  </Box>
-                </AccordionPanel>
-              </StyledAccordion>
-            </Box>
-          )}
           { progress >= 100
             && (
               <FormFooter>
@@ -437,6 +355,9 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
               </FormFooter>
             )
           }
+          {progress === null && template.data && (
+            <FieldOverview data={template.data} />
+          )}
         </StyledForm>
       </FormWrapper>
     );

@@ -318,6 +318,10 @@ export default defineMessages({
       id: 'app.containers.App.import.optional',
       defaultMessage: 'Optional',
     },
+    unique: {
+      id: 'app.containers.App.import.unique',
+      defaultMessage: 'Unique',
+    },
     text: {
       id: 'app.containers.App.import.text',
       defaultMessage: 'text',
@@ -350,10 +354,6 @@ export default defineMessages({
     },
     reference: {
       id: 'app.containers.App.importFields.reference',
-      defaultMessage: 'Reference',
-    },
-    referenceRequired: {
-      id: 'app.containers.App.importFields.referenceRequired',
       defaultMessage: 'Reference',
     },
     description: {
@@ -399,6 +399,50 @@ export default defineMessages({
     framework_id: {
       id: 'app.containers.App.importFields.framework_id',
       defaultMessage: 'Framework id',
+    },
+  },
+  importFieldHints: {
+    support_level: {
+      id: 'app.containers.App.importFieldHints.support_level',
+      defaultMessage: '(UPR only; supported: 2; supported in part: 1; noted: 0; not applicable: leave blank)',
+    },
+  },
+  importHints: {
+    'category-id': {
+      id: 'app.containers.App.importHints.category-id',
+      defaultMessage: 'one or more category ids (as assigned by the database / comma-separated)',
+    },
+    'category-reference': {
+      id: 'app.containers.App.importHints.category-reference',
+      defaultMessage: 'one or more category references (as assigned by the users / comma-separated)',
+    },
+    'category-short-title': {
+      id: 'app.containers.App.importHints.category-short-title',
+      defaultMessage: 'one or more category "short titles" (as assigned by the users / comma-separated)',
+    },
+    'action-id': {
+      id: 'app.containers.App.importHints.action-id',
+      defaultMessage: 'one or more unique action ids (as assigned by the database / comma-separated)',
+    },
+    'action-reference': {
+      id: 'app.containers.App.importHints.action-reference',
+      defaultMessage: 'one or more unique action references (as assigned by the users / comma-separated)',
+    },
+    'indicator-id': {
+      id: 'app.containers.App.importHints.indicator-id',
+      defaultMessage: 'one or more unique indicator ids (as assigned by the database / comma-separated)',
+    },
+    'indicator-reference': {
+      id: 'app.containers.App.importHints.indicator-reference',
+      defaultMessage: 'one or more unique indicator references (as assigned by the users / comma-separated)',
+    },
+    'recommendation-id': {
+      id: 'app.containers.App.importHints.recommendation-id',
+      defaultMessage: 'one or more unique recommendation/objective ids (as assigned by the database / comma-separated)',
+    },
+    'recommendation-reference': {
+      id: 'app.containers.App.importHints.recommendation-reference',
+      defaultMessage: 'one or more unique recommendation/objective references (as assigned by the users / comma-separated)',
     },
   },
   placeholders: {

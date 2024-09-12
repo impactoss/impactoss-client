@@ -18,6 +18,7 @@ import { getImportFields, getColumnAttribute } from 'utils/import';
 
 import qe from 'utils/quasi-equals';
 import { checkActionAttribute } from 'utils/entities';
+import appMessage from 'utils/app-message';
 
 import {
   redirectIfNotPermitted,
@@ -103,7 +104,9 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
         import: true,
         relationshipValue: val.attribute,
         separator: val.separator,
-        hint: val.hint,
+        hint: val.hintMessage
+          ? appMessage(intl, val.hintMessage)
+          : val.hint,
       };
     });
 
@@ -143,7 +146,14 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             sending={this.props.sending}
             template={{
               filename: `${intl.formatMessage(messages.filename)}.csv`,
-              data: getImportFields({ fields, relationshipFields }, intl.formatMessage),
+              data: getImportFields({
+                shape: {
+                  fields,
+                  relationshipFields,
+                },
+                type: 'measures',
+                formatMessage: intl.formatMessage,
+              }),
             }}
           />
         </Content>

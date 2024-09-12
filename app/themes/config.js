@@ -286,11 +286,15 @@ export const ENTITY_FIELDS = {
         exportFlip: true,
       },
       reference: {
-        type: 'markdown',
+        type: 'text',
+        required: true,
+        import: true,
+        unique: true,
       },
       title: {
         type: 'text',
         exportDefault: true,
+        required: true,
       },
       description: {
         type: 'markdown',
@@ -374,7 +378,7 @@ export const ENTITY_FIELDS = {
           attribute: 'reference',
         },
         keyPair: ['measure_id', 'category_id'], // own, other
-        hint: 'one or more category references (as assigned by the users / comma-separated)',
+        hintMessage: 'importHints.category-reference',
       },
       'category-short-title': {
         type: 'text',
@@ -384,7 +388,7 @@ export const ENTITY_FIELDS = {
           attribute: 'short_title',
         },
         keyPair: ['measure_id', 'category_id'], // own, other
-        hint: 'one or more category "short titles" (as assigned by the users / comma-separated)',
+        hintMessage: 'importHints.category-short-title',
       },
       // has category
       'category-id': {
@@ -394,7 +398,7 @@ export const ENTITY_FIELDS = {
           table: API.CATEGORIES, // id assumed
         },
         keyPair: ['measure_id', 'category_id'], // own, other
-        hint: 'one or more category ids (as assigned by the database / comma-separated)',
+        hintMessage: 'importHints.category-id',
       },
       // has indicator
       'indicator-reference': {
@@ -405,7 +409,7 @@ export const ENTITY_FIELDS = {
           attribute: 'reference',
         },
         keyPair: ['measure_id', 'indicator_id'], // own, other
-        hint: 'one or more unique action references (as assigned by the users / comma-separated)',
+        hintMessage: 'importHints.indicator-reference',
       },
       // has indicator
       'indicator-id': {
@@ -416,7 +420,7 @@ export const ENTITY_FIELDS = {
           table: API.INDICATORS,
         },
         keyPair: ['measure_id', 'indicator_id'], // own, other
-        hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
+        hintMessage: 'importHints.indicator-id',
       },
       // has recommendation
       'recommendation-reference': {
@@ -427,7 +431,7 @@ export const ENTITY_FIELDS = {
           attribute: 'reference',
         },
         keyPair: ['measure_id', 'recommendation_id'], // own, other
-        hint: 'one or more unique action references (as assigned by the users / comma-separated)',
+        hintMessage: 'importHints.recommendation-reference',
       },
       // has recommendation
       'recommendation-id': {
@@ -438,7 +442,7 @@ export const ENTITY_FIELDS = {
           table: API.RECOMMENDATIONS,
         },
         keyPair: ['measure_id', 'recommendation_id'], // own, other
-        hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
+        hintMessage: 'importHints.recommendation-id',
       },
     },
   },
@@ -455,10 +459,14 @@ export const ENTITY_FIELDS = {
       },
       reference: {
         type: 'text',
+        required: true,
+        import: true,
+        unique: true,
       },
       title: {
         type: 'text',
         exportDefault: true,
+        required: true,
       },
       description: {
         type: 'markdown',
@@ -538,7 +546,7 @@ export const ENTITY_FIELDS = {
           attribute: 'reference',
         },
         keyPair: ['indicator_id', 'measure_id'], // own, other
-        hint: 'one or more unique action references (as assigned by the users / comma-separated)',
+        hintMessage: 'importHints.action-reference',
       },
       // has action
       'action-id': {
@@ -549,7 +557,7 @@ export const ENTITY_FIELDS = {
           table: API.ACTIONS,
         },
         keyPair: ['indicator_id', 'measure_id'], // own, other
-        hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
+        hintMessage: 'importHints.action-id',
       },
     },
   },
@@ -577,6 +585,7 @@ export const ENTITY_FIELDS = {
         type: 'text',
         required: true,
         import: true,
+        unique: true,
       },
       title: {
         type: 'text',
@@ -663,7 +672,7 @@ export const ENTITY_FIELDS = {
           attribute: 'reference',
         },
         keyPair: ['recommendation_id', 'category_id'], // own, other
-        hint: 'one or more category references (as assigned by the users / comma-separated)',
+        hintMessage: 'importHints.category-reference',
       },
       'category-short-title': {
         type: 'text',
@@ -673,7 +682,7 @@ export const ENTITY_FIELDS = {
           attribute: 'short_title',
         },
         keyPair: ['recommendation_id', 'category_id'], // own, other
-        hint: 'one or more category "short titles" (as assigned by the users / comma-separated)',
+        hintMessage: 'importHints.category-short-title',
       },
       // has category
       'category-id': {
@@ -683,7 +692,7 @@ export const ENTITY_FIELDS = {
           table: API.CATEGORIES, // id assumed
         },
         keyPair: ['recommendation_id', 'category_id'], // own, other
-        hint: 'one or more category ids (as assigned by the database / comma-separated)',
+        hintMessage: 'importHints.category-id',
       },
       'action-reference': {
         type: 'text',
@@ -693,7 +702,7 @@ export const ENTITY_FIELDS = {
           attribute: 'reference',
         },
         keyPair: ['recommendation_id', 'measure_id'], // own, other
-        hint: 'one or more unique action references (as assigned by the users / comma-separated)',
+        hintMessage: 'importHints.action-reference',
       },
       'action-id': {
         type: 'text',
@@ -703,7 +712,7 @@ export const ENTITY_FIELDS = {
           table: API.ACTIONS,
         },
         keyPair: ['recommendation_id', 'measure_id'], // own, other
-        hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
+        hintMessage: 'importHints.action-id',
       },
     },
   },
