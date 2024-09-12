@@ -29,6 +29,10 @@ import LanguageProvider from 'containers/LanguageProvider';
 
 // Import ThemeProvider
 import { Grommet } from 'grommet';
+
+import { StyleSheetManager } from 'styled-components';
+import isPropValid from '@emotion/is-prop-valid';
+
 import theme from 'themes/theme-nz';
 import './fonts/fonts.css';
 
@@ -66,12 +70,24 @@ const render = (messages) => {
   root.render(
     <Provider store={store}>
       <LanguageProvider messages={messages}>
-        <Grommet theme={theme}>
-          <Router
-            history={history}
-            routes={rootRoute}
-          />
-        </Grommet>
+        <StyleSheetManager
+          enableVendorPrefixes
+          shouldForwardProp={(propName, target) => {
+            if (typeof target === "string") {
+              // For HTML elements, forward the prop if it is a valid HTML attribute
+              return isPropValid(propName);
+            }
+            // For other elements, forward all props
+            return true;
+          }}
+        >
+          <Grommet theme={theme}>
+            <Router
+              history={history}
+              routes={rootRoute}
+            />
+          </Grommet>
+        </StyleSheetManager>
       </LanguageProvider>
     </Provider>
   );
