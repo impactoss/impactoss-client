@@ -18,6 +18,7 @@ const config = {
     '@storybook/addon-themes',
     'storybook-react-intl',
     '@storybook/addon-a11y',
+    '@storybook/addon-viewport',
   ],
   framework: {
     name: '@storybook/react-webpack5',
