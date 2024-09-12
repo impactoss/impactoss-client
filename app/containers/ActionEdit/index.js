@@ -493,11 +493,6 @@ function mapDispatchToProps(dispatch, props) {
             }),
           )
       );
-      // default to database id
-      const formRef = formData.getIn(['attributes', 'reference']) || '';
-      if (formRef.trim() === '') {
-        saveData = saveData.setIn(['attributes', 'reference'], formData.get('id'));
-      }
       // check if attributes have changed
       if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
         saveData = saveData.set('skipAttributes', true);
