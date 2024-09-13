@@ -45,7 +45,6 @@ export const selectTaxonomies = createSelector(
     associations,
     'tags_recommendations',
     id,
-    false, //  do not include parent taxonomies
   )
 );
 

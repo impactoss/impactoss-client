@@ -303,6 +303,11 @@ export const entitySetSingles = (entity, singles) => entity
     entity,
   );
 
+const isParent = (taxonomy, otherTaxonomies, tagsKey) => otherTaxonomies.some(
+  (other) => other.getIn(['attributes', tagsKey])
+    && qe(taxonomy.get('id'), other.getIn(['attributes', 'parent_id']))
+);
+
 // taxonomies or parent taxonomies
 export const filterTaxonomies = (
   taxonomies,
@@ -310,14 +315,13 @@ export const filterTaxonomies = (
   includeParents = true,
 ) => taxonomies && taxonomies.filter(
   (tax, key, list) => tax.getIn(['attributes', tagsKey])
-    && (
-      includeParents
-      // only non-parents
-      || !list.some(
-        (other) => other.getIn(['attributes', tagsKey])
-          && qe(tax.get('id'), other.getIn(['attributes', 'parent_id']))
-      )
-    )
+    && (includeParents || !isParent(tax, list, tagsKey))
+);
+
+// assumes taxonomies with nested categories, and categories that are marked if associated
+export const getNonParentTaxonomiesUnlessAssociated = (taxonomies, tagsKey) => taxonomies.filter(
+  (tax, key, list) => !isParent(tax, list, tagsKey)
+    || tax.get('categories').some((cat) => cat.get('associated'))
 );
 
 export const prepareTaxonomiesIsAssociated = (
