@@ -12,6 +12,8 @@ import {
 
 import { checkResponseError } from 'utils/request';
 
+export const IMPORT_ORIGIN = 'entity-import';
+
 const initialState = fromJS({
   sending: {},
   success: {},
@@ -26,11 +28,15 @@ export const entityImportReducer = (state = initialState, action) => {
     case LOCATION_CHANGE:
       return initialState;
     case SAVE_SENDING:
-      return action.data ? state.setIn(['sending', action.data.timestamp], action.data) : state;
+      return action.data && action.data.origin === IMPORT_ORIGIN
+        ? state.setIn(['sending', action.data.timestamp], action.data)
+        : state;
     case SAVE_SUCCESS:
-      return action.data ? state.setIn(['success', action.data.timestamp], action.data) : state;
+      return action.data && action.data.origin === IMPORT_ORIGIN
+        ? state.setIn(['success', action.data.timestamp], action.data)
+        : state;
     case SAVE_ERROR:
-      return action.data
+      return action.data && action.data.origin === IMPORT_ORIGIN
         ? state.setIn(
           ['errors', action.data.timestamp],
           { data: action.data, error: checkResponseError(action.error) }

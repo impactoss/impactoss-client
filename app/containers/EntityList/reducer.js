@@ -30,6 +30,7 @@ import {
   PATH_CHANGE,
   DISMISS_ERROR,
   DISMISS_ALL_ERRORS,
+  LIST_ORIGIN,
 } from './constants';
 
 const initialState = fromJS({
@@ -84,13 +85,17 @@ function entityListReducer(state = initialState, action) {
         .set('activePanel', EDIT_PANEL);
     case DELETE_SENDING:
     case SAVE_SENDING:
-      return action.data ? state.setIn(['sending', action.data.timestamp], action.data) : state;
+      return action.data && action.data.origin === LIST_ORIGIN
+        ? state.setIn(['sending', action.data.timestamp], action.data)
+        : state;
     case DELETE_SUCCESS:
     case SAVE_SUCCESS:
-      return action.data ? state.setIn(['success', action.data.timestamp], action.data) : state;
+      return action.data && action.data.origin === LIST_ORIGIN
+        ? state.setIn(['success', action.data.timestamp], action.data)
+        : state;
     case DELETE_ERROR:
     case SAVE_ERROR:
-      return action.data
+      return action.data && action.data.origin === LIST_ORIGIN
         ? state.setIn(
           ['errors', action.data.timestamp],
           { data: action.data, error: checkResponseError(action.error) }

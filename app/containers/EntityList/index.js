@@ -157,6 +157,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     const sending = viewDomain.get('sending');
     const success = viewDomain.get('success');
+
     const errors = viewDomain.get('errors').size > 0 ? this.mapErrors(viewDomain.get('errors')) : Map();
 
     const entities = (errors.size > 0)
