@@ -415,7 +415,7 @@ export const getStatusField = (formatMessage) => ({
 export const getArchiveField = (formatMessage) => ({
   id: 'is_archive',
   controlType: 'select',
-  model: '.attributes.is_archive',
+  name: '.attributes.is_archive',
   label: formatMessage(appMessages.attributes.is_archive),
   options: IS_ARCHIVE_STATUSES,
 });
