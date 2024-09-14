@@ -283,7 +283,10 @@ function mapDispatchToProps(dispatch, { params }) {
                           if (categories && relConfig.lookup.table === API.CATEGORIES) {
                             const category = relConfig.lookup.attribute
                               ? categories.find(
+                                // if "short_title" also check for "title" in case short title is auto generated
+                                // TODO better explicitly store automatic short title in database when null
                                 (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), idOrCode)
+                                  || (relConfig.lookup.attribute === 'short_title' && qe(entity.getIn(['attributes', 'title']).trim(), idOrCode))
                               )
                               : categories.get(idOrCode);
                             connectionId = category ? category.get('id') : null;
