@@ -31,6 +31,8 @@ import ButtonCancel from 'components/buttons/ButtonCancel';
 import ButtonSubmit from 'components/buttons/ButtonSubmit';
 import Clear from 'components/styled/Clear';
 
+import { IGNORE_ROW_TAG } from 'themes/config';
+
 import ImportFileSelectControl from '../ImportFileSelectControl';
 import FormWrapper from '../FormWrapper';
 import FormBody from '../FormBody';
@@ -211,7 +213,10 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                         <FormattedMessage {...messages.hintTitle} />
                       </Text>
                     </HintTitle>
-                    <Hints className="impactoss-import-hints" source={intl.formatMessage(messages.formatHint)} />
+                    <Hints
+                      className="impactoss-import-hints"
+                      source={intl.formatMessage(messages.formatHint, { IGNORE_ROW_TAG })}
+                    />
                   </Hint>
                   <Field noPadding>
                     <FormFieldWrap>
@@ -235,7 +240,7 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                                     && formData.get('import')
                                     && formData.get('import').file
                                     ? `"${formData.get('import').file.name}"`
-                                    : 'OOPS'
+                                    : '...'
                                   }
                                 </ImportingText>
                                 <Loading progress={progress} />

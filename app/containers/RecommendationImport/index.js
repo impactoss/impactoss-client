@@ -286,7 +286,7 @@ function mapDispatchToProps(dispatch, { params }) {
                                 (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), idOrCode)
                               )
                               : categories.get(idOrCode);
-                            connectionId = category ? category.get('id') : `INVALID|${idOrCode}`;
+                            connectionId = category ? category.get('id') : null;
                             if (!category) {
                               console.log('category not found');
                               console.log('row', index + 1);
@@ -298,7 +298,7 @@ function mapDispatchToProps(dispatch, { params }) {
                                 (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), idOrCode)
                               )
                               : connections.get(relConfig.lookup.table).get(idOrCode);
-                            connectionId = connection ? connection.get('id') : `INVALID|${idOrCode}`;
+                            connectionId = connection ? connection.get('id') : null;
                             if (!connection) {
                               console.log('connection not found');
                               console.log('row', index + 1);
@@ -306,50 +306,52 @@ function mapDispatchToProps(dispatch, { params }) {
                             }
                           }
                         }
-                        // actor actions by code or id
-                        if (relField === 'action-reference' || relField === 'action-id') {
-                          const create = { measure_id: connectionId };
-                          if (recommendationMeasures && recommendationMeasures.create) {
-                            // make sure does not already exist
-                            if (!recommendationMeasures.create.find((el) => el.measure_id === connectionId)) {
-                              recommendationMeasures.create = [
-                                ...recommendationMeasures.create,
+                        if (connectionId) {
+                          // actor actions by code or id
+                          if (relField === 'action-reference' || relField === 'action-id') {
+                            const create = { measure_id: connectionId };
+                            if (recommendationMeasures && recommendationMeasures.create) {
+                              // make sure does not already exist
+                              if (!recommendationMeasures.create.find((el) => el.measure_id === connectionId)) {
+                                recommendationMeasures.create = [
+                                  ...recommendationMeasures.create,
+                                  create,
+                                ];
+                              }
+                            } else {
+                              recommendationMeasures = { create: [create] };
+                            }
+                          }
+                          // indicator by code or id
+                          if (relField === 'indicator-reference' || relField === 'indicator-id') {
+                            const create = { indicator_id: connectionId };
+                            if (recommendationIndicators && recommendationIndicators.create) {
+                              recommendationIndicators.create = [
+                                ...recommendationIndicators.create,
                                 create,
                               ];
+                            } else {
+                              recommendationIndicators = { create: [create] };
                             }
-                          } else {
-                            recommendationMeasures = { create: [create] };
                           }
-                        }
-                        // indicator by code or id
-                        if (relField === 'indicator-reference' || relField === 'indicator-id') {
-                          const create = { indicator_id: connectionId };
-                          if (recommendationIndicators && recommendationIndicators.create) {
-                            recommendationIndicators.create = [
-                              ...recommendationIndicators.create,
-                              create,
-                            ];
-                          } else {
-                            recommendationIndicators = { create: [create] };
-                          }
-                        }
-                        // actorCategories by code or id
-                        if (
-                          relField === 'category-reference'
-                          || relField === 'category-id'
-                          || relField === 'category-short-title'
-                        ) {
-                          const create = { category_id: connectionId };
-                          if (recommendationCategories && recommendationCategories.create) {
-                            // only add if not already present
-                            if (!recommendationCategories.create.find((el) => el.category_id === connectionId)) {
-                              recommendationCategories.create = [
-                                ...recommendationCategories.create,
-                                create,
-                              ];
+                          // actorCategories by code or id
+                          if (
+                            relField === 'category-reference'
+                            || relField === 'category-id'
+                            || relField === 'category-short-title'
+                          ) {
+                            const create = { category_id: connectionId };
+                            if (recommendationCategories && recommendationCategories.create) {
+                              // only add if not already present
+                              if (!recommendationCategories.create.find((el) => el.category_id === connectionId)) {
+                                recommendationCategories.create = [
+                                  ...recommendationCategories.create,
+                                  create,
+                                ];
+                              }
+                            } else {
+                              recommendationCategories = { create: [create] };
                             }
-                          } else {
-                            recommendationCategories = { create: [create] };
                           }
                         }
                       } // relConfig

@@ -277,31 +277,38 @@ function mapDispatchToProps(dispatch) {
                                 (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), idOrCode)
                               )
                               : connections.get(relConfig.lookup.table).get(idOrCode);
-                            connectionId = connection ? connection.get('id') : `INVALID|${idOrCode}`;
+                            connectionId = connection ? connection.get('id') : null;
+                            if (!connection) {
+                              console.log('connection not found');
+                              console.log('row', index + 1);
+                              console.log('idOrCode', idOrCode);
+                            }
                           }
                         }
-                        // action by code or id
-                        if (relField === 'action-reference' || relField === 'action-id') {
-                          const create = { measure_id: connectionId };
-                          if (measureIndicators && measureIndicators.create) {
-                            measureIndicators.create = [
-                              ...measureIndicators.create,
-                              create,
-                            ];
-                          } else {
-                            measureIndicators = { create: [create] };
+                        if (connectionId) {
+                          // action by code or id
+                          if (relField === 'action-reference' || relField === 'action-id') {
+                            const create = { measure_id: connectionId };
+                            if (measureIndicators && measureIndicators.create) {
+                              measureIndicators.create = [
+                                ...measureIndicators.create,
+                                create,
+                              ];
+                            } else {
+                              measureIndicators = { create: [create] };
+                            }
                           }
-                        }
-                        // action by code or id
-                        if (relField === 'recommendation-reference' || relField === 'recommendation-id') {
-                          const create = { recommendation_id: connectionId };
-                          if (recommendationIndicators && recommendationIndicators.create) {
-                            recommendationIndicators.create = [
-                              ...recommendationIndicators.create,
-                              create,
-                            ];
-                          } else {
-                            recommendationIndicators = { create: [create] };
+                          // action by code or id
+                          if (relField === 'recommendation-reference' || relField === 'recommendation-id') {
+                            const create = { recommendation_id: connectionId };
+                            if (recommendationIndicators && recommendationIndicators.create) {
+                              recommendationIndicators.create = [
+                                ...recommendationIndicators.create,
+                                create,
+                              ];
+                            } else {
+                              recommendationIndicators = { create: [create] };
+                            }
                           }
                         }
                       } // relConfig

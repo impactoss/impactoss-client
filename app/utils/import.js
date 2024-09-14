@@ -1,6 +1,6 @@
 import { filter, reduce } from 'lodash/collection';
 import appMessages from 'containers/App/messages';
-import { DB_DATE_FORMAT } from 'themes/config';
+import { DB_DATE_FORMAT, IGNORE_ROW_TAG } from 'themes/config';
 
 const getColumnTitle = (field, formatMessage) => {
   const msg = (appMessages.importFields[field.label] || appMessages.importFields[field.attribute])
@@ -72,7 +72,7 @@ export const getImportFields = ({ shape, formatMessage }) => {
       values,
     );
   }
-  return Object.assign(values, { '': formatMessage(appMessages.import.hint) });
+  return Object.assign(values, { '': `${formatMessage(appMessages.import.hint)} ${IGNORE_ROW_TAG}` });
 };
 
 export const getColumnAttribute = (columnTitle) => {

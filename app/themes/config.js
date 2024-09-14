@@ -731,3 +731,5 @@ export const SETTINGS = {
     minRole: SEE_ARCHIVED_MIN_ROLE,
   },
 };
+
+export const IGNORE_ROW_TAG = '[ignore-row]';

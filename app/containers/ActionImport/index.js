@@ -281,7 +281,7 @@ function mapDispatchToProps(dispatch) {
                                 (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), idOrCode)
                               )
                               : categories.get(idOrCode);
-                            connectionId = category ? category.get('id') : `INVALID|${idOrCode}`;
+                            connectionId = category ? category.get('id') : null;
                             if (!category) {
                               console.log('category not found');
                               console.log('row', index + 1);
@@ -293,7 +293,7 @@ function mapDispatchToProps(dispatch) {
                                 (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), idOrCode)
                               )
                               : connections.get(relConfig.lookup.table).get(idOrCode);
-                            connectionId = connection ? connection.get('id') : `INVALID|${idOrCode}`;
+                            connectionId = connection ? connection.get('id') : null;
                             if (!connection) {
                               console.log('connection not found');
                               console.log('row', index + 1);
@@ -301,46 +301,48 @@ function mapDispatchToProps(dispatch) {
                             }
                           }
                         }
-                        // recommendations by code or id
-                        if (relField === 'recommendation-reference' || relField === 'recommendation-id') {
-                          const create = { recommendation_id: connectionId };
-                          if (recommendationMeasures && recommendationMeasures.create) {
-                            if (!recommendationMeasures.create.find((el) => el.recommendation_id === connectionId)) {
-                              recommendationMeasures.create = [
-                                ...recommendationMeasures.create,
+                        if (connectionId) {
+                          // recommendations by code or id
+                          if (relField === 'recommendation-reference' || relField === 'recommendation-id') {
+                            const create = { recommendation_id: connectionId };
+                            if (recommendationMeasures && recommendationMeasures.create) {
+                              if (!recommendationMeasures.create.find((el) => el.recommendation_id === connectionId)) {
+                                recommendationMeasures.create = [
+                                  ...recommendationMeasures.create,
+                                  create,
+                                ];
+                              }
+                            } else {
+                              recommendationMeasures = { create: [create] };
+                            }
+                          }
+                          // indicator by code or id
+                          if (relField === 'indicator-reference' || relField === 'indicator-id') {
+                            const create = { indicator_id: connectionId };
+                            if (measureIndicators && measureIndicators.create) {
+                              measureIndicators.create = [
+                                ...measureIndicators.create,
                                 create,
                               ];
+                            } else {
+                              measureIndicators = { create: [create] };
                             }
-                          } else {
-                            recommendationMeasures = { create: [create] };
                           }
-                        }
-                        // indicator by code or id
-                        if (relField === 'indicator-reference' || relField === 'indicator-id') {
-                          const create = { indicator_id: connectionId };
-                          if (measureIndicators && measureIndicators.create) {
-                            measureIndicators.create = [
-                              ...measureIndicators.create,
-                              create,
-                            ];
-                          } else {
-                            measureIndicators = { create: [create] };
-                          }
-                        }
-                        // categories by code or id
-                        if (
-                          relField === 'category-reference'
-                          || relField === 'category-id'
-                          || relField === 'category-short-title'
-                        ) {
-                          const create = { category_id: connectionId };
-                          if (measureCategories && measureCategories.create) {
-                            measureCategories.create = [
-                              ...measureCategories.create,
-                              create,
-                            ];
-                          } else {
-                            measureCategories = { create: [create] };
+                          // categories by code or id
+                          if (
+                            relField === 'category-reference'
+                            || relField === 'category-id'
+                            || relField === 'category-short-title'
+                          ) {
+                            const create = { category_id: connectionId };
+                            if (measureCategories && measureCategories.create) {
+                              measureCategories.create = [
+                                ...measureCategories.create,
+                                create,
+                              ];
+                            } else {
+                              measureCategories = { create: [create] };
+                            }
                           }
                         }
                       } // relConfig
