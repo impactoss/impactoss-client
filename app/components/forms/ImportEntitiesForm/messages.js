@@ -29,14 +29,6 @@ export default defineMessages({
     id: 'app.components.ImportEntitiesForm.formatHint',
     defaultMessage: 'When saving from Excel (Office 2016 or later), chose file type "CSV UTF-8 (Comma delimited)". For instructions for previous versions of Excel (Office 2013 and earlier) please refer to the ',
   },
-  formatHintLink: {
-    id: 'app.components.ImportEntitiesForm.formatHintLink',
-    defaultMessage: 'user-manual.impactoss.org/managers/import.html',
-  },
-  formatHintLinkAnchor: {
-    id: 'app.components.ImportEntitiesForm.formatHintLinkAnchor',
-    defaultMessage: 'user manual',
-  },
   someErrors: {
     id: 'app.components.ImportEntitiesForm.someErrors',
     defaultMessage: 'We are sorry, only {successNo} of {rowNo} row(s) could be imported.',

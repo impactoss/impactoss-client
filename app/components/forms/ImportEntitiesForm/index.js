@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Form } from 'react-redux-form/immutable';
+import ReactMarkdown from 'react-markdown';
 
 import CsvDownloader from 'react-csv-downloader';
 import styled from 'styled-components';
@@ -59,6 +60,24 @@ const ImportingText = styled.div`
   }
 `;
 
+const Hints = styled(ReactMarkdown)`
+  margin-bottom: 10px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    margin-bottom: 16px;
+    font-size: ${({ theme }) => theme.text.medium.size};
+  }
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.large};
+  }
+  li {
+    margin-bottom: ${({ theme }) => theme.global.edgeSize.xsmall};
+    strong {
+      font-weight: 500;
+    }
+  }
+
+`;
+
 const DocumentWrapEdit = styled(DocumentWrap)`
   background-color: ${palette('background', 0)};
   position: relative;
@@ -74,7 +93,6 @@ const Intro = styled.div`
   margin-bottom: 10px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     margin-bottom: 16px;
-    font-size: 1.2em;
   }
   @media print {
     font-size: ${(props) => props.theme.sizes.print.large};
@@ -101,10 +119,6 @@ const NoteLink = styled(A)`
 `;
 const RowResults = styled.div`
   margin-top: 2em;
-`;
-
-const HintList = styled.ul`
-  margin: 10px 0;
 `;
 
 const HintTitle = styled.h6`
@@ -173,44 +187,31 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                     <Text size="medium">
                       <FormattedMessage {...messages.introduction} />
                     </Text>
+                    <Text size="medium">
+                      {' '}
+                      <FormattedMessage {...messages.templateHint} />
+                    </Text>
+                    <CsvDownload>
+                      <CsvDownloader
+                        datas={asArray(template.data)}
+                        filename={template.filename}
+                      >
+                        <NoteLink href="/" onClick={(evt) => evt.preventDefault()}>
+                          <Text size="medium">
+                            <FormattedMessage {...messages.templateHintDownloadLink} />
+                            {'.'}
+                          </Text>
+                        </NoteLink>
+                      </CsvDownloader>
+                    </CsvDownload>
                   </Intro>
                   <Hint>
                     <HintTitle>
-                      <Text size="medium">
+                      <Text size="medium" weight={500}>
                         <FormattedMessage {...messages.hintTitle} />
                       </Text>
                     </HintTitle>
-                    <HintList>
-                      <li>
-                        <Text size="medium">
-                          <FormattedMessage {...messages.templateHint} />
-                        </Text>
-                        <CsvDownload>
-                          <CsvDownloader
-                            datas={asArray(template.data)}
-                            filename={template.filename}
-                          >
-                            <NoteLink href="/" onClick={(evt) => evt.preventDefault()}>
-                              <Text size="medium">
-                                <FormattedMessage {...messages.templateHintDownloadLink} />
-                              </Text>
-                            </NoteLink>
-                          </CsvDownloader>
-                        </CsvDownload>
-                      </li>
-                      <li>
-                        <Text size="medium">
-                          <FormattedMessage {...messages.formatHint} />
-                        </Text>
-                        {messages.formatHintLink && messages.formatHintLink !== '' && (
-                          <A href={intl.formatMessage(messages.formatHintLink)} target="_blank">
-                            <Text size="medium">
-                              {intl.formatMessage(messages.formatHintLinkAnchor)}
-                            </Text>
-                          </A>
-                        )}
-                      </li>
-                    </HintList>
+                    <Hints className="impactoss-import-hints" source={intl.formatMessage(messages.formatHint)} />
                   </Hint>
                   <Field noPadding>
                     <FormFieldWrap>
