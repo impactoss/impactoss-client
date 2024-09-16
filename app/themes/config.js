@@ -479,6 +479,7 @@ export const ENTITY_FIELDS = {
       },
       frequency_months: {
         type: 'number',
+        options: REPORT_FREQUENCIES,
       },
       repeat: {
         defaultValue: false,
@@ -605,6 +606,7 @@ export const ENTITY_FIELDS = {
       support_level: {
         type: 'number',
         import: true,
+        options: SUPPORT_LEVELS,
       },
       created_at: {
         skipImport: true,

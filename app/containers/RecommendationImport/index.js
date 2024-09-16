@@ -89,6 +89,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
             type: val.type || 'text',
             required: !!val.required,
             unique: !!val.unique,
+            options: val.options,
             import: true,
           },
         ];

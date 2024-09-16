@@ -104,13 +104,21 @@ export const countRelationshipsFromRows = (rows) => rows.reduce(
 
 const getFieldInfo = (attribute, fields) => fields && fields.find((f) => f.attribute === attribute);
 
+const validateOptions = (options, val) => {
+  const optionValues = options.map((o) => o.value.toString());
+  return optionValues.indexOf(val.toString()) > -1;
+};
+
 export const validateType = (attribute, val, fields) => {
   const field = getFieldInfo(attribute, fields);
+  let result = true;
   if (field.type === 'date') {
-    return validateDateFormat(val);
+    result = result && validateDateFormat(val);
+  } else if (field.type === 'number') {
+    result = result && validateNumber(val);
   }
-  if (field.type === 'number') {
-    return validateNumber(val);
+  if (field.options) {
+    result = result && validateOptions(field.options, val);
   }
-  return true;
+  return result;
 };

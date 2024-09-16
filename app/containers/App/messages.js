@@ -406,6 +406,10 @@ export default defineMessages({
       id: 'app.containers.App.importFieldHints.support_level',
       defaultMessage: '(UPR only; supported: 2; supported in part: 1; noted: 0; not applicable: leave blank)',
     },
+    frequency_months: {
+      id: 'app.containers.App.importFieldHints.frequency_months',
+      defaultMessage: '(...)',
+    },
   },
   importHints: {
     'category-id': {

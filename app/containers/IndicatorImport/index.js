@@ -13,7 +13,7 @@ import { actions as formActions } from 'react-redux-form/immutable';
 import { fromJS } from 'immutable';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES, ENTITY_FIELDS } from 'themes/config';
+import { API, USER_ROLES, ENTITY_FIELDS } from 'themes/config';
 import { getImportFields, getColumnAttribute, validateType } from 'utils/import';
 
 import qe from 'utils/quasi-equals';
@@ -25,6 +25,7 @@ import {
   updatePath,
   loadEntitiesIfNeeded,
   resetProgress,
+  invalidateEntities,
 } from 'containers/App/actions';
 
 import {
@@ -88,6 +89,7 @@ export class IndicatorImport extends React.PureComponent { // eslint-disable-lin
             attribute: key,
             type: val.type || 'text',
             required: !!val.required,
+            options: val.options,
             import: true,
           },
         ];
@@ -334,6 +336,8 @@ function mapDispatchToProps(dispatch) {
       }
     },
     handleCancel: () => {
+      // invalidate due dates to reload
+      dispatch(invalidateEntities(API.DUE_DATES));
       dispatch(updatePath(ROUTES.INDICATORS));
     },
     handleReset: () => {

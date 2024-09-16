@@ -86,6 +86,7 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             attribute: key,
             type: val.type || 'text',
             required: !!val.required,
+            options: val.options,
             import: true,
           },
         ];

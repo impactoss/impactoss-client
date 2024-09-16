@@ -483,6 +483,7 @@
   "app.containers.App.import.text": "text",
   "app.containers.App.import.unique": "Unique",
   "app.containers.App.importFieldHints.support_level": "(UPR only; supported: 2; supported in part: 1; noted: 0; not applicable: leave blank)",
+  "app.containers.App.importFieldHints.frequency_months": "(options: monthly: 1; quarterly: 3; biannual: 6; yearly: 12; not applicable: leave blank)",
   "app.containers.App.importFields.comment": "Comment",
   "app.containers.App.importFields.description": "Description",
   "app.containers.App.importFields.framework_id": "Framework: 1 - HR; 2 - SDS; 3 - SDGs",
