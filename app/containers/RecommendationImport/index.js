@@ -14,7 +14,7 @@ import { fromJS } from 'immutable';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES, API, ENTITY_FIELDS } from 'themes/config';
-import { getImportFields, getColumnAttribute } from 'utils/import';
+import { getImportFields, getColumnAttribute, validateType } from 'utils/import';
 import qe from 'utils/quasi-equals';
 import { checkRecommendationAttribute } from 'utils/entities';
 import appMessage from 'utils/app-message';
@@ -138,7 +138,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
             fieldModel="import"
             formData={this.props.formData}
             handleSubmit={(formData) => {
-              this.props.handleSubmit(formData, connections, categories);
+              this.props.handleSubmit(formData, connections, categories, fields);
             }}
             handleCancel={this.props.handleCancel}
             handleReset={this.props.handleReset}
@@ -216,7 +216,7 @@ function mapDispatchToProps(dispatch, { params }) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    handleSubmit: (formData, connections, categories) => {
+    handleSubmit: (formData, connections, categories, fields) => {
       if (formData.get('import') !== null) {
         // submit requests for each row
         fromJS(formData.get('import').rows).forEach((row, index) => {
@@ -227,7 +227,13 @@ function mapDispatchToProps(dispatch, { params }) {
           let rowClean = {
             attributes: rowCleanColumns
               // make sure only valid fields are imported
-              .filter((val, att) => checkRecommendationAttribute(frameworkId, att))
+              .filter(
+                (val, att) => typeof val !== 'undefined'
+                  && val !== null
+                  && val.toString().trim() !== ''
+                  && checkRecommendationAttribute(frameworkId, att)
+                  && validateType(att, val, fields)
+              )
               .set('framework_id', frameworkId)
               // make sure we only import draft content
               .set('draft', true)

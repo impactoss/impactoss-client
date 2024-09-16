@@ -14,7 +14,7 @@ import { fromJS } from 'immutable';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES, API, ENTITY_FIELDS } from 'themes/config';
-import { getImportFields, getColumnAttribute } from 'utils/import';
+import { getImportFields, getColumnAttribute, validateType } from 'utils/import';
 
 import qe from 'utils/quasi-equals';
 import { checkActionAttribute } from 'utils/entities';
@@ -136,7 +136,12 @@ export class ActionImport extends React.PureComponent { // eslint-disable-line r
             model="measureImport.form.data"
             fieldModel="import"
             formData={this.props.formData}
-            handleSubmit={(formData) => this.props.handleSubmit(formData, connections, categories)}
+            handleSubmit={(formData) => this.props.handleSubmit(
+              formData,
+              connections,
+              categories,
+              fields,
+            )}
             handleCancel={this.props.handleCancel}
             handleReset={this.props.handleReset}
             resetProgress={this.props.resetProgress}
@@ -212,7 +217,7 @@ function mapDispatchToProps(dispatch) {
     initialiseForm: (model, formData) => {
       dispatch(formActions.load(model, formData));
     },
-    handleSubmit: (formData, connections, categories) => {
+    handleSubmit: (formData, connections, categories, fields) => {
       if (formData.get('import') !== null) {
         fromJS(formData.get('import').rows).forEach((row, index) => {
           // make sure we only take valid columns
@@ -221,7 +226,14 @@ function mapDispatchToProps(dispatch) {
           let rowClean = {
             attributes: rowCleanColumns
               // make sure only valid fields are imported
-              .filter((val, att) => checkActionAttribute(att))
+              // remove undefined/empty attributes
+              .filter(
+                (val, att) => typeof val !== 'undefined'
+                  && val !== null
+                  && val.toString().trim() !== ''
+                  && checkActionAttribute(att)
+                  && validateType(att, val, fields)
+              )
               // make sure we only import draft content
               .set('draft', true)
               // for testing, give new ref everytime

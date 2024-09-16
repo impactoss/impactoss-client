@@ -14,7 +14,7 @@ import { fromJS } from 'immutable';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES, ENTITY_FIELDS } from 'themes/config';
-import { getImportFields, getColumnAttribute } from 'utils/import';
+import { getImportFields, getColumnAttribute, validateType } from 'utils/import';
 
 import qe from 'utils/quasi-equals';
 import { checkIndicatorAttribute } from 'utils/entities';
@@ -136,7 +136,7 @@ export class IndicatorImport extends React.PureComponent { // eslint-disable-lin
             model="indicatorImport.form.data"
             fieldModel="import"
             formData={this.props.formData}
-            handleSubmit={(formData) => this.props.handleSubmit(formData, connections)}
+            handleSubmit={(formData) => this.props.handleSubmit(formData, connections, fields)}
             handleCancel={this.props.handleCancel}
             handleReset={this.props.handleReset}
             resetProgress={this.props.resetProgress}
@@ -210,7 +210,7 @@ function mapDispatchToProps(dispatch) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    handleSubmit: (formData, connections) => {
+    handleSubmit: (formData, connections, fields) => {
       if (formData.get('import') !== null) {
         fromJS(formData.get('import').rows).forEach((row, index) => {
           // make sure we only take valid columns
@@ -219,7 +219,13 @@ function mapDispatchToProps(dispatch) {
           let rowClean = {
             attributes: rowCleanColumns
               // make sure only valid fields are imported
-              .filter((val, att) => checkIndicatorAttribute(att))
+              .filter(
+                (val, att) => typeof val !== 'undefined'
+                  && val !== null
+                  && val.toString().trim() !== ''
+                  && checkIndicatorAttribute(att)
+                  && validateType(att, val, fields)
+              )
               // make sure we only import draft content
               .set('draft', true)
               // for testing, give new ref everytime

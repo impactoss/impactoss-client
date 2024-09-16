@@ -13,10 +13,6 @@ export default defineMessages({
     id: 'app.components.ImportEntitiesForm.introduction',
     defaultMessage: 'Import multiple items from a CSV file.',
   },
-  hintTitle: {
-    id: 'app.components.ImportEntitiesForm.hintLabel',
-    defaultMessage: 'Please note:',
-  },
   templateHint: {
     id: 'app.components.ImportEntitiesForm.templateHint',
     defaultMessage: 'For the available fields and field types please ',

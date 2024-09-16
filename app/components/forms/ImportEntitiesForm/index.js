@@ -123,10 +123,6 @@ const RowResults = styled.div`
   margin-top: 2em;
 `;
 
-const HintTitle = styled.h6`
-  margin: 0;
-  font-weight: normal;
-`;
 const ErrorHint = styled.div``;
 const ErrorHintTitle = styled.h5``;
 const ErrorHintText = styled.p``;
@@ -208,11 +204,6 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                     </CsvDownload>
                   </Intro>
                   <Hint>
-                    <HintTitle>
-                      <Text size="medium" weight={500}>
-                        <FormattedMessage {...messages.hintTitle} />
-                      </Text>
-                    </HintTitle>
                     <Hints
                       className="impactoss-import-hints"
                       source={intl.formatMessage(messages.formatHint, { IGNORE_ROW_TAG })}
@@ -249,20 +240,13 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                           )}
                           {progress >= 100 && (
                             <div>
-                              {(
-                                stats.totalRowsErrors > 0
-                                && stats.totalRowsSending === stats.totalRowsErrors
-                              )
-                              && (
+                              {stats.totalRowsErrors > 0 && (stats.totalRowsSending === stats.totalRowsErrors) && (
                                 <Messages
                                   type="error"
                                   message={intl.formatMessage(messages.allErrors)}
                                 />
                               )}
-                              {(
-                                stats.totalRowsErrors > 0
-                                && stats.totalRowsSending > stats.totalRowsErrors
-                              ) && (
+                              {stats.totalRowsErrors > 0 && (stats.totalRowsSending > stats.totalRowsErrors) && (
                                 <Messages
                                   type="error"
                                   message={intl.formatMessage(messages.someErrors, {
@@ -285,47 +269,45 @@ export class ImportEntitiesForm extends React.PureComponent { // eslint-disable-
                           {(progress >= 100 && stats.totalRowsSending > 0) && (
                             <RowResults>
                               <FormattedMessage {...messages.rowResultsHint} />
-                              {sending
-                                && sending.groupBy(
-                                  (item) => item && item.saveRef
-                                ).sortBy(
-                                  (item, key) => key
-                                ).entrySeq().map(
-                                  ([rowNo, row]) => row.entrySeq().map(
-                                    ([rowItemKey, rowItem]) => {
-                                      const error = errors.get(rowItemKey);
-                                      const isMainItem = !!rowItem.entity;
-                                      const rowItemRef = isMainItem
-                                        && (rowItem.entity.attributes.reference || truncateText(rowItem.entity.attributes.title, 22));
-                                      let message = intl.formatMessage(messages.resultRowNo, { rowNo });
-                                      if (error) {
-                                        message = `${message} ${intl.formatMessage(messages.resultError, { isMainItem })}`;
-                                        if (isMainItem) {
-                                          message = `${message}: ${rowItemRef}`;
-                                        }
-                                        message = error.error.messages.reduce(
-                                          (memo, msg) => `${memo} "${msg}"`,
-                                          message,
-                                        );
-                                      } else {
-                                        message = `${message} ${intl.formatMessage(messages.resultSuccess, { isMainItem })}`;
-                                        if (isMainItem) {
-                                          message = `${message}: ${rowItemRef}`;
-                                        }
+                              {sending && sending.groupBy(
+                                (item) => item && item.saveRef
+                              ).sortBy(
+                                (item, key) => key
+                              ).entrySeq().map(
+                                ([rowNo, row]) => row.entrySeq().map(
+                                  ([rowItemKey, rowItem]) => {
+                                    const error = errors.get(rowItemKey);
+                                    const isMainItem = !!rowItem.entity;
+                                    const rowItemRef = isMainItem
+                                      && (rowItem.entity.attributes.reference || truncateText(rowItem.entity.attributes.title, 22));
+                                    let message = intl.formatMessage(messages.resultRowNo, { rowNo });
+                                    if (error) {
+                                      message = `${message} ${intl.formatMessage(messages.resultError, { isMainItem })}`;
+                                      if (isMainItem) {
+                                        message = `${message}: ${rowItemRef}`;
                                       }
-                                      return (
-                                        <Messages
-                                          key={rowItemKey}
-                                          type={error ? 'error' : 'success'}
-                                          details
-                                          preMessage={false}
-                                          messages={[message]}
-                                        />
+                                      message = error.error.messages.reduce(
+                                        (memo, msg) => `${memo} "${msg}"`,
+                                        message,
                                       );
+                                    } else {
+                                      message = `${message} ${intl.formatMessage(messages.resultSuccess, { isMainItem })}`;
+                                      if (isMainItem) {
+                                        message = `${message}: ${rowItemRef}`;
+                                      }
                                     }
-                                  )
+                                    return (
+                                      <Messages
+                                        key={rowItemKey}
+                                        type={error ? 'error' : 'success'}
+                                        details
+                                        preMessage={false}
+                                        messages={[message]}
+                                      />
+                                    );
+                                  }
                                 )
-                              }
+                              )}
                             </RowResults>
                           )}
                           {(progress >= 100 && errors.size > 0 && progress >= 100) && (

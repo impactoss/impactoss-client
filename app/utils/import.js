@@ -1,6 +1,8 @@
 import { filter, reduce } from 'lodash/collection';
 import appMessages from 'containers/App/messages';
 import { DB_DATE_FORMAT, IGNORE_ROW_TAG } from 'themes/config';
+import validateDateFormat from 'components/forms/validators/validate-date-format';
+import validateNumber from 'components/forms/validators/validate-number';
 
 const getColumnTitle = (field, formatMessage) => {
   const msg = (appMessages.importFields[field.label] || appMessages.importFields[field.attribute])
@@ -99,3 +101,16 @@ export const countRelationshipsFromRows = (rows) => rows.reduce(
   },
   0,
 );
+
+const getFieldInfo = (attribute, fields) => fields && fields.find((f) => f.attribute === attribute);
+
+export const validateType = (attribute, val, fields) => {
+  const field = getFieldInfo(attribute, fields);
+  if (field.type === 'date') {
+    return validateDateFormat(val);
+  }
+  if (field.type === 'number') {
+    return validateNumber(val);
+  }
+  return true;
+};
