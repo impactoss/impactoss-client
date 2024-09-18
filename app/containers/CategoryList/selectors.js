@@ -1,6 +1,8 @@
 import { createSelector } from 'reselect';
 import { Map } from 'immutable';
 
+import { CURRENT_TAXONOMY_IDS } from 'themes/config';
+
 import {
   selectEntities,
   selectSortByQuery,
@@ -8,10 +10,10 @@ import {
   selectFWTaxonomiesSorted,
   selectFWRecommendations,
   selectFWMeasures,
-  selectActiveFrameworks,
   selectRecommendationMeasuresByMeasure,
   selectMeasureCategoriesByMeasure,
   selectRecommendationCategoriesByRecommendation,
+  selectSettingsFromQuery,
 } from 'containers/App/selectors';
 
 import { qe } from 'utils/quasi-equals';
@@ -107,7 +109,6 @@ const getCategoryCounts = (
   measures,
   recommendations,
   categories,
-  frameworks,
 ) => taxonomyCategories.map(
   (cat, categoryId) => {
     let category = cat;
@@ -171,21 +172,11 @@ const getCategoryCounts = (
       const associatedRecsPublic = associatedRecs.filter(
         (rec) => !rec.getIn(['attributes', 'draft'])
       );
-      // get all public accepted associated recs
-      const publicAccepted = associatedRecsPublic.filter(
-        (rec) => !!rec.getIn(['attributes', 'accepted'])
-      );
-
       // all frameworks
       category = category.set('recommendationsCount', associatedRecs.size);
       category = category.set(
         'recommendationsPublicCount',
         associatedRecsPublic ? associatedRecsPublic.size : 0
-      );
-      // const framework = frameworks.find((fw) => qe(fw.get('id'), taxonomy.get('frameworkIds').first()));
-      category = category.set(
-        'recommendationsAcceptedCount',
-        publicAccepted ? publicAccepted.size : 0
       );
       // by framework
       category = category.set(
@@ -202,21 +193,7 @@ const getCategoryCounts = (
           ).map((group) => group.size)
           : 0,
       );
-      category = category.set(
-        'recommendationsAcceptedCountByFW',
-        publicAccepted
-          ? publicAccepted.groupBy(
-            (rec) => rec.getIn(['attributes', 'framework_id'])
-          ).map((group, key) => {
-            const framework = frameworks.find(
-              (fw) => qe(fw.get('id'), key)
-            );
-            return (framework && framework.getIn(['attributes', 'has_response']))
-              ? group.size
-              : -1;
-          })
-          : 0
-      );
+
       // for sorting
       category = category.set(
         'recommendations',
@@ -278,13 +255,19 @@ const selectCategoryCountGroups = createSelector(
   selectRecommendations,
   selectMeasures,
   (state) => selectEntities(state, 'categories'),
-  selectActiveFrameworks,
-  (taxonomy, recommendations, measures, categories, frameworks) => {
-    if (taxonomy && recommendations && measures && categories && frameworks) {
+  selectSettingsFromQuery,
+  (taxonomy, recommendations, measures, categories, settingsFromQuery) => {
+    if (taxonomy && recommendations && measures && categories) {
       const taxonomyCategories = taxonomy && categories && categories.filter(
         (cat) => qe(
           cat.getIn(['attributes', 'taxonomy_id']),
           taxonomy.get('id')
+        ) && (
+          CURRENT_TAXONOMY_IDS.indexOf(parseInt(taxonomy.get('id'), 10)) === -1
+          || settingsFromQuery.loadNonCurrent
+          || !!cat.getIn(['attributes', 'is_current'])
+        ) && (
+          settingsFromQuery.loadArchived || !cat.getIn(['attributes', 'is_archive'])
         )
       );
       if (taxonomyCategories) {
@@ -295,7 +278,6 @@ const selectCategoryCountGroups = createSelector(
             measures,
             recommendations,
             categories,
-            frameworks,
           );
           return catCounts
             ? Map().set(
@@ -325,7 +307,6 @@ const selectCategoryCountGroups = createSelector(
                 measures,
                 recommendations,
                 categories,
-                frameworks,
               );
               return parentCat.set('categories', catCounts);
             }
@@ -347,20 +328,20 @@ const mapCategoryGroups = (
   const sortOption = getSortOption(SORT_OPTIONS, sort, 'query');
   const groups = categoryGroups && categoryGroups.map(
     (group) => {
-      const filtered = group.get('categories').filter(
+      const filteredCategories = group.get('categories').filter(
         (cat) => userOnly
           ? cat.getIn(['attributes', 'user_only'])
           : !cat.getIn(['attributes', 'user_only'])
       );
       return group.set(
         'measures',
-        filtered.reduce(
+        filteredCategories.reduce(
           (sum, cat) => sum + cat.get('measuresPublicCount'),
           0,
         ),
       ).set(
         'recommendations',
-        filtered.reduce(
+        filteredCategories.reduce(
           (sum, cat) => sum + cat.get('recommendationsPublicCount'),
           0,
         ),
@@ -368,7 +349,7 @@ const mapCategoryGroups = (
         'categories',
         sortEntities(
           sortEntities(
-            filtered,
+            filteredCategories,
             order || (sortOption ? sortOption.order : 'asc'),
             sortOption ? sortOption.field : 'title',
             sortOption ? sortOption.type : 'string',

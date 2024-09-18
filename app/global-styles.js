@@ -1,63 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
-import Roboto400TTF from './fonts/roboto-400.ttf';
-import Roboto400iTTF from './fonts/roboto-400i.ttf';
-import Roboto500iTTF from './fonts/roboto-500i.ttf';
-import Roboto500TTF from './fonts/roboto-500.ttf';
-import Roboto700TTF from './fonts/roboto-700.ttf';
-import Roboto700iTTF from './fonts/roboto-700i.ttf';
 
 /* eslint no-unused-expressions: 0 */
 const GlobalStyle = createGlobalStyle`
-
-  /* roboto - 400 - latin */
-  @font-face {
-    font-display: swap;
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 400;
-    src: url(${Roboto400TTF}) format('truetype');
-  }
-  /* roboto - 400 - italic - latin */
-  @font-face {
-    font-display: swap;
-    font-family: 'Roboto';
-    font-style: italic;
-    font-weight: 400;
-    src: url(${Roboto400iTTF}) format('truetype');
-  }
-  /* roboto - 500 - latin */
-  @font-face {
-    font-display: swap;
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 500;
-    src: url(${Roboto500TTF}) format('truetype');
-  }
-  /* roboto - 500 - italic - latin */
-  @font-face {
-    font-display: swap;
-    font-family: 'Roboto';
-    font-style: italic;
-    font-weight: 500;
-    src: url(${Roboto500iTTF}) format('truetype');
-  }
-  /* roboto - 700 - latin */
-  @font-face {
-    font-display: swap;
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 700;
-    src: url(${Roboto700TTF}) format('truetype');
-  }
-  /* roboto - 700 - italic - latin */
-  @font-face {
-    font-display: swap;
-    font-family: 'Roboto';
-    font-style: italic;
-    font-weight: 700;
-    src: url(${Roboto700iTTF}) format('truetype');
-  }
-
   html,
   body {
     height: 100%;
@@ -100,7 +44,6 @@ const GlobalStyle = createGlobalStyle`
     text-align: left;
     color: #0077d8;
     text-decoration: none;
-
     &:hover {
       color: #d66149;
     }
@@ -193,35 +136,25 @@ const GlobalStyle = createGlobalStyle`
     h6 {
       font-size: 1em;
     }
+    a {
+      color: #BA5D03;
+      font-weight: 500;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 
-  .content-page {
-    .react-markdown {
-      p {
-        &:first-child{
-          font-size: 1.2em;
-          color: #6A7880;
-        }
-      }
-    }
+  .react-markdown-search strong{
+    font-weight: 500;
   }
-  @media (min-width: 769px) {
-    .content-page {
-      .react-markdown {
-        p {
-          &:first-child{
-            font-size: 1.5em;
-            padding-bottom: 20px;
-          }
-        }
-      }
-    }
-  }
+
   .download-csv-modal {
     z-index:105;
     max-width: none !important;
   }
 
+  .global-settings-modal,
   .download-csv-modal,
   .new-entity-modal {
     position: absolute;
@@ -239,6 +172,7 @@ const GlobalStyle = createGlobalStyle`
     max-width: 1170px;
   }
   @media (min-width: 769px) {
+    .global-settings-modal,
     .download-csv-modal,
     .new-entity-modal {
       padding: 20px;
@@ -250,6 +184,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .download-csv-modal,
+  .global-settings-modal-overlay,
   .new-entity-modal-overlay {
     position: fixed;
     top: 0;
@@ -327,16 +262,6 @@ const GlobalStyle = createGlobalStyle`
     }
     ul, ol, dl {
       page-break-before: avoid;
-    }
-
-    .content-page {
-      .react-markdown {
-        p {
-          &:first-child{
-            font-size: 12pt;
-          }
-        }
-      }
     }
   }
 

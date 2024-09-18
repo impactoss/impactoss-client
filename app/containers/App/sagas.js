@@ -8,6 +8,7 @@ import {
 import { push, replace, goBack } from 'react-router-redux';
 import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
+import { fromJS } from 'immutable';
 
 import asArray from 'utils/as-array';
 import {
@@ -43,6 +44,8 @@ import {
   ROUTES,
   PARAMS,
   SET_FRAMEWORK,
+  SET_LOAD_ARCHIVED,
+  SET_LOAD_NONCURRENT,
   OPEN_BOOKMARK,
 } from 'containers/App/constants';
 
@@ -50,7 +53,11 @@ import {
   ENDPOINTS,
   KEYS,
   DB_TABLES,
+  DB_TABLES_CURRENT,
+  DB_TABLES_ARCHIVED,
   ENABLE_AZURE,
+  KEEP_QUERY_ARGS,
+  SETTINGS,
 } from 'themes/config';
 
 import {
@@ -77,6 +84,7 @@ import {
   recoverError,
   forwardOnAuthenticationChange,
   updatePath,
+  initializeSettings,
 } from 'containers/App/actions';
 
 import {
@@ -88,6 +96,8 @@ import {
   selectLocation,
   selectSessionUserRoles,
   selectIsAuthenticating,
+  selectLoadArchivedQuery,
+  selectLoadNonCurrentQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -119,8 +129,34 @@ export function* checkEntitiesSaga(payload) {
           yield put(entitiesLoaded({}, payload.path, Date.now()));
         } else {
           // Call the API, cancel on invalidate
+          let query = {};
+          // if (payload.includeArchive) {
+          const includeArchive = yield select(selectLoadArchivedQuery);
+          const includeNonCurrent = yield select(selectLoadNonCurrentQuery);
+          // only apply to relevant tables
+          if (!includeArchive && DB_TABLES_ARCHIVED.indexOf(payload.path) > -1) {
+            query = {
+              ...query,
+              include_archive: 'false',
+            };
+          }
+          if (!includeNonCurrent && DB_TABLES_CURRENT.indexOf(payload.path) > -1) {
+            query = {
+              ...query,
+              current_only: 'true',
+            };
+          }
           const { response } = yield race({
-            response: call(apiRequest, 'get', payload.path),
+            response: call(
+              apiRequest,
+              'get',
+              payload.path,
+              query,
+              // {
+              //   // include_archive: 'false',
+              //   // current_only: 'true',
+              // },
+            ),
             cancel: take(INVALIDATE_ENTITIES), // will also reset entities requested
           });
           if (response) {
@@ -173,7 +209,9 @@ export function* authenticateSaga(payload) {
     yield put(invalidateEntities()); // important invalidate before forward to allow for reloading of entities
     yield put(forwardOnAuthenticationChange());
   } catch (err) {
-    err.response.json = yield err.response.json();
+    if (err && err.response && err.response.json) {
+      err.response.json = yield err.response.json();
+    }
     yield put(authenticateError(err));
   }
 }
@@ -193,7 +231,7 @@ export function* authenticateWithAzureSaga() {
     location = `${location}&auth_origin_url=${encodeURIComponent(successLocation)}`;
     window.location.href = location;
   } catch (err) {
-    if (err.response) {
+    if (err && err.response && err.response.json) {
       err.response.json = yield err.response.json();
       yield put(authenticateError(err));
     }
@@ -218,7 +256,9 @@ export function* recoverSaga(payload) {
       }
     ));
   } catch (err) {
-    err.response.json = yield err.response.json();
+    if (err && err.response && err.response.json) {
+      err.response.json = yield err.response.json();
+    }
     yield put(recoverError(err));
   }
 }
@@ -231,6 +271,7 @@ export function* authChangeSaga() {
     // forward to home
     yield put(updatePath('/', { replace: true }));
   }
+  yield put(initializeSettings(fromJS(SETTINGS)));
 }
 
 export function* logoutSaga() {
@@ -240,9 +281,15 @@ export function* logoutSaga() {
     yield put(logoutSuccess());
     if (ENABLE_AZURE) {
       // forward to home to prevent second login
-      yield put(updatePath('/', { replace: true }));
+      yield put(updatePath(
+        '/',
+        {
+          replace: true,
+          keepQuery: true,
+        }
+      ));
     } else {
-      yield put(updatePath(ROUTES.LOGIN, { replace: true }));
+      yield put(updatePath(ROUTES.LOGIN, { replace: true, keepQuery: true }));
     }
   } catch (err) {
     yield call(clearAuthValues);
@@ -277,22 +324,28 @@ export function* validateTokenSaga() {
     }
   } catch (err) {
     yield call(clearAuthValues);
-    err.response.json = yield err.response.json();
+    if (err && err.response && err.response.json) {
+      err.response.json = yield err.response.json();
+    }
     yield put(authenticateError(err));
   }
 }
 
 
-function stampPayload(payload, type) {
-  return Object.assign(payload, {
-    timestamp: `${Date.now()}-${Math.random().toString(36).slice(-8)}`,
-    type,
-  });
+function stampPayload({ data, type, origin }) {
+  return Object.assign(
+    data,
+    {
+      timestamp: `${Date.now()}-${Math.random().toString(36).slice(-8)}`,
+      type,
+      origin,
+    },
+  );
 }
 
 
 function* createConnectionsSaga({
-  entityId, path, updates, keyPair,
+  entityId, path, updates, keyPair, saveRef, origin,
 }) {
   // make sure to use new entity id for full payload
   // we should have either the one (recommendation_id) or the other (measure_id)
@@ -301,12 +354,15 @@ function* createConnectionsSaga({
     [keyPair[0]]: create[keyPair[0]] || entityId,
     [keyPair[1]]: create[keyPair[1]] || entityId,
   }));
-
-  yield call(saveConnectionsSaga, { data: { path, updates: updatesUpdated } });
+  yield call(saveConnectionsSaga, { data: { path, updates: updatesUpdated, saveRef }, origin });
 }
 
-export function* saveEntitySaga({ data }, updateClient = true, multiple = false) {
-  const dataTS = stampPayload(data, 'save');
+export function* saveEntitySaga(
+  { data, origin },
+  updateClient = true,
+  multiple = false,
+) {
+  const dataTS = stampPayload({ data, type: 'save', origin });
   try {
     yield put(saveSending(dataTS));
 
@@ -329,6 +385,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             path: 'user_roles',
             updates: data.entity.userRoles,
           },
+          origin,
         });
       }
 
@@ -339,6 +396,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             path: 'user_categories',
             updates: data.entity.userCategories,
           },
+          origin,
         });
       }
 
@@ -349,6 +407,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             path: 'recommendation_measures',
             updates: data.entity.recommendationMeasures,
           },
+          origin,
         });
       }
       // update recommendation-indicator connections
@@ -358,6 +417,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             path: 'recommendation_indicators',
             updates: data.entity.recommendationIndicators,
           },
+          origin,
         });
       }
 
@@ -368,6 +428,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             path: 'measure_indicators',
             updates: data.entity.measureIndicators,
           },
+          origin,
         });
       }
 
@@ -378,6 +439,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             path: 'measure_categories',
             updates: data.entity.measureCategories,
           },
+          origin,
         });
       }
 
@@ -388,6 +450,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             path: 'recommendation_categories',
             updates: data.entity.recommendationCategories,
           },
+          origin,
         });
       }
     }
@@ -399,7 +462,9 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
       yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
     }
   } catch (err) {
-    err.response.json = yield err.response.json();
+    if (err && err.response && err.response.json) {
+      err.response.json = yield err.response.json();
+    }
     yield put(saveError(err, dataTS));
     if (updateClient) {
       yield put(invalidateEntities(data.path));
@@ -407,12 +472,12 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
   }
 }
 
-export function* saveMultipleEntitiesSaga({ path, data }) {
+export function* saveMultipleEntitiesSaga({ path, data, origin }) {
   const updateClient = data && data.length <= 20;
   yield all(data.map(
     (datum) => call(
       saveEntitySaga,
-      { data: datum },
+      { data: datum, origin },
       updateClient, // update client for small batch jobs
       true, // multiple
     )
@@ -422,8 +487,8 @@ export function* saveMultipleEntitiesSaga({ path, data }) {
   }
 }
 
-export function* deleteEntitySaga({ data }, updateClient = true, multiple = false) {
-  const dataTS = stampPayload(data, 'delete');
+export function* deleteEntitySaga({ data, origin }, updateClient = true, multiple = false) {
+  const dataTS = stampPayload({ data, type: 'delete', origin });
   try {
     yield put(deleteSending(dataTS));
     yield call(deleteEntityRequest, data.path, data.id);
@@ -438,7 +503,9 @@ export function* deleteEntitySaga({ data }, updateClient = true, multiple = fals
     }
     yield put(deleteSuccess(dataTS));
   } catch (err) {
-    err.response.json = yield err.response.json();
+    if (err && err.response && err.response.json) {
+      err.response.json = yield err.response.json();
+    }
     yield put(deleteError(err, dataTS));
     if (updateClient) {
       yield put(invalidateEntities(data.path));
@@ -446,12 +513,12 @@ export function* deleteEntitySaga({ data }, updateClient = true, multiple = fals
   }
 }
 
-export function* deleteMultipleEntitiesSaga({ path, data }) {
+export function* deleteMultipleEntitiesSaga({ path, data, origin }) {
   const updateClient = data && data.length <= 20;
   yield all(data.map(
     (datum) => call(
       deleteEntitySaga,
-      { data: datum },
+      { data: datum, origin },
       updateClient, // do not update client
       true, // multiple
     )
@@ -461,14 +528,13 @@ export function* deleteMultipleEntitiesSaga({ path, data }) {
   }
 }
 
-export function* newEntitySaga({ data }, updateClient = true, multiple = false) {
-  const dataTS = stampPayload(data, 'new');
+export function* newEntitySaga({ data, origin }, updateClient = true, multiple = false) {
+  const dataTS = stampPayload({ data, type: 'new', origin });
   try {
     yield put(saveSending(dataTS));
     // update entity attributes
     // on the server
     const entityCreated = yield call(newEntityRequest, data.path, data.entity.attributes);
-
     if (!data.createAsGuest) {
       if (updateClient) {
         yield put(addEntity(data.path, entityCreated.data));
@@ -482,6 +548,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
             path: 'recommendation_measures',
             updates: data.entity.recommendationMeasures,
             keyPair: ['recommendation_id', 'measure_id'],
+            saveRef: data.saveRef,
           });
         }
         // update sdgtarget-indicator connections
@@ -491,6 +558,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
             path: 'recommendation_indicators',
             updates: data.entity.recommendationIndicators,
             keyPair: ['indicator_id', 'recommendation_id'],
+            saveRef: data.saveRef,
           });
         }
 
@@ -501,6 +569,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
             path: 'measure_indicators',
             updates: data.entity.measureIndicators,
             keyPair: ['indicator_id', 'measure_id'],
+            saveRef: data.saveRef,
           });
         }
 
@@ -511,6 +580,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
             path: 'measure_categories',
             updates: data.entity.measureCategories,
             keyPair: ['category_id', 'measure_id'],
+            saveRef: data.saveRef,
           });
         }
 
@@ -521,6 +591,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
             path: 'recommendation_categories',
             updates: data.entity.recommendationCategories,
             keyPair: ['category_id', 'recommendation_id'],
+            saveRef: data.saveRef,
           });
         }
       }
@@ -549,7 +620,9 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
       yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
     }
   } catch (err) {
-    err.response.json = yield err.response.json();
+    if (err.response && err.response.json) {
+      err.response.json = yield err.response.json();
+    }
     yield put(saveError(err, dataTS));
     if (updateClient) {
       yield put(invalidateEntities(data.path));
@@ -572,12 +645,12 @@ export function* newMultipleEntitiesSaga({ path, data }) {
   }
 }
 
-export function* saveConnectionsSaga({ data }) {
+export function* saveConnectionsSaga({ data, origin }) {
   if (data.updates && (
     (data.updates.create && data.updates.create.length > 0)
     || (data.updates.delete && data.updates.delete.length > 0)
   )) {
-    const dataTS = stampPayload(data);
+    const dataTS = stampPayload({ data, origin });
     try {
       yield put(saveSending(dataTS));
       // on the server
@@ -586,7 +659,9 @@ export function* saveConnectionsSaga({ data }) {
       yield put(updateConnections(data.path, connectionsUpdated));
       yield put(saveSuccess(dataTS));
     } catch (err) {
-      err.response.json = yield err.response.json();
+      if (err && err.response && err.response.json) {
+        err.response.json = yield err.response.json();
+      }
       yield put(saveError(err, dataTS));
       yield put(invalidateEntities(data.path));
     }
@@ -675,6 +750,42 @@ export function* setFrameworkSaga({ framework }) {
 
   yield put(replace(`${location.get('pathname')}?${getNextQueryString(queryNext)}`));
 }
+export function* setLoadArchivedSaga({ loadArchived }) {
+  const location = yield select(selectLocation);
+
+  yield put(updatePath(
+    location.get('pathname'),
+    {
+      query: [
+        {
+          arg: 'loadArchived',
+          value: loadArchived || null,
+          remove: !loadArchived,
+        },
+      ],
+      extend: true,
+    },
+  ));
+  yield put(invalidateEntities()); // important invalidate to allow for reloading of entities
+}
+export function* setLoadNonCurrentSaga({ loadNonCurrent }) {
+  const location = yield select(selectLocation);
+
+  yield put(updatePath(
+    location.get('pathname'),
+    {
+      query: [
+        {
+          arg: 'loadNonCurrent',
+          value: loadNonCurrent || null,
+          remove: !loadNonCurrent,
+        },
+      ],
+      extend: true,
+    },
+  ));
+  yield put(invalidateEntities()); // important invalidate to allow for reloading of entities
+}
 
 export function* openBookmarkSaga({ bookmark }) {
   const path = bookmark.getIn(['attributes', 'view', 'path']);
@@ -701,19 +812,50 @@ export function* dismissQueryMessagesSaga() {
 }
 
 export function* updatePathSaga({ path, args }) {
-  const relativePath = path.startsWith('/') ? path : `/${path}`;
+  let relativePath = path.startsWith('/') ? path : `/${path}`;
+  let query = (args && args.query) || [];
+  // keep query args from path (as is needed for login redirect)
+  if (relativePath.indexOf('?') > -1) {
+    const [p, search] = relativePath.split('?');
+    relativePath = p;
+    let searchParams = Object.fromEntries(new URLSearchParams(search));
+    searchParams = Object.keys(searchParams).reduce(
+      (memo, key) => ([
+        ...memo,
+        { arg: key, value: searchParams[key] },
+      ]),
+      [],
+    );
+    query = [
+      ...query,
+      ...searchParams,
+    ];
+  }
   const location = yield select(selectLocation);
+
   let queryNext = {};
-  if (args && (args.query || args.keepQuery)) {
-    if (args.query) {
-      queryNext = getNextQuery(args.query, args.extend, location);
-    }
-    if (args.keepQuery) {
-      queryNext = location.get('query').toJS();
-    }
+  // update query based on provided query args
+  if (query) {
+    queryNext = getNextQuery(query, args ? args.extend : false, location);
+  }
+  // optionally keep all previous query args
+  if (args && args.keepQuery) {
+    queryNext = {
+      ...queryNext,
+      ...location.get('query').toJS(),
+    };
   } else {
-    // always keep "framework filter"
-    queryNext = location.get('query').filter((val, key) => key === 'fw').toJS();
+    // otherwise keep "specific args" incl framework (unless explicitly removed)
+    const argsRemove = query
+      ? asArray(query).filter((item) => item.remove).map((item) => item.arg)
+      : [];
+    const queryKeep = location.get('query').filter(
+      (val, key) => KEEP_QUERY_ARGS.indexOf(key) > -1 && argsRemove.indexOf(key) === -1
+    ).toJS();
+    queryNext = {
+      ...queryNext,
+      ...queryKeep,
+    };
   }
   // convert to string
   const queryNextString = getNextQueryString(queryNext);
@@ -765,6 +907,8 @@ export default function* rootSaga() {
   yield takeEvery(UPDATE_ROUTE_QUERY, updateRouteQuerySaga);
   yield takeEvery(UPDATE_PATH, updatePathSaga);
   yield takeEvery(SET_FRAMEWORK, setFrameworkSaga);
+  yield takeEvery(SET_LOAD_ARCHIVED, setLoadArchivedSaga);
+  yield takeEvery(SET_LOAD_NONCURRENT, setLoadNonCurrentSaga);
   yield takeEvery(OPEN_BOOKMARK, openBookmarkSaga);
   yield takeEvery(DISMISS_QUERY_MESSAGES, dismissQueryMessagesSaga);
 

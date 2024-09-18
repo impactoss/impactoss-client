@@ -8,7 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map } from 'immutable';
@@ -23,16 +22,19 @@ import {
   getConnectionUpdatesFromFormData,
   getTitleFormField,
   getReferenceFormField,
-  getAcceptedField,
+  getSupportField,
   getStatusField,
-  getMarkdownField,
+  getArchiveField,
+  getMarkdownFormField,
 } from 'utils/forms';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import { getNonParentTaxonomiesUnlessAssociated } from 'utils/entities';
 import { canUserDeleteEntities } from 'utils/permissions';
 import { getMetaField } from 'utils/fields';
 import { qe } from 'utils/quasi-equals';
+import { lowerCase } from 'utils/string';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
@@ -52,10 +54,10 @@ import {
 import {
   selectReady,
   selectReadyForAuthCheck,
-  selectIsUserAdmin,
   selectSessionUserHighestRoleId,
   selectFrameworks,
   selectRecommendationReferences,
+  selectCanUserAdministerCategories,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -63,6 +65,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import NotFoundEntity from 'containers/NotFoundEntity';
 
 import {
   selectDomain,
@@ -131,7 +134,11 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getReferenceFormField(intl.formatMessage, true, false, existingReferences), // required
+          getReferenceFormField({
+            formatMessage: intl.formatMessage,
+            required: true,
+            prohibitedValues: existingReferences,
+          }),
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -144,6 +151,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       {
         fields: [
           getStatusField(intl.formatMessage),
+          getArchiveField(intl.formatMessage),
           getMetaField(entity),
         ],
       },
@@ -162,9 +170,18 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     const groups = [];
     groups.push({
       fields: [
-        getMarkdownField(intl.formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
-        hasResponse && getAcceptedField(intl.formatMessage, entity),
-        hasResponse && getMarkdownField(intl.formatMessage, 'response'),
+        getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'description',
+          label: 'fullRecommendation',
+          placeholder: 'fullRecommendation',
+          hint: 'fullRecommendation',
+        }),
+        hasResponse && getSupportField(intl.formatMessage, entity),
+        getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'response',
+        }),
       ],
     });
     if (measures) {
@@ -188,13 +205,31 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     return groups;
   }
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => {
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
     const { intl } = this.context;
+    // also show connected parent taxonomies
+    const nonParentTaxisUnlessConnected = getNonParentTaxonomiesUnlessAssociated(
+      taxonomies,
+      'tags_recommendations'
+    );
+    taxonomies.filter(
+      (tax, key, list) => {
+        const isParent = list.some(
+          (other) => other.getIn(['attributes', 'tags_recommendations'])
+            && qe(tax.get('id'), other.getIn(['attributes', 'parent_id']))
+        );
+        return !isParent || tax.get('categories').some((cat) => cat.get('associated'));
+      }
+    );
     return ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
-        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+        fields: renderTaxonomyControl({
+          taxonomies: nonParentTaxisUnlessConnected,
+          onCreateOption: canCreateCategories ? onCreateOption : null,
+          contextIntl: intl,
+        }),
       },
     ]);
   };
@@ -212,6 +247,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       onCreateOption,
       frameworks,
       existingReferences,
+      canUserAdministerCategories,
     } = this.props;
     const reference = this.props.params.id;
     const {
@@ -283,13 +319,12 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
           }
-          {!viewEntity && dataReady && !saveError && !deleteSending
-            && (
-              <div>
-                <FormattedMessage {...messages.notFound} />
-              </div>
-            )
-          }
+          {!viewEntity && dataReady && !saveError && !deleteSending && (
+            <NotFoundEntity
+              id={this.props.params.id}
+              type={lowerCase(type)}
+            />
+          )}
           {viewEntity && dataReady && !deleteSending
             && (
               <EntityForm
@@ -326,7 +361,11 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                       onCreateOption,
                       hasResponse,
                     ),
-                    aside: this.getBodyAsideFields(fwTaxonomies, onCreateOption),
+                    aside: this.getBodyAsideFields(
+                      fwTaxonomies,
+                      onCreateOption,
+                      canUserAdministerCategories,
+                    ),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -356,7 +395,6 @@ RecommendationEdit.propTypes = {
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
-  isUserAdmin: PropTypes.bool,
   highestRole: PropTypes.number,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
@@ -368,6 +406,7 @@ RecommendationEdit.propTypes = {
   connectedTaxonomies: PropTypes.object,
   frameworks: PropTypes.object,
   existingReferences: PropTypes.array,
+  canUserAdministerCategories: PropTypes.bool,
 };
 
 RecommendationEdit.contextTypes = {
@@ -375,7 +414,6 @@ RecommendationEdit.contextTypes = {
 };
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
-  isUserAdmin: selectIsUserAdmin(state),
   highestRole: selectSessionUserHighestRoleId(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
@@ -386,6 +424,7 @@ const mapStateToProps = (state, props) => ({
   connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectFrameworks(state),
   existingReferences: selectRecommendationReferences(state),
+  canUserAdministerCategories: selectCanUserAdministerCategories(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -452,11 +491,11 @@ function mapDispatchToProps(dispatch, props) {
       // cleanup attributes for framework
       if (!currentFramework || !currentFramework.getIn(['attributes', 'has_response'])) {
         saveData = saveData
-          .setIn(['attributes', 'accepted'], '')
+          .setIn(['attributes', 'support_level'], '')
           .setIn(['attributes', 'response'], '');
       }
-      if (saveData.getIn(['attributes', 'accepted']) === 'null') {
-        saveData = saveData.setIn(['attributes', 'accepted'], null);
+      if (saveData.getIn(['attributes', 'support_level']) === 'null') {
+        saveData = saveData.setIn(['attributes', 'support_level'], null);
       }
       // check if attributes have changed
       if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {

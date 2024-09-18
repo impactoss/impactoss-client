@@ -8,7 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 
 import { Map, List, fromJS } from 'immutable';
@@ -23,7 +22,8 @@ import {
   getTitleFormField,
   getReferenceFormField,
   getStatusField,
-  getMarkdownField,
+  getArchiveField,
+  getMarkdownFormField,
   getDateField,
   getFrequencyField,
   getCheckboxField,
@@ -36,6 +36,7 @@ import { canUserDeleteEntities } from 'utils/permissions';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import { lowerCase } from 'utils/string';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 import validateDateAfterDate from 'components/forms/validators/validate-date-after-date';
@@ -60,7 +61,6 @@ import {
 import {
   selectReady,
   selectReadyForAuthCheck,
-  selectIsUserAdmin,
   selectSessionUserHighestRoleId,
   selectIndicatorReferences,
 } from 'containers/App/selectors';
@@ -70,7 +70,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
-
+import NotFoundEntity from 'containers/NotFoundEntity';
 import {
   selectDomain,
   selectViewEntity,
@@ -147,7 +147,11 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getReferenceFormField(intl.formatMessage, true, false, existingReferences),
+          getReferenceFormField({
+            formatMessage: intl.formatMessage,
+            required: true,
+            prohibitedValues: existingReferences,
+          }),
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -160,6 +164,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       {
         fields: [
           getStatusField(intl.formatMessage),
+          getArchiveField(intl.formatMessage),
           getMetaField(entity),
         ],
       },
@@ -171,7 +176,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     const groups = [];
     groups.push(
       {
-        fields: [getMarkdownField(intl.formatMessage)],
+        fields: [getMarkdownFormField({ formatMessage: intl.formatMessage })],
       },
     );
     if (measures) {
@@ -315,13 +320,12 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
           }
-          {!viewEntity && dataReady && !saveError && !deleteSending
-            && (
-              <div>
-                <FormattedMessage {...messages.notFound} />
-              </div>
-            )
-          }
+          {!viewEntity && dataReady && !saveError && !deleteSending && (
+            <NotFoundEntity
+              id={this.props.params.id}
+              type={lowerCase(intl.formatMessage(appMessages.entities.indicators.single))}
+            />
+          )}
           {viewEntity && dataReady && !deleteSending
             && (
               <EntityForm
@@ -389,7 +393,6 @@ IndicatorEdit.propTypes = {
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
-  isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   measures: PropTypes.object,
   recommendationsByFw: PropTypes.object,
@@ -409,7 +412,6 @@ IndicatorEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
-  isUserAdmin: selectIsUserAdmin(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
@@ -565,11 +567,6 @@ function mapDispatchToProps(dispatch, props) {
       }
 
       // cleanup
-      // default to database id
-      const formRef = formData.getIn(['attributes', 'reference']) || '';
-      if (formRef.trim() === '') {
-        saveData = saveData.setIn(['attributes', 'reference'], formData.get('id'));
-      }
       // do not store repeat fields when not repeat
       if (!saveData.getIn(['attributes', 'repeat'])) {
         saveData = saveData

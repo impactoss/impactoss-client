@@ -17,9 +17,9 @@ import {
   renderTaxonomyControl,
   getTitleFormField,
   getReferenceFormField,
-  getAcceptedField,
+  getSupportField,
   getStatusField,
-  getMarkdownField,
+  getMarkdownFormField,
   renderIndicatorControl,
   getFrameworkFormField,
 } from 'utils/forms';
@@ -53,6 +53,7 @@ import {
   selectCurrentFrameworkId,
   selectActiveFrameworks,
   selectRecommendationReferences,
+  selectCanUserAdministerCategories,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -116,7 +117,11 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       { // fieldGroup
         fields: [
           hasFWOptions && getFrameworkFormField(intl.formatMessage, frameworks), // required
-          getReferenceFormField(intl.formatMessage, true, false, existingReferences), // required
+          getReferenceFormField({
+            formatMessage: intl.formatMessage,
+            required: true,
+            prohibitedValues: existingReferences,
+          }),
           getTitleFormField(intl.formatMessage, 'titleText'),
         ],
       },
@@ -141,9 +146,18 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     const groups = [];
     groups.push({
       fields: [
-        getMarkdownField(intl.formatMessage, 'description', 'fullRecommendation', 'fullRecommendation', 'fullRecommendation'),
-        hasResponse && getAcceptedField(intl.formatMessage),
-        hasResponse && getMarkdownField(intl.formatMessage, 'response'),
+        getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'description',
+          label: 'fullRecommendation',
+          placeholder: 'fullRecommendation',
+          hint: 'fullRecommendation',
+        }),
+        hasResponse && getSupportField(intl.formatMessage),
+        getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'response',
+        }),
       ],
     });
     if (measures) {
@@ -167,13 +181,17 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     return groups;
   }
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => {
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
     const { intl } = this.context;
     return ([ // fieldGroup
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
-        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+        fields: renderTaxonomyControl({
+          taxonomies,
+          onCreateOption: canCreateCategories ? onCreateOption : null,
+          contextIntl: intl,
+        }),
       },
     ]);
   };
@@ -191,6 +209,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       frameworkId,
       frameworks,
       existingReferences,
+      canUserAdministerCategories,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const fwSpecified = (frameworkId && frameworkId !== 'all');
@@ -285,7 +304,11 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                       onCreateOption,
                       hasResponse,
                     ),
-                    aside: this.getBodyAsideFields(fwTaxonomies, onCreateOption),
+                    aside: this.getBodyAsideFields(
+                      fwTaxonomies,
+                      onCreateOption,
+                      canUserAdministerCategories,
+                    ),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -323,6 +346,7 @@ RecommendationNew.propTypes = {
   frameworkId: PropTypes.string,
   frameworks: PropTypes.object,
   existingReferences: PropTypes.array,
+  canUserAdministerCategories: PropTypes.bool,
 };
 
 RecommendationNew.contextTypes = {
@@ -340,6 +364,7 @@ const mapStateToProps = (state) => ({
   frameworkId: selectCurrentFrameworkId(state),
   frameworks: selectActiveFrameworks(state),
   existingReferences: selectRecommendationReferences(state),
+  canUserAdministerCategories: selectCanUserAdministerCategories(state),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -425,11 +450,11 @@ function mapDispatchToProps(dispatch) {
       // cleanup attributes for framework
       if (!currentFramework.getIn(['attributes', 'has_response'])) {
         saveData = saveData
-          .setIn(['attributes', 'accepted'], null)
+          .setIn(['attributes', 'support_level'], null)
           .setIn(['attributes', 'response'], null);
       }
-      if (saveData.getIn(['attributes', 'accepted']) === 'null') {
-        saveData = saveData.setIn(['attributes', 'accepted'], null);
+      if (saveData.getIn(['attributes', 'support_level']) === 'null') {
+        saveData = saveData.setIn(['attributes', 'support_level'], null);
       }
       if (!currentFramework.get('id')) {
         saveData = saveData.setIn(['attributes', 'framework_id'], DEFAULT_FRAMEWORK);

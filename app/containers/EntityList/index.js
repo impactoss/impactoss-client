@@ -28,6 +28,8 @@ import {
   selectHasUserRole,
   selectCurrentPathname,
   selectAllTaxonomiesWithCategories,
+  selectCanUserAdministerCategories,
+  selectSettingsFromQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -150,10 +152,12 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
       onDismissAllErrors,
       allTaxonomies,
       config,
+      globalSettings,
     } = this.props;
 
     const sending = viewDomain.get('sending');
     const success = viewDomain.get('success');
+
     const errors = viewDomain.get('errors').size > 0 ? this.mapErrors(viewDomain.get('errors')) : Map();
 
     const entities = (errors.size > 0)
@@ -275,6 +279,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             activePanel={this.props.activePanel}
             onPanelSelect={this.props.onPanelSelect}
             onCreateOption={this.props.onCreateOption}
+            canCreateCategories={this.props.canUserAdministerCategories}
             onUpdate={
               (associations, activeEditOption) => this.props.handleEditSubmit(
                 associations,
@@ -282,6 +287,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 this.props.entityIdsSelected,
                 viewDomain.get('errors'),
               )}
+            globalSettings={globalSettings}
           />
         )}
         {this.props.dataReady && this.props.config.taxonomies && (
@@ -415,6 +421,8 @@ EntityList.propTypes = {
   onDismissAllErrors: PropTypes.func.isRequired,
   canEdit: PropTypes.bool,
   showSidebar: PropTypes.bool,
+  canUserAdministerCategories: PropTypes.bool,
+  globalSettings: PropTypes.object,
 };
 
 EntityList.contextTypes = {
@@ -430,6 +438,8 @@ const mapStateToProps = (state) => ({
   progressTypes: selectProgressTypes(state),
   currentPath: selectCurrentPathname(state),
   allTaxonomies: selectAllTaxonomiesWithCategories(state),
+  canUserAdministerCategories: selectCanUserAdministerCategories(state),
+  globalSettings: selectSettingsFromQuery(state),
 });
 
 function mapDispatchToProps(dispatch, props) {
@@ -559,7 +569,7 @@ function mapDispatchToProps(dispatch, props) {
               });
             }
           });
-          if (activeEditOption.optionId === 'accepted' && newValue === 'null') {
+          if (activeEditOption.optionId === 'support_level' && newValue === 'null') {
             newValue = null;
           }
           dispatch(saveMultiple(

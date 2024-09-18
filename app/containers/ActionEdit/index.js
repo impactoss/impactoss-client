@@ -8,7 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
 import { actions as formActions } from 'react-redux-form/immutable';
 import { Map, fromJS } from 'immutable';
 
@@ -19,7 +18,8 @@ import {
   getConnectionUpdatesFromFormData,
   getTitleFormField,
   getStatusField,
-  getMarkdownField,
+  getArchiveField,
+  getMarkdownFormField,
   renderIndicatorControl,
   renderRecommendationsByFwControl,
   getDateField,
@@ -35,6 +35,8 @@ import {
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 import { canUserDeleteEntities } from 'utils/permissions';
+import { lowerCase } from 'utils/string';
+import { getNonParentTaxonomiesUnlessAssociated } from 'utils/entities';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
@@ -53,8 +55,8 @@ import {
 import {
   selectReady,
   selectReadyForAuthCheck,
-  selectIsUserAdmin,
   selectSessionUserHighestRoleId,
+  selectCanUserAdministerCategories,
   selectMeasureReferences,
 } from 'containers/App/selectors';
 
@@ -63,6 +65,7 @@ import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
+import NotFoundEntity from 'containers/NotFoundEntity';
 
 import appMessages from 'containers/App/messages';
 
@@ -141,7 +144,11 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       [ // fieldGroups
         { // fieldGroup
           fields: [
-            getReferenceFormField(intl.formatMessage, false, true, existingReferences),
+            getReferenceFormField({
+              formatMessage: intl.formatMessage,
+              required: true,
+              prohibitedValues: existingReferences,
+            }),
             getTitleFormField(intl.formatMessage),
           ],
         },
@@ -155,6 +162,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       {
         fields: [
           getStatusField(intl.formatMessage),
+          getArchiveField(intl.formatMessage),
           getMetaField(entity),
         ],
       },
@@ -172,9 +180,17 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     groups.push(
       {
         fields: [
-          getMarkdownField(intl.formatMessage),
-          getMarkdownField(intl.formatMessage, 'outcome'),
-          getMarkdownField(intl.formatMessage, 'indicator_summary'),
+          getMarkdownFormField({
+            formatMessage: intl.formatMessage,
+            attribute: 'description',
+            label: 'fullMeasure',
+          }),
+          getMarkdownFormField({
+            formatMessage: intl.formatMessage,
+            attribute: 'outcome',
+            label: 'comment',
+          }),
+          // getMarkdownFormField(intl.formatMessage, 'indicator_summary'),
         ],
       },
     );
@@ -209,8 +225,13 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption) => {
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
     const { intl } = this.context;
+    // also show connected parent taxonomies
+    const nonParentTaxisUnlessConnected = getNonParentTaxonomiesUnlessAssociated(
+      taxonomies,
+      'tags_recommendations'
+    );
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -227,7 +248,11 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
-        fields: renderTaxonomyControl(taxonomies, onCreateOption, intl),
+        fields: renderTaxonomyControl({
+          taxonomies: nonParentTaxisUnlessConnected,
+          onCreateOption: canCreateCategories ? onCreateOption : null,
+          contextIntl: intl,
+        }),
       },
     ]);
   };
@@ -243,6 +268,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       indicators,
       onCreateOption,
       existingReferences,
+      canUserAdministerCategories,
     } = this.props;
     const { intl } = this.context;
     const reference = this.props.params.id;
@@ -301,13 +327,12 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
           }
-          {!viewEntity && dataReady && !saveError && !deleteSending
-            && (
-              <div>
-                <FormattedMessage {...messages.notFound} />
-              </div>
-            )
-          }
+          {!viewEntity && dataReady && !saveError && !deleteSending && (
+            <NotFoundEntity
+              id={this.props.params.id}
+              type={lowerCase(intl.formatMessage(appMessages.entities.measures.single))}
+            />
+          )}
           {viewEntity && dataReady && !deleteSending
             && (
               <EntityForm
@@ -344,6 +369,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                     aside: this.getBodyAsideFields(
                       taxonomies,
                       onCreateOption,
+                      canUserAdministerCategories,
                     ),
                   },
                 }}
@@ -374,12 +400,12 @@ ActionEdit.propTypes = {
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
-  isUserAdmin: PropTypes.bool,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
   highestRole: PropTypes.number,
   connectedTaxonomies: PropTypes.object,
   recommendationsByFw: PropTypes.object,
+  canUserAdministerCategories: PropTypes.bool,
   indicators: PropTypes.object,
   onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
@@ -393,8 +419,8 @@ ActionEdit.contextTypes = {
 
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
-  isUserAdmin: selectIsUserAdmin(state),
   highestRole: selectSessionUserHighestRoleId(state),
+  canUserAdministerCategories: selectCanUserAdministerCategories(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
@@ -473,11 +499,6 @@ function mapDispatchToProps(dispatch, props) {
             }),
           )
       );
-      // default to database id
-      const formRef = formData.getIn(['attributes', 'reference']) || '';
-      if (formRef.trim() === '') {
-        saveData = saveData.setIn(['attributes', 'reference'], formData.get('id'));
-      }
       // check if attributes have changed
       if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
         saveData = saveData.set('skipAttributes', true);

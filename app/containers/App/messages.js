@@ -211,6 +211,10 @@ export default defineMessages({
         defaultMessage: 'Not met',
       },
     },
+    settings: {
+      id: 'app.containers.App.labels.settings',
+      defaultMessage: 'Settings',
+    },
   },
   fields: {
     connectionsGrouped: {
@@ -314,12 +318,20 @@ export default defineMessages({
       id: 'app.containers.App.import.optional',
       defaultMessage: 'Optional',
     },
+    unique: {
+      id: 'app.containers.App.import.unique',
+      defaultMessage: 'Unique',
+    },
     text: {
       id: 'app.containers.App.import.text',
       defaultMessage: 'text',
     },
     number: {
       id: 'app.containers.App.import.number',
+      defaultMessage: 'number',
+    },
+    int: {
+      id: 'app.containers.App.import.int',
       defaultMessage: 'number',
     },
     markdown: {
@@ -344,10 +356,6 @@ export default defineMessages({
       id: 'app.containers.App.importFields.reference',
       defaultMessage: 'Reference',
     },
-    referenceRequired: {
-      id: 'app.containers.App.importFields.referenceRequired',
-      defaultMessage: 'Reference',
-    },
     description: {
       id: 'app.containers.App.importFields.description',
       defaultMessage: 'Description',
@@ -356,13 +364,21 @@ export default defineMessages({
       id: 'app.containers.App.importFields.fullRecommendation',
       defaultMessage: 'Full recommendation text',
     },
-    accepted: {
-      id: 'app.containers.App.importFields.accepted',
-      defaultMessage: 'Accepted',
+    comment: {
+      id: 'app.containers.App.importFields.comment',
+      defaultMessage: 'Comment',
+    },
+    fullMeasure: {
+      id: 'app.containers.App.importFields.fullMeasure',
+      defaultMessage: 'Full action text',
+    },
+    support_level: {
+      id: 'app.containers.App.importFields.support_level',
+      defaultMessage: 'Government response (support)',
     },
     response: {
       id: 'app.containers.App.importFields.response',
-      defaultMessage: 'Government response',
+      defaultMessage: 'Government response (text)',
     },
     outcome: {
       id: 'app.containers.App.importFields.outcome',
@@ -383,6 +399,54 @@ export default defineMessages({
     framework_id: {
       id: 'app.containers.App.importFields.framework_id',
       defaultMessage: 'Framework id',
+    },
+  },
+  importFieldHints: {
+    support_level: {
+      id: 'app.containers.App.importFieldHints.support_level',
+      defaultMessage: '(UPR only; supported: 2; supported in part: 1; noted: 0; not applicable: leave blank)',
+    },
+    frequency_months: {
+      id: 'app.containers.App.importFieldHints.frequency_months',
+      defaultMessage: '(...)',
+    },
+  },
+  importHints: {
+    'category-id': {
+      id: 'app.containers.App.importHints.category-id',
+      defaultMessage: 'one or more category ids (as assigned by the database / comma-separated)',
+    },
+    'category-reference': {
+      id: 'app.containers.App.importHints.category-reference',
+      defaultMessage: 'one or more category references (as assigned by the users / comma-separated)',
+    },
+    'category-short-title': {
+      id: 'app.containers.App.importHints.category-short-title',
+      defaultMessage: 'one or more category "short titles" (as assigned by the users / comma-separated)',
+    },
+    'action-id': {
+      id: 'app.containers.App.importHints.action-id',
+      defaultMessage: 'one or more unique action ids (as assigned by the database / comma-separated)',
+    },
+    'action-reference': {
+      id: 'app.containers.App.importHints.action-reference',
+      defaultMessage: 'one or more unique action references (as assigned by the users / comma-separated)',
+    },
+    'indicator-id': {
+      id: 'app.containers.App.importHints.indicator-id',
+      defaultMessage: 'one or more unique indicator ids (as assigned by the database / comma-separated)',
+    },
+    'indicator-reference': {
+      id: 'app.containers.App.importHints.indicator-reference',
+      defaultMessage: 'one or more unique indicator references (as assigned by the users / comma-separated)',
+    },
+    'recommendation-id': {
+      id: 'app.containers.App.importHints.recommendation-id',
+      defaultMessage: 'one or more unique recommendation/objective ids (as assigned by the database / comma-separated)',
+    },
+    'recommendation-reference': {
+      id: 'app.containers.App.importHints.recommendation-reference',
+      defaultMessage: 'one or more unique recommendation/objective references (as assigned by the users / comma-separated)',
     },
   },
   placeholders: {
@@ -484,13 +548,21 @@ export default defineMessages({
       id: 'app.containers.App.attributes.fullRecommendation',
       defaultMessage: 'Full recommendation text',
     },
+    fullMeasure: {
+      id: 'app.containers.App.attributes.fullMeasure',
+      defaultMessage: 'Full action text',
+    },
+    comment: {
+      id: 'app.containers.App.attributes.comment',
+      defaultMessage: 'Comment',
+    },
     content: {
       id: 'app.containers.App.attributes.content',
       defaultMessage: 'Content',
     },
-    accepted: {
-      id: 'app.containers.App.attributes.accepted',
-      defaultMessage: 'Government response',
+    support_level: {
+      id: 'app.containers.App.attributes.support_level',
+      defaultMessage: 'Government response (level of support)',
     },
     response: {
       id: 'app.containers.App.attributes.response',
@@ -673,6 +745,14 @@ export default defineMessages({
     framework_id: {
       id: 'app.containers.App.attributes.framework_id',
       defaultMessage: 'Framework',
+    },
+    is_archive: {
+      id: 'app.containers.App.attributes.is_archive',
+      defaultMessage: 'Archived/active',
+    },
+    is_current: {
+      id: 'app.containers.App.attributes.is_current',
+      defaultMessage: 'Latest/previous cycle',
     },
   },
   nav: {
@@ -1106,6 +1186,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.1.description',
           defaultMessage: 'About human rights bodies',
         },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.1.descriptionAdditional',
+          defaultMessage: 'About human rights bodies',
+        },
       },
       2: {
         single: {
@@ -1130,6 +1214,10 @@ export default defineMessages({
         },
         description: {
           id: 'app.containers.App.entities.taxonomies.2.description',
+          defaultMessage: 'About cycles',
+        },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.2.descriptionAdditional',
           defaultMessage: 'About cycles',
         },
       },
@@ -1158,6 +1246,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.3.description',
           defaultMessage: 'About human rights issues',
         },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.3.descriptionAdditional',
+          defaultMessage: 'About human rights issues',
+        },
       },
       4: {
         single: {
@@ -1182,6 +1274,10 @@ export default defineMessages({
         },
         description: {
           id: 'app.containers.App.entities.taxonomies.4.description',
+          defaultMessage: 'About affected persons',
+        },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.4.descriptionAdditional',
           defaultMessage: 'About affected persons',
         },
       },
@@ -1210,6 +1306,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.5.description',
           defaultMessage: 'About thematic clusters',
         },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.5.descriptionAdditional',
+          defaultMessage: 'About thematic clusters',
+        },
       },
       6: {
         single: {
@@ -1234,6 +1334,10 @@ export default defineMessages({
         },
         description: {
           id: 'app.containers.App.entities.taxonomies.6.description',
+          defaultMessage: 'About organisations',
+        },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.6.descriptionAdditional',
           defaultMessage: 'About organisations',
         },
       },
@@ -1262,6 +1366,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.7.description',
           defaultMessage: 'About Sustainable Development Goals',
         },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.7.descriptionAdditional',
+          defaultMessage: 'About Sustainable Development Goals',
+        },
       },
       8: {
         single: {
@@ -1286,6 +1394,10 @@ export default defineMessages({
         },
         description: {
           id: 'app.containers.App.entities.taxonomies.8.description',
+          defaultMessage: 'About tax 8',
+        },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.8.descriptionAdditional',
           defaultMessage: 'About tax 8',
         },
       },
@@ -1314,6 +1426,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.9.description',
           defaultMessage: 'About tax 9',
         },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.9.descriptionAdditional',
+          defaultMessage: 'About tax 9',
+        },
       },
       10: {
         single: {
@@ -1340,6 +1456,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.10.description',
           defaultMessage: 'About tax 10',
         },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.10.descriptionAdditional',
+          defaultMessage: 'About tax 10',
+        },
       },
       11: {
         single: {
@@ -1364,6 +1484,10 @@ export default defineMessages({
         },
         description: {
           id: 'app.containers.App.entities.taxonomies.11.description',
+          defaultMessage: 'About tax 10',
+        },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.11.descriptionAdditional',
           defaultMessage: 'About tax 10',
         },
       },
@@ -1512,18 +1636,42 @@ export default defineMessages({
         defaultMessage: 'Private',
       },
     },
-    acceptedStatuses: {
-      accepted: {
-        id: 'app.containers.App.ui.acceptedStatuses.accepted',
-        defaultMessage: 'Accepted',
+    supportLevels: {
+      supported: {
+        id: 'app.containers.App.ui.supportLevels.supported',
+        defaultMessage: 'Supported',
+      },
+      supportedInPart: {
+        id: 'app.containers.App.ui.supportLevels.supportedInPart',
+        defaultMessage: 'Supported in part',
       },
       noted: {
-        id: 'app.containers.App.ui.acceptedStatuses.noted',
-        defaultMessage: 'Not accepted',
+        id: 'app.containers.App.ui.supportLevels.noted',
+        defaultMessage: 'Noted',
       },
       null: {
-        id: 'app.containers.App.ui.acceptedStatuses.null',
+        id: 'app.containers.App.ui.supportLevels.null',
         defaultMessage: 'Not applicable',
+      },
+    },
+    archiveStatuses: {
+      archived: {
+        id: 'app.containers.App.ui.archiveStatuses.archived',
+        defaultMessage: 'Archived',
+      },
+      notArchived: {
+        id: 'app.containers.App.ui.archiveStatuses.notArchived',
+        defaultMessage: 'Active',
+      },
+    },
+    currentStatuses: {
+      current: {
+        id: 'app.containers.App.ui.currentStatuses.current',
+        defaultMessage: 'Latest cycle',
+      },
+      notCurrent: {
+        id: 'app.containers.App.ui.currentStatuses.notCurrent',
+        defaultMessage: 'Previous cycle',
       },
     },
     reportFrequencies: {

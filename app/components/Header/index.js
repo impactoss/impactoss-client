@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { filter } from 'lodash/collection';
+import { Box } from 'grommet';
 
 import { truncateText } from 'utils/string';
 
@@ -161,12 +162,12 @@ const SelectFrameworks = styled(LinkMain)`
 const Search = styled(LinkMain)`
   display: none;
   padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
+  border-right: none;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: inline-block;
     min-width: auto;
     padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px 0;
-    position: absolute;
-    right: 0;
+    float: right;
     border-left: none;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
@@ -174,7 +175,28 @@ const Search = styled(LinkMain)`
     padding-right: 24px;
   }
 `;
+const Config = styled(LinkMain)`
+  display: none;
+  padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
+  border-left: 1px solid ${palette('dark', 3)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: inline-block;
+    min-width: auto;
+    padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px;
+    float: right;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+`;
 const SearchSecondary = styled(LinkPage)`
+  display: block;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    display: none;
+  }
+`;
+const ConfigSecondary = styled(LinkPage)`
   display: block;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: none;
@@ -207,7 +229,6 @@ const FrameworkOption = styled(Button)`
   }
   color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
 `;
-
 const STATE_INITIAL = {
   showSecondary: false,
   showFrameworks: false,
@@ -291,7 +312,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     this.forceUpdate();
   };
 
-  renderSecondary = (navItemsAdmin, search) => (
+  renderSecondary = (navItemsAdmin, search, hasSettings, onShowSettings) => (
     <PrintHide>
       <ShowSecondary
         visible={!this.state.showSecondary}
@@ -328,6 +349,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             this.props.onPageLink(path, query);
           }}
           currentPath={this.props.currentPath}
+          fullPath={this.props.fullPath}
         />
         {navItemsAdmin
           && (
@@ -366,11 +388,24 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
               active={search.active}
               onClick={(evt) => this.onClick(evt, search.path)}
             >
-              {search.title}
-              {search.icon
-                && <Icon title={search.title} name={search.icon} text textRight size="1em" />
-              }
+              <Box direction="row" gap="xsmall" align="center">
+                <span>{search.title}</span>
+                {search.icon
+                  && <Icon title={search.title} name={search.icon} text textRight size="1em" />
+                }
+              </Box>
             </SearchSecondary>
+          )}
+          {hasSettings && onShowSettings && (
+            <ConfigSecondary
+              as="button"
+              onClick={() => onShowSettings()}
+            >
+              <Box direction="row" gap="xsmall" align="center">
+                <FormattedMessage {...appMessages.labels.settings} />
+                <Icon name="settings" size="18px" />
+              </Box>
+            </ConfigSecondary>
           )}
         </NavPages>
       </NavSecondary>
@@ -384,6 +419,8 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       onSelectFramework,
       search,
       brandPath,
+      onShowSettings,
+      hasSettings,
     } = this.props;
     const { intl } = this.context;
     const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
@@ -423,7 +460,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         {!SHOW_BRAND_ON_HOME && isHome
           && (
             <HomeNavWrap>
-              {this.renderSecondary(navItemsAdmin, search)}
+              {this.renderSecondary(navItemsAdmin, search, hasSettings, onShowSettings)}
             </HomeNavWrap>
           )
         }
@@ -448,7 +485,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 </BrandText>
               )}
             </Brand>
-            {this.renderSecondary(navItemsAdmin, search)}
+            {this.renderSecondary(navItemsAdmin, search, hasSettings, onShowSettings)}
           </Banner>
         )}
         {!isHome && (
@@ -497,6 +534,14 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 </LinkTitle>
               </LinkMain>
             ))}
+            {hasSettings && onShowSettings && (
+              <Config
+                as="button"
+                onClick={() => onShowSettings()}
+              >
+                <Icon name="settings" size="24px" />
+              </Config>
+            )}
             {search && (
               <Search
                 href={search.path}
@@ -524,15 +569,18 @@ Header.propTypes = {
   isSignedIn: PropTypes.bool,
   user: PropTypes.object,
   currentPath: PropTypes.string,
+  fullPath: PropTypes.string,
   pages: PropTypes.array,
   navItems: PropTypes.array,
   onPageLink: PropTypes.func.isRequired,
   onSelectFramework: PropTypes.func.isRequired,
+  onShowSettings: PropTypes.func,
   isHome: PropTypes.bool, // not shown on home page
   theme: PropTypes.object.isRequired,
   search: PropTypes.object,
   frameworkOptions: PropTypes.array,
   brandPath: PropTypes.string,
+  hasSettings: PropTypes.bool,
 };
 
 Header.defaultProps = {

@@ -5,8 +5,8 @@ import headerLogo2x from 'themes/media/header-logo@2x.png';
 
 import footerLogo1 from 'themes/media/footer-logo-nzgov.png';
 import footerLogo1_2x from 'themes/media/footer-logo-nzgov@2x.png';
-import footerLogo2 from 'themes/media/footer-logo-nzjustice.png';
-import footerLogo2_2x from 'themes/media/footer-logo-nzjustice@2x.png';
+// import footerLogo2 from 'themes/media/footer-logo-nzjustice.png';
+// import footerLogo2_2x from 'themes/media/footer-logo-nzjustice@2x.png';
 
 import graphicHome from 'themes/media/home-graphic.png';
 import graphicHome2x from 'themes/media/home-graphic@2x.png';
@@ -33,7 +33,6 @@ theme.media = {
   // ],
   agencyLogos: [
     [footerLogo1, footerLogo1_2x],
-    [footerLogo2, footerLogo2_2x],
   ],
 };
 
@@ -190,8 +189,8 @@ theme.palette = {
   measuresHover: ['#964B00'], // FFC107  AA compliant
   measures: ['#BA5D03'],
   measuresConnectionText: [light[0], '#BA5D03'], // published, draft
-  recommendationsHover: ['#510064', '#a94dbf'], // accepted, noted ['#FF9B69', '#FFB28B'],
-  recommendations: ['#73018E', '#a94dbf'],
+  recommendationsHover: ['#510064'],
+  recommendations: ['#73018E'],
   recommendationsConnectionText: [light[0], '#73018E'], // published, draft
   indicatorsHover: ['#F09F5B'],
   indicators: ['#FFCEA5'],
@@ -416,22 +415,6 @@ theme.sizes = {
     },
   },
 };
-
-theme.text = {
-  xxxlarge: { size: '48px', height: '60px', maxWidth: '800px' },
-  xxlarge: { size: '30px', height: '36px', maxWidth: '800px' },
-  xlarge: { size: '20px', height: '28px', maxWidth: '800px' },
-  large: { size: '18px', height: '24px', maxWidth: '800px' },
-  largeTall: { size: '18px', height: '26px', maxWidth: '800px' },
-  medium: { size: '16px', height: '21px', maxWidth: '800px' },
-  mediumTall: { size: '16px', height: '23px', maxWidth: '800px' },
-  mediumTight: { size: '16px', height: '18px', maxWidth: '800px' },
-  small: { size: '14px', height: '18px', maxWidth: '700px' },
-  xsmall: { size: '13px', height: '16px', maxWidth: '600px' },
-  xxsmall: { size: '12px', height: '14px', maxWidth: '500px' },
-  xxxsmall: { size: '11px', height: '13px', maxWidth: '500px' },
-};
-
 // end styled-theme settings
 
 // other global theme variables

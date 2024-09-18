@@ -71,6 +71,10 @@ import {
   DISMISS_QUERY_MESSAGES,
   SET_FRAMEWORK,
   OPEN_BOOKMARK,
+  SET_LOAD_ARCHIVED,
+  SET_LOAD_NONCURRENT,
+  SHOW_SETTINGS_MODAL,
+  INITIALIZE_SETTINGS,
 } from './constants';
 
 export function submitInvalid(valid) {
@@ -226,54 +230,61 @@ export function entitiesLoadingError(error, path) {
 
 
 // server side
-export function deleteEntity(data) {
+export function deleteEntity(data, origin) {
   return {
     type: DELETE_ENTITY,
     data,
+    origin,
   };
 }
-export function deleteMultipleEntities(path, data) {
+export function deleteMultipleEntities(path, data, origin) {
   return {
     type: DELETE_MULTIPLE_ENTITIES,
     path,
     data,
+    origin,
   };
 }
 
 // server side
-export function saveEntity(data) {
+export function saveEntity(data, origin) {
   return {
     type: SAVE_ENTITY,
     data,
+    origin,
   };
 }
-export function saveMultipleEntities(path, data) {
+export function saveMultipleEntities(path, data, origin) {
   return {
     type: SAVE_MULTIPLE_ENTITIES,
     path,
     data,
+    origin,
   };
 }
 
 // server side
-export function newEntity(data) {
+export function newEntity(data, origin) {
   return {
     type: NEW_ENTITY,
     data,
+    origin,
   };
 }
-export function newMultipleEntities(path, data) {
+export function newMultipleEntities(path, data, origin) {
   return {
     type: NEW_MULTIPLE_ENTITIES,
     path,
     data,
+    origin,
   };
 }
 // server side
-export function saveConnections(data) {
+export function saveConnections(data, origin) {
   return {
     type: SAVE_CONNECTIONS,
     data,
+    origin,
   };
 }
 
@@ -516,9 +527,33 @@ export function setFramework(framework) {
     framework,
   };
 }
+export function setLoadArchived(loadArchived) {
+  return {
+    type: SET_LOAD_ARCHIVED,
+    loadArchived,
+  };
+}
+export function setLoadNonCurrent(loadNonCurrent) {
+  return {
+    type: SET_LOAD_NONCURRENT,
+    loadNonCurrent,
+  };
+}
 export function openBookmark(bookmark) {
   return {
     type: OPEN_BOOKMARK,
     bookmark,
+  };
+}
+export function showSettingsModal(open = true) {
+  return {
+    type: SHOW_SETTINGS_MODAL,
+    open,
+  };
+}
+export function initializeSettings(settings) { // Immutable Map
+  return {
+    type: INITIALIZE_SETTINGS,
+    settings,
   };
 }

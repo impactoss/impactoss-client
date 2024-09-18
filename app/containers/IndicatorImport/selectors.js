@@ -25,7 +25,10 @@ export const selectSuccess = createSelector(
   selectPage,
   (pageState) => pageState.get('success')
 );
-
+export const selectSending = createSelector(
+  selectPage,
+  (pageState) => pageState.get('sending')
+);
 export const selectProgress = createSelector(
   selectPage,
   (pageState) => pageState.get('sending') && pageState.get('sending').size > 0

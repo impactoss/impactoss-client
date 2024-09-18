@@ -52,7 +52,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
     if (isUserSignedIn) {
       headerOptions.actions.push({
         type: 'bookmarker',
-        title: intl.formatMessage(messages.pageTitle),
+        title: intl.formatMessage(appMessages.entities.indicators.plural),
       });
     }
     if (window.print) {

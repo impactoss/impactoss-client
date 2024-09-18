@@ -8,10 +8,16 @@ import Component from 'components/styled/Component';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import {
+  PUBLISH_STATUSES,
+  IS_CURRENT_STATUSES,
+  IS_ARCHIVE_STATUSES,
+} from 'themes/config';
+
 import { lowerCase } from 'utils/string';
 import appMessages from 'containers/App/messages';
 
-const Styled = styled(Component)`
+const Styled = styled((p) => <Component {...p} />)`
   background-color: ${palette('mainListItem', 1)};
   position: relative;
   padding-left: 0;
@@ -26,7 +32,7 @@ const Styled = styled(Component)`
   }
 `;
 
-const Wrapper = styled(Component)`
+const Wrapper = styled((p) => <Component {...p} />)`
   position: relative;
   padding-right: 6px;
   padding-top: 4px;
@@ -108,6 +114,30 @@ class EntityListNestedReportItem extends React.PureComponent { // eslint-disable
             </Title>
           </EntityListItemMainTitleWrap>
           <EntityListItemMainTopWrap>
+            {report.getIn(['attributes', 'draft']) && (
+              <ItemStatus
+                value={report.getIn(['attributes', 'draft']).toString()}
+                options={PUBLISH_STATUSES}
+                float="left"
+              />
+            )}
+            {report.getIn(['attributes', 'is_archive']) && (
+              <ItemStatus
+                value={report.getIn(['attributes', 'is_archive']).toString()}
+                options={IS_ARCHIVE_STATUSES}
+                float="left"
+              />
+            )}
+            {!report.getIn(['attributes', 'is_current']) && (
+              <ItemStatus
+                value={report.getIn(['attributes', 'is_current'])
+                  ? report.getIn(['attributes', 'is_current']).toString()
+                  : 'false'
+                }
+                options={IS_CURRENT_STATUSES}
+                float="left"
+              />
+            )}
             {report.get('date')
               && (
                 <Reference>
@@ -122,7 +152,6 @@ class EntityListNestedReportItem extends React.PureComponent { // eslint-disable
                 </Reference>
               )
             }
-            <ItemStatus draft={report.getIn(['attributes', 'draft'])} />
           </EntityListItemMainTopWrap>
         </Wrapper>
       </Styled>

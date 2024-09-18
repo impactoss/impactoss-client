@@ -8,7 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
 
 import {
   getReferenceField,
@@ -29,14 +28,16 @@ import { qe } from 'utils/quasi-equals';
 import { getEntityTitleTruncated, getEntityReference } from 'utils/entities';
 
 import { loadEntitiesIfNeeded, updatePath, closeEntity } from 'containers/App/actions';
+import { lowerCase } from 'utils/string';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, IS_ARCHIVE_STATUSES, IS_CURRENT_STATUSES } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import EntityView from 'components/EntityView';
+import NotFoundEntity from 'containers/NotFoundEntity';
 
 import {
   selectReady,
@@ -84,6 +85,22 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     {
       fields: [
         getStatusField(entity),
+        !entity.getIn(['attributes', 'draft'])
+        && getStatusField(
+          entity,
+          'is_current',
+          IS_CURRENT_STATUSES,
+          appMessages.attributes.is_current,
+          true,
+        ),
+        entity.getIn(['attributes', 'is_archive'])
+        && getStatusField(
+          entity,
+          'is_archive',
+          IS_ARCHIVE_STATUSES,
+          appMessages.attributes.is_archive,
+          false,
+        ),
         getMetaField(entity),
       ],
     },
@@ -113,9 +130,9 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     // own attributes
     groups.push({
       fields: [
-        getMarkdownField(entity, 'description', true),
-        getMarkdownField(entity, 'outcome', true),
-        getMarkdownField(entity, 'indicator_summary', true),
+        getMarkdownField(entity, 'description', true, 'fullMeasure'),
+        getMarkdownField(entity, 'outcome', true, 'comment'),
+        // getMarkdownField(entity, 'indicator_summary', true),
       ],
     });
     // indicators
@@ -204,7 +221,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
         title: intl.formatMessage(appMessages.buttons.printTitle),
         icon: 'print',
       });
-      buttons = isManager
+      buttons = (isManager && viewEntity)
         ? buttons.concat([
           {
             type: 'edit',
@@ -243,13 +260,12 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
           { !dataReady
             && <Loading />
           }
-          { !viewEntity && dataReady
-            && (
-              <div>
-                <FormattedMessage {...messages.notFound} />
-              </div>
-            )
-          }
+          {!viewEntity && dataReady && (
+            <NotFoundEntity
+              id={this.props.params.id}
+              type={lowerCase(intl.formatMessage(appMessages.entities.measures.single))}
+            />
+          )}
           { viewEntity && dataReady
             && (
               <EntityView

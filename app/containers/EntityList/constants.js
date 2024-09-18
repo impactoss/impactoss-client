@@ -30,3 +30,5 @@ export const PATH_CHANGE = 'impactoss/EntityList/PATH_CHANGE';
 export const DISMISS_ERROR = 'impactoss/EntityList/DISMISS_ERROR';
 export const DISMISS_ALL_ERRORS = 'impactoss/EntityList/DISMISS_ALL_ERRORS';
 export const RESET_SEARCH_QUERY = 'impactoss/EntityList/RESET_SEARCH_QUERY';
+
+export const LIST_ORIGIN = 'list-origin'; // used for save events

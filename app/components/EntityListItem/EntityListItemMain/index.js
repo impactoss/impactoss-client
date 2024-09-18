@@ -6,16 +6,17 @@ import { palette } from 'styled-theme';
 import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
 import { qe } from 'utils/quasi-equals';
+
 import Component from 'components/styled/Component';
 import SkipContent from 'components/styled/SkipContent';
-import { USER_ROLES, PROGRESS_TAXONOMY_ID } from 'themes/config';
+import { USER_ROLES, PROGRESS_TAXONOMY_ID, SUPPORT_LEVELS } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import EntityListItemMainTop from './EntityListItemMainTop';
 import EntityListItemMainTitle from './EntityListItemMainTitle';
 import EntityListItemMainBottom from './EntityListItemMainBottom';
 
-const Styled = styled(Component)`
+const Styled = styled((p) => <Component {...p} />)`
   position: relative;
   padding-left: 0;
   box-shadow: ${({ isConnection }) => isConnection ? '0px 0px 6px 0px rgba(0,0,0,0.2)' : 'none'};
@@ -31,7 +32,7 @@ const Styled = styled(Component)`
     padding-right: 0;
   }
 `;
-const Wrapper = styled(Component)`
+const Wrapper = styled((p) => <Component {...p} />)`
   position: relative;
   padding-right: 6px;
   padding-top: 4px;
@@ -214,19 +215,35 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     nestLevel,
     entityPath,
     connections,
-    entityIcon,
     taxonomies,
   }) => {
     const { intl } = this.context;
+    let path = '';
+    if (entityPath) {
+      path = entityPath;
+    } else if (config && (config.expandableColumns || config.clientPath)) {
+      path = nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath;
+    }
+    let supportLevel;
+    if (
+      typeof entity.getIn(['attributes', 'support_level']) !== 'undefined'
+      && entity.getIn(['attributes', 'support_level']) !== 'null'
+    ) {
+      supportLevel = SUPPORT_LEVELS.find(
+        (level) => qe(level.value, entity.getIn(['attributes', 'support_level'])),
+      );
+    }
     return ({
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
-      subtitle: config.sublabel && entity.getIn(['attributes', config.sublabel]),
-      reference: this.getReference(entity, config),
+      subtitle: config && config.sublabel && entity.getIn(['attributes', config.sublabel]),
+      reference: this.getReference(entity),
       draft: entity.getIn(['attributes', 'draft']),
+      is_archive: entity.getIn(['attributes', 'is_archive']),
+      is_current: entity.getIn(['attributes', 'is_current']),
       role: entity.get('roles') && connections.get('roles') && this.getRole(entity.get('roles'), connections.get('roles')),
-      path: entityPath || (nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath),
-      entityIcon: entityIcon && entityIcon(entity),
+      path,
+      support: supportLevel,
       categories: taxonomies && this.getWithoutProgressCategories(taxonomies, entity.get('categories')),
       connectedCounts: config && config.connections
         ? this.getConnections(entity, config.connections.options, connections)

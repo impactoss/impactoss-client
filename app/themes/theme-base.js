@@ -1,15 +1,15 @@
 import coolorsToHex from 'coolors-to-hex';
 
-import headerLogo from 'themes/media/headerLogo.png';
-// import headerLogo2x from 'themes/media/headerLogo@2x.png';
-
-import graphicHome from 'themes/media/homeGraphic.png';
-// import graphicHome2x from 'themes/media/homeGraphic@2x.png';
-import titleHome from 'themes/media/homeTitle.png';
-import titleHome2x from 'themes/media/homeTitle@2x.png';
-
-import impactossLogo from 'themes/media/impactoss.png';
-import impactossLogo2x from 'themes/media/impactoss@2x.png';
+// import headerLogo from 'themes/media/headerLogo.png';
+// // import headerLogo2x from 'themes/media/headerLogo@2x.png';
+//
+// import graphicHome from 'themes/media/homeGraphic.png';
+// // import graphicHome2x from 'themes/media/homeGraphic@2x.png';
+// import titleHome from 'themes/media/homeTitle.png';
+// import titleHome2x from 'themes/media/homeTitle@2x.png';
+//
+// import impactossLogo from 'themes/media/impactoss.png';
+// import impactossLogo2x from 'themes/media/impactoss@2x.png';
 
 // import partner1 from 'themes/media/partner1.png';
 // import partner2 from 'themes/media/partner2.png';
@@ -26,10 +26,10 @@ const theme = {};
 // pass array for retina images: [normalSrc, retinaSrc],
 // or single image: src
 theme.media = {
-  headerLogo: [headerLogo],
-  graphicHome: [graphicHome],
-  titleHome: [titleHome, titleHome2x],
-  impactossLogo: [impactossLogo, impactossLogo2x],
+  // headerLogo: [headerLogo],
+  // graphicHome: [graphicHome],
+  // titleHome: [titleHome, titleHome2x],
+  // impactossLogo: [impactossLogo, impactossLogo2x],
   // up to 6 partner logos,
   // link text and title to be set in translations/[lang].js > app.components.Footer.partners.[]
   // partnerLogos: [
@@ -196,8 +196,8 @@ theme.palette = {
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
   measuresHover: ['#C75300'], // FFC107  AA compliant
   measures: ['#ED7000'],
-  recommendationsHover: ['#023066', '#426BA6'], // accepted, noted ['#FF9B69', '#FFB28B'],
-  recommendations: ['#033A89', '#6889B8'],
+  recommendationsHover: ['#023066', '#023066', '#426BA6'], // supported, in part, noted ['#FF9B69', '#FFB28B'],
+  recommendations: ['#033A89', '#033A89', '#6889B8'],
   indicatorsHover: ['#15881A'],
   indicators: ['#1BAC29'],
   reportsHover: [error[1]],

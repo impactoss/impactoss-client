@@ -62,7 +62,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     if (isUserSignedIn) {
       headerOptions.actions.push({
         type: 'bookmarker',
-        title: intl.formatMessage(messages.pageTitle),
+        title: intl.formatMessage(appMessages.entities.measures.plural),
       });
     }
     if (window.print) {

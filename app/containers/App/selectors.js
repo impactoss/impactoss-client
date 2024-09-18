@@ -16,7 +16,13 @@ import asArray from 'utils/as-array';
 import asList from 'utils/as-list';
 import { sortEntities } from 'utils/sort';
 
-import { USER_ROLES, DB_TABLES } from 'themes/config';
+import {
+  API,
+  USER_ROLES,
+  DB_TABLES,
+  CATEGORY_ADMIN_MIN_ROLE,
+  CURRENT_TAXONOMY_IDS,
+} from 'themes/config';
 
 import {
   filterEntitiesByAttributes,
@@ -36,6 +42,14 @@ const getGlobalRequested = (state) => state.getIn(['global', 'requested']);
 export const selectNewEntityModal = createSelector(
   getGlobal,
   (globalState) => globalState.get('newEntityModal')
+);
+export const selectShowSettings = createSelector(
+  getGlobal,
+  (globalState) => !!globalState.get('showSettings')
+);
+export const selectSettingsConfig = createSelector(
+  getGlobal,
+  (globalState) => globalState.get('settings')
 );
 
 export const selectIsAuthenticating = createSelector(
@@ -121,6 +135,11 @@ export const selectHasUserRole = createSelector(
     [USER_ROLES.MANAGER.value]: isManager,
     [USER_ROLES.CONTRIBUTOR.value]: isContributor,
   })
+);
+
+export const selectCanUserAdministerCategories = createSelector(
+  selectHasUserRole,
+  (hasUserRole) => hasUserRole[CATEGORY_ADMIN_MIN_ROLE],
 );
 
 export const selectSessionUserHighestRoleId = createSelector(
@@ -309,6 +328,24 @@ export const selectFrameworkQuery = createSelector(
     : 'all'
 );
 
+export const selectLoadArchivedQuery = createSelector(
+  selectLocationQuery,
+  (query) => ((query && query.get('loadArchived') === 'true') || false)
+);
+export const selectLoadNonCurrentQuery = createSelector(
+  selectLocationQuery,
+  (query) => ((query && query.get('loadNonCurrent') === 'true') || false)
+);
+
+export const selectSettingsFromQuery = createSelector(
+  selectLoadArchivedQuery,
+  selectLoadNonCurrentQuery,
+  (loadArchived, loadNonCurrent) => ({
+    loadArchived,
+    loadNonCurrent,
+  })
+);
+
 const selectEntitiesAll = (state) => state.getIn(['global', 'entities']);
 
 export const selectEntities = createSelector(
@@ -381,10 +418,10 @@ export const selectFWRecommendations = createSelector(
       ).map(
         (rec) => {
           if (
-            rec.getIn(['attributes', 'accepted']) === null
-            || typeof rec.getIn(['attributes', 'accepted']) === 'undefined'
+            rec.getIn(['attributes', 'support_level']) === null
+            || typeof rec.getIn(['attributes', 'support_level']) === 'undefined'
           ) {
-            return rec.setIn(['attributes', 'accepted'], 'null');
+            return rec.setIn(['attributes', 'support_level'], 'null');
           }
           return rec;
         }
@@ -975,3 +1012,18 @@ export const selectViewRecommendationFrameworkId = createSelector(
 //     ).keySeq()
 //   ),
 // );
+
+
+// if there are any non-current categories from the relevant taxonomies then we have multiple cycles
+export const selectHasPreviousCycles = createSelector(
+  (state) => selectEntities(state, API.CATEGORIES),
+  (categories) => categories.some(
+    (cat) => !cat.getIn(['attributes', 'is_current'])
+      && CURRENT_TAXONOMY_IDS.indexOf(parseInt(cat.getIn(['attributes', 'taxonomy_id']), 10)) > -1
+  )
+);
+// select all categories
+export const selectCategories = createSelector(
+  (state) => selectEntities(state, API.CATEGORIES),
+  (entities) => entities
+);

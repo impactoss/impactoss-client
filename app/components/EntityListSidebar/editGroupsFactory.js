@@ -1,8 +1,8 @@
 import { reduce } from 'lodash/collection';
 import { sortEntities } from 'utils/sort';
 import { qe } from 'utils/quasi-equals';
-
-export const makeEditGroups = (
+import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
+export const makeEditGroups = ({
   config,
   taxonomies,
   activeEditOption,
@@ -10,7 +10,7 @@ export const makeEditGroups = (
   messages,
   frameworks,
   selectedFrameworkIds,
-) => {
+}) => {
   const editGroups = {};
   const selectedFrameworks = frameworks && frameworks.filter(
     (fw) => selectedFrameworkIds.find((id) => qe(id, fw.get('id'))),
@@ -26,6 +26,7 @@ export const makeEditGroups = (
       options: reduce(
         config.attributes.options,
         (optionsMemo, option) => {
+          // check for frameworks
           if (
             option.frameworkFilter
             && option.editForFrameworks
@@ -34,9 +35,11 @@ export const makeEditGroups = (
           ) {
             return optionsMemo;
           }
+          // check for user roles and settings
           return (
             (typeof option.edit === 'undefined' || option.edit)
             && (typeof option.role === 'undefined' || hasUserRole[option.role])
+            && (typeof option.editRole === 'undefined' || hasUserRole[option.editRole])
           )
             ? optionsMemo.concat({
               id: option.attribute, // filterOptionId
@@ -52,6 +55,7 @@ export const makeEditGroups = (
   }
   // taxonomy option group
   if (config.taxonomies && taxonomies) {
+    const canCreateCategories = hasUserRole[CATEGORY_ADMIN_MIN_ROLE];
     // first prepare taxonomy options
     editGroups.taxonomies = {
       id: 'taxonomies', // filterGroupId
@@ -84,10 +88,12 @@ export const makeEditGroups = (
                   key: config.taxonomies.key,
                   ownKey: config.taxonomies.ownKey,
                   active: !!activeEditOption && activeEditOption.optionId === taxonomy.get('id'),
-                  create: {
-                    path: 'categories',
-                    attributes: { taxonomy_id: taxonomy.get('id') },
-                  },
+                  create: canCreateCategories
+                    ? {
+                      path: 'categories',
+                      attributes: { taxonomy_id: taxonomy.get('id') },
+                    }
+                    : null,
                 },
               ])
               : memo,

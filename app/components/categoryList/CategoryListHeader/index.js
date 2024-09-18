@@ -2,21 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { reduce } from 'lodash/collection';
 
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 import Icon from 'components/Icon';
 import ColumnHeader from 'components/styled/ColumnHeader';
-import CategoryListKey from 'components/categoryList/CategoryListKey';
 
 const Styled = styled.div`
   width:100%;
   background-color: ${palette('light', 1)};
   display: table;
   table-layout: fixed;
-  margin-bottom: ${({ keyCount }) => keyCount * 20}px;
+  margin-bottom: 20px;
   @media print {
-    margin-bottom: ${({ keyCount }) => keyCount * 15}px;
+    margin-bottom: 15px;
   }
 `;
 
@@ -65,27 +63,9 @@ const SortButton = styled(ButtonFlatIconOnly)`
 class CategoryListHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { columns } = this.props;
-    const keyCount = columns.reduce(
-      (maxKeys, col) => {
-        if (col.keys) {
-          const keyItemsMax = reduce(
-            col.keys,
-            (maxItems, key) => {
-              if (key.items && key.items.length > maxItems) {
-                return key.items.length;
-              }
-              return maxItems;
-            },
-            0,
-          );
-          if (keyItemsMax > maxKeys) return keyItemsMax;
-        }
-        return maxKeys;
-      },
-      0,
-    );
+
     return (
-      <Styled keyCount={keyCount}>
+      <Styled>
         {
           columns.map((col, i) => (
             <Column key={i} colWidth={col.width}>
@@ -104,9 +84,6 @@ class CategoryListHeader extends React.PureComponent { // eslint-disable-line re
                     <Icon name={col.sortIcon} hidePrint={!col.active} />
                   </SortButton>
                 </SortWrapper>
-              )}
-              {col.keys && (
-                <CategoryListKey keys={col.keys} />
               )}
             </Column>
           ))
