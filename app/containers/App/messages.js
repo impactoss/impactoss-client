@@ -1134,6 +1134,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.1.description',
           defaultMessage: 'About human rights bodies',
         },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.1.descriptionAdditional',
+          defaultMessage: 'About human rights bodies',
+        },
       },
       2: {
         single: {
@@ -1158,6 +1162,10 @@ export default defineMessages({
         },
         description: {
           id: 'app.containers.App.entities.taxonomies.2.description',
+          defaultMessage: 'About cycles',
+        },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.2.descriptionAdditional',
           defaultMessage: 'About cycles',
         },
       },
@@ -1186,6 +1194,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.3.description',
           defaultMessage: 'About human rights issues',
         },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.3.descriptionAdditional',
+          defaultMessage: 'About human rights issues',
+        },
       },
       4: {
         single: {
@@ -1210,6 +1222,10 @@ export default defineMessages({
         },
         description: {
           id: 'app.containers.App.entities.taxonomies.4.description',
+          defaultMessage: 'About affected persons',
+        },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.4.descriptionAdditional',
           defaultMessage: 'About affected persons',
         },
       },
@@ -1238,6 +1254,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.5.description',
           defaultMessage: 'About thematic clusters',
         },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.5.descriptionAdditional',
+          defaultMessage: 'About thematic clusters',
+        },
       },
       6: {
         single: {
@@ -1262,6 +1282,10 @@ export default defineMessages({
         },
         description: {
           id: 'app.containers.App.entities.taxonomies.6.description',
+          defaultMessage: 'About organisations',
+        },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.6.descriptionAdditional',
           defaultMessage: 'About organisations',
         },
       },
@@ -1290,6 +1314,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.7.description',
           defaultMessage: 'About Sustainable Development Goals',
         },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.7.descriptionAdditional',
+          defaultMessage: 'About Sustainable Development Goals',
+        },
       },
       8: {
         single: {
@@ -1314,6 +1342,10 @@ export default defineMessages({
         },
         description: {
           id: 'app.containers.App.entities.taxonomies.8.description',
+          defaultMessage: 'About tax 8',
+        },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.8.descriptionAdditional',
           defaultMessage: 'About tax 8',
         },
       },
@@ -1342,6 +1374,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.9.description',
           defaultMessage: 'About tax 9',
         },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.9.descriptionAdditional',
+          defaultMessage: 'About tax 9',
+        },
       },
       10: {
         single: {
@@ -1368,6 +1404,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.10.description',
           defaultMessage: 'About tax 10',
         },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.10.descriptionAdditional',
+          defaultMessage: 'About tax 10',
+        },
       },
       11: {
         single: {
@@ -1392,6 +1432,10 @@ export default defineMessages({
         },
         description: {
           id: 'app.containers.App.entities.taxonomies.11.description',
+          defaultMessage: 'About tax 10',
+        },
+        descriptionAdditional: {
+          id: 'app.containers.App.entities.taxonomies.11.descriptionAdditional',
           defaultMessage: 'About tax 10',
         },
       },

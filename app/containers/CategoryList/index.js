@@ -10,6 +10,8 @@ import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { fromJS } from 'immutable';
+import ReactMarkdown from 'react-markdown';
+
 import { getDefaultTaxonomy } from 'utils/taxonomies';
 
 // containers
@@ -53,12 +55,17 @@ import { updateSort } from './actions';
 const UsersOnly = styled.h4`
   margin-top: 4em;
 `;
-const Description = styled.p`
+const Description = styled(ReactMarkdown)`
+  margin-top: 1em;
   margin-bottom: 2em;
   font-size: 1em;
   @media print {
     font-size: ${(props) => props.theme.sizes.print.default};
   }
+`;
+
+const DescriptionAdditional = styled(Description)`
+  margin-top: 3em;
 `;
 export class CategoryList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   // make sure to load all data from server
@@ -92,9 +99,27 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
   }
 
   /* eslint-disable react/destructuring-assignment */
-  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
+  getTaxTitle = (id) => {
+    if (appMessages.entities.taxonomies[id] && appMessages.entities.taxonomies[id].plural) {
+      return this.context.intl.formatMessage(appMessages.entities.taxonomies[id].plural);
+    }
+    return null;
+  }
 
-  getTaxDescription = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].description);
+  getTaxDescription = (id) => {
+    if (appMessages.entities.taxonomies[id] && appMessages.entities.taxonomies[id].description) {
+      return this.context.intl.formatMessage(appMessages.entities.taxonomies[id].description);
+    }
+    return null;
+  };
+
+  getTaxDescriptionAdditional = (id) => {
+    if (appMessages.entities.taxonomies[id] && appMessages.entities.taxonomies[id].descriptionAdditional) {
+      const msg = this.context.intl.formatMessage(appMessages.entities.taxonomies[id].descriptionAdditional);
+      return msg.trim().length > 0 ? msg.trim() : null;
+    }
+    return null;
+  };
 
   getTaxButtonTitle = (id) => this.context.intl.formatMessage(
     appMessages.entities.taxonomies[id].shortSingle || appMessages.entities.taxonomies[id].single
@@ -119,6 +144,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     const reference = taxonomy && taxonomy.get('id');
     const contentTitle = (taxonomy && typeof reference !== 'undefined') ? this.getTaxTitle(reference) : '';
     const contentDescription = (taxonomy && typeof reference !== 'undefined') && this.getTaxDescription(reference);
+    const contentAdditional = (taxonomy && typeof reference !== 'undefined') && this.getTaxDescriptionAdditional(reference);
     const buttons = [];
     if (dataReady) {
       buttons.push({
@@ -167,7 +193,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
               />
               <div style={{ position: 'relative' }}>
                 {contentDescription
-                  && <Description>{contentDescription}</Description>
+                  && <Description source={contentDescription} />
                 }
                 <SkipContent
                   href="#sidebar-taxonomy-options"
@@ -217,6 +243,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                   />
                 )
               }
+              {contentAdditional && <DescriptionAdditional source={contentAdditional} />}
             </Content>
           </Container>
           <Footer hasBorder />
