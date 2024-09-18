@@ -18,12 +18,12 @@ const Styled = styled.span`
   vertical-align: top;
 `;
 
-const Item = styled(Component)`
+const Item = styled((p) => <Component {...p} />)`
   display: table;
   width: 100%;
   background-color: ${palette('mainListItem', 1)};
 `;
-const MainWrapper = styled(Component)`
+const MainWrapper = styled((p) => <Component {...p} />)`
   display: table-cell;
   width: ${(props) => props.expandable ? COLUMN_WIDTHS.MAIN * 100 : 100}%;
   border-left: 3px solid ${palette('background', 1)};

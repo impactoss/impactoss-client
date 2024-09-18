@@ -45,7 +45,6 @@ export const selectTaxonomies = createSelector(
     associations,
     'tags_measures',
     id,
-    false,
   )
 );
 

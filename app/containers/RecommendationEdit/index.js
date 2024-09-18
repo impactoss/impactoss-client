@@ -30,6 +30,7 @@ import {
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import { getNonParentTaxonomiesUnlessAssociated } from 'utils/entities';
 import { canUserDeleteEntities } from 'utils/permissions';
 import { getMetaField } from 'utils/fields';
 import { qe } from 'utils/quasi-equals';
@@ -206,12 +207,26 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 
   getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
     const { intl } = this.context;
+    // also show connected parent taxonomies
+    const nonParentTaxisUnlessConnected = getNonParentTaxonomiesUnlessAssociated(
+      taxonomies,
+      'tags_recommendations'
+    );
+    taxonomies.filter(
+      (tax, key, list) => {
+        const isParent = list.some(
+          (other) => other.getIn(['attributes', 'tags_recommendations'])
+            && qe(tax.get('id'), other.getIn(['attributes', 'parent_id']))
+        );
+        return !isParent || tax.get('categories').some((cat) => cat.get('associated'));
+      }
+    );
     return ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
         fields: renderTaxonomyControl({
-          taxonomies,
+          taxonomies: nonParentTaxisUnlessConnected,
           onCreateOption: canCreateCategories ? onCreateOption : null,
           contextIntl: intl,
         }),

@@ -8,7 +8,7 @@ import Icon from 'components/Icon';
 
 import messages from './messages';
 
-const Styled = styled(Component)`
+const Styled = styled((p) => <Component {...p} />)`
   display: none;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     display: table-cell;

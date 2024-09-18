@@ -1,6 +1,12 @@
 import { Map } from 'immutable';
 
-import { TEXT_TRUNCATE, SUPPORT_LEVELS, SEARCH } from 'themes/config';
+import {
+  TEXT_TRUNCATE,
+  SEARCH,
+  ENTITY_FIELDS,
+  SUPPORT_LEVELS,
+} from 'themes/config';
+
 import { find, reduce, every } from 'lodash/collection';
 
 import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/string';
@@ -297,6 +303,11 @@ export const entitySetSingles = (entity, singles) => entity
     entity,
   );
 
+const isParent = (taxonomy, otherTaxonomies, tagsKey) => otherTaxonomies.some(
+  (other) => other.getIn(['attributes', tagsKey])
+    && qe(taxonomy.get('id'), other.getIn(['attributes', 'parent_id']))
+);
+
 // taxonomies or parent taxonomies
 export const filterTaxonomies = (
   taxonomies,
@@ -304,14 +315,13 @@ export const filterTaxonomies = (
   includeParents = true,
 ) => taxonomies && taxonomies.filter(
   (tax, key, list) => tax.getIn(['attributes', tagsKey])
-    && (
-      includeParents
-      // only non-parents
-      || !list.some(
-        (other) => other.getIn(['attributes', tagsKey])
-          && qe(tax.get('id'), other.getIn(['attributes', 'parent_id']))
-      )
-    )
+    && (includeParents || !isParent(tax, list, tagsKey))
+);
+
+// assumes taxonomies with nested categories, and categories that are marked if associated
+export const getNonParentTaxonomiesUnlessAssociated = (taxonomies, tagsKey) => taxonomies.filter(
+  (tax, key, list) => !isParent(tax, list, tagsKey)
+    || tax.get('categories').some((cat) => cat.get('associated'))
 );
 
 export const prepareTaxonomiesIsAssociated = (
@@ -645,3 +655,83 @@ export const getTaxonomyCategories = (
     }
   );
 };
+
+export const checkAttribute = ({
+  typeId,
+  att,
+  attributes,
+  isAdmin,
+}) => {
+  if (typeId && attributes && attributes[att]) {
+    if (
+      attributes[att].adminOnly
+      && !isAdmin
+    ) {
+      return false;
+    }
+    if (attributes[att].adminOnlyForTypes
+      && attributes[att].adminOnlyForTypes.indexOf(typeId.toString()) > -1
+      && !isAdmin
+    ) {
+      return false;
+    }
+    if (attributes[att].optional) {
+      return Array.isArray(attributes[att].optional)
+        ? attributes[att].optional.indexOf(typeId.toString()) > -1
+        : attributes[att].optional;
+    }
+    if (attributes[att].import) {
+      return Array.isArray(attributes[att].import)
+        ? attributes[att].import.indexOf(typeId.toString()) > -1
+        : attributes[att].import;
+    }
+    if (attributes[att].required) {
+      return Array.isArray(attributes[att].required)
+        ? attributes[att].required.indexOf(typeId.toString()) > -1
+        : attributes[att].required;
+    }
+  } else if (!typeId && attributes && attributes[att]) {
+    if (attributes[att].adminOnly && !isAdmin) {
+      return false;
+    }
+    if (attributes[att].optional) {
+      return !!attributes[att].optional;
+    }
+    if (attributes[att].required) {
+      return !!attributes[att].required;
+    }
+    if (attributes[att].import) {
+      return !!attributes[att].import;
+    }
+    return !attributes[att].skipImport;
+  }
+  return false;
+};
+
+export const checkRecommendationAttribute = (typeId, att, isAdmin) => ENTITY_FIELDS
+  && ENTITY_FIELDS.recommendations
+  && ENTITY_FIELDS.recommendations.ATTRIBUTES
+  && checkAttribute({
+    typeId,
+    att,
+    attributes: ENTITY_FIELDS.recommendations.ATTRIBUTES,
+    isAdmin,
+  });
+
+export const checkActionAttribute = (att, isAdmin) => ENTITY_FIELDS
+  && ENTITY_FIELDS.measures
+  && ENTITY_FIELDS.measures.ATTRIBUTES
+  && checkAttribute({
+    att,
+    attributes: ENTITY_FIELDS.measures.ATTRIBUTES,
+    isAdmin,
+  });
+
+export const checkIndicatorAttribute = (att, isAdmin) => ENTITY_FIELDS
+  && ENTITY_FIELDS.indicators
+  && ENTITY_FIELDS.indicators.ATTRIBUTES
+  && checkAttribute({
+    att,
+    attributes: ENTITY_FIELDS.indicators.ATTRIBUTES,
+    isAdmin,
+  });

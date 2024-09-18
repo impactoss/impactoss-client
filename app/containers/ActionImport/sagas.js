@@ -2,18 +2,24 @@ import {
   take, put, cancel, takeEvery,
 } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
+import { IMPORT_ORIGIN } from 'containers/App/entityImportReducer';
 
 import { newEntity } from 'containers/App/actions';
 
 import { SAVE } from './constants';
 
 export function* save({ data }) {
-  yield put(newEntity({
-    path: 'measures',
-    entity: data,
-    redirect: false,
-    saveRef: data.saveRef,
-  }));
+  yield put(newEntity(
+    // data
+    {
+      path: 'measures',
+      entity: data,
+      redirect: false,
+      saveRef: data.saveRef,
+    },
+    // origin
+    IMPORT_ORIGIN,
+  ));
 }
 
 

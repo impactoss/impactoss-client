@@ -17,6 +17,7 @@ import asList from 'utils/as-list';
 import { sortEntities } from 'utils/sort';
 
 import {
+  API,
   USER_ROLES,
   DB_TABLES,
   CATEGORY_ADMIN_MIN_ROLE,
@@ -1015,9 +1016,14 @@ export const selectViewRecommendationFrameworkId = createSelector(
 
 // if there are any non-current categories from the relevant taxonomies then we have multiple cycles
 export const selectHasPreviousCycles = createSelector(
-  (state) => selectEntities(state, 'categories'),
+  (state) => selectEntities(state, API.CATEGORIES),
   (categories) => categories.some(
     (cat) => !cat.getIn(['attributes', 'is_current'])
       && CURRENT_TAXONOMY_IDS.indexOf(parseInt(cat.getIn(['attributes', 'taxonomy_id']), 10)) > -1
   )
+);
+// select all categories
+export const selectCategories = createSelector(
+  (state) => selectEntities(state, API.CATEGORIES),
+  (entities) => entities
 );

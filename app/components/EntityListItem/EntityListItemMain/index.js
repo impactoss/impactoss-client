@@ -16,7 +16,7 @@ import EntityListItemMainTop from './EntityListItemMainTop';
 import EntityListItemMainTitle from './EntityListItemMainTitle';
 import EntityListItemMainBottom from './EntityListItemMainBottom';
 
-const Styled = styled(Component)`
+const Styled = styled((p) => <Component {...p} />)`
   position: relative;
   padding-left: 0;
   box-shadow: ${({ isConnection }) => isConnection ? '0px 0px 6px 0px rgba(0,0,0,0.2)' : 'none'};
@@ -32,7 +32,7 @@ const Styled = styled(Component)`
     padding-right: 0;
   }
 `;
-const Wrapper = styled(Component)`
+const Wrapper = styled((p) => <Component {...p} />)`
   position: relative;
   padding-right: 6px;
   padding-top: 4px;

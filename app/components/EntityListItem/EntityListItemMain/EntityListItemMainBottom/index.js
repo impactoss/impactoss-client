@@ -8,7 +8,7 @@ import Component from 'components/styled/Component';
 import EntityListItemMainConnections from './EntityListItemMainConnections';
 import EntityListItemMainTaxonomies from './EntityListItemMainTaxonomies';
 
-const Styled = styled(Component)`
+const Styled = styled((p) => <Component {...p} />)`
   margin-bottom: -5px;
   display: none;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {

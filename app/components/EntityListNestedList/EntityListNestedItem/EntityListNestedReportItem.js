@@ -17,7 +17,7 @@ import {
 import { lowerCase } from 'utils/string';
 import appMessages from 'containers/App/messages';
 
-const Styled = styled(Component)`
+const Styled = styled((p) => <Component {...p} />)`
   background-color: ${palette('mainListItem', 1)};
   position: relative;
   padding-left: 0;
@@ -32,7 +32,7 @@ const Styled = styled(Component)`
   }
 `;
 
-const Wrapper = styled(Component)`
+const Wrapper = styled((p) => <Component {...p} />)`
   position: relative;
   padding-right: 6px;
   padding-top: 4px;

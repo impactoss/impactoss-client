@@ -23,4 +23,8 @@ export default defineMessages({
     id: 'app.components.ImportFileSelectControl.fileSelectError',
     defaultMessage: 'Error parsing file. Please make sure to use the correct format only.',
   },
+  noValidRowsIdentified: {
+    id: 'app.components.ImportFileSelectControl.noValidRowsIdentified',
+    defaultMessage: 'Note: Your file does not appear to contain any (valid rows). Please review your file and try again',
+  },
 });

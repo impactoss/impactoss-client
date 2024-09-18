@@ -36,6 +36,7 @@ import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
 import { canUserDeleteEntities } from 'utils/permissions';
 import { lowerCase } from 'utils/string';
+import { getNonParentTaxonomiesUnlessAssociated } from 'utils/entities';
 
 import { CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
@@ -226,6 +227,11 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
     const { intl } = this.context;
+    // also show connected parent taxonomies
+    const nonParentTaxisUnlessConnected = getNonParentTaxonomiesUnlessAssociated(
+      taxonomies,
+      'tags_recommendations'
+    );
     return ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -243,7 +249,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
         fields: renderTaxonomyControl({
-          taxonomies,
+          taxonomies: nonParentTaxisUnlessConnected,
           onCreateOption: canCreateCategories ? onCreateOption : null,
           contextIntl: intl,
         }),
@@ -493,11 +499,6 @@ function mapDispatchToProps(dispatch, props) {
             }),
           )
       );
-      // default to database id
-      const formRef = formData.getIn(['attributes', 'reference']) || '';
-      if (formRef.trim() === '') {
-        saveData = saveData.setIn(['attributes', 'reference'], formData.get('id'));
-      }
       // check if attributes have changed
       if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
         saveData = saveData.set('skipAttributes', true);

@@ -567,11 +567,6 @@ function mapDispatchToProps(dispatch, props) {
       }
 
       // cleanup
-      // default to database id
-      const formRef = formData.getIn(['attributes', 'reference']) || '';
-      if (formRef.trim() === '') {
-        saveData = saveData.setIn(['attributes', 'reference'], formData.get('id'));
-      }
       // do not store repeat fields when not repeat
       if (!saveData.getIn(['attributes', 'repeat'])) {
         saveData = saveData

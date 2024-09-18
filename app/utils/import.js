@@ -1,18 +1,80 @@
 import { filter, reduce } from 'lodash/collection';
 import appMessages from 'containers/App/messages';
-import { DB_DATE_FORMAT } from 'themes/config';
+import { DB_DATE_FORMAT, IGNORE_ROW_TAG } from 'themes/config';
+import validateDateFormat from 'components/forms/validators/validate-date-format';
+import validateNumber from 'components/forms/validators/validate-number';
 
-const getColumnTitle = (field, formatMessage) => `${formatMessage(appMessages.importFields[field.label || field.attribute])} [database:${field.attribute}]`;
+const getColumnTitle = (field, formatMessage) => {
+  const msg = (appMessages.importFields[field.label] || appMessages.importFields[field.attribute])
+    ? formatMessage(appMessages.importFields[field.label || field.attribute])
+    : formatMessage(appMessages.attributes[field.label || field.attribute]);
+  return `${msg} [database:${field.attribute}]`;
+};
 
-export const getImportFields = (shape, formatMessage) => {
-  const fields = filter(shape.fields, (field) => field.import === true && !field.disabled);
-  const values = reduce(fields, (memo, field) => {
-    const value = `${field.required
-      ? formatMessage(appMessages.import.required)
-      : formatMessage(appMessages.import.optional)}: ${formatMessage(appMessages.import[field.type], { format: DB_DATE_FORMAT })}`;
-    return Object.assign(memo, { [getColumnTitle(field, formatMessage)]: value });
-  }, {});
-  return Object.assign(values, { '': formatMessage(appMessages.import.hint) });
+const getRelationshipColumnTitle = (field) => {
+  let msg = field.attribute;
+  msg = `${msg} [rel:${field.attribute}`; // open bracket
+  if (field.relationshipValue && field.relationshipValue.code) {
+    msg = `${msg}${field.separator || '|'}${field.relationshipValue.code}`;
+  }
+  return `${msg}]`; // close bracket
+};
+
+
+// export const getImportFields = ({ shape, type, formatMessage }) => {
+export const getImportFields = ({ shape, formatMessage }) => {
+  let values = {};
+  if (shape.fields) {
+    const fields = filter(
+      shape.fields,
+      (field) => field.import === true && !field.disabled
+    );
+    values = reduce(
+      fields,
+      (memo, field) => {
+        let value = field.required
+          ? formatMessage(appMessages.import.required)
+          : formatMessage(appMessages.import.optional);
+        if (field.unique) {
+          value = `${value}/${formatMessage(appMessages.import.unique)}`;
+        }
+        const typeInfo = formatMessage(
+          appMessages.import[field.type],
+          { format: DB_DATE_FORMAT },
+        );
+        value = `${value}: ${typeInfo}`;
+        if (field.hint) {
+          value = `${value} ${field.hint}`;
+        } else if (appMessages.importFieldHints[field.attribute]) {
+          value = `${value} ${formatMessage(appMessages.importFieldHints[field.attribute])}`;
+        }
+        return Object.assign(
+          memo,
+          { [getColumnTitle(field, formatMessage)]: value },
+        );
+      },
+      values,
+    );
+  }
+  if (shape.relationshipFields) {
+    values = reduce(
+      shape.relationshipFields,
+      (memo, field) => {
+        const pre = field.required
+          ? formatMessage(appMessages.import.required)
+          : formatMessage(appMessages.import.optional);
+        const value = `${pre}: ${field.hint || formatMessage(appMessages.import[field.type])}`;
+        return Object.assign(
+          memo,
+          {
+            [getRelationshipColumnTitle(field)]: value,
+          },
+        );
+      },
+      values,
+    );
+  }
+  return Object.assign(values, { '': `${formatMessage(appMessages.import.hint)} ${IGNORE_ROW_TAG}` });
 };
 
 export const getColumnAttribute = (columnTitle) => {
@@ -20,4 +82,43 @@ export const getColumnAttribute = (columnTitle) => {
   return split.length > 1
     ? split[1].replace(']', '')
     : columnTitle;
+};
+
+
+export const countRelationshipsFromRows = (rows) => rows.reduce(
+  (counter, row) => {
+    const relKeys = Object.keys(row).filter((key) => key.indexOf('[rel:') > -1);
+    return relKeys.reduce(
+      (counter2, key) => {
+        if (row[key] && row[key].trim() !== '') {
+          const inc = row[key].split(',').length;
+          return counter2 + inc;
+        }
+        return counter2;
+      },
+      counter,
+    );
+  },
+  0,
+);
+
+const getFieldInfo = (attribute, fields) => fields && fields.find((f) => f.attribute === attribute);
+
+const validateOptions = (options, val) => {
+  const optionValues = options.map((o) => o.value.toString());
+  return optionValues.indexOf(val.toString()) > -1;
+};
+
+export const validateType = (attribute, val, fields) => {
+  const field = getFieldInfo(attribute, fields);
+  let result = true;
+  if (field.type === 'date') {
+    result = result && validateDateFormat(val);
+  } else if (field.type === 'number') {
+    result = result && validateNumber(val);
+  }
+  if (field.options) {
+    result = result && validateOptions(field.options, val);
+  }
+  return result;
 };

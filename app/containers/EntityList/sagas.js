@@ -25,6 +25,7 @@ import {
   SORTBY_CHANGE,
   SORTORDER_CHANGE,
   RESET_SEARCH_QUERY,
+  LIST_ORIGIN,
 } from './constants';
 
 export function* updateQuery({ value }) {
@@ -115,39 +116,49 @@ export function* updateSortOrder({ order }) {
 }
 
 export function* save({ data }) {
-  yield put(saveEntity({
-    path: data.path,
-    entity: data.entity,
-    saveRef: data.saveRef,
-    redirect: false,
-  }));
+  yield put(saveEntity(
+    {
+      path: data.path,
+      entity: data.entity,
+      saveRef: data.saveRef,
+      redirect: false,
+    },
+    // origin
+    LIST_ORIGIN,
+  ));
 }
 export function* saveMultiple({ path, data }) {
-  yield put(saveMultipleEntities(path, data));
+  yield put(saveMultipleEntities(path, data, LIST_ORIGIN));
 }
 export function* newMultiple({ path, data }) {
-  yield put(newMultipleEntities(path, data));
+  yield put(newMultipleEntities(path, data, LIST_ORIGIN));
 }
 export function* deleteMultiple({ path, data }) {
-  yield put(deleteMultipleEntities(path, data));
+  yield put(deleteMultipleEntities(path, data, LIST_ORIGIN));
 }
 
 export function* newConnection({ data }) {
-  yield put(newEntity({
-    path: data.path,
-    entity: data.entity,
-    saveRef: data.saveRef,
-    redirect: false,
-  }));
+  yield put(newEntity(
+    {
+      path: data.path,
+      entity: data.entity,
+      saveRef: data.saveRef,
+      redirect: false,
+    },
+    LIST_ORIGIN,
+  ));
 }
 
 export function* deleteConnection({ data }) {
-  yield put(deleteEntity({
-    path: data.path,
-    id: data.id,
-    saveRef: data.saveRef,
-    redirect: false,
-  }));
+  yield put(deleteEntity(
+    {
+      path: data.path,
+      id: data.id,
+      saveRef: data.saveRef,
+      redirect: false,
+    },
+    LIST_ORIGIN,
+  ));
 }
 
 export default function* entityList() {
