@@ -149,28 +149,6 @@ const GlobalStyle = createGlobalStyle`
     font-weight: 500;
   }
 
-  .content-page {
-    .react-markdown {
-      p {
-        &:first-child{
-          font-size: 1.2em;
-          color: #6A7880;
-        }
-      }
-    }
-  }
-  @media (min-width: 769px) {
-    .content-page {
-      .react-markdown {
-        p {
-          &:first-child{
-            font-size: 1.5em;
-            padding-bottom: 20px;
-          }
-        }
-      }
-    }
-  }
   .download-csv-modal {
     z-index:105;
     max-width: none !important;
@@ -284,16 +262,6 @@ const GlobalStyle = createGlobalStyle`
     }
     ul, ol, dl {
       page-break-before: avoid;
-    }
-
-    .content-page {
-      .react-markdown {
-        p {
-          &:first-child{
-            font-size: 12pt;
-          }
-        }
-      }
     }
   }
 

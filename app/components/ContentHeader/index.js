@@ -123,7 +123,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
       buttons,
       subTitle,
     } = this.props;
-
+    const hasSupTitle = supTitle && supTitle.trim() !== title.trim();
     return (
       <Styled
         hasBottomBorder={type === CONTENT_PAGE || type === CONTENT_MODAL}
@@ -145,7 +145,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
           </VisibleMobile>
         )}
         <TitleWrap>
-          {supTitle && <SupTitle icon={icon} title={supTitle} />}
+          {hasSupTitle && <SupTitle icon={icon} title={supTitle} />}
           <Table>
             <TableCell>
               {this.renderTitle(type, title, icon)}
