@@ -7,7 +7,7 @@ const ColumnHeader = styled.div`
   padding-left: ${(props) => (props.isSelect)
     ? 0
     : 4
-}px
+}px;
   word-break: break-word;
   width: ${(props) => props.colWidth}%;
   position: relative;
@@ -20,7 +20,6 @@ const ColumnHeader = styled.div`
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-top: 8px;
     padding-bottom: 8px;
-    padding-left: 8px;
     padding-left: ${(props) => (props.isSelect)
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal

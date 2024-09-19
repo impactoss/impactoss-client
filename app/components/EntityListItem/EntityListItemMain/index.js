@@ -9,7 +9,13 @@ import { qe } from 'utils/quasi-equals';
 
 import Component from 'components/styled/Component';
 import SkipContent from 'components/styled/SkipContent';
-import { USER_ROLES, PROGRESS_TAXONOMY_ID, SUPPORT_LEVELS } from 'themes/config';
+import {
+  USER_ROLES,
+  PROGRESS_TAXONOMY_ID,
+  SUPPORT_LEVELS,
+  SHOW_TYPE_WITH_LIST_ITEM_REFERENCE,
+} from 'themes/config';
+
 import appMessages from 'containers/App/messages';
 
 import EntityListItemMainTop from './EntityListItemMainTop';
@@ -19,11 +25,15 @@ import EntityListItemMainBottom from './EntityListItemMainBottom';
 const Styled = styled((p) => <Component {...p} />)`
   position: relative;
   padding-left: 0;
+  padding-left: ${(props) => !props.theme.sizes
+    ? 0
+    : props.theme.sizes.mainListItemSmall.paddingHorizontal
+}px;
   box-shadow: ${({ isConnection }) => isConnection ? '0px 0px 6px 0px rgba(0,0,0,0.2)' : 'none'};
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-left: ${(props) => (!props.theme.sizes || props.isManager)
     ? 0
-    : props.theme.sizes.mainListItem.paddingHorizontal
+    : props.theme.sizes.mainListItemSmall.paddingHorizontal
 }px;
   }
   @media print {
@@ -177,6 +187,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     if (intl
       && appMessages.entities[type]
       && appMessages.entities[type].singleShort
+      && SHOW_TYPE_WITH_LIST_ITEM_REFERENCE
     ) {
       return `${intl.formatMessage(appMessages.entities[type].singleShort)}: ${reference}`;
     }
