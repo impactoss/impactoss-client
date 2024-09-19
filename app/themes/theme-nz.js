@@ -441,6 +441,9 @@ theme.global = {
     height: 1.42857,
   },
   breakpoints: {
+    xsmall: {
+      value: BREAKPOINTS.xsmall.max,
+    },
     small: {
       value: BREAKPOINTS.small.max,
     },
