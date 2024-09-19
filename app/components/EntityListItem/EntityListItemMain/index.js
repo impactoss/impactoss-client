@@ -9,7 +9,13 @@ import { qe } from 'utils/quasi-equals';
 
 import Component from 'components/styled/Component';
 import SkipContent from 'components/styled/SkipContent';
-import { USER_ROLES, PROGRESS_TAXONOMY_ID, SUPPORT_LEVELS } from 'themes/config';
+import {
+  USER_ROLES,
+  PROGRESS_TAXONOMY_ID,
+  SUPPORT_LEVELS,
+  SHOW_TYPE_WITH_LIST_ITEM_REFERENCE,
+} from 'themes/config';
+
 import appMessages from 'containers/App/messages';
 
 import EntityListItemMainTop from './EntityListItemMainTop';
@@ -177,6 +183,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     if (intl
       && appMessages.entities[type]
       && appMessages.entities[type].singleShort
+      && SHOW_TYPE_WITH_LIST_ITEM_REFERENCE
     ) {
       return `${intl.formatMessage(appMessages.entities[type].singleShort)}: ${reference}`;
     }
