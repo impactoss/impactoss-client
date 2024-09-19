@@ -375,6 +375,9 @@ theme.sizes = {
     paddingTop: 12,
     paddingBottom: 12,
   },
+  mainListItemSmall: {
+    paddingHorizontal: 4,
+  },
   header: {
     banner: {
       height: 88,
