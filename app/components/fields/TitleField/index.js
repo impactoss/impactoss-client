@@ -13,13 +13,9 @@ class TitleField extends React.PureComponent { // eslint-disable-line react/pref
     const { field } = this.props;
     return (
       <FieldWrap>
-        {field.isManager
-          && (
-            <Label>
-              <FormattedMessage {...(field.label || appMessages.attributes.title)} />
-            </Label>
-          )
-        }
+        <Label>
+          <FormattedMessage {...(field.label || appMessages.attributes.title)} />
+        </Label>
         <Title>{field.value}</Title>
       </FieldWrap>
     );
