@@ -74,6 +74,7 @@ export const regExMultipleWords = (str) => {
 export const regExMultipleWordsMatchStart = (str) => reduce(str.split(' '), (words, s) => `${words}(?=.*\\b${s})`, '');
 
 export const truncateText = (text, limit, keepWords = true) => {
+  if (!text) return '';
   if (text.length > (limit + TEXT_TRUNCATE.GRACE)) {
     if (!keepWords) {
       return `${text.substring(0, limit).trim()}\u2026`;
