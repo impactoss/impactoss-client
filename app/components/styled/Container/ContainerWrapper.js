@@ -9,6 +9,7 @@ right:0;
 overflow-y: auto;
 @media print {
   position: static;
+  overflow-y: visible;
 }
 `;
 export default ContainerWrapper;

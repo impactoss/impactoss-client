@@ -57,7 +57,6 @@ const PrintHintKey = styled(PrintOnly)`
 const StyledContent = styled(Content)`
   margin-bottom: 10em;
   @media print {
-    margin-bottom: 0;
     min-height: 0;
   }
 `;
