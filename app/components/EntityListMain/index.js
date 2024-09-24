@@ -56,6 +56,10 @@ const PrintHintKey = styled(PrintOnly)`
 
 const StyledContent = styled(Content)`
   margin-bottom: 10em;
+  @media print {
+    margin-bottom: 0;
+    min-height: 0;
+  }
 `;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function

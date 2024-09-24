@@ -71,7 +71,7 @@ const Styled = styled.div`
   z-index: 101;
   @media print {
     display: ${({ isHome }) => isHome ? 'none' : 'block'};
-    height: ${({ theme }) => theme.sizes.header.banner.heightPrint}px;
+    height: ${({ theme }) => theme.sizes.header.banner.height}px;
     border-bottom: 1px solid ${palette('dark', 2)};
     position: static;
     box-shadow: none;
