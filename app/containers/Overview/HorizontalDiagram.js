@@ -102,6 +102,9 @@ const Annotation = styled.div`
   font-size: 0.85em;
   margin-top: 1.6em;
   left: ${(props) => props.hasSDGs ? 31 : 30}%;
+  @media print {
+    margin-top: 0;
+  }
 `;
 const AnnotationMeasured = styled(Annotation)`
   left: 70%;
@@ -117,6 +120,9 @@ const AnnotationVertical = styled.div`
   font-size: 0.8em;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 0.85em;
+  }
+  @media print {
+    background-color: transparent;
   }
 `;
 
@@ -139,6 +145,9 @@ const Categorised = styled.div`
     border-bottom: 0;
     padding-bottom: 0;
     margin: 0;
+  }
+  @media print {
+    display: none;
   }
 `;
 
@@ -284,6 +293,9 @@ const DiagramSvgWrapper = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
+  @media print {
+    display: none;
+  }
 `;
 
 const PathLineCustom = styled(PathLine)`

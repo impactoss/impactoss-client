@@ -30,7 +30,10 @@ const FooterMain = styled.div`
   @media print {
     color: ${palette('text', 0)};
     background-color: transparent;
-    border: 1px solid;
+    padding: 0px;
+    div { 
+      break-inside: avoid; 
+    }
   }
 `;
 

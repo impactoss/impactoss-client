@@ -23,6 +23,7 @@ import ContentHeader from 'components/ContentHeader';
 import TagSearch from 'components/TagSearch';
 import PrintOnly from 'components/styled/PrintOnly';
 import Footer from 'containers/Footer';
+import PrintHide from 'components/styled/PrintHide';
 
 import { CONTENT_LIST, PARAMS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -55,6 +56,10 @@ const PrintHintKey = styled(PrintOnly)`
 
 const StyledContent = styled(Content)`
   margin-bottom: 10em;
+  @media print {
+    margin-bottom: 0;
+    min-height: 0;
+  }
 `;
 
 class EntityListMain extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -324,7 +329,9 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
             )}
           </StyledContent>
         </Container>
-        <Footer hasBorder />
+        <PrintHide>
+          <Footer hasBorder />
+        </PrintHide>
       </ContainerWrapperSidebar>
     );
   }
