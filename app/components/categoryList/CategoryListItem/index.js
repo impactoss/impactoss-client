@@ -54,7 +54,8 @@ const BarWrap = styled.div`
   width:100%;
   vertical-align: middle;
   font-size: 0px;
-  padding: ${({ multiple }) => multiple ? '4px 6px' : '10px 6px'};
+  padding: ${({ multiple }) => multiple ? '4px 4px' : '10px 4px'};
+  padding-left: 28px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-top: ${({ multiple }) => multiple ? 0 : 10}px;
     padding-bottom: ${({ multiple }) => multiple ? 8 : 10}px;
@@ -95,7 +96,7 @@ const Bar = styled.div`
   }
 `;
 const Count = styled.div`
-  display: none;
+  display: block;
   position: absolute;
   line-height: ${({ multiple }) => multiple ? 8 : 16}px;
   left: 0;
@@ -103,15 +104,16 @@ const Count = styled.div`
   padding: 2px 0;
   color: ${(props) => palette(props.palette, 0)};
   white-space: nowrap;
+  font-size: ${({ theme }) => theme.sizes.text.small};
+  font-weight: 500;
+  text-align: right;
+  padding: 0 5px 0 0;
+  right: 100%;
+  bottom: auto;
+  left: auto;
   @media print, (min-width: ${(props) => props.theme.breakpoints.small}) {
-    display: block;
+    font-weight: 600;
     font-size: ${({ theme, multiple }) => multiple ? theme.sizes.text.default : theme.sizes.text.aaLargeBold};
-    font-weight: bold;
-    text-align: right;
-    padding: 0 5px 0 0;
-    right: 100%;
-    bottom: auto;
-    left: auto;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     line-height: ${({ multiple }) => multiple ? 12 : 24}px;

@@ -24,9 +24,11 @@ const isMaxXLarge = (size) => isMaxLarge(size) || size === 'xlarge';
 const isMaxLarge = (size) => isMaxMedium(size) || size === 'large';
 const isMaxMedium = (size) => isMaxSM(size) || size === 'medium';
 const isMaxSM = (size) => isMaxSmall(size) || size === 'ms';
-const isMaxSmall = (size) => size === 'small';
+const isMaxSmall = (size) => isMaxXSmall(size) || size === 'small';
+const isMaxXSmall = (size) => size === 'xsmall';
 
 export const isMaxSize = (currentSize, checkSize) => {
+  if (checkSize === 'xsmall') return isMaxXSmall(currentSize);
   if (checkSize === 'small') return isMaxSmall(currentSize);
   if (checkSize === 'ms') return isMaxSM(currentSize);
   if (checkSize === 'medium') return isMaxMedium(currentSize);

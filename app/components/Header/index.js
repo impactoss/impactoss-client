@@ -72,6 +72,7 @@ const Styled = styled.div`
   @media print {
     display: ${({ isHome }) => isHome ? 'none' : 'block'};
     height: ${({ theme }) => theme.sizes.header.banner.height}px;
+    border-bottom: 1px solid ${palette('dark', 2)};
     position: static;
     box-shadow: none;
     background: white;

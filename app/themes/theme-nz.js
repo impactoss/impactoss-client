@@ -375,6 +375,9 @@ theme.sizes = {
     paddingTop: 12,
     paddingBottom: 12,
   },
+  mainListItemSmall: {
+    paddingHorizontal: 4,
+  },
   header: {
     banner: {
       height: 88,
@@ -441,6 +444,9 @@ theme.global = {
     height: 1.42857,
   },
   breakpoints: {
+    xsmall: {
+      value: BREAKPOINTS.xsmall.max,
+    },
     small: {
       value: BREAKPOINTS.small.max,
     },
