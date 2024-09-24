@@ -9,7 +9,13 @@ import { qe } from 'utils/quasi-equals';
 
 import Component from 'components/styled/Component';
 import SkipContent from 'components/styled/SkipContent';
-import { USER_ROLES, PROGRESS_TAXONOMY_ID, SUPPORT_LEVELS } from 'themes/config';
+import {
+  USER_ROLES,
+  PROGRESS_TAXONOMY_ID,
+  SUPPORT_LEVELS,
+  SHOW_TYPE_WITH_LIST_ITEM_REFERENCE,
+} from 'themes/config';
+
 import appMessages from 'containers/App/messages';
 
 import EntityListItemMainTop from './EntityListItemMainTop';
@@ -18,12 +24,23 @@ import EntityListItemMainBottom from './EntityListItemMainBottom';
 
 const Styled = styled((p) => <Component {...p} />)`
   position: relative;
-  padding-left: 0;
+  padding-left: ${({ theme }) => {
+    if (!theme.sizes) {
+      return 4;
+    }
+    return theme.sizes.mainListItemSmall.paddingHorizontal;
+  }
+}px;
   box-shadow: ${({ isConnection }) => isConnection ? '0px 0px 6px 0px rgba(0,0,0,0.2)' : 'none'};
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
-    padding-left: ${(props) => (!props.theme.sizes || props.isManager)
-    ? 0
-    : props.theme.sizes.mainListItem.paddingHorizontal
+    padding-left: ${({ theme, isManager, isConnection }) => {
+    if (!theme.sizes) {
+      return 4;
+    }
+    return (isManager && !isConnection)
+      ? 0
+      : theme.sizes.mainListItem.paddingHorizontal;
+  }
 }px;
   }
   @media print {
@@ -177,6 +194,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     if (intl
       && appMessages.entities[type]
       && appMessages.entities[type].singleShort
+      && SHOW_TYPE_WITH_LIST_ITEM_REFERENCE
     ) {
       return `${intl.formatMessage(appMessages.entities[type].singleShort)}: ${reference}`;
     }
@@ -267,6 +285,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     const entity = this.mapToEntityListItem(this.props);
 
     const bottomTaxonomies = taxonomies && taxonomies.filter((tax) => !qe(tax.get('id'), PROGRESS_TAXONOMY_ID));
+
     return (
       <Styled isManager={this.props.isManager} isConnection={this.props.isConnection}>
         <Wrapper>

@@ -30,7 +30,10 @@ const FooterMain = styled.div`
   @media print {
     color: ${palette('text', 0)};
     background-color: transparent;
-    border: 1px solid;
+    padding: 0px;
+    div { 
+      break-inside: avoid; 
+    }
   }
 `;
 
@@ -102,7 +105,7 @@ const Footer = ({
             justify="between"
             border={hasBorder ? 'top' : false}
             align="start"
-            pad={{ vertical: 'ml', bottom: 'medium' }}
+            pad={{ vertical: isMobile ? 'medium' : 'ml', bottom: 'medium' }}
           >
             <Box
               gap="small"

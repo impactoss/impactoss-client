@@ -64,6 +64,8 @@ export const SHOW_HOME_TITLE = true;
 export const SHOW_BRAND_ON_HOME = true;
 export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
 
+export const SHOW_TYPE_WITH_LIST_ITEM_REFERENCE = false;
+
 // show footer logo section
 export const FOOTER = {
   INTERNAL_LINKS: [
