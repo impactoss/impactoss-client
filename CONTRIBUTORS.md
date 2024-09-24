@@ -7,6 +7,7 @@
 - dankerk
 - oventi
 - hannahnorthover
+- vbojilova
 
 ### `react-boilerplate`
 - mxstbr
