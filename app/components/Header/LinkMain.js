@@ -16,13 +16,13 @@ export default styled(Link)`
   }
   font-size: 0.8em;
   padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
-  height: ${(props) => props.theme.sizes.header.nav.heightMobile - 1}px;
+  height: ${(props) => props.theme.sizes.header.nav.heightMobile}px;
   border-left: 1px solid ${palette('dark', 3)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     min-width: 120px;
     font-size: 0.9em;
     padding: 5px ${(props) => props.theme.sizes.header.paddingLeft.small}px;
-    height: ${(props) => props.theme.sizes.header.nav.height - 1}px;
+    height: ${(props) => props.theme.sizes.header.nav.height}px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     min-width: 160px;
