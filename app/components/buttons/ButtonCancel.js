@@ -5,8 +5,11 @@ import ButtonForm from './ButtonForm';
 
 const ButtonCancel = styled(ButtonForm)`
   color: ${palette('buttonCancel', 0)};
-  &:hover, &:hover {
+  &:hover, &:focus-visible {
     color: ${palette('buttonCancelHover', 0)};
+  }
+  &:focus-visible {
+    outline: 2px solid  ${palette('primary', 0)};
   }
 `;
 

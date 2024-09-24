@@ -70,8 +70,13 @@ const MultiselectActiveOptionRemove = styled(Button)`
   display: block;
   bottom: 0;
   color: ${palette('link', 2)};
-  &:hover {
+  &:hover, :focus-visible {
     color: ${palette('linkHover', 2)};
+  }
+  &:focus-visible {
+    outline: 2px solid  ${palette('primary', 0)};
+    border-radius: 0.5em;
+    z-index: 99999;
   }
   padding: 0 8px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
@@ -99,12 +104,18 @@ const MultiSelectDropdown = styled(Button)`
   font-size: 0.85em;
   text-align: left;
   color: ${palette('multiSelectFieldButton', 0)};
-  background-color: ${palette('multiSelectFieldButton', 1)};
+  background-color: ${palette('multiSelectFieldButton', 1)};  
+  padding: 12px 0 12px 8px;
+
   &:hover {
     color: ${palette('multiSelectFieldButtonHover', 0)};
     background-color: ${palette('multiSelectFieldButtonHover', 1)}
   }
-  padding: 12px 0 12px 8px;
+  &:focus-visible {
+    outline: 2px solid  ${palette('primary', 0)};
+    border-radius: 0.5em;
+    z-index: 9999; 
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 0.85em;
     padding: 12px 0 12px 16px;

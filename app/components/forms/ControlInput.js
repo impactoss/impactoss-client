@@ -8,6 +8,10 @@ const ControlInput = styled(Control.input)`
   border: 1px solid ${palette('light', 1)};
   padding: 0.7em;
   border-radius: 0.5em;
+  &:focus-visible {
+    outline: 2px solid  ${palette('primary', 0)};
+    border-radius: 0.5em;
+  }
 `;
 
 export default ControlInput;

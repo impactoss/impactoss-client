@@ -1,5 +1,6 @@
 /* DayPicker styles */
 import { createGlobalStyle } from 'styled-components';
+import { palette } from 'styled-theme';
 
 /* eslint no-unused-expressions: 0 */
 /* stylelint-disable */
@@ -210,6 +211,12 @@ const DatePickerStyle = createGlobalStyle`
     @media (min-width: 769px) {
       right: 0;
       left: auto;
+    }
+
+    .DayPickerInput input {
+      &:focus-visible {
+        outline: 2px solid  ${palette('primary', 0)};
+      }
     }
   }
 `;

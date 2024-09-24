@@ -56,7 +56,7 @@ const MDButton = styled((p) => (
   <Button
     plain
     as="div"
-    tabindex="0"
+    tabIndex="0"
     role="button"
     {...p}
   />
@@ -67,6 +67,21 @@ const MDButton = styled((p) => (
   padding: 4px 7px;
   &:hover {
     background-color: ${({ disabled }) => disabled ? 'transparent' : palette('light', 2)};
+  }
+  &:focus {
+    box-shadow: none;
+  }
+  &:focus-visible {
+    border-radius: 0.5em;
+    outline: 2px solid  ${palette('primary', 0)};
+    outline-offset: 0px;
+    svg {
+      color: ${palette('primary', 0)};
+      stroke: ${palette('primary', 0)};
+    }
+    span {
+      color: ${palette('primary', 0)};
+    }
   }
 `;
 const ViewButton = styled((p) => (
@@ -85,6 +100,14 @@ const ViewButton = styled((p) => (
   &:hover {
     opacity: 0.8;
     border-bottom-color: ${palette('light', 2)};
+  }
+  &:focus {
+    outline-color: none;
+    box-shadow: none;
+  }
+  &:focus-visible {
+    color: ${palette('primary', 0)};
+    border-bottom-color: ${palette('primary', 0)};
   }
 `;
 const MDButtonText = styled((p) => (

@@ -7,6 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
+import { palette } from 'styled-theme';
 
 import styled from 'styled-components';
 import {
@@ -25,6 +26,10 @@ import LayerContent from './LayerContent';
 
 const Markdown = styled(ReactMarkdown)`
   font-size: ${(props) => props.theme.sizes.text.markdownMobile};
+  a:focus-visible { 
+    outline: none !important;
+    text-decoration: underline;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     font-size: ${(props) => props.theme.sizes.text.markdown};
   }
@@ -32,7 +37,20 @@ const Markdown = styled(ReactMarkdown)`
     font-size: ${(props) => props.theme.sizes.print.markdown};
   }
 `;
-
+const StyledButton = styled((p) => <Button {...p} />)`
+  &:focus {
+    box-shadow: none;
+  }
+  &:focus-visible {
+    color: ${palette('primary', 0)};
+    outline: 2px solid  ${palette('primary', 0)};
+    border-radius: 0.5em;
+    outline-offset: 2px;
+    svg {
+      stroke: ${palette('primary', 0)};
+    }
+  }
+`;
 function Overlay({
   onClose,
   title,
@@ -57,7 +75,7 @@ function Overlay({
           </Box>
           {onClose && (
             <Box flex={{ grow: 0 }}>
-              <Button plain icon={<FormClose size="medium" />} onClick={onClose} />
+              <StyledButton plain icon={<FormClose size="medium" />} onClick={onClose} />
             </Box>
           )}
         </LayerHeader>
