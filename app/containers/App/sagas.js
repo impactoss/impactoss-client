@@ -318,9 +318,9 @@ export function* validateTokenSaga() {
       );
       if (!response.success) {
         yield call(clearAuthValues);
-        yield put(invalidateEntities());
       }
       yield put(authenticateSuccess(response.data)); // need to store currentUserData
+      yield put(invalidateEntities());
     }
   } catch (err) {
     yield call(clearAuthValues);
