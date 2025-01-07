@@ -2,7 +2,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
-const OfflinePlugin = require('offline-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
@@ -27,7 +26,6 @@ module.exports = require('./webpack.base.babel')({
     minimize: true,
     minimizer: [
       (compiler) => {
-        const TerserPlugin = require('terser-webpack-plugin');
         new TerserPlugin({
           terserOptions: {
             warnings: false,
@@ -42,7 +40,7 @@ module.exports = require('./webpack.base.babel')({
             },
             sourceMap: true,
           },
-        parallel: true,
+          parallel: true,
         }).apply(compiler);
       },
     ],

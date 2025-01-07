@@ -5,7 +5,6 @@ import importPlugin from "eslint-plugin-import";
 import globals from "globals";
 import babelParser from "@babel/eslint-parser";
 import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
 import { includeIgnoreFile } from "@eslint/compat";
 
 import path from "node:path";
@@ -15,12 +14,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const gitignorePath = path.resolve(__dirname, ".gitignore");
-
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
 
 export default [
     js.configs.recommended,

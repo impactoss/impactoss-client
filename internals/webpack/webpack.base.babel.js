@@ -5,7 +5,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin"); 
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
 
 module.exports = (options) => ({
   mode: options.mode,
@@ -50,7 +50,7 @@ module.exports = (options) => ({
         },
       },
       {
-        test: /\.(jpe?g|png|gif|svg)$/i,
+        test: /\.(jpe?g|png|gif|svg|ico)$/i,
         type: 'asset',
       },
       {
@@ -92,37 +92,18 @@ module.exports = (options) => ({
     minimizer: [
       new ImageMinimizerPlugin({
         minimizer: {
-          implementation: ImageMinimizerPlugin.imageminMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {
-            // Lossless optimization with custom option
-            plugins: [
-              ["gifsicle", { interlaced: true }],
-              ["jpegtran", { progressive: true }],
-              ["optipng", { optimizationLevel: 7 }],
-              // Svgo configuration here https://github.com/svg/svgo#configuration
-              [
-                "svgo",
-                {
-                  plugins: [
-                    {
-                      name: "preset-default",
-                      params: {
-                        overrides: {
-                          removeViewBox: false,
-                          addAttributesToSVGElement: {
-                            params: {
-                              attributes: [
-                                { xmlns: "http://www.w3.org/2000/svg" },
-                              ],
-                            },
-                          },
-                        },
-                      },
-                    },
-                  ],
-                },
-              ],
-            ],
+            encodeOptions: {
+              jpeg: {
+                quality: 100,
+              },
+              webp: {
+                lossless: true,
+              },
+              png: {},
+              gif: {},
+            },
           },
         },
       }),
