@@ -14,6 +14,10 @@ const ListLink = styled(
   &:hover {
     color: ${({ paletteHover, pIndexHover }) => palette(paletteHover || 'mainListItemHover', pIndexHover || 0)};
   }
+  &:focus-visible {
+    outline: none;
+    text-decoration: underline;
+  }
 `;
 
 export default ListLink;

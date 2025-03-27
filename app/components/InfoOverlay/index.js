@@ -7,6 +7,7 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
+import { palette } from 'styled-theme';
 
 import styled from 'styled-components';
 import {
@@ -18,6 +19,20 @@ import { CircleInformation, CircleQuestion } from 'grommet-icons';
 
 import Overlay from './Overlay';
 
+const StyledButton = styled((p) => <Button {...p} />)`
+  &:focus {
+    box-shadow: none;
+  }
+  &:focus-visible {
+    color: ${palette('primary', 0)};
+    outline: 2px solid  ${palette('primary', 0)};
+    border-radius: 0.5em;
+    outline-offset: 2px;
+    svg {
+      stroke: ${palette('primary', 0)};
+    }
+  }
+`;
 const DropContent = styled(({ dropBackground, ...p }) => (
   <Box
     pad="xxsmall"
@@ -64,7 +79,7 @@ function InfoOverlay({
         align="center"
         justify="center"
       >
-        <Button
+        <StyledButton
           plain
           icon={
             (tooltip || icon === 'question')
