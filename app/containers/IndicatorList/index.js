@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { List, Map, fromJS } from 'immutable';
+import { injectIntl } from 'react-intl';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
@@ -39,8 +40,9 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
   }
 
   render() {
-    const { intl } = this.context;
-    const { dataReady, isManager, isUserSignedIn } = this.props;
+    const {
+      dataReady, isManager, isUserSignedIn, intl,
+    } = this.props;
 
     // specify the filter and query  options
     const headerOptions = {
@@ -126,9 +128,6 @@ IndicatorList.propTypes = {
   location: PropTypes.object,
   isManager: PropTypes.bool,
   isUserSignedIn: PropTypes.bool,
-};
-
-IndicatorList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -155,4 +154,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(IndicatorList);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(IndicatorList));

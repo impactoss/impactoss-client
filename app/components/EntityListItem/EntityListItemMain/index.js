@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { injectIntl } from 'react-intl';
 // import { isEqual } from 'lodash/lang';
 import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
@@ -84,6 +85,7 @@ const EntityListItemMainTopWrap = styled.div`
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal
 }px;
+  }
 `;
 
 const EntityListItemMainSubtitle = styled.div`
@@ -100,9 +102,8 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     if (this.props.isFocus) this.title.focus();
   }
 
-  getConnections = (entity, connectionOptions, connections) => {
-    const { intl } = this.context;
-    return reduce(connectionOptions, (memo, option) => {
+  getConnections = (entity, connectionOptions, connections, intl) =>
+    reduce(connectionOptions, (memo, option) => {
       // console.log(memo, option, entity.toJS())
       let memoX = memo;
       if (
@@ -158,17 +159,15 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       }
       return memoX;
     }, []);
-  };
 
   getRole = (entityRoles, roles) => {
     const role = roles.find((r) => parseInt(r.get('id'), 10) === entityRoles.first());
     // console.log('roles entityRoles.first()', entityRoles.first())
     // console.log('roles role', role)
     return role ? parseInt(role.get('id'), 10) : USER_ROLES.DEFAULT.value;
-  }
+  };
 
-  getReference = (entity) => {
-    const { intl } = this.context;
+  getReference = (entity, intl) => {
     const reference = entity.getIn(['attributes', 'reference']) || entity.get('id');
     let type = entity.get('type');
     if (entity.getIn(['attributes', 'framework_id'])) {
@@ -181,7 +180,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       return `${intl.formatMessage(appMessages.entities[type].singleShort)}: ${reference}`;
     }
     return reference;
-  }
+  };
 
   getProgressTaxonomy = (taxonomies) => taxonomies && taxonomies.find((tax) => qe(tax.get('id'), PROGRESS_TAXONOMY_ID));
 
@@ -193,7 +192,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
         (cat) => categoryIds.includes(parseInt(cat.get('id'), 10))
       );
     return progressCategory && progressCategory.toJS();
-  }
+  };
 
   getWithoutProgressCategories = (taxonomies, categoryIds) => {
     const progressTaxonomy = taxonomies && this.getProgressTaxonomy(taxonomies);
@@ -207,7 +206,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
         }
       )
       : categoryIds;
-  }
+  };
 
   mapToEntityListItem = ({
     config,
@@ -216,8 +215,8 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     entityPath,
     connections,
     taxonomies,
+    intl,
   }) => {
-    const { intl } = this.context;
     let path = '';
     if (entityPath) {
       path = entityPath;
@@ -237,7 +236,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       id: entity.get('id'),
       title: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
       subtitle: config && config.sublabel && entity.getIn(['attributes', config.sublabel]),
-      reference: this.getReference(entity),
+      reference: this.getReference(entity, intl),
       draft: entity.getIn(['attributes', 'draft']),
       is_archive: entity.getIn(['attributes', 'is_archive']),
       is_current: entity.getIn(['attributes', 'is_current']),
@@ -246,7 +245,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       support: supportLevel,
       categories: taxonomies && this.getWithoutProgressCategories(taxonomies, entity.get('categories')),
       connectedCounts: config && config.connections
-        ? this.getConnections(entity, config.connections.options, connections)
+        ? this.getConnections(entity, config.connections.options, connections, intl)
         : [],
       assignedUser: entity.get('manager') && ({ name: entity.getIn(['manager', 'attributes', 'name']) }),
       targetDate: entity.getIn(['attributes', 'target_date'])
@@ -254,7 +253,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
         && intl.formatDate(entity.getIn(['attributes', 'target_date'])),
       progressCategory: taxonomies && this.getProgressCategory(taxonomies, entity.get('categories')),
     });
-  }
+  };
 
   render() {
     const {
@@ -330,9 +329,7 @@ EntityListItemMain.propTypes = {
   isManager: PropTypes.bool,
   isFocus: PropTypes.bool,
   skipTargetId: PropTypes.string,
-};
-EntityListItemMain.contextTypes = {
-  intl: PropTypes.object,
+  intl: PropTypes.object.isRequired,
 };
 
-export default EntityListItemMain;
+export default injectIntl(EntityListItemMain);

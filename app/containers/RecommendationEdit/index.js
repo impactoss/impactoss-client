@@ -8,9 +8,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
-import { Map } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 import {
   taxonomyOptions,
@@ -43,7 +43,6 @@ import {
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   deleteEntity,
   openNewEntityModal,
   submitInvalid,
@@ -83,23 +82,17 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.viewEntity) {
-      this.props.initialiseForm('recommendationEdit.form.data', this.getInitialFormData());
-    }
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
-    }
-    // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.initialiseForm('recommendationEdit.form.data', this.getInitialFormData(nextProps));
     }
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
@@ -109,12 +102,12 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     }
   }
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const {
-      taxonomies, measures, indicators, viewEntity,
-    } = props;
-    return viewEntity
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getInitialFormData = ({ taxonomies, measures, indicators, viewEntity }) =>
+    viewEntity
       ? Map({
         id: viewEntity.get('id'),
         attributes: viewEntity.get('attributes').mergeWith(
@@ -126,11 +119,9 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
         associatedIndicators: entityOptions(indicators, true),
       })
       : Map();
-  };
 
-  getHeaderMainFields = (existingReferences) => {
-    const { intl } = this.context;
-    return ([ // fieldGroups
+  getHeaderMainFields = (existingReferences, intl) => 
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getReferenceFormField({
@@ -142,11 +133,9 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
         ],
       },
     ]);
-  };
 
-  getHeaderAsideFields = (entity) => {
-    const { intl } = this.context;
-    return ([
+  getHeaderAsideFields = (entity, intl) =>
+    ([
       {
         fields: [
           getStatusField(intl.formatMessage),
@@ -155,7 +144,6 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
         ],
       },
     ]);
-  };
 
   getBodyMainFields = (
     connectedTaxonomies,
@@ -164,8 +152,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     indicators,
     onCreateOption,
     hasResponse,
+    intl
   ) => {
-    const { intl } = this.context;
     const groups = [];
     groups.push({
       fields: [
@@ -202,11 +190,10 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       });
     }
     return groups;
-  }
+  };
 
-  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
-    const { intl } = this.context;
-    return ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
@@ -217,10 +204,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
         }),
       },
     ]);
-  };
 
   render() {
-    const { intl } = this.context;
     const {
       viewEntity,
       dataReady,
@@ -233,6 +218,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       frameworks,
       existingReferences,
       canUserAdministerCategories,
+      intl,
     } = this.props;
     const reference = this.props.params.id;
     const {
@@ -276,7 +262,11 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('recommendationEdit.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }] : null
             }
           />
@@ -313,9 +303,9 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           {viewEntity && dataReady && !deleteSending
             && (
               <EntityForm
-                model="recommendationEdit.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   fwTaxonomies,
@@ -326,16 +316,16 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
-                handleUpdate={this.props.handleUpdate}
                 handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(
                       existingReferences
                         ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
-                        : null
+                        : null,
+                      intl
                     ),
-                    aside: this.getHeaderAsideFields(viewEntity),
+                    aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
@@ -345,11 +335,13 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                       hasIndicators && indicators,
                       onCreateOption,
                       hasResponse,
+                      intl
                     ),
                     aside: this.getBodyAsideFields(
                       fwTaxonomies,
                       onCreateOption,
                       canUserAdministerCategories,
+                      intl
                     ),
                   },
                 }}
@@ -369,12 +361,9 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 RecommendationEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  initialiseForm: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
@@ -392,11 +381,9 @@ RecommendationEdit.propTypes = {
   frameworks: PropTypes.object,
   existingReferences: PropTypes.array,
   canUserAdministerCategories: PropTypes.bool,
-};
-
-RecommendationEdit.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
+
 const mapStateToProps = (state, props) => ({
   viewDomain: selectDomain(state),
   highestRole: selectSessionUserHighestRoleId(state),
@@ -420,10 +407,6 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
     },
@@ -433,17 +416,15 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
     handleSubmit: (
-      formData,
+      formValues,
       taxonomies,
       measures,
       indicators,
       currentFramework,
       viewEntity,
     ) => {
+      const formData = fromJS(formValues)
       let saveData = formData
         .set(
           'recommendationCategories',
@@ -491,9 +472,6 @@ function mapDispatchToProps(dispatch, props) {
     handleCancel: () => {
       dispatch(updatePath(`${ROUTES.RECOMMENDATIONS}/${props.params.id}`, { replace: true }));
     },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
-    },
     handleDelete: () => {
       dispatch(deleteEntity({
         path: 'recommendations',
@@ -506,4 +484,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RecommendationEdit);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(RecommendationEdit));

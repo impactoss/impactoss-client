@@ -8,13 +8,13 @@ const GlobalStyle = createGlobalStyle`
     width: 100%;
   }
   body {
-    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 1.428571429;
     color: #1c2121;;
   }
   button, input, select, textarea {
-    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     background-color: transparent;
     border-style: none;
     color: inherit;
@@ -235,7 +235,7 @@ const GlobalStyle = createGlobalStyle`
   }
   @media print {
     @page {
-      margin: 1.5cm 1.2cm 1.5cm;
+      margin: 1.5cm 1.2cm;
     }
     body {
       font-size: 10pt;

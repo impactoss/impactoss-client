@@ -7,7 +7,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import styled, { withTheme } from 'styled-components';
 
@@ -121,7 +121,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
   };
 
   render() {
-    const { intl } = this.context;
     const {
       dataReady,
       onTaxonomyLink,
@@ -129,6 +128,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       frameworks,
       frameworkId,
       onPageLink,
+      intl,
     } = this.props;
     let recommendationCount = 1;
     let recommendationDraftCount = 0;
@@ -173,7 +173,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
               </Description>
               <SkipContent
                 href="#sidebar-taxonomy-options"
-                title={this.context.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
+                title={intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
               >
                 <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
               </SkipContent>
@@ -240,9 +240,6 @@ Overview.propTypes = {
   indicatorDraftCount: PropTypes.number,
   frameworks: PropTypes.object,
   frameworkId: PropTypes.string,
-};
-
-Overview.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -278,4 +275,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default withTheme(connect(mapStateToProps, mapDispatchToProps)(Overview));
+export default injectIntl(withTheme(connect(mapStateToProps, mapDispatchToProps)(Overview)));

@@ -33,7 +33,7 @@ export const FORM_INITIAL = fromJS({
     reference: '',
     user_only: false,
     draft: true,
-    date: null,
+    date: '',
   },
   associatedMeasures: [],
   associatedRecommendationsByFw: {},

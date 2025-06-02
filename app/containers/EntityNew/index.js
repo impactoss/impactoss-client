@@ -7,13 +7,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { actions as formActions } from 'react-redux-form/immutable';
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
+
 import { Box } from 'grommet';
+
 import { getEntityAttributeFields } from 'utils/forms';
 import { qe } from 'utils/quasi-equals';
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
+import { injectIntl } from 'react-intl';
 
 import {
   newEntity,
@@ -52,38 +54,32 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
-  }
-
-  UNSAFE_componentWillMount() {
-    this.props.initialiseForm('entityNew.form.data', this.getInitialFormData());
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
       scrollToTop(this.scrollContainer.current);
     }
-    if (!this.props.frameworkId && nextProps.frameworkId) {
-      this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData(nextProps));
-    }
   }
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const { frameworkId } = props;
-    return Map(FORM_INITIAL.setIn(
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getInitialFormData = ({ frameworkId }) =>
+    Map(FORM_INITIAL.setIn(
       ['attributes', 'framework_id'],
       (frameworkId && frameworkId !== 'all')
         ? frameworkId
         : DEFAULT_FRAMEWORK,
     ));
-  }
 
   /* eslint-disable react/destructuring-assignment */
-  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+  getTaxTitle = (id) => this.props.intl.formatMessage(appMessages.entities.taxonomies[id].single);
   /* eslint-enable react/destructuring-assignment */
 
   render() {
-    const { intl } = this.context;
     const {
       viewDomain,
       path,
@@ -98,6 +94,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
       recommendationReferences,
       measureReferences,
       indicatorReferences,
+      intl,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
 
@@ -158,7 +155,11 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('entityNew.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }]}
             />
           </Box>
@@ -184,10 +185,10 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             && <Loading />
           }
           <EntityForm
-            model="entityNew.form.data"
-            formData={viewDomain.getIn(['form', 'data'])}
+            formData={this.getInitialFormData(this.props).toJS()}
             inModal={inModal}
             saving={saveSending}
+            bindHandleSubmit={this.bindHandleSubmit}
             handleSubmit={(formData) => this.props.handleSubmit(
               formData,
               attributes
@@ -233,14 +234,12 @@ EntityNew.propTypes = {
   taxonomy: PropTypes.object,
   parentTaxonomy: PropTypes.object,
   categoryParentOptions: PropTypes.object,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   inModal: PropTypes.bool,
   // onSaveSuccess: PropTypes.func,
   viewDomain: PropTypes.object,
-  initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   framework: PropTypes.object,
@@ -249,9 +248,6 @@ EntityNew.propTypes = {
   recommendationReferences: PropTypes.array,
   measureReferences: PropTypes.array,
   indicatorReferences: PropTypes.array,
-};
-
-EntityNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -282,10 +278,6 @@ const mapStateToProps = (state, { path, attributes }) => ({
 
 function mapDispatchToProps(dispatch, props) {
   return {
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
     },
@@ -295,10 +287,8 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, attributes) => {
+    handleSubmit: (formValues, attributes) => {
+      const formData = fromJS(formValues)
       let saveData = attributes
         ? formData.mergeIn(['attributes'], attributes)
         : formData;
@@ -324,4 +314,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EntityNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(EntityNew));

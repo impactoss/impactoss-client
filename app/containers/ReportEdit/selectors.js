@@ -10,10 +10,7 @@ import { entitySetUser } from 'utils/entities';
 import { qe } from 'utils/quasi-equals';
 import { sortEntities } from 'utils/sort';
 
-export const selectDomain = createSelector(
-  (state) => state.get('reportEdit'),
-  (substate) => substate
-);
+export const selectDomain = (state) => state.get('reportEdit');
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'progress_reports', id }),

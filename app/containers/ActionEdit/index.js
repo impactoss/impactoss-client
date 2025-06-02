@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 import { Map, fromJS } from 'immutable';
 
 import {
@@ -44,7 +44,6 @@ import {
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   deleteEntity,
   openNewEntityModal,
   submitInvalid,
@@ -85,13 +84,12 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.viewEntity) {
-      this.props.initialiseForm('measureEdit.form.data', this.getInitialFormData());
-    }
+
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -99,11 +97,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.initialiseForm('measureEdit.form.data', this.getInitialFormData(nextProps));
-    }
-    //
+
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
@@ -112,15 +106,16 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     }
   }
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const {
-      viewEntity, taxonomies, recommendationsByFw, indicators,
-    } = props;
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getInitialFormData = ({ viewEntity, taxonomies, recommendationsByFw, indicators }) => {
     let attributes = viewEntity.get('attributes');
     if (!attributes.get('reference') || attributes.get('reference') === '') {
       attributes = attributes.set('reference', viewEntity.get('id'));
     }
+
     return viewEntity
       ? Map({
         id: viewEntity.get('id'),
@@ -135,29 +130,24 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
         associatedIndicators: entityOptions(indicators, true),
       })
       : Map();
-  }
-
-  getHeaderMainFields = (existingReferences) => {
-    const { intl } = this.context;
-    return (
-      [ // fieldGroups
-        { // fieldGroup
-          fields: [
-            getReferenceFormField({
-              formatMessage: intl.formatMessage,
-              required: true,
-              prohibitedValues: existingReferences,
-            }),
-            getTitleFormField(intl.formatMessage),
-          ],
-        },
-      ]
-    );
   };
 
-  getHeaderAsideFields = (entity) => {
-    const { intl } = this.context;
-    return ([
+  getHeaderMainFields = (existingReferences, intl) =>
+    ([ // fieldGroups
+      { // fieldGroup
+        fields: [
+          getReferenceFormField({
+            formatMessage: intl.formatMessage,
+            required: true,
+            prohibitedValues: existingReferences,
+          }),
+          getTitleFormField(intl.formatMessage),
+        ],
+      },
+    ]);
+
+  getHeaderAsideFields = (entity, intl) =>
+    ([
       {
         fields: [
           getStatusField(intl.formatMessage),
@@ -166,15 +156,14 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
         ],
       },
     ]);
-  };
 
   getBodyMainFields = (
     connectedTaxonomies,
     indicators,
     recommendationsByFw,
     onCreateOption,
+    intl,
   ) => {
-    const { intl } = this.context;
     const groups = [];
     groups.push(
       {
@@ -224,15 +213,14 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
-    const { intl } = this.context;
-    return ([ // fieldGroups
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
-          getDateField(
-            intl.formatMessage,
-            'target_date',
-          ),
+          getDateField({
+            formatMessage: intl.formatMessage,
+            attribute: 'target_date',
+          }),
           getTextareaField(
             intl.formatMessage,
             'target_date_comment',
@@ -249,7 +237,6 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
         }),
       },
     ]);
-  };
 
   render() {
     const {
@@ -263,8 +250,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
       onCreateOption,
       existingReferences,
       canUserAdministerCategories,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     const reference = this.props.params.id;
     const {
       saveSending, saveError, deleteSending, deleteError, submitValid,
@@ -292,7 +279,11 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 {
                   type: 'save',
                   disabled: saveSending,
-                  onClick: () => this.props.handleSubmitRemote('measureEdit.form.data'),
+                  onClick: (e) => {
+                    if (this.remoteSubmitForm) {
+                      this.remoteSubmitForm(e);
+                    }
+                  },
                 }]
                 : null
             }
@@ -330,8 +321,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           {viewEntity && dataReady && !deleteSending
             && (
               <EntityForm
-                model="measureEdit.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
+                bindHandleSubmit={this.bindHandleSubmit}
                 saving={saveSending}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
@@ -342,16 +333,16 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
-                handleUpdate={this.props.handleUpdate}
                 handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(
                       existingReferences
                         ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
-                        : null
+                        : null,
+                      intl
                     ),
-                    aside: this.getHeaderAsideFields(viewEntity),
+                    aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
@@ -359,11 +350,13 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                       indicators,
                       recommendationsByFw,
                       onCreateOption,
+                      intl,
                     ),
                     aside: this.getBodyAsideFields(
                       taxonomies,
                       onCreateOption,
                       canUserAdministerCategories,
+                      intl,
                     ),
                   },
                 }}
@@ -383,12 +376,9 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 ActionEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  initialiseForm: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
@@ -405,9 +395,6 @@ ActionEdit.propTypes = {
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   existingReferences: PropTypes.array,
-};
-
-ActionEdit.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -433,10 +420,6 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
     },
@@ -446,10 +429,8 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, taxonomies, recommendationsByFw, indicators, viewEntity) => {
+    handleSubmit: (formValues, taxonomies, recommendationsByFw, indicators, viewEntity) => {
+      const formData = fromJS(formValues);
       let saveData = formData
         .set(
           'measureCategories',
@@ -508,9 +489,6 @@ function mapDispatchToProps(dispatch, props) {
     handleCancel: () => {
       dispatch(updatePath(`/actions/${props.params.id}`, { replace: true }));
     },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
-    },
     handleDelete: () => {
       dispatch(deleteEntity({
         path: 'measures',
@@ -524,4 +502,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ActionEdit);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(ActionEdit));

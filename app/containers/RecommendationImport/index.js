@@ -8,7 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
 import { fromJS } from 'immutable';
 
@@ -40,29 +40,20 @@ import ImportEntitiesForm from 'components/forms/ImportEntitiesForm';
 import {
   selectErrors,
   selectProgress,
-  selectFormData,
   selectSuccess,
   selectSending,
 } from './selectors';
 
 import messages from './messages';
-import { save, resetForm } from './actions';
-import { FORM_INITIAL, DEPENDENCIES } from './constants';
+import { save } from './actions';
+import { FORM_INITIAL } from './constants';
 
 export class RecommendationImport extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  UNSAFE_componentWillMount() {
-    if (this.props.dataReady) {
-      this.props.initialiseForm('recommendationImport.form.data', FORM_INITIAL);
-    }
-  }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
-    }
-    if (nextProps.dataReady && !this.props.dataReady) {
-      this.props.initialiseForm('recommendationImport.form.data', FORM_INITIAL);
     }
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
@@ -70,44 +61,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
   }
 
   render() {
-    const { intl } = this.context;
-    const { connections, categories, params } = this.props;
-    const frameworkId = params.id || 1;
-    const recFields = ENTITY_FIELDS.recommendations;
-    // prepare attribute fields
-    const fields = Object.keys(recFields.ATTRIBUTES).reduce((memo, key) => {
-      const val = recFields.ATTRIBUTES[key];
-      if (
-        !val.skipImport
-        && checkRecommendationAttribute(frameworkId, key)
-      ) {
-        return [
-          ...memo,
-          {
-            attribute: key,
-            type: val.type || 'text',
-            required: !!val.required,
-            import: true,
-          },
-        ];
-      }
-      return memo;
-    }, []);
-    // prepare connection fields
-    const relationshipFields = Object.keys(
-      recFields.RELATIONSHIPS_IMPORT
-    ).map((key) => {
-      const val = recFields.RELATIONSHIPS_IMPORT[key];
-      return {
-        attribute: key,
-        type: val.type || 'text',
-        required: !!val.required,
-        import: true,
-        relationshipValue: val.attribute,
-        separator: val.separator,
-        hint: val.hint,
-      };
-    });
+    const { intl } = this.props;
     return (
       <div>
         <HelmetCanonical
@@ -130,22 +84,49 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
             }]}
           />
           <ImportEntitiesForm
-            model="recommendationImport.form.data"
             fieldModel="import"
-            formData={this.props.formData}
-            handleSubmit={(formData) => {
-              this.props.handleSubmit(formData, connections, categories);
-            }}
+            formData={FORM_INITIAL}
+            handleSubmit={(formData) => this.props.handleSubmit(formData)}
             handleCancel={this.props.handleCancel}
-            handleReset={this.props.handleReset}
             resetProgress={this.props.resetProgress}
             errors={this.props.errors}
             success={this.props.success}
             progress={this.props.progress}
             sending={this.props.sending}
             template={{
-              filename: `${intl.formatMessage(messages.filename)}.csv`,
-              data: getImportFields({ fields, relationshipFields }, intl.formatMessage),
+              filename: `${intl.formatMessage(messages.filename)}`,
+              data: getImportFields({
+                fields: [
+                  {
+                    attribute: 'reference',
+                    type: 'text',
+                    required: true,
+                    import: true,
+                  },
+                  {
+                    attribute: 'title',
+                    type: 'text',
+                    required: true,
+                    import: true,
+                  },
+                  {
+                    attribute: 'description',
+                    label: 'fullRecommendation',
+                    type: 'markdown',
+                    import: true,
+                  },
+                  {
+                    attribute: 'support_level',
+                    type: 'number',
+                    import: true,
+                  },
+                  {
+                    attribute: 'response',
+                    type: 'markdown',
+                    import: true,
+                  },
+                ],
+              }, intl.formatMessage),
             }}
           />
         </Content>
@@ -157,29 +138,19 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
 RecommendationImport.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  initialiseForm: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleReset: PropTypes.func.isRequired,
-  formData: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
   resetProgress: PropTypes.func.isRequired,
   progress: PropTypes.number,
-  errors: PropTypes.object, // Map
-  sending: PropTypes.object, // Map
-  success: PropTypes.object, // Map
-  params: PropTypes.object,
-  connections: PropTypes.object,
-  categories: PropTypes.object,
-};
-
-RecommendationImport.contextTypes = {
+  errors: PropTypes.object,
+  success: PropTypes.object,
   intl: PropTypes.object.isRequired,
 };
 
+
 const mapStateToProps = (state) => ({
-  formData: selectFormData(state),
   progress: selectProgress(state),
   errors: selectErrors(state),
   success: selectSuccess(state),
@@ -197,30 +168,23 @@ function mapDispatchToProps(dispatch, { params }) {
     },
     resetProgress: () => {
       dispatch(resetProgress());
-      dispatch(resetForm());
-    },
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, formData));
     },
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    handleSubmit: (formData, connections, categories) => {
+    handleSubmit: (formValues) => {
+      const formData = fromJS(formValues)
       if (formData.get('import') !== null) {
-        // submit requests for each row
-        fromJS(formData.get('import').rows).forEach((row, index) => {
-          // make sure we only take valid columns
-          const rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
-          // use framework id from URL if set, otherwise assume default framework 1
-          const frameworkId = params.id || 1;
-          let rowClean = {
-            attributes: rowCleanColumns
-              // make sure only valid fields are imported
-              .filter((val, att) => checkRecommendationAttribute(frameworkId, att))
-              .set('framework_id', frameworkId)
-              // make sure we only import draft content
-              .set('draft', true)
-              .toJS(),
+        formData.getIn(['import', 'rows']).forEach((row, index) => {
+          const attributes = row
+            .mapKeys((k) => getColumnAttribute(k))
+            .set('draft', true)
+            .toJS();
+          if (!attributes.framework_id) {
+            attributes.framework_id = 1;
+          }
+          dispatch(save({
+            attributes,
             saveRef: index + 1,
           };
           const rowJS = row.toJS();
@@ -362,11 +326,7 @@ function mapDispatchToProps(dispatch, { params }) {
     handleCancel: () => {
       dispatch(updatePath(ROUTES.RECOMMENDATIONS));
     },
-    handleReset: () => {
-      dispatch(resetProgress());
-      dispatch(resetForm());
-    },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(RecommendationImport);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(RecommendationImport));

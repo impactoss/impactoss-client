@@ -8,9 +8,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
-import { Map } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 import {
   getTitleFormField,
@@ -49,7 +49,6 @@ import {
   redirectNotPermitted,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   deleteEntity,
   submitInvalid,
   saveErrorDismiss,
@@ -81,24 +80,17 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-
-    if (this.props.dataReady && this.props.viewEntity) {
-      this.props.initialiseForm('reportEdit.form.data', this.getInitialFormData());
-    }
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
-    }
-
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.initialiseForm('reportEdit.form.data', this.getInitialFormData(nextProps));
     }
     if (nextProps.authReady) {
       this.props.onRedirectIfNotPermitted();
@@ -125,9 +117,11 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     }
   }
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const { viewEntity } = props;
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getInitialFormData = ({ viewEntity }) => {
     let attributes = viewEntity.get('attributes');
     attributes = attributes.set('due_date_id', attributes.get('due_date_id')
       ? attributes.get('due_date_id').toString()
@@ -141,22 +135,19 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         ),
       })
       : Map();
-  }
+  };
 
-  getHeaderMainFields = () => {
-    const { intl } = this.context;
-    return ([ // fieldGroups
+  getHeaderMainFields = (intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getTitleFormField(intl.formatMessage),
         ],
       },
     ]);
-  };
 
-  getHeaderAsideFields = (entity, canUserPublish) => {
-    const { intl } = this.context;
-    return ([
+  getHeaderAsideFields = (entity, canUserPublish, intl) =>
+    ([
       {
         fields: [
           canUserPublish
@@ -175,11 +166,9 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         ],
       },
     ]);
-  };
 
-  getBodyMainFields = () => {
-    const { intl } = this.context;
-    return ([
+  getBodyMainFields = (intl) =>
+    ([
       {
         fields: [
           getMarkdownFormField({ formatMessage: intl.formatMessage }),
@@ -188,11 +177,9 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         ],
       },
     ]);
-  };
 
-  getBodyAsideFields = (entity) => {
-    const { intl } = this.context;
-    return ([ // fieldGroups
+  getBodyAsideFields = (entity, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.single),
         icon: 'calendar',
@@ -210,11 +197,11 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           )],
       },
     ]);
-  };
 
   render() {
-    const { intl } = this.context;
-    const { viewEntity, dataReady, viewDomain } = this.props;
+    const {
+      viewEntity, dataReady, viewDomain, intl,
+    } = this.props;
     const reference = this.props.params.id;
     const {
       saveSending, saveError, deleteSending, deleteError, submitValid,
@@ -247,7 +234,11 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('reportEdit.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }] : null
             }
           />
@@ -284,31 +275,31 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           {viewEntity && dataReady && !deleteSending
             && (
               <EntityForm
-                model="reportEdit.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   viewEntity
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
-                handleUpdate={this.props.handleUpdate}
                 handleDelete={canUserDeleteEntities(this.props.highestRole)
                   ? () => this.props.handleDelete(viewEntity.getIn(['attributes', 'indicator_id']))
                   : null
                 }
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
+                    main: this.getHeaderMainFields(intl),
                     aside: this.getHeaderAsideFields(
                       viewEntity,
                       canUserPublishReports(this.props.highestRole),
+                      intl,
                     ),
                   },
                   body: {
-                    main: this.getBodyMainFields(),
-                    aside: this.getBodyAsideFields(viewEntity),
+                    main: this.getBodyMainFields(intl),
+                    aside: this.getBodyAsideFields(viewEntity, intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -328,12 +319,8 @@ ReportEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   onRedirectIfNotPermitted: PropTypes.func,
   onRedirectNotPermitted: PropTypes.func,
-  initialiseForm: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
-  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
@@ -342,11 +329,8 @@ ReportEdit.propTypes = {
   params: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
-  // userId: PropTypes.string, // used in nextProps
-};
-
-ReportEdit.contextTypes = {
   intl: PropTypes.object.isRequired,
+  // userId: PropTypes.string, // used in nextProps
 };
 
 const mapStateToProps = (state, props) => ({
@@ -371,9 +355,6 @@ function mapDispatchToProps(dispatch, props) {
     onRedirectNotPermitted: () => {
       dispatch(redirectNotPermitted());
     },
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.load(model, formData));
-    },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
     },
@@ -383,10 +364,8 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, viewEntity) => {
+    handleSubmit: (formValues, viewEntity) => {
+      const formData = fromJS(formValues)
       let saveData = formData;
       const previousDateAssigned = viewEntity.getIn(['attributes', 'due_date_id']);
       const dateAssigned = formData.getIn(['attributes', 'due_date_id']);
@@ -410,9 +389,6 @@ function mapDispatchToProps(dispatch, props) {
     handleCancel: (reference) => {
       dispatch(updatePath(`${ROUTES.PROGRESS_REPORTS}/${reference}`, { replace: true }));
     },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
-    },
     handleDelete: (indicatorId) => {
       dispatch(deleteEntity({
         path: 'progress_reports',
@@ -423,4 +399,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ReportEdit);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(ReportEdit));

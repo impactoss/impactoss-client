@@ -3,7 +3,7 @@ import { palette } from 'styled-theme';
 
 const ShortTitleTag = styled.span`
   display: inline-block;
-  color: ${({ pIndex }) => palette('taxonomiesTextColor', pIndex)}};
+  color: ${({ pIndex }) => palette('taxonomiesTextColor', pIndex)};
   background-color: ${({ pIndex }) => palette('taxonomies', pIndex || 0)};
   padding: 1px 6px;
   margin-right: 2px;

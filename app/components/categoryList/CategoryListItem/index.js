@@ -82,7 +82,7 @@ const Bar = styled.div`
   }
   @media print {
     z-index: 0;
-    &:before {
+    &::before {
       content: '';
       display: block;
       position: absolute;
@@ -363,10 +363,6 @@ CategoryListItem.propTypes = {
   columns: PropTypes.array,
   onPageLink: PropTypes.func,
   frameworkId: PropTypes.string,
-};
-
-CategoryListItem.contextTypes = {
-  intl: PropTypes.object.isRequired,
 };
 
 export default CategoryListItem;

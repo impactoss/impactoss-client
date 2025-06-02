@@ -68,7 +68,6 @@ export const UPDATE_ROUTE_QUERY = 'impactoss/App/UPDATE_ROUTE_QUERY';
 export const UPDATE_PATH = 'impactoss/App/UPDATE_PATH';
 
 export const SAVE_ENTITY_FORM = 'impactoss/App/SAVE_ENTITY_FORM';
-export const UPDATE_ENTITY_FORM = 'impactoss/App/UPDATE_ENTITY_FORM';
 
 export const CLOSE_ENTITY = 'impactoss/App/CLOSE_ENTITY';
 

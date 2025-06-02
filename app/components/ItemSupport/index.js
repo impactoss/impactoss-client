@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { injectIntl, intlShape } from 'react-intl';
+import { injectIntl } from 'react-intl';
 
 import appMessage from 'utils/app-message';
 
@@ -30,7 +30,7 @@ class ItemSupport extends React.PureComponent { // eslint-disable-line react/pre
 
 ItemSupport.propTypes = {
   supportLevel: PropTypes.object,
-  intl: intlShape,
+  intl: PropTypes.object.isRequired,
 };
 
 export default injectIntl(ItemSupport);

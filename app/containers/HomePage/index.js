@@ -7,11 +7,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import ReactMarkdown from 'react-markdown';
+import rehypeExternalLinks from 'rehype-external-links';
+
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
-import Grid from 'grid-styled';
+import { Box } from 'grommet';
 import Row from 'components/styled/Row';
 import Container from 'components/styled/Container';
 
@@ -36,6 +38,11 @@ import { DEPENDENCIES } from './constants';
 
 import messages from './messages';
 
+/* eslint-disable react/no-children-prop */
+
+const StyledRow = styled(Row)`
+  display: flex;
+`;
 const GraphicHomeWrapper = styled.div`
   width: 100%;
   padding-top: ${(props) => props.hasBrand
@@ -118,13 +125,29 @@ const Intro = styled(ReactMarkdown)`
     font-size: ${(props) => props.theme.sizes.print.large};
   }
 `;
-const GridSpace = styled(Grid)`
-  display: none !important;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    display: inline-block;
+const GridSpace = styled((p) => <Box {...p} />)`
+  @media (min-width: 0px) {
+    display: none !important;
+  }
+  @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
+    display: inline-block !important;
+    flex-basis: ${({ flexBasis }) => flexBasis || '15'}%;
   }
 `;
-const FrameworkButtonGrid = styled(Grid)`
+const StyledBox = styled((p) => <Box {...p} />)`
+  display: inline-block;
+  vertical-align: top;
+  padding-left: 32px;
+  padding-right: 32px;
+  @media (min-width: 0px) {
+    flex-basis: 100%;
+  }
+  @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
+    flex-basis: 70%;
+  }
+`;
+
+const FrameworkButtonGrid = styled(Box)`
   display: inline-block !important;
   width: auto !important;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
@@ -175,9 +198,8 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
-    const { intl } = this.context;
     const {
-      theme, frameworks, onSelectFramework, onPageLink, signingIn, dataReady,
+      theme, frameworks, onSelectFramework, onPageLink, signingIn, dataReady, intl,
     } = this.props;
     const appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
     return (
@@ -199,58 +221,59 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
               { !SHOW_HOME_TITLE
                 && <GraphicHome src={theme.media.titleHome} alt={appTitle} />
               }
-              { SHOW_HOME_TITLE
-                && (
-                  <Row>
-                    <GridSpace lg={1 / 8} />
-                    <Grid lg={3 / 4} sm={1}>
-                      <Claim>
-                        <FormattedMessage {...appMessages.app.claim} />
-                      </Claim>
-                    </Grid>
-                  </Row>
-                )
-              }
-              <Row>
-                <GridSpace lg={1 / 6} sm={1 / 8} />
-                <Grid lg={2 / 3} sm={3 / 4} xs={1}>
-                  <Intro source={intl.formatMessage(messages.intro)} />
-                </Grid>
-              </Row>
+              {SHOW_HOME_TITLE && (
+                <StyledRow>
+                  <GridSpace flexBasis="12.5" />
+                  <StyledBox>
+                    <Claim>
+                      <FormattedMessage {...appMessages.app.claim} />
+                    </Claim>
+                  </StyledBox>
+                </StyledRow>
+              )}
+              <StyledRow>
+                <GridSpace />
+                <StyledBox>
+                  <Intro
+                    children={intl.formatMessage(messages.intro)}
+                    rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
+                  />
+                </StyledBox>
+              </StyledRow>
               <HomeActions>
                 {(signingIn || !dataReady) && (
-                  <Row>
-                    <GridSpace lg={1 / 6} sm={1 / 8} />
-                    <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                  <StyledRow>
+                    <GridSpace />
+                    <StyledBox>
                       <Loading />
-                    </Grid>
-                  </Row>
+                    </StyledBox>
+                  </StyledRow>
                 )}
                 {(signingIn || !dataReady) && (
-                  <Row>
-                    <GridSpace lg={1 / 6} sm={1 / 8} />
-                    <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                  <StyledRow>
+                    <GridSpace />
+                    <StyledBox>
                       {signingIn && (
                         <FormattedMessage {...messages.signingIn} />
                       )}
                       {!signingIn && (
                         <FormattedMessage {...messages.loading} />
                       )}
-                    </Grid>
-                  </Row>
+                    </StyledBox>
+                  </StyledRow>
                 )}
                 {dataReady && !signingIn && frameworks.size > 1 && (
                   <span role="navigation" aria-label="Primary">
-                    <Row>
-                      <GridSpace lg={1 / 6} sm={1 / 8} />
-                      <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                    <StyledRow>
+                      <GridSpace />
+                      <StyledBox>
                         <FrameworkHint>
                           <FormattedMessage {...messages.selectFramework} />
                         </FrameworkHint>
-                      </Grid>
-                    </Row>
-                    <Row>
-                      <FrameworkButtonGrid lg={1} sm={1} xs={1}>
+                      </StyledBox>
+                    </StyledRow>
+                    <StyledRow>
+                      <FrameworkButtonGrid>
                         {frameworks.entrySeq().map(([key, fw]) => (
                           <FrameworkButton
                             space
@@ -262,21 +285,21 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                           </FrameworkButton>
                         ))}
                       </FrameworkButtonGrid>
-                    </Row>
-                    <Row>
-                      <GridSpace lg={1 / 6} sm={1 / 8} />
-                      <Grid lg={2 / 3} sm={3 / 4} xs={1}>
+                    </StyledRow>
+                    <StyledRow>
+                      <GridSpace />
+                      <StyledBox>
                         <StyledButtonFlat onClick={() => onSelectFramework('all')}>
                           <FormattedMessage {...messages.exploreAllFrameworks} />
                         </StyledButtonFlat>
-                      </Grid>
-                    </Row>
+                      </StyledBox>
+                    </StyledRow>
                   </span>
                 )}
                 {dataReady && !signingIn && frameworks.size === 1 && (
-                  <Row>
-                    <GridSpace lg={1 / 6} sm={1 / 8} />
-                    <Grid lg={2 / 3} sm={3 / 4} xs={1} role="navigation" aria-label="Primary">
+                  <StyledRow>
+                    <GridSpace />
+                    <StyledBox role="navigation" aria-label="Primary">
                       <FrameworkButton
                         single
                         onClick={() => onPageLink(ROUTES.OVERVIEW)}
@@ -284,8 +307,8 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                       >
                         <FormattedMessage {...messages.explore} />
                       </FrameworkButton>
-                    </Grid>
-                  </Row>
+                    </StyledBox>
+                  </StyledRow>
                 )}
               </HomeActions>
             </SectionWrapper>
@@ -305,9 +328,6 @@ HomePage.propTypes = {
   frameworks: PropTypes.object,
   signingIn: PropTypes.bool,
   dataReady: PropTypes.bool,
-};
-
-HomePage.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -342,4 +362,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 // Wrap the component to inject dispatch and state into it
-export default connect(mapStateToProps, mapDispatchToProps)(withTheme(HomePage));
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(withTheme(HomePage)));

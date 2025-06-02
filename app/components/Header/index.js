@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { filter } from 'lodash/collection';
@@ -421,8 +421,8 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       brandPath,
       onShowSettings,
       hasSettings,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
     const navItemsAdmin = filter(this.props.navItems, (item) => item.isAdmin);
 
@@ -561,10 +561,6 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
   }
 }
 
-Header.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
-
 Header.propTypes = {
   isSignedIn: PropTypes.bool,
   user: PropTypes.object,
@@ -581,6 +577,7 @@ Header.propTypes = {
   frameworkOptions: PropTypes.array,
   brandPath: PropTypes.string,
   hasSettings: PropTypes.bool,
+  intl: PropTypes.object.isRequired,
 };
 
 Header.defaultProps = {
@@ -588,4 +585,4 @@ Header.defaultProps = {
   brandPath: '/',
 };
 
-export default withTheme(Header);
+export default injectIntl(withTheme(Header));

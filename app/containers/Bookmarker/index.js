@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { injectIntl } from 'react-intl';
 
 import { getBookmarkForSaving, generateBookmarkTitle } from 'utils/bookmark';
 
@@ -55,9 +56,8 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
       bookmarks,
       viewTitle,
       type,
+      intl,
     } = this.props;
-
-    const { intl } = this.context;
 
     if (dataReady) {
       return (
@@ -137,9 +137,6 @@ Bookmarker.propTypes = {
   location: PropTypes.object,
   viewTitle: PropTypes.string,
   type: PropTypes.string,
-};
-
-Bookmarker.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -187,4 +184,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Bookmarker);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(Bookmarker));

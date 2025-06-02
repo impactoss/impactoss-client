@@ -113,7 +113,5 @@ EntityView.propTypes = {
   fields: PropTypes.object,
   seamless: PropTypes.bool,
 };
-EntityView.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
+
 export default EntityView;

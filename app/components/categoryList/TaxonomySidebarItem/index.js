@@ -93,8 +93,4 @@ TaxonomySidebarItem.propTypes = {
   onTaxonomyOver: PropTypes.func,
 };
 
-TaxonomySidebarItem.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
-
 export default TaxonomySidebarItem;

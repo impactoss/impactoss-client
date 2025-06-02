@@ -259,10 +259,7 @@ export const selectLocationQuery = createSelector(
 );
 
 // TODO consider replacing all "(state, locationQuery) => locationQuery" with selectLocationQuery
-const selectWhereQuery = createSelector(
-  (state, locationQuery) => locationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('where')
-);
+const selectWhereQuery = (state, locationQuery) => locationQuery && locationQuery.get('where');
 
 export const selectAttributeQuery = createSelector(
   (state, { locationQuery }) => selectWhereQuery(state, locationQuery),
@@ -275,34 +272,17 @@ export const selectAttributeQuery = createSelector(
   )
 );
 
-export const selectWithoutQuery = createSelector(
-  (state, locationQuery) => locationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('without')
-);
+export const selectWithoutQuery = (state, locationQuery) => locationQuery && locationQuery.get('without');
 
-export const selectCategoryQuery = createSelector(
-  (state, locationQuery) => locationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('cat')
-);
+export const selectCategoryQuery = (state, locationQuery) => locationQuery && locationQuery.get('cat');
 
-export const selectConnectionQuery = createSelector(
-  (state, locationQuery) => locationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('connected')
-);
+export const selectConnectionQuery = (state, locationQuery) => locationQuery && locationQuery.get('connected');
 
-export const selectConnectedCategoryQuery = createSelector(
-  (state, locationQuery) => locationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('catx')
-);
+export const selectConnectedCategoryQuery = (state, locationQuery) => locationQuery && locationQuery.get('catx');
 
-export const selectSearchQuery = createSelector(
-  (state, locationQuery) => locationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('search')
-);
-export const selectFrameworkListQuery = createSelector(
-  (state, locationQuery) => locationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('fwx')
-);
+export const selectSearchQuery = (state, locationQuery) => locationQuery && locationQuery.get('search');
+
+export const selectFrameworkListQuery = (state, locationQuery) => locationQuery && locationQuery.get('fwx');
 
 export const selectExpandQuery = createSelector(
   (state, locationQuery) => locationQuery,
@@ -311,15 +291,9 @@ export const selectExpandQuery = createSelector(
     : 0
 );
 
-export const selectSortOrderQuery = createSelector(
-  (state, locationQuery) => locationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('order')
-);
+export const selectSortOrderQuery = (state, locationQuery) => locationQuery && locationQuery.get('order');
 
-export const selectSortByQuery = createSelector(
-  (state, locationQuery) => locationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('sort')
-);
+export const selectSortByQuery = (state, locationQuery) => locationQuery && locationQuery.get('sort');
 
 export const selectFrameworkQuery = createSelector(
   selectLocationQuery,
@@ -348,20 +322,15 @@ export const selectSettingsFromQuery = createSelector(
 
 const selectEntitiesAll = (state) => state.getIn(['global', 'entities']);
 
-export const selectEntities = createSelector(
-  selectEntitiesAll,
-  (state, path) => path,
-  (entities, path) => entities.get(path)
-);
+export const selectEntities = (state, path) => {
+  const entities = selectEntitiesAll(state);
+  return entities.get(path);
+};
 
-export const selectFrameworks = createSelector(
-  (state) => selectEntities(state, 'frameworks'),
-  (entities) => entities
-);
-export const selectUsers = createSelector(
-  (state) => selectEntities(state, 'users'),
-  (entities) => entities
-);
+export const selectFrameworks = (state) => selectEntities(state, 'frameworks');
+
+export const selectUsers = (state) => selectEntities(state, 'users');
+
 // use for testing single framework configuration
 // && entities.filter((fw) => fw.get('id') === '1')
 
@@ -688,6 +657,7 @@ const selectRecommendationsWhereQuery = createSelector(
     ? filterEntitiesByAttributes(entities, query)
     : entities
 );
+
 export const selectRecommendationsSearchQuery = createSelector(
   selectRecommendationsWhereQuery,
   (state, { locationQuery }) => selectSearchQuery(state, locationQuery),

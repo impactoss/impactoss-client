@@ -51,10 +51,7 @@ const Word = styled.span`
     return 'inline';
   }};
   }
-  ${(props) => props.iconRight
-    ? '&:after { content: " "; }'
-    : '&:before { content: " "; }'
-}
+  ${(props) => props.iconRight ? '&::after { content: " "; }' : '&::before { content: " "; }'}
 `;
 
 class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

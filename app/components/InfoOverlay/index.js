@@ -1,12 +1,13 @@
+/* eslint-disable react/no-children-prop */
 /*
  *
  * InfoOverlay
  *
  */
-
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
+import rehypeExternalLinks from 'rehype-external-links';
 
 import styled from 'styled-components';
 import {
@@ -98,7 +99,11 @@ function InfoOverlay({
           <DropContent dropBackground={dropBackground}>
             {markdown && (
               <div>
-                <Markdown source={content} className="react-markdown" linkTarget="_blank" />
+                <Markdown
+                  children={content}
+                  className="react-markdown"
+                  rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
+                />
               </div>
             )}
             {!markdown && content}

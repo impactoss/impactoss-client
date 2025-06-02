@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { Map, List, fromJS } from 'immutable';
+import { injectIntl } from 'react-intl';
 
 import {
   loadEntitiesIfNeeded,
@@ -47,8 +48,7 @@ export class UserList extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
-    const { intl } = this.context;
-    const { dataReady } = this.props;
+    const { dataReady, intl } = this.props;
     const headerOptions = {
       supTitle: intl.formatMessage(messages.pageTitle),
       icon: 'users',
@@ -89,9 +89,6 @@ UserList.propTypes = {
   taxonomies: PropTypes.instanceOf(Map),
   connections: PropTypes.instanceOf(Map),
   location: PropTypes.object,
-};
-
-UserList.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -113,4 +110,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserList);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserList));

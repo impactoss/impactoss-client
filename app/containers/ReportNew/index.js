@@ -8,9 +8,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
-import { Map } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 import {
   getTitleFormField,
@@ -41,7 +41,6 @@ import appMessages from 'containers/App/messages';
 import {
   loadEntitiesIfNeeded,
   updatePath,
-  updateEntityForm,
   submitInvalid,
   saveErrorDismiss,
   redirectNotPermitted,
@@ -76,13 +75,11 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
       draftNoteDismissed: false,
     };
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.indicator) {
-      this.props.initialiseForm('reportNew.form.data', this.getInitialFormData());
-    }
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -90,10 +87,6 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
     }
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.indicator) {
-      this.props.initialiseForm('reportNew.form.data', this.getInitialFormData(nextProps));
-    }
-    // console.log('UNSAFE_componentWillReceiveProps', nextProps.indicator, this.props.indicator)
     if (nextProps.dataAndAuthReady && nextProps.indicator) {
       // to allow creating it requires
       // user to have CONTRIBUTOR_MIN_ROLE
@@ -116,42 +109,41 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     }
   }
 
-  getHeaderMainFields = () => {
-    const { intl } = this.context;
-    return ([ // fieldGroups
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getHeaderMainFields = (intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getTitleFormField(intl.formatMessage),
         ],
       },
     ]);
-  };
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const { indicator } = props;
-    return Map(FORM_INITIAL.setIn(
+  getInitialFormData = ({ indicator }) =>
+    Map(FORM_INITIAL.setIn(
       ['attributes', 'due_date_id'],
       indicator.get('dates')
         ? getDueDateDateOptions(indicator.get('dates'))[0].value
         : '0'
     ));
-  }
 
-  getHeaderAsideFields = (canUserPublish) => {
-    const { intl } = this.context;
-    return ([{
-      fields: [
-        canUserPublish
-          ? getStatusField(intl.formatMessage)
-          : getStatusInfoField(),
-      ],
-    }]);
-  };
+  getHeaderAsideFields = (canUserPublish, intl) =>
+    ([
+      {
+        fields: [
+          canUserPublish
+            ? getStatusField(intl.formatMessage)
+            : getStatusInfoField(),
+        ],
+      },
+    ]);
 
-  getBodyMainFields = () => {
-    const { intl } = this.context;
-    return ([
+
+  getBodyMainFields = (intl) =>
+    ([
       {
         fields: [
           getMarkdownFormField({ formatMessage: intl.formatMessage }),
@@ -160,11 +152,9 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
         ],
       },
     ]);
-  };
 
-  getBodyAsideFields = (indicator) => {
-    const { intl } = this.context;
-    return ([ // fieldGroups
+  getBodyAsideFields = (indicator, intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.single),
         icon: 'calendar',
@@ -179,17 +169,15 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
           )],
       },
     ]);
-  };
 
   dismissDraftNote = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ draftNoteDismissed: true });
-  }
+  };
 
   render() {
-    const { intl } = this.context;
     const {
-      dataReady, indicator, viewDomain, highestRole,
+      dataReady, indicator, viewDomain, highestRole, intl,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const indicatorReference = this.props.params.id;
@@ -221,9 +209,11 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => {
-                  this.dismissDraftNote();
-                  this.props.handleSubmitRemote('reportNew.form.data');
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.dismissDraftNote();
+                    this.remoteSubmitForm(e);
+                  }
                 },
               }] : null
             }
@@ -261,9 +251,9 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
           {dataReady
             && (
               <EntityForm
-                model="reportNew.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => {
                   this.dismissDraftNote();
                   this.props.handleSubmit(
@@ -274,15 +264,14 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                 }}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(indicatorReference)}
-                handleUpdate={this.props.handleUpdate}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
-                    aside: this.getHeaderAsideFields(canUserPublish),
+                    main: this.getHeaderMainFields(intl),
+                    aside: this.getHeaderAsideFields(canUserPublish, intl),
                   },
                   body: {
-                    main: this.getBodyMainFields(),
-                    aside: this.getBodyAsideFields(indicator),
+                    main: this.getBodyMainFields(intl),
+                    aside: this.getBodyAsideFields(indicator, intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -300,25 +289,19 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
 
 ReportNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   onRedirectNotPermitted: PropTypes.func,
   indicator: PropTypes.object,
   params: PropTypes.object,
-  initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   highestRole: PropTypes.number,
   // userId: PropTypes.string, // used in nextProps
   // dataAndAuthReady: PropTypes.bool, // used in nextProps
-};
-
-ReportNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -335,10 +318,6 @@ const mapStateToProps = (state, props) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
@@ -354,10 +333,8 @@ function mapDispatchToProps(dispatch) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, indicatorReference, highestRole) => {
+    handleSubmit: (formValues, indicatorReference, highestRole) => {
+      const formData = fromJS(formValues);
       let saveData = formData;
 
       saveData = saveData.setIn(['attributes', 'indicator_id'], indicatorReference);
@@ -376,10 +353,7 @@ function mapDispatchToProps(dispatch) {
     handleCancel: (indicatorReference) => {
       dispatch(updatePath(`${ROUTES.INDICATORS}/${indicatorReference}`, { replace: true }));
     },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
-    },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ReportNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(ReportNew));

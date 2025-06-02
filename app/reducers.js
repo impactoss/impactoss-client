@@ -12,7 +12,6 @@ import globalReducer from 'containers/App/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import entityNewReducer from 'containers/EntityNew/reducer';
 import entityListReducer from 'containers/EntityList/reducer';
-import entityListFormReducer from 'containers/EntityListForm/reducer';
 
 /*
  * routeReducer
@@ -59,7 +58,6 @@ export default function createReducer(asyncReducers) {
     language: languageProviderReducer,
     entityNew: entityNewReducer,
     entityList: entityListReducer,
-    entityListForm: entityListFormReducer,
     ...asyncReducers,
   });
 }

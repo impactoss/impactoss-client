@@ -8,9 +8,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
-import { Map } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 import {
   getTitleFormField,
@@ -37,7 +37,6 @@ import {
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   deleteEntity,
   submitInvalid,
   saveErrorDismiss,
@@ -71,23 +70,17 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    if (this.props.dataReady && this.props.viewEntity) {
-      this.props.initialiseForm('pageEdit.form.data', this.getInitialFormData());
-    }
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     // reload entities if invalidated
     if (!nextProps.dataReady) {
       this.props.loadEntitiesIfNeeded();
-    }
-    // repopulate if new data becomes ready
-    if (nextProps.dataReady && !this.props.dataReady && nextProps.viewEntity) {
-      this.props.initialiseForm('pageEdit.form.data', this.getInitialFormData(nextProps));
     }
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
@@ -97,10 +90,12 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
     }
   }
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const { viewEntity } = props;
-    return viewEntity
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getInitialFormData = ({ viewEntity }) =>
+    viewEntity
       ? Map({
         id: viewEntity.get('id'),
         attributes: viewEntity.get('attributes').mergeWith(
@@ -109,11 +104,9 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
         ),
       })
       : Map();
-  }
 
-  getHeaderMainFields = () => {
-    const { intl } = this.context;
-    return ([ // fieldGroups
+  getHeaderMainFields = (intl) =>
+    ([ // fieldGroups
       { // fieldGroup
         fields: [
           getTitleFormField(intl.formatMessage),
@@ -122,11 +115,9 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
         ],
       },
     ]);
-  };
 
-  getHeaderAsideFields = (entity) => {
-    const { intl } = this.context;
-    return ([
+  getHeaderAsideFields = (entity, intl) =>
+    ([
       {
         fields: [
           getStatusField(intl.formatMessage),
@@ -135,21 +126,21 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
         ],
       },
     ]);
-  };
 
-  getBodyMainFields = () => {
-    const { intl } = this.context;
-    return ([{
-      fields: [getMarkdownFormField({
-        formatMessage: intl.formatMessage,
-        attribute: 'content',
-      })],
-    }]);
-  };
+  getBodyMainFields = (intl) =>
+    ([
+      {
+        fields: [getMarkdownFormField({
+          formatMessage: intl.formatMessage,
+          attribute: 'content',
+        })],
+      },
+    ]);
 
   render() {
-    const { intl } = this.context;
-    const { viewEntity, dataReady, viewDomain } = this.props;
+    const {
+      viewEntity, dataReady, viewDomain, intl,
+    } = this.props;
     const reference = this.props.params.id;
     const {
       saveSending, saveError, deleteSending, deleteError, submitValid,
@@ -175,7 +166,11 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('pageEdit.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }] : null
             }
           />
@@ -212,21 +207,20 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           {viewEntity && dataReady && !deleteSending
             && (
               <EntityForm
-                model="pageEdit.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(formData, viewEntity)}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
-                handleUpdate={this.props.handleUpdate}
                 handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(),
-                    aside: this.getHeaderAsideFields(viewEntity),
+                    main: this.getHeaderMainFields(intl),
+                    aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
                   body: {
-                    main: this.getBodyMainFields(viewEntity),
+                    main: this.getBodyMainFields(intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -245,12 +239,9 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
 PageEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  initialiseForm: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
@@ -260,9 +251,6 @@ PageEdit.propTypes = {
   highestRole: PropTypes.number,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
-};
-
-PageEdit.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -282,10 +270,6 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN.value));
     },
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     onErrorDismiss: () => {
       dispatch(submitInvalid(true));
     },
@@ -295,10 +279,8 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, viewEntity) => {
+    handleSubmit: (formValues, viewEntity) => {
+      const formData = fromJS(formValues);
       let saveData = formData;
       // check if attributes have changed
       if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
@@ -309,9 +291,6 @@ function mapDispatchToProps(dispatch, props) {
     handleCancel: () => {
       dispatch(updatePath(`${ROUTES.PAGES}/${props.params.id}`, { replace: true }));
     },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
-    },
     handleDelete: () => {
       dispatch(deleteEntity({
         path: 'pages',
@@ -321,4 +300,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PageEdit);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(PageEdit));

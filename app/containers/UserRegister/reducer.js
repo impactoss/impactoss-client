@@ -9,7 +9,6 @@ import { fromJS } from 'immutable';
 import { checkResponseError } from 'utils/request';
 
 import { combineReducers } from 'redux-immutable';
-import { combineForms } from 'react-redux-form/immutable';
 
 import {
   REGISTER_USER_SENDING,
@@ -46,18 +45,6 @@ function userRegisterReducer(state = initialState, action) {
   }
 }
 
-const formData = fromJS({
-  attributes: {
-    name: '',
-    email: '',
-    password: '',
-    passwordConfirmation: '',
-  },
-});
-
 export default combineReducers({
   page: userRegisterReducer,
-  form: combineForms({
-    data: formData,
-  }, 'userRegister.form'),
 });

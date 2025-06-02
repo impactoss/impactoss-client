@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { reduce } from 'lodash/collection';
 
@@ -70,7 +70,7 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
   null);
 
   translateMessage = (message) => {
-    const { intl } = this.context;
+    const { intl } = this.props;
     if (message === SERVER_ERRORS.RECORD_OUTDATED) {
       return intl && intl.formatMessage(appMessages.forms.outdatedError);
     }
@@ -93,7 +93,7 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
       return intl && intl.formatMessage(appMessages.forms.referenceRequiredError);
     }
     return message;
-  }
+  };
 
   render() {
     const {
@@ -181,13 +181,11 @@ Messages.propTypes = {
   preMessage: PropTypes.bool,
   details: PropTypes.bool,
   autoDismiss: PropTypes.number,
+  intl: PropTypes.object.isRequired,
 };
 
 Messages.defaultProps = {
   preMessage: true,
 };
-Messages.contextTypes = {
-  intl: PropTypes.object,
-};
 
-export default Messages;
+export default injectIntl(Messages);

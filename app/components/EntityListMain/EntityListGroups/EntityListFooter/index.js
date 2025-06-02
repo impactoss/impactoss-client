@@ -7,6 +7,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { injectIntl } from 'react-intl';
 
 import { isEqual } from 'lodash/lang';
 
@@ -104,12 +105,12 @@ export class EntityListFooter extends React.Component { // eslint-disable-line r
 
   render() {
     // console.log('EntityListOptions.render')
-    const { intl } = this.context;
     const {
       pager,
       onPageSelect,
       onPageItemsSelect,
       pageSize,
+      intl,
     } = this.props;
 
     const perPageOptions = PAGE_ITEM_OPTIONS.map((option) => ({
@@ -157,7 +158,7 @@ export class EntityListFooter extends React.Component { // eslint-disable-line r
                       onPageSelect(1);
                     }}
                   >
-                  1
+                    1
                   </ListInlineItemLink>
                 </ListInlineItem>
               )
@@ -165,7 +166,7 @@ export class EntityListFooter extends React.Component { // eslint-disable-line r
               { pager.pages.indexOf(2) < 0
               && (
                 <ListInlineItem>
-                ...
+                  ...
                 </ListInlineItem>
               )
               }
@@ -196,7 +197,7 @@ export class EntityListFooter extends React.Component { // eslint-disable-line r
               { pager.pages.indexOf(pager.totalPages - 1) < 0
               && (
                 <ListInlineItem>
-                ...
+                  ...
                 </ListInlineItem>
               )
               }
@@ -261,11 +262,7 @@ EntityListFooter.propTypes = {
   pager: PropTypes.object,
   onPageSelect: PropTypes.func,
   onPageItemsSelect: PropTypes.func,
-};
-
-EntityListFooter.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-
-export default EntityListFooter;
+export default injectIntl(EntityListFooter);

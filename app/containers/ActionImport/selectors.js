@@ -5,13 +5,6 @@ import { createSelector } from 'reselect';
  */
 export const selectViewDomain = (state) => state.get('measureImport');
 
-export const selectFormData = createSelector(
-  selectViewDomain,
-  (substate) => substate.get('form').data
-    ? substate.get('form').data
-    : null
-);
-
 const selectPage = createSelector(
   selectViewDomain,
   (substate) => substate.get('page')

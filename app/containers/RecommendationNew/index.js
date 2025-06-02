@@ -8,9 +8,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
-import { Map, List } from 'immutable';
+import { Map, List, fromJS } from 'immutable';
 
 import {
   renderMeasureControl,
@@ -38,7 +38,6 @@ import {
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   openNewEntityModal,
   submitInvalid,
   saveErrorDismiss,
@@ -76,11 +75,11 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData());
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -91,27 +90,24 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     if (nextProps.authReady && !this.props.authReady) {
       this.props.redirectIfNotPermitted();
     }
-    if (!this.props.frameworkId && nextProps.frameworkId) {
-      this.props.initialiseForm('recommendationNew.form.data', this.getInitialFormData(nextProps));
-    }
     if (hasNewError(nextProps, this.props) && this.scrollContainer) {
       scrollToTop(this.scrollContainer.current);
     }
   }
 
-  getInitialFormData = (nextProps) => {
-    const props = nextProps || this.props;
-    const { frameworkId } = props;
-    return Map(FORM_INITIAL.setIn(
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getInitialFormData = ({ frameworkId }) =>
+    Map(FORM_INITIAL.setIn(
       ['attributes', 'framework_id'],
       (frameworkId && frameworkId !== 'all')
         ? frameworkId
-        : DEFAULT_FRAMEWORK,
+        : DEFAULT_FRAMEWORK
     ));
-  }
 
-  getHeaderMainFields = (frameworkId, frameworks, existingReferences) => {
-    const { intl } = this.context;
+  getHeaderMainFields = (frameworkId, frameworks, existingReferences, intl) => {
     const hasFWOptions = frameworks && frameworks.size > 1 && frameworkId === 'all';
     return ([ // fieldGroups
       { // fieldGroup
@@ -128,12 +124,12 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     ]);
   };
 
-  getHeaderAsideFields = () => {
-    const { intl } = this.context;
-    return ([{
-      fields: [getStatusField(intl.formatMessage)],
-    }]);
-  }
+  getHeaderAsideFields = (intl) =>
+    ([
+      {
+        fields: [getStatusField(intl.formatMessage)],
+      },
+    ]);
 
   getBodyMainFields = (
     connectedTaxonomies,
@@ -141,8 +137,8 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     indicators,
     onCreateOption,
     hasResponse,
+    intl,
   ) => {
-    const { intl } = this.context;
     const groups = [];
     groups.push({
       fields: [
@@ -179,11 +175,10 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       });
     }
     return groups;
-  }
+  };
 
-  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories) => {
-    const { intl } = this.context;
-    return ([ // fieldGroup
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) => 
+    ([ // fieldGroup
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
         icon: 'categories',
@@ -194,10 +189,8 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
         }),
       },
     ]);
-  };
 
   render() {
-    const { intl } = this.context;
     const {
       dataReady,
       viewDomain,
@@ -210,6 +203,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       frameworks,
       existingReferences,
       canUserAdministerCategories,
+      intl,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const fwSpecified = (frameworkId && frameworkId !== 'all');
@@ -252,7 +246,11 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('recommendationNew.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }] : null
             }
           />
@@ -280,9 +278,9 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
           {dataReady
             && (
               <EntityForm
-                model="recommendationNew.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   currentFramework,
@@ -290,11 +288,10 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
-                handleUpdate={this.props.handleUpdate}
                 fields={{ // isManager, taxonomies,
                   header: {
-                    main: this.getHeaderMainFields(frameworkId, frameworks, existingReferences),
-                    aside: this.getHeaderAsideFields(),
+                    main: this.getHeaderMainFields(frameworkId, frameworks, existingReferences, intl),
+                    aside: this.getHeaderAsideFields(intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
@@ -303,11 +300,13 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                       hasIndicators && indicators,
                       onCreateOption,
                       hasResponse,
+                      intl,
                     ),
                     aside: this.getBodyAsideFields(
                       fwTaxonomies,
                       onCreateOption,
                       canUserAdministerCategories,
+                      intl,
                     ),
                   },
                 }}
@@ -327,11 +326,9 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
 RecommendationNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
@@ -339,7 +336,6 @@ RecommendationNew.propTypes = {
   measures: PropTypes.object,
   indicators: PropTypes.object,
   onCreateOption: PropTypes.func,
-  initialiseForm: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
@@ -347,9 +343,6 @@ RecommendationNew.propTypes = {
   frameworks: PropTypes.object,
   existingReferences: PropTypes.array,
   canUserAdministerCategories: PropTypes.bool,
-};
-
-RecommendationNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -369,10 +362,6 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData, { silent: true }));
-    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
@@ -388,11 +377,8 @@ function mapDispatchToProps(dispatch) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    // handleSubmit: (formData, currentFramework) => {
-    handleSubmit: (formData, currentFramework, fwTaxonomies) => {
+    handleSubmit: (formValues, currentFramework, fwTaxonomies) => {
+      const formData = fromJS(formValues);
       let saveData = formData;
 
       // recommendationCategories=
@@ -464,9 +450,6 @@ function mapDispatchToProps(dispatch) {
     handleCancel: () => {
       dispatch(updatePath(ROUTES.RECOMMENDATIONS, { replace: true }));
     },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
-    },
     onCreateOption: (args) => {
       dispatch(openNewEntityModal(args));
     },
@@ -474,4 +457,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(RecommendationNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(RecommendationNew));

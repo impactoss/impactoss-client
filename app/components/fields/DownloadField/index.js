@@ -40,7 +40,5 @@ class DownloadField extends React.PureComponent { // eslint-disable-line react/p
 DownloadField.propTypes = {
   field: PropTypes.object.isRequired,
 };
-DownloadField.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
+
 export default DownloadField;

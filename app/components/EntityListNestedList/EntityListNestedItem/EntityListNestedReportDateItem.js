@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Map } from 'immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { injectIntl } from 'react-intl';
 
 import Icon from 'components/Icon';
 
@@ -56,11 +57,10 @@ const IconWrapUnscheduled = styled(IconWrap)`
 class EntityListNestedReportDateItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   static propTypes = {
     dates: PropTypes.instanceOf(Map),
-  }
+  };
 
   render() {
-    const { dates } = this.props;
-    const { intl } = this.context;
+    const { dates, intl } = this.props;
     const date = dates.get('scheduled');
     const scheduled = !!date;
     const overdue = scheduled && date.getIn(['attributes', 'overdue']);
@@ -120,8 +120,8 @@ class EntityListNestedReportDateItem extends React.PureComponent { // eslint-dis
   }
 }
 
-EntityListNestedReportDateItem.contextTypes = {
-  intl: PropTypes.object,
+EntityListNestedReportDateItem.propTypes = {
+  intl: PropTypes.object.isRequired,
 };
 
-export default EntityListNestedReportDateItem;
+export default injectIntl(EntityListNestedReportDateItem);

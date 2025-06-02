@@ -9,7 +9,6 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 import { checkResponseError } from 'utils/request';
 
 import { combineReducers } from 'redux-immutable';
-import { combineForms } from 'react-redux-form/immutable';
 
 import {
   PASSWORD_SENDING,
@@ -46,17 +45,6 @@ function userPasswordReducer(state = initialState, action) {
   }
 }
 
-const formData = fromJS({
-  attributes: {
-    password: '',
-    passwordNew: '',
-    passwordConfirmation: '',
-  },
-});
-
 export default combineReducers({
   page: userPasswordReducer,
-  form: combineForms({
-    data: formData,
-  }, 'userPassword.form'),
 });

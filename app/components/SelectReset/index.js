@@ -6,6 +6,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { find } from 'lodash/collection';
+import { injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -42,7 +43,6 @@ const Select = styled.select`
   }
   @media print {
     appearance: none;
-    text-overflow: '';
     text-indent: 0.01px; /* Removes default arrow from firefox */
     text-overflow: "";  /* Removes default arrow from firefox */
     font-size: ${(props) => props.theme.sizes.print.small};
@@ -83,8 +83,8 @@ export class SelectReset extends React.PureComponent { // eslint-disable-line re
       index,
       hidePrint,
       labelScreenreaderOnly,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     const optionActive = find(options, (option) => option.value === value);
     return (
       <Styled hidePrint={hidePrint}>
@@ -143,10 +143,7 @@ SelectReset.propTypes = {
   onChange: PropTypes.func,
   isReset: PropTypes.bool,
   hidePrint: PropTypes.bool,
-};
-
-SelectReset.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default SelectReset;
+export default injectIntl(SelectReset);

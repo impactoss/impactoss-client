@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import { lowerCase } from 'utils/string';
 import appMessage from 'utils/app-message';
@@ -50,9 +50,8 @@ const IdSpacer = styled.span`
 // <Label bold={props.bold} italic={props.isNew}>
 class Option extends React.Component { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { intl } = this.context;
     const {
-      draft, reference, message, label, messagePrefix, isNew, sublabel,
+      draft, reference, message, label, messagePrefix, isNew, sublabel, intl,
     } = this.props;
 
     let optionLabel;
@@ -102,10 +101,7 @@ Option.propTypes = {
   sublabel: PropTypes.string,
   draft: PropTypes.bool,
   isNew: PropTypes.bool,
-};
-
-Option.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
-export default Option;
+export default injectIntl(Option);

@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { FormattedMessage, injectIntl, intlShape } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import {
   Box,
@@ -209,7 +209,7 @@ GlobalSettings.propTypes = {
   onSetLoadArchived: PropTypes.func,
   onSetLoadNonCurrent: PropTypes.func,
   onClose: PropTypes.func,
-  intl: intlShape,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({

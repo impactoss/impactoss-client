@@ -22,7 +22,7 @@ const getColor = (props, isHover = false) => {
 
 // eslint-disable no-nested-ternary
 const ButtonTagCategory = styled(Button)`
-  color: ${(props) => palette('taxonomiesTextColor', props.taxId)}};
+  color: ${(props) => palette('taxonomiesTextColor', props.taxId)};
   background-color: ${(props) => getColor(props)};
   margin-right: 2px;
   border-radius: ${(props) => props.isSmartTag ? 9999 : 3}px;
@@ -31,7 +31,7 @@ const ButtonTagCategory = styled(Button)`
   cursor:${(props) => props.disabled ? 'default' : 'pointer'};
   border: 1px solid ${(props) => getColor(props)};
   &:hover, &:focus-visible {
-    color: ${(props) => palette('taxonomiesTextColor', props.taxId)}};
+    color: ${(props) => palette('taxonomiesTextColor', props.taxId)};
     background-color: ${(props) => getColor(props, true)};
     border-color: ${(props) => getColor(props, true)};
   }

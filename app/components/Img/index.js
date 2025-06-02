@@ -1,24 +1,27 @@
 /**
  *
- * Img.react.js
+ * Img
  *
  * Renders an image, enforcing the usage of the alt="" tag
- *
- * see https://github.com/KyleAMathews/react-retina-image
+ * 
  */
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import RetinaImage from 'react-retina-image';
 
-function Img(props) {
+const generateSrcSet = (srcArray) =>
+  srcArray.slice(1).map((src, index) => `${src} ${index + 2}x`).join(', ');
+function Img({
+  src,
+  alt,
+  className,
+}) {
   return (
-    <RetinaImage
-      className={props.className}
-      src={props.src}
-      alt={props.alt}
-      forceOriginalDimensions={props.forceOriginalDimensions}
-      checkIfRetinaImgExists={props.checkIfRetinaImgExists}
+    <img
+      className={className}
+      src={src[0]}
+      srcSet={generateSrcSet(src)}
+      alt={alt}
     />
   );
 }
@@ -31,13 +34,6 @@ Img.propTypes = {
   ]).isRequired,
   alt: PropTypes.string.isRequired,
   className: PropTypes.string,
-  forceOriginalDimensions: PropTypes.bool,
-  checkIfRetinaImgExists: PropTypes.bool,
-};
-
-Img.defaultProps = {
-  checkIfRetinaImgExists: true,
-  forceOriginalDimensions: false,
 };
 
 export default Img;

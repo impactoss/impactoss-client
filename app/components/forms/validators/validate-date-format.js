@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 import { isValid, parse } from 'date-fns';
 
 import { DB_DATE_FORMAT } from 'themes/config';

@@ -6,11 +6,10 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import styled from 'styled-components';
-import { actions as formActions } from 'react-redux-form/immutable';
 
 import {
   getEmailFormField,
@@ -25,6 +24,7 @@ import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
 import { ROUTES } from 'containers/App/constants';
+import { FORM_INITIAL } from './constants';
 
 import { updatePath } from 'containers/App/actions';
 
@@ -38,12 +38,8 @@ const BottomLinks = styled.div`
 `;
 
 export class UserPasswordRecover extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  UNSAFE_componentWillMount() {
-    this.props.initialiseForm();
-  }
-
   render() {
-    const { intl } = this.context;
+    const { intl, handleCancel, handleSubmit } = this.props;
     const { error, sending } = this.props.viewDomain.get('page').toJS();
 
     return (
@@ -67,20 +63,16 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
           {sending
             && <Loading />
           }
-          { this.props.viewDomain.get('form')
-            && (
-              <AuthForm
-                model="userPasswordRecover.form.data"
-                sending={sending}
-                handleSubmit={(formData) => this.props.handleSubmit(formData)}
-                handleCancel={this.props.handleCancel}
-                labels={{ submit: intl.formatMessage(messages.submit) }}
-                fields={[
-                  getEmailFormField(intl.formatMessage, '.email'),
-                ]}
-              />
-            )
-          }
+          <AuthForm
+            sending={sending}
+            handleSubmit={handleSubmit}
+            handleCancel={handleCancel}
+            initialValues={FORM_INITIAL}
+            labels={{ submit: intl.formatMessage(messages.submit) }}
+            fields={[
+              getEmailFormField(intl.formatMessage),
+            ]}
+          />
           <BottomLinks>
             <p>
               <A
@@ -106,10 +98,6 @@ UserPasswordRecover.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
-  initialiseForm: PropTypes.func,
-};
-
-UserPasswordRecover.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -119,11 +107,8 @@ const mapStateToProps = (state) => ({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: () => {
-      dispatch(formActions.reset('userPasswordRecover.form.data'));
-    },
     handleSubmit: (formData) => {
-      dispatch(recover(formData.toJS()));
+      dispatch(recover(formData));
     },
     handleCancel: () => {
       dispatch(updatePath('/'));
@@ -134,4 +119,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserPasswordRecover);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserPasswordRecover));

@@ -8,11 +8,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
-import { actions as formActions } from 'react-redux-form/immutable';
+import { injectIntl } from 'react-intl';
 
-import { List, fromJS } from 'immutable';
+import { List, Map, fromJS } from 'immutable';
 
 import {
+  userOptions,
+  entityOptions,
+  parentCategoryOptions,
   renderUserControl,
   renderMeasureControl,
   renderRecommendationsByFwControl,
@@ -42,7 +45,6 @@ import {
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  updateEntityForm,
   submitInvalid,
   saveErrorDismiss,
   openNewEntityModal,
@@ -82,11 +84,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
   constructor(props) {
     super(props);
     this.scrollContainer = React.createRef();
+    this.remoteSubmitForm = null;
   }
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-    this.props.initialiseForm('categoryNew.form.data', FORM_INITIAL);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -102,8 +104,21 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     }
   }
 
-  getHeaderMainFields = (parentOptions, parentTaxonomy) => {
-    const { intl } = this.context;
+  bindHandleSubmit = (submitForm) => {
+    this.remoteSubmitForm = submitForm;
+  };
+
+  getInitialFormData = ({ users, measures, recommendationsByFw, parentOptions,
+  }) => FORM_INITIAL
+    .set('associatedMeasures', measures && entityOptions(measures, true))
+    .set('associatedCategory', parentOptions && parentCategoryOptions(parentOptions, null))
+    .set('associatedRecommendationsByFw', recommendationsByFw
+      ? recommendationsByFw.map((recs) => entityOptions(recs, true))
+      : Map())
+    .set('associatedUser', users && userOptions(users, null));
+
+
+  getHeaderMainFields = (parentOptions, parentTaxonomy, intl) => {
     const groups = [];
     groups.push({ // fieldGroup
       fields: [
@@ -125,8 +140,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     return groups;
   };
 
-  getHeaderAsideFields = (taxonomy) => {
-    const { intl } = this.context;
+  getHeaderAsideFields = (taxonomy, intl) => {
     const fields = []; // fieldGroups
     fields.push({
       fields: [
@@ -144,7 +158,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       });
     }
     return fields;
-  }
+  };
 
   getBodyMainFields = (
     taxonomy,
@@ -153,8 +167,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     measures,
     onCreateOption,
     userOnly,
+    intl,
   ) => {
-    const { intl } = this.context;
     const groups = [];
     groups.push({
       fields: [getMarkdownFormField({ formatMessage: intl.formatMessage })],
@@ -193,8 +207,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     return groups;
   };
 
-  getBodyAsideFields = (users, isAdmin, taxonomy) => {
-    const { intl } = this.context;
+  getBodyAsideFields = (users, isAdmin, taxonomy, intl) => {
     const fields = []; // fieldGroups
     fields.push({
       fields: [
@@ -221,14 +234,13 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       });
     }
     return fields;
-  }
+  };
 
   /* eslint-disable react/destructuring-assignment */
-  getTaxTitle = (id) => this.context.intl.formatMessage(appMessages.entities.taxonomies[id].single);
+  getTaxTitle = (id) => this.props.intl.formatMessage(appMessages.entities.taxonomies[id].single);
   /* eslint-enable react/destructuring-assignment */
 
   render() {
-    const { intl } = this.context;
     const {
       taxonomy,
       dataReady,
@@ -241,6 +253,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       onCreateOption,
       parentOptions,
       parentTaxonomy,
+      intl,
     } = this.props;
     const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
     const taxonomyReference = this.props.params.id;
@@ -276,7 +289,11 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               {
                 type: 'save',
                 disabled: saveSending,
-                onClick: () => this.props.handleSubmitRemote('categoryNew.form.data'),
+                onClick: (e) => {
+                  if (this.remoteSubmitForm) {
+                    this.remoteSubmitForm(e);
+                  }
+                },
               }] : null
             }
           />
@@ -304,9 +321,9 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
           {dataReady
             && (
               <EntityForm
-                model="categoryNew.form.data"
-                formData={viewDomain.getIn(['form', 'data'])}
+                formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
+                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   measures,
@@ -315,11 +332,10 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(taxonomyReference)}
-                handleUpdate={this.props.handleUpdate}
                 fields={{ // isManager, taxonomies,
                   header: {
-                    main: this.getHeaderMainFields(parentOptions, parentTaxonomy),
-                    aside: this.getHeaderAsideFields(taxonomy),
+                    main: this.getHeaderMainFields(parentOptions, parentTaxonomy, intl),
+                    aside: this.getHeaderAsideFields(taxonomy, intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
@@ -328,9 +344,10 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                       recommendationsByFw,
                       measures,
                       onCreateOption,
-                      viewDomain.getIn(['form', 'data', 'attributes', 'user_only'])
+                      FORM_INITIAL.getIn(['attributes', 'user_only']),
+                      intl
                     ),
-                    aside: this.getBodyAsideFields(users, isAdmin, taxonomy),
+                    aside: this.getBodyAsideFields(users, isAdmin, taxonomy, intl),
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
@@ -346,11 +363,9 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 CategoryNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  handleSubmitRemote: PropTypes.func.isRequired,
   handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleUpdate: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
   isAdmin: PropTypes.bool,
@@ -363,13 +378,9 @@ CategoryNew.propTypes = {
   measures: PropTypes.object,
   recommendationsByFw: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
-  initialiseForm: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func,
-};
-
-CategoryNew.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -389,10 +400,6 @@ const mapStateToProps = (state, props) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    initialiseForm: (model, formData) => {
-      dispatch(formActions.reset(model));
-      dispatch(formActions.change(model, formData));
-    },
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
@@ -408,10 +415,8 @@ function mapDispatchToProps(dispatch) {
     handleSubmitFail: () => {
       dispatch(submitInvalid(false));
     },
-    handleSubmitRemote: (model) => {
-      dispatch(formActions.submit(model));
-    },
-    handleSubmit: (formData, measures, recommendationsByFw, taxonomy) => {
+    handleSubmit: (formValues, measures, recommendationsByFw, taxonomy) => {
+      const formData = fromJS(formValues);
       let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomy.get('id'));
       if (!formData.getIn(['attributes', 'user_only'])) {
         if (taxonomy.getIn(['attributes', 'tags_measures'])) {
@@ -471,13 +476,10 @@ function mapDispatchToProps(dispatch) {
     handleCancel: (taxonomyReference) => {
       dispatch(updatePath(`${ROUTES.TAXONOMIES}/${taxonomyReference}`, { replace: true }));
     },
-    handleUpdate: (formData) => {
-      dispatch(updateEntityForm(formData));
-    },
     onCreateOption: (args) => {
       dispatch(openNewEntityModal(args));
     },
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoryNew);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(CategoryNew));

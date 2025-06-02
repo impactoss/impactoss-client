@@ -8,6 +8,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
+import { injectIntl } from 'react-intl';
 
 import {
   getTitleField,
@@ -117,9 +118,8 @@ export class ReportView extends React.PureComponent { // eslint-disable-line rea
 
 
   render() {
-    const { intl } = this.context;
     const {
-      viewEntity, dataReady, isManager, sessionUserId, highestRole,
+      viewEntity, dataReady, isManager, sessionUserId, highestRole, intl,
     } = this.props;
     const hasUserMinimumRole = dataReady
       && canUserCreateOrEditReports(highestRole);
@@ -217,9 +217,6 @@ ReportView.propTypes = {
   isManager: PropTypes.bool,
   params: PropTypes.object,
   highestRole: PropTypes.number,
-};
-
-ReportView.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -245,4 +242,4 @@ function mapDispatchToProps(dispatch, props) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ReportView);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(ReportView));

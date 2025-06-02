@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { injectIntl } from 'react-intl';
 
 import appMessages from 'containers/App/messages';
 
@@ -42,8 +43,7 @@ const SmartIcon = styled.div`
 
 class SmartTaxonomyField extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { field } = this.props;
-    const { intl } = this.context;
+    const { field, intl } = this.props;
     return (
       <StyledFieldWrap>
         <ListInline>
@@ -80,9 +80,7 @@ class SmartTaxonomyField extends React.PureComponent { // eslint-disable-line re
 
 SmartTaxonomyField.propTypes = {
   field: PropTypes.object.isRequired,
-};
-SmartTaxonomyField.contextTypes = {
-  intl: PropTypes.object,
+  intl: PropTypes.object.isRequired,
 };
 
-export default SmartTaxonomyField;
+export default injectIntl(SmartTaxonomyField);

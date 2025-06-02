@@ -98,8 +98,5 @@ Group.propTypes = {
   field: PropTypes.object.isRequired,
   group: PropTypes.object.isRequired,
 };
-Group.contextTypes = {
-  intl: PropTypes.object.isRequired,
-};
 
 export default Group;

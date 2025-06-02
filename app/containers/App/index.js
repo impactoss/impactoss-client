@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import ReactModal from 'react-modal';
 import GlobalStyle from 'global-styles';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -110,8 +110,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     }))
     .toArray();
 
-  prepareFrameworkOptions = (frameworks, activeId) => {
-    const { intl } = this.context;
+  prepareFrameworkOptions = (frameworks, activeId, intl) => {
     const options = Object.values(frameworks.toJS()).map((fw) => ({
       value: fw.id,
       label: intl.formatMessage(messages.frameworks[fw.id]),
@@ -130,8 +129,8 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     currentPath,
     currentFrameworkId,
     viewRecommendationFramework,
+    intl,
   ) => {
-    const { intl } = this.context;
     let navItems = [
       {
         path: ROUTES.OVERVIEW,
@@ -218,8 +217,8 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       onShowSettings,
       dataReady,
       settings,
+      intl,
     } = this.props;
-    const { intl } = this.context;
     const title = intl.formatMessage(messages.app.title);
     const isHome = location.pathname === ROUTES.INTRO || location.pathname === `${ROUTES.INTRO}/`;
     const hasSettings = settings && settings.some((val) => !!val.get('available'));
@@ -227,7 +226,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       <div>
         <SkipContent
           href="#main-content"
-          title={this.context.intl.formatMessage(messages.screenreader.skipToContent)}
+          title={intl.formatMessage(messages.screenreader.skipToContent)}
         >
           <FormattedMessage {...messages.screenreader.skipToContent} />
         </SkipContent>
@@ -242,6 +241,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             location.pathname,
             currentFrameworkId,
             viewRecommendationFramework,
+            intl,
           )}
           search={{
             path: ROUTES.SEARCH,
@@ -256,6 +256,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             ? this.prepareFrameworkOptions(
               frameworks,
               currentFrameworkId,
+              intl,
             )
             : null}
           currentPath={location.pathname}
@@ -335,8 +336,6 @@ App.propTypes = {
   onInitializeSettings: PropTypes.func,
   settings: PropTypes.object,
   dataReady: PropTypes.bool,
-};
-App.contextTypes = {
   intl: PropTypes.object.isRequired,
 };
 
@@ -410,4 +409,4 @@ export function mapDispatchToProps(dispatch) {
 }
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(App));

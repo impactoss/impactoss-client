@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { injectIntl } from 'react-intl';
+
 import { ROUTES } from 'containers/App/constants';
+
 import ItemStatus from 'components/ItemStatus';
 import Label from 'components/styled/Label';
 import Component from 'components/styled/Component';
@@ -74,12 +77,13 @@ const EntityListItemMainTopWrap = styled.div`
   right: 0;
   padding-top: 4px;
   padding-right: 6px;
-  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}){
     padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
     padding-right: ${(props) => (!props.theme.sizes)
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal
 }px;
+  }
 `;
 
 const Reference = styled(Label)`
@@ -97,8 +101,7 @@ const Title = styled.div`
 
 class EntityListNestedReportItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { report, onEntityClick } = this.props;
-    const { intl } = this.context;
+    const { report, onEntityClick, intl } = this.props;
     return (
       <Styled>
         <Wrapper>
@@ -162,11 +165,7 @@ class EntityListNestedReportItem extends React.PureComponent { // eslint-disable
 EntityListNestedReportItem.propTypes = {
   report: PropTypes.object.isRequired,
   onEntityClick: PropTypes.func,
+  intl: PropTypes.object.isRequired,
 };
 
-
-EntityListNestedReportItem.contextTypes = {
-  intl: PropTypes.object,
-};
-
-export default EntityListNestedReportItem;
+export default injectIntl(EntityListNestedReportItem);
