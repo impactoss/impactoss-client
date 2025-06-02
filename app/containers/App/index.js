@@ -7,13 +7,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import HelmetCanonical from 'components/HelmetCanonical';
+
 import ReactModal from 'react-modal';
-import GlobalStyle from 'global-styles';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+
+import GlobalStyle from 'global-styles';
+
+import HelmetCanonical from 'components/HelmetCanonical';
 import Header from 'components/Header';
 import SkipContent from 'components/styled/SkipContent';
 import EntityNew from 'containers/EntityNew';
@@ -23,6 +26,8 @@ import { sortEntities } from 'utils/sort';
 import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
 
 import { FOOTER } from 'themes/config';
+
+import { ROUTES, DEPENDENCIES } from './constants';
 
 import {
   selectIsSignedIn,
@@ -48,8 +53,6 @@ import {
   showSettingsModal,
   initializeSettings,
 } from './actions';
-
-import { ROUTES, DEPENDENCIES } from './constants';
 
 import messages from './messages';
 

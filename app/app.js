@@ -15,8 +15,14 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
+
+// Import ThemeProvider
+import { Grommet } from 'grommet';
+
+import { StyleSheetManager } from 'styled-components';
+import isPropValid from '@emotion/is-prop-valid';
+
 import 'sanitize.css/sanitize.css';
-import './fonts.css';
 
 // Import root app
 import App from 'containers/App';
@@ -26,12 +32,6 @@ import { makeSelectLocationState } from 'containers/App/selectors';
 
 // Import Language Provider
 import LanguageProvider from 'containers/LanguageProvider';
-
-// Import ThemeProvider
-import { Grommet } from 'grommet';
-
-import { StyleSheetManager } from 'styled-components';
-import isPropValid from '@emotion/is-prop-valid';
 
 import theme from 'themes/theme-nz';
 import './fonts/fonts.css';

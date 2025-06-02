@@ -17,6 +17,7 @@ const appLocales = [
   'en-NZ',
 ];
 
+// prettier-ignore
 const formatTranslationMessages = (locale, messages) => {
   const defaultFormattedMessages = locale !== DEFAULT_LOCALE
     ? formatTranslationMessages(DEFAULT_LOCALE, enTranslationMessages)
