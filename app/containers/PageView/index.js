@@ -38,6 +38,7 @@ import {
   getStatusField,
   getMetaField,
   getMarkdownField,
+  getDownloadField,
 } from 'utils/fields';
 
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -92,7 +93,10 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
   }]);
 
   getBodyMainFields = (entity) => ([{
-    fields: [getMarkdownField(entity, 'content', false)],
+    fields: [
+      getDownloadField(entity),
+      getMarkdownField(entity, 'content', false),
+    ],
   }]);
 
   getFields = (entity, isManager) => ({

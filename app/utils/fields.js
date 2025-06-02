@@ -453,10 +453,9 @@ export const getManagerField = (entity, messageLabel, messageEmpty) => ({
   showEmpty: messageEmpty,
 });
 
-export const getDownloadField = (entity, isManager) => ({
+export const getDownloadField = (entity) => ({
   type: 'download',
   value: entity.getIn(['attributes', 'document_url']),
-  isManager,
   public: entity.getIn(['attributes', 'public']),
   showEmpty: appMessages.attributes.documentEmpty,
 });
