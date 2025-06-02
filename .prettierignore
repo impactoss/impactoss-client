@@ -2,6 +2,8 @@ build/
 node_modules/
 internals/generators/
 internals/scripts/
+internals/webpack/
 package-lock.json
 yarn.lock
 package.json
+eslint.config.mjs
