@@ -20,6 +20,20 @@ import coolorsToHex from 'coolors-to-hex';
 // import partner3x2x from 'themes/media/partner3@2x.png';
 // import partner4x2x from 'themes/media/partner4@2x.png';
 
+import headerLogo from 'themes/media/header-logo.png';
+import headerLogo2x from 'themes/media/header-logo@2x.png';
+
+import footerLogo1 from 'themes/media/footer-logo-nzgov.png';
+import footerLogo1_2x from 'themes/media/footer-logo-nzgov@2x.png';
+// import footerLogo2 from 'themes/media/footer-logo-nzjustice.png';
+// import footerLogo2_2x from 'themes/media/footer-logo-nzjustice@2x.png';
+
+import graphicHome from 'themes/media/home-graphic.png';
+import graphicHome2x from 'themes/media/home-graphic@2x.png';
+
+import impactossLogo from 'themes/media/impactoss-logo.png';
+import impactossLogo2x from 'themes/media/impactoss-logo@2x.png';
+
 const theme = {};
 
 // image files
@@ -38,6 +52,24 @@ theme.media = {
   //   [partner3, partner3x2x],
   //   [partner4, partner4x2x],
   // ],
+};
+
+theme.media = {
+  headerLogo: [headerLogo, headerLogo2x],
+  graphicHome: [graphicHome, graphicHome2x],
+  impactossLogo: [impactossLogo, impactossLogo2x],
+  // titleHome: [titleHome, titleHome2x],
+  // up to 6 partner logos,
+  // link text and title to be set in translations/[lang].js > app.components.Footer.partners.[]
+  // partnerLogos: [
+  //   [partner1, partner1x2x],
+  //   [partner2, partner2x2x],
+  //   [partner3, partner3x2x],
+  //   [partner4, partner4x2x],
+  // ],
+  agencyLogos: [
+    [footerLogo1, footerLogo1_2x],
+  ],
 };
 
 // grid-styles settings https://github.com/jxnblk/grid-styled
@@ -167,10 +199,10 @@ theme.palette = {
     '#416680', // 3: State
     '#007C70', // 4: Human right
     '#05A763', // 5: Affected persons
-    '#B7177A', // 6: Thematic cluster
-    '#114060', // 7: Organisation
-    '#E56700', // 8: SMART
-    '#007c3a', // 9: Progress status
+    '#114060', // 6: Organisation
+    '#E56700', // 7: SMART
+    '#007c3a', // 8: Progress status
+    '#B7177A', // 9: Thematic cluster
   ],
   taxonomiesHover: [
     '#656F75', // default, not used
@@ -179,10 +211,23 @@ theme.palette = {
     '#395970', // 3: State
     '#007267', // 4: Human right
     '#008740', // 5: Affected persons
-    '#A5156E', // 6: Thematic cluster
-    '#0F364C', // 7: Organisation
-    '#C75300', // 8: SMART
-    '#007034', // 9: Progress status
+    '#0F364C', // 6: Organisation
+    '#C75300', // 7: SMART
+    '#007034', // 8: Progress status
+    '#A5156E', // 9: Thematic cluster
+  ],
+  taxonomiesTextColor: [
+    primary[4], // default, not used
+    primary[4], // 1: Human Rights Body
+    primary[4], // 2: Reporting Cycle
+    primary[4], // 3: Recommending State
+    primary[4], // 4: Human right
+    primary[4], // 5: Affected persons
+    primary[4], // 6: Organisation
+    primary[4], // 7: SMART
+    primary[4], // 8: Progress status
+    primary[4], // 9.
+    primary[4],
   ],
   // bg inactive, bg hover, icon
   smartInactive: [
@@ -196,10 +241,13 @@ theme.palette = {
   // maybe [#AA-Large compliant] 18pt/24px or 14pt/19px bold can suffice with AA com,pliant hover if agreed by customer
   measuresHover: ['#C75300'], // FFC107  AA compliant
   measures: ['#ED7000'],
+  measuresConnectionText: [light[0], '#BA5D03'], // published, draft
   recommendationsHover: ['#023066', '#023066', '#426BA6'], // supported, in part, noted ['#FF9B69', '#FFB28B'],
   recommendations: ['#033A89', '#033A89', '#6889B8'],
+  recommendationsConnectionText: [light[0], '#73018E'], // published, draft
   indicatorsHover: ['#15881A'],
   indicators: ['#1BAC29'],
+  indicatorsConnectionText: [dark[0], dark[0]], // published, draft
   reportsHover: [error[1]],
   reports: [error[0]],
   attributesHover: [dark[2]],
@@ -210,7 +258,8 @@ theme.palette = {
   //
   // UI PALETTES //////////////////////////////////////////////////////////////
   //
-
+  // main background
+  mainBackground: ['#f1f4f4'],
   // text
   // [#primaryFont, #secondaryFont, #inverse]
   text: [dark[0], dark[3], primary[4]],
@@ -278,6 +327,9 @@ theme.palette = {
   asideListGroup: [dark[2], light[1]],
   asideListGroupHover: [dark[3], light[0]],
 
+  // mainListHeader
+  mainListHeader: [dark[0], '#E5E7E8'],
+
   // mainListItem: [#color, '#bg',], eg category and entity list items
   mainListItem: [dark[0], primary[4]],
   mainListItemHover: [dark[3], primary[4]],
@@ -311,6 +363,8 @@ theme.palette = {
   // ButtonInverse: ['#color', '#bg'],
   buttonInverse: [primary[2], primary[4]], // used for taxonomy tags, background only
   buttonInverseHover: [primary[0], primary[4]],
+  // checkbox
+  checkbox: [dark[2]],
 };
 
 // fonts

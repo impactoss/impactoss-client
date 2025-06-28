@@ -33,7 +33,7 @@ import { makeSelectLocationState } from 'containers/App/selectors';
 // Import Language Provider
 import LanguageProvider from 'containers/LanguageProvider';
 
-import theme from 'themes/theme-nz';
+import theme from 'themes/theme-base';
 import './fonts/fonts.css';
 
 import configureStore from './store';
