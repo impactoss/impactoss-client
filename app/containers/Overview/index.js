@@ -16,6 +16,7 @@ import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import {
   selectFWTaxonomiesSorted,
   selectReady,
+  selectFrameworks,
   selectActiveFrameworks,
   selectCurrentFrameworkId,
 } from 'containers/App/selectors';
@@ -126,6 +127,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       onTaxonomyLink,
       taxonomies,
       frameworks,
+      allFrameworks,
       frameworkId,
       onPageLink,
       intl,
@@ -179,7 +181,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
               </SkipContent>
             </div>
             {!dataReady && <Loading />}
-            {dataReady && frameworks.size > 1 && (
+            {dataReady && allFrameworks.size > 1 && (
               <VerticalDiagram
                 frameworks={frameworks}
                 onPageLink={onPageLink}
@@ -191,7 +193,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 indicatorDraftCount={this.props.indicatorDraftCount}
               />
             )}
-            {dataReady && frameworks.size === 1 && (
+            {dataReady && allFrameworks.size === 1 && (
               <HorizontalDiagram
                 onPageLink={onPageLink}
                 onTaxonomyIconMouseOver={this.onTaxonomyIconMouseOver}
@@ -239,6 +241,7 @@ Overview.propTypes = {
   measureDraftCount: PropTypes.number,
   indicatorDraftCount: PropTypes.number,
   frameworks: PropTypes.object,
+  allFrameworks: PropTypes.object,
   frameworkId: PropTypes.string,
   intl: PropTypes.object.isRequired,
 };
@@ -247,6 +250,7 @@ const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectFWTaxonomiesSorted(state),
   frameworks: selectActiveFrameworks(state),
+  allFrameworks: selectFrameworks(state),
   frameworkId: selectCurrentFrameworkId(state),
   recommendationCountByFw: selectRecommendationCount(state),
   measureCount: selectMeasureCount(state),

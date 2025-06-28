@@ -501,11 +501,11 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                   : this.onShowFrameworks(evt)
                 }
               >
-                <LinkSuperTitle active>
-                  {intl.formatMessage(appMessages.frameworks.single)}
+                <LinkSuperTitle>
+                  Select framework
                 </LinkSuperTitle>
                 {currentFrameworkOption && (
-                  <LinkTitle active>
+                  <LinkTitle>
                     {truncateText(
                       currentFrameworkOption.label,
                       TEXT_TRUNCATE.FW_SELECT,

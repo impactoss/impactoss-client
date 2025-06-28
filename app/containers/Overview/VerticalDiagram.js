@@ -172,12 +172,20 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
     window.addEventListener('resize', this.resize);
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.frameworks !== this.props.frameworks) {
+      // Reset itemRefs
+      this.itemRefs = {};
+      // Trigger re-render of DiagramSVG
+      this.setState((prev) => ({ diagramVersion: prev.diagramVersion + 1 }));
+    }
+  }
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
   }
 
   resize = () => {
-    console.log('resize')
     // reset
     this.itemRefs={};
     this.setState((prev) => ({ diagramVersion: (prev.diagramVersion || 0) + 1 }));
@@ -204,6 +212,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
       onPageLink,
       intl,
     } = this.props;
+    console.log('frameworks', frameworks && frameworks.toJS())
     return (
       <Diagram
         ref={(node) => {
