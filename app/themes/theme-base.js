@@ -203,6 +203,7 @@ theme.palette = {
     '#E56700', // 7: SMART
     '#007c3a', // 8: Progress status
     '#B7177A', // 9: Thematic cluster
+    '#199CD4', // 10: SDGs
   ],
   taxonomiesHover: [
     '#656F75', // default, not used
@@ -215,6 +216,7 @@ theme.palette = {
     '#C75300', // 7: SMART
     '#007034', // 8: Progress status
     '#A5156E', // 9: Thematic cluster
+    '#178EC1', // 10: SDGs
   ],
   taxonomiesTextColor: [
     primary[4], // default, not used
