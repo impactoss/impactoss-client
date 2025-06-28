@@ -126,8 +126,8 @@ export const VIEWPORTS = {
 };
 
 export const ROUTES = {
-  INTRO: '/intro',
-  OVERVIEW: '/',
+  INTRO: '/',
+  OVERVIEW: '/overview',
   PASSWORD: '/password',
   LOGIN: '/login',
   LOGIN_OAUTH_SUCCESS: '/loginOAuthSuccess',

@@ -11,6 +11,10 @@ export default defineMessages({
       id: 'app.containers.App.app.title',
       defaultMessage: 'Sadata',
     },
+    titleHome: {
+      id: 'app.containers.App.app.titleHome',
+      defaultMessage: 'Sadata',
+    },
     claim: {
       id: 'app.containers.App.app.claim',
       defaultMessage: 'Samoa\'s home of human rights implementation',

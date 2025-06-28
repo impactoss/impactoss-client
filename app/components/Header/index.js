@@ -11,7 +11,9 @@ import { truncateText } from 'utils/string';
 import {
   SHOW_HEADER_TITLE,
   SHOW_HEADER_PATTERN,
+  STICKY_HEADER_ON_HOME,
   SHOW_BRAND_ON_HOME,
+  SHOW_HEADER_SHADOW_ON_HOME,
   TEXT_TRUNCATE,
 } from 'themes/config';
 
@@ -437,7 +439,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         fixed={isHome}
         sticky={!isHome}
         hasBackground={!isHome}
-        hasShadow
+        hasShadow={!isHome || SHOW_HEADER_SHADOW_ON_HOME}
         hasNav={!isHome}
         hasBrand={SHOW_BRAND_ON_HOME || !isHome}
       >

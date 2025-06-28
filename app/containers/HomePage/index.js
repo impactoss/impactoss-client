@@ -31,7 +31,11 @@ import { ROUTES } from 'containers/App/constants';
 
 import {
   SHOW_HOME_TITLE,
+  SHOW_HOME_TITLE_OR_CLAIM,
   SHOW_BRAND_ON_HOME,
+  HEADER_PATTERN_HEIGHT,
+  SHOW_HEADER_PATTERN_HOME_GRAPHIC,
+  HOME_GRAPHIC_WIDTH,
 } from 'themes/config';
 
 import { DEPENDENCIES } from './constants';
@@ -55,11 +59,17 @@ const GraphicHomeWrapper = styled.div`
     : 0
 }px;
   }
+  background-image: ${(props) => (props.showPattern && props.theme.backgroundImages.header)
+    ? props.theme.backgroundImages.header
+    : 'none'
+  };
+  background-repeat: repeat;
+  background-size: ${HEADER_PATTERN_HEIGHT}px auto;
 `;
 
 const GraphicHome = styled(NormalImg)`
   width: 100%;
-  max-width: 600px;
+  max-width: ${HOME_GRAPHIC_WIDTH}px;
 `;
 
 const SectionTop = styled.div`
@@ -93,8 +103,21 @@ const HomeActions = styled.div`
   }
 `;
 
+const Title = styled.h1`
+  color:${palette('headerBrand', 0)};
+  font-family: ${(props) => props.theme.fonts.title};
+  font-size: ${(props) => props.theme.sizes.home.text.titleMobile};
+  margin-top: 0.5em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: ${(props) => props.theme.sizes.home.text.title};
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    margin-top: 1em;
+  }
+`;
+
 const Claim = styled.h2`
-  color: ${palette('headerBrand', 0)};
+  color: ${palette('headerBrand', 1)};
   font-family: ${(props) => props.theme.fonts.claim};
   font-size: ${(props) => props.theme.sizes.home.text.claimMobile};
   margin-left: auto;
@@ -143,11 +166,11 @@ const StyledBox = styled((p) => <Box {...p} />)`
     flex-basis: 100%;
   }
   @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
-    flex-basis: 70%;
+    flex-basis: ${({ flexBasis }) => flexBasis || '70'}%;
   }
 `;
 
-const FrameworkButtonGrid = styled(Box)`
+const FrameworkButtonGrid = styled((p) => <Box {...p} />)`
   display: inline-block !important;
   width: auto !important;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
@@ -210,21 +233,27 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Container noPaddingBottom>
-          <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
-            <SectionWrapper hasBrand={SHOW_BRAND_ON_HOME}>
-              <GraphicHomeWrapper
-                hasBrand={SHOW_BRAND_ON_HOME}
-              >
-                <GraphicHome src={theme.media.graphicHome} alt={intl.formatMessage(appMessages.app.title)} />
-              </GraphicHomeWrapper>
-              { !SHOW_HOME_TITLE
-                && <GraphicHome src={theme.media.titleHome} alt={appTitle} />
-              }
-              {SHOW_HOME_TITLE && (
+        <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
+          <SectionWrapper hasBrand={SHOW_BRAND_ON_HOME}>
+            <GraphicHomeWrapper
+              hasBrand={SHOW_BRAND_ON_HOME}
+              showPattern={SHOW_HEADER_PATTERN_HOME_GRAPHIC}
+            >
+              <GraphicHome src={theme.media.graphicHome} alt={intl.formatMessage(appMessages.app.title)} />
+            </GraphicHomeWrapper>
+            { !SHOW_HOME_TITLE
+              && <GraphicHome src={theme.media.titleHome} alt={appTitle} />
+            }
+            <Container noPaddingBottom>
+              {SHOW_HOME_TITLE_OR_CLAIM && (
                 <StyledRow>
-                  <GridSpace flexBasis="12.5" />
-                  <StyledBox>
+                  <GridSpace flexBasis="10" />
+                  <StyledBox flexBasis="80">
+                    {SHOW_HOME_TITLE && (
+                      <Title>
+                        <FormattedMessage {...appMessages.app.titleHome} />
+                      </Title>
+                    )}
                     <Claim>
                       <FormattedMessage {...appMessages.app.claim} />
                     </Claim>
@@ -273,7 +302,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                       </StyledBox>
                     </StyledRow>
                     <StyledRow>
-                      <FrameworkButtonGrid>
+                      <FrameworkButtonGrid direction="row" margin={{ vertical: 'small' }}>
                         {frameworks.entrySeq().map(([key, fw]) => (
                           <FrameworkButton
                             space
@@ -311,9 +340,9 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
                   </StyledRow>
                 )}
               </HomeActions>
-            </SectionWrapper>
-          </SectionTop>
-        </Container>
+            </Container>
+          </SectionWrapper>
+        </SectionTop>
         <Footer fill />
       </div>
     );

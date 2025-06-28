@@ -25,7 +25,7 @@ import GlobalSettings from 'containers/GlobalSettings';
 import { sortEntities } from 'utils/sort';
 import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
 
-import { FOOTER } from 'themes/config';
+import { FOOTER, SHOW_HEADER_SHADOW_ON_HOME } from 'themes/config';
 
 import { ROUTES, DEPENDENCIES } from './constants';
 
@@ -57,22 +57,33 @@ import {
 import messages from './messages';
 
 const Main = styled.div`
-  position: absolute;
-  top: ${(props) => props.isHome
-    ? props.theme.sizes.header.banner.heightMobile
-    : props.theme.sizes.header.banner.heightMobile + props.theme.sizes.header.nav.heightMobile
-}px;
+  position: ${(props) => (props.isHome && !SHOW_HEADER_SHADOW_ON_HOME) ? 'relative' : 'absolute'};
+  top: ${(props) => {
+    if (props.isHome) {
+      if (!SHOW_HEADER_SHADOW_ON_HOME) return 0;
+      return props.theme.sizes.header.banner.heightMobile;
+    }
+    return props.theme.sizes.header.banner.heightMobile + props.theme.sizes.header.nav.heightMobile
+}}px;
   left: 0;
   right: 0;
   bottom:0;
   background-color: ${(props) => props.isHome ? 'transparent' : palette('mainBackground', 0)};
-  overflow: ${(props) => props.isHome ? 'auto' : 'hidden'};
-
+  overflow: ${(props) => {
+    if (props.isHome) {
+      if (!SHOW_HEADER_SHADOW_ON_HOME) return 'hidden';
+      return 'auto';
+    }
+    return 'hidden';
+}};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    top: ${(props) => props.isHome
-    ? props.theme.sizes.header.banner.height
-    : props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height
-}px;
+    top: ${(props) => {
+      if (props.isHome) {
+        if (!SHOW_HEADER_SHADOW_ON_HOME) return 0;
+        return props.theme.sizes.header.banner.height;
+      }
+      return props.theme.sizes.header.banner.height + props.theme.sizes.header.nav.height;
+}}px;
   }
   @media print {
     background: white;
@@ -264,7 +275,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             : null}
           currentPath={location.pathname}
           fullPath={`${location.pathname}${location.search}`}
-          brandPath={ROUTES.OVERVIEW}
+          brandPath={ROUTES.INTRO}
           onShowSettings={() => onShowSettings(true)}
           hasSettings={dataReady && hasSettings}
         />

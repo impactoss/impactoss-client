@@ -11,7 +11,7 @@
 
 // Language and date settings ********************
 // Note: you may also set the locales in i18n.js
-import version from '../../package.json';
+import packageJson from '../../package.json';
 
 export const SERVER = (process && process.env && process.env.SERVER) || 'development';
 const SERVER_ENDPOINTS = {
@@ -27,7 +27,7 @@ export const IS_PROD = SERVER === 'production';
 export const IS_TEST = SERVER === 'UAT';
 // const IS_DEV = SERVER === 'development';
 const version_text = IS_PROD ? '' : ` [${SERVER}]`;
-export const VERSION = `${version}${version_text}`;
+export const VERSION = `${packageJson.version}${version_text}`;
 
 // enable azure for test and prod environments but not for dev
 export const ENABLE_AZURE = IS_PROD || IS_TEST;
@@ -59,10 +59,13 @@ export const SHOW_SIDEBAR_HEADER_PATTERN = false;
 // set in translations/[LOCALE].js
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
+export const SHOW_HOME_TITLE_OR_CLAIM = true;
 export const SHOW_HOME_TITLE = true;
+export const SHOW_HEADER_SHADOW_ON_HOME = false;
 
 export const SHOW_BRAND_ON_HOME = true;
-export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
+export const HOME_GRAPHIC_WIDTH = 1200;
+export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = true;
 
 // show footer logo section
 export const FOOTER = {
