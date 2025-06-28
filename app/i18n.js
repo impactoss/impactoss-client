@@ -8,13 +8,13 @@
  *   You CANNOT use import/export in this file.
  */
 
-const enTranslationMessages = require('./translations/en-NZ.json');
+const enTranslationMessages = require('./translations/en-GB.json');
 
-const DEFAULT_LOCALE = 'en-NZ';
+const DEFAULT_LOCALE = 'en-GB';
 
 // prettier-ignore
 const appLocales = [
-  'en-NZ',
+  'en-GB',
 ];
 
 // prettier-ignore
@@ -32,7 +32,7 @@ const formatTranslationMessages = (locale, messages) => {
 };
 
 const translationMessages = {
-  'en-NZ': formatTranslationMessages('en-NZ', enTranslationMessages),
+  'en-GB': formatTranslationMessages('en-GB', enTranslationMessages),
 };
 
 exports.appLocales = appLocales;

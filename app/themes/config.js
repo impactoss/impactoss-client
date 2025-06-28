@@ -11,18 +11,18 @@
 
 // Language and date settings ********************
 // Note: you may also set the locales in i18n.js
-import { version } from '../../package.json';
+import version from '../../package.json';
 
 export const SERVER = (process && process.env && process.env.SERVER) || 'development';
 const SERVER_ENDPOINTS = {
-  production: 'https://nz-api.impactoss.org',
-  UAT: 'https://nz-dev-api.impactoss.org',
-  development: 'https://nz-dev-6568bd13e406.herokuapp.com',
+  production: 'https://impactoss-frameworks.herokuapp.com',
+  UAT: 'https://impactoss-frameworks.herokuapp.com',
+  development: 'https://impactoss-frameworks.herokuapp.com/',
 };
 export const SERVER_ENDPOINT = SERVER_ENDPOINTS[SERVER];
 // used for redirect and canonical tag
 
-export const CLIENT_URL = 'https://uat.humanrights.govt.nz';
+export const CLIENT_URL = 'https://impactoss-demo-fw.web.app';
 export const IS_PROD = SERVER === 'production';
 export const IS_TEST = SERVER === 'UAT';
 // const IS_DEV = SERVER === 'development';
@@ -33,7 +33,7 @@ export const VERSION = `${version}${version_text}`;
 export const ENABLE_AZURE = IS_PROD || IS_TEST;
 
 // default language locale
-export const DEFAULT_LOCALE = 'en-NZ';
+export const DEFAULT_LOCALE = 'en-GB';
 // date format - change to format according to locale, only used for form error message
 export const DATE_FORMAT = 'dd/MM/yyyy';
 export const NODE_ENV = sessionStorage.NODE_ENV || 'production';

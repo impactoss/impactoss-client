@@ -12,7 +12,7 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { IntlProvider } from 'react-intl';
 
-import { DEFAULT_LOCALE } from 'themes/config';
+import { DEFAULT_LOCALE } from 'i18n';
 
 import { makeSelectLocale } from './selectors';
 
