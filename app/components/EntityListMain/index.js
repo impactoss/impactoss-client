@@ -116,18 +116,19 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     const expandNo = config.expandableColumns && locationQuery.get('expand')
       ? parseInt(locationQuery.get('expand'), 10)
       : 0;
-
+    const currentFWid = locationQuery.get('fw') || '1';
     let groupSelectValue = locationQuery.get('group');
     const groupforFramework = config.taxonomies
       && config.taxonomies.defaultGroupsByFramework
       && frameworks
       && frameworks.size === 1;
+
     if (config.taxonomies && !groupSelectValue) {
       if (groupforFramework) {
         /* eslint-disable prefer-destructuring */
         groupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][1];
         /* eslint-enable prefer-destructuring */
-      } else {
+      } else if (currentFWid !== 'all'){
         groupSelectValue = getGroupValue(
           taxonomies,
           config.taxonomies.defaultGroupAttribute,

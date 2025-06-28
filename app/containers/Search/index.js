@@ -246,9 +246,9 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                     <Description as="div">
                       <Markdown
                         className="react-markdown react-markdown-search"
-                        disallowedTypes={['paragraph']}
+                        disallowedElements={['paragraph']}
                         unwrapDisallowed
-                        source={intl.formatMessage(messages.settingsHint, { settingsHintContent })}
+                        children={intl.formatMessage(messages.settingsHint, { settingsHintContent })}
                       />
                       {' '}
                       <FormattedMessage

@@ -375,7 +375,6 @@ function mapDispatchToProps(dispatch) {
       dispatch(updatePath(path));
     },
     onSelectFramework: (framework) => {
-      console.log(framework)
       dispatch(updatePath(
         ROUTES.OVERVIEW,
         {

@@ -821,7 +821,6 @@ export function* updatePathSaga({ path, args }) {
   }
   // convert to string
   const queryNextString = getNextQueryString(queryNext);
-  console.log(queryNextString)
   const nextPath = `${relativePath}?${queryNextString}`;
   if (args && args.replace) {
     yield put(replace(nextPath));

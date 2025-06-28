@@ -587,8 +587,6 @@ export const selectFWTaxonomies = createSelector(
           List(),
         );
         const taxCategories = getTaxCategories(categories, tax);
-        console.log(tax.toJS())
-        console.log(hasFramework, connectedToFramework)
         return tax
           .setIn(['attributes', 'tags_recommendations'], hasFramework || connectedToFramework)
           .set('frameworkIds', frameworkIds)

@@ -65,6 +65,8 @@ export const CONFIG = {
     // TODO better store in database join table framework_taxonomies
     defaultGroupsByFramework: {
       1: { 1: '1', 2: '2' }, // framework 1 recs are grouped by taxonomies 1 & 2
+      2: { 1: '10' }, // framework 1 recs are grouped by taxonomies 1 & 2
+      3: { 1: '9' }, // framework 1 recs are grouped by taxonomies 1 & 2
     },
     groupBy: 'framework_id',
     editForFrameworks: true,

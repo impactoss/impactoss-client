@@ -212,7 +212,6 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
       onPageLink,
       intl,
     } = this.props;
-    console.log('frameworks', frameworks && frameworks.toJS())
     return (
       <Diagram
         ref={(node) => {
@@ -237,11 +236,11 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
                     <DiagramButtonWrap key={fwId} multiple={frameworks.size > 1}>
                       <VerticalDiagramButton
                         path={ROUTES.RECOMMENDATIONS}
-                        query={frameworks.size > 1 && {
+                        query={frameworks.size > 1 ? {
                           arg: 'fwx',
                           value: fwId,
                           replace: true,
-                        }}
+                        } : null}
                         paletteDefault="recommendations"
                         paletteHover="recommendationsHover"
                         icon={`recommendations_${fwId}`}
