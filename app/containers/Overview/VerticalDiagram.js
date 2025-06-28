@@ -22,8 +22,12 @@ import isNumber from 'utils/is-number';
 // relative
 import appMessages from 'containers/App/messages';
 import messages from './messages';
+import VerticalDiagramButton from './VerticalDiagramButton';
+import VerticalDiagramSVG  from './VerticalDiagramSVG';
 
-const Diagram = styled.div`
+const Diagram = styled(
+  React.forwardRef((p, ref) => <div ref={ref} {...p} />)
+)`
   position: relative;
   width: 100%;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
@@ -155,269 +159,38 @@ const SectionLabel = styled.div`
   }
 `;
 
-const STATE_INITIAL = {
-  diagram: null,
-  buttonRecs_1: null,
-  buttonRecs_2: null,
-  buttonRecs_3: null,
-  buttonRecs_4: null,
-  buttonRecs_5: null,
-  buttonMeasures: null,
-  buttonIndicators: null,
-};
-
 export class VerticalDiagram extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = STATE_INITIAL;
+    this.itemRefs = {};
+    this.state = {
+      diagramVersion: 0, // trigger re-render of DiagramSVG
+    };
   }
 
-  getConnectionPoint = (node, nodeReference, side = 'bottom') => {
-    const boundingRect = node.getBoundingClientRect();
-    const boundingRectReference = nodeReference.getBoundingClientRect();
+  componentDidMount() {
+    window.addEventListener('resize', this.resize);
+  }
 
-    if (side === 'right' || side === 'left') {
-      return ({
-        x: side === 'right'
-          ? (boundingRect.right - boundingRectReference.left)
-          : (boundingRect.left - boundingRectReference.left),
-        y: (boundingRect.top - boundingRectReference.top)
-          + (((boundingRect.bottom - boundingRectReference.top) - (boundingRect.top - boundingRectReference.top)) / 2),
-      });
-    }
-    return ({
-      x: (boundingRect.left - boundingRectReference.left)
-        + (((boundingRect.right - boundingRectReference.left) - (boundingRect.left - boundingRectReference.left)) / 2),
-      y: side === 'bottom'
-        ? (boundingRect.bottom - boundingRectReference.top)
-        : (boundingRect.top - boundingRectReference.top),
-    });
-  };
-
-  getConnectionPath = (start, end) => [
-    { x: start.x, y: start.y + 5 },
-    { x: end.x, y: end.y - 5 },
-  ];
-
-  getCurvedConnectionPath = (direction = 'vertical', start, end, curve = 0.2) => {
-    if (direction === 'right') {
-      return [
-        { x: start.x + 5, y: start.y },
-        { x: Math.max(start.x, end.x) + 25, y: start.y },
-        { x: Math.max(start.x, end.x) + 25, y: end.y },
-        { x: end.x + 5, y: end.y },
-      ];
-    }
-    return [
-      { x: start.x, y: start.y + 5 },
-      { x: start.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
-      { x: end.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
-      { x: end.x, y: end.y - 5 },
-    ];
-  };
-
-  getConnectionPathArrow = (connectionPath, direction = 'bottom') => {
-    const point = connectionPath[connectionPath.length - 1];
-    if (direction === 'left') {
-      return [
-        point,
-        { x: point.x + 5, y: point.y + 5 },
-        { x: point.x + 5, y: point.y - 5 },
-        point,
-      ];
-    }
-    return [
-      point,
-      { x: point.x - 5, y: point.y - 5 },
-      { x: point.x + 5, y: point.y - 5 },
-      point,
-    ];
-  };
-
-  connectRecommendationsMeasures = (fwId) => this.getCurvedConnectionPath(
-    'vertical',
-    this.getConnectionPoint(this.state[`buttonRecs_${fwId}`], this.state.diagram, 'bottom'),
-    this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, 'top'),
-    0.25,
-  );
-
-  connectRecommendationsIndicators = (direction = 'vertical', fwId) => this.getCurvedConnectionPath(
-    direction,
-    this.getConnectionPoint(
-      this.state[`buttonRecs_${fwId}`],
-      this.state.diagram,
-      direction === 'vertical' ? 'bottom' : direction,
-    ),
-    this.getConnectionPoint(
-      this.state.buttonIndicators,
-      this.state.diagram,
-      direction === 'vertical' ? 'top' : direction,
-    ),
-    0.9, // curve
-  );
-
-  connectMeasuresIndicators = () => this.getConnectionPath(
-    this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, 'bottom'),
-    this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, 'top'),
-  );
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resize);
+  }
 
   resize = () => {
+    console.log('resize')
     // reset
-    this.setState(STATE_INITIAL);
-    this.forceUpdate();
+    this.itemRefs={};
+    this.setState((prev) => ({ diagramVersion: (prev.diagramVersion || 0) + 1 }));
   };
 
-  renderPathsSVG = (frameworks) => {
-    const radius = 15;
-    return (
-      <DiagramSvgWrapper>
-        {this.state.diagram && (
-          <DiagramSvg
-            width={this.state.diagram.getBoundingClientRect().width}
-            height={this.state.diagram.getBoundingClientRect().height}
-          >
-            {frameworks && frameworks.valueSeq().map((fw) => {
-              const fwId = fw.get('id');
-              return fw.getIn(['attributes', 'has_indicators'])
-                && this.state[`buttonRecs_${fwId}`]
-                && this.state.buttonIndicators
-                && (
-                  <PathLineCustom
-                    key={fwId}
-                    r={radius}
-                    strokeDasharray="5,5"
-                    points={this.connectRecommendationsIndicators(
-                      frameworks.size === 1 ? 'right' : 'vertical',
-                      fwId,
-                    )}
-                  />
-                );
-            })}
-            {frameworks && frameworks.valueSeq().map((fw) => {
-              const fwId = fw.get('id');
-              return fw.getIn(['attributes', 'has_indicators'])
-                && this.state[`buttonRecs_${fwId}`]
-                && this.state.buttonIndicators
-                && frameworks.size === 1
-                && (
-                  <PathLineArrow
-                    key={fwId}
-                    r={0}
-                    points={
-                      this.getConnectionPathArrow(
-                        this.connectRecommendationsIndicators(
-                          'right',
-                          fwId,
-                        ),
-                        'left'
-                      )
-                    }
-                  />
-                );
-            })}
-            {frameworks && frameworks.valueSeq().map((fw) => {
-              const fwId = fw.get('id');
-              return this.state[`buttonRecs_${fwId}`]
-                && this.state.buttonMeasures
-                && (
-                  <PathLineCustom
-                    key={fwId}
-                    r={frameworks.size > 1 ? radius : 0}
-                    points={this.connectRecommendationsMeasures(fwId)}
-                  />
-                );
-            })}
-            {frameworks && frameworks.valueSeq().map((fw) => {
-              const fwId = fw.get('id');
-              return fw.getIn(['attributes', 'has_measures'])
-                && this.state[`buttonRecs_${fwId}`]
-                && this.state.buttonMeasures
-                && (
-                  <PathLineArrow
-                    key={fwId}
-                    r={0}
-                    points={
-                      this.getConnectionPathArrow(
-                        this.connectRecommendationsMeasures(fwId)
-                      )
-                    }
-                  />
-                );
-            })}
-            { this.state.buttonIndicators && this.state.buttonMeasures && (
-              <PathLineCustom
-                r={0}
-                points={this.connectMeasuresIndicators()}
-              />
-            )}
-            { this.state.buttonIndicators && this.state.buttonMeasures && (
-              <PathLineArrow
-                r={0}
-                points={
-                  this.getConnectionPathArrow(
-                    this.connectMeasuresIndicators()
-                  )
-                }
-              />
-            )}
-          </DiagramSvg>
-        )}
-      </DiagramSvgWrapper>
-    );
-  };
+  setItemRef = (ref, key) => {
+    if (ref && !this.itemRefs[key]) {
+      this.itemRefs[key] = ref;
+      // Force update to re-render DiagramSVG and cause effect to re-run
+      this.setState((prev) => ({ diagramVersion: (prev.diagramVersion || 0) + 1 }));
+    }
 
-  renderButton = ({
-    path,
-    query,
-    paletteDefault,
-    paletteHover,
-    icon,
-    type,
-    count,
-    draftCount,
-    stateButton,
-    multiple,
-    onPageLink,
-    intl,
-  }) =>
-    <DiagramButton
-      onClick={() => onPageLink(path, query)}
-      paletteDefault={paletteDefault}
-      paletteHover={paletteHover}
-      ref={(node) => {
-        if (!this.state[stateButton]) {
-          this.setState({ [stateButton]: node });
-        }
-      }}
-      draft={draftCount > 0}
-      multiple={multiple}
-      title={intl.formatMessage(
-        messages.buttons.title,
-        { label: `${count || 0} ${intl.formatMessage(appMessages.entities[type][count !== 1 ? 'plural' : 'single'])}` },
-      )}
-    >
-      <DiagramButtonIcon>
-        <Icon
-          name={icon}
-          sizes={{
-            mobile: '24px',
-            small: '24px',
-            medium: '24px',
-            large: '24px',
-          }}
-        />
-      </DiagramButtonIcon>
-      <div>
-        {`${count || 0} ${intl.formatMessage(appMessages.entities[type][count !== 1 ? 'plural' : 'single'])}`}
-      </div>
-      {draftCount > 0
-        && (
-          <DraftEntities>
-            <FormattedMessage {...messages.buttons.draft} values={{ count: draftCount }} />
-          </DraftEntities>
-        )
-      }
-    </DiagramButton>
+  };
 
   render() {
     const {
@@ -431,16 +204,17 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
       onPageLink,
       intl,
     } = this.props;
-
     return (
       <Diagram
         ref={(node) => {
-          if (!this.state.diagram) {
-            this.setState({ diagram: node });
-          }
+          this.setItemRef(node, 'diagram');
         }}
       >
-        { this.renderPathsSVG(frameworks) }
+        <VerticalDiagramSVG
+          frameworks={frameworks}
+          itemRefs={this.itemRefs}
+          version={this.state.diagramVersion}
+        />
         <div>
           <DiagramSectionVertical>
             <SectionLabel>
@@ -452,24 +226,26 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
                   const fwId = isNumber(fw.get('id')) ? parseInt(fw.get('id'), 10) : fw.get('id');
                   return (
                     <DiagramButtonWrap key={fwId} multiple={frameworks.size > 1}>
-                      {this.renderButton({
-                        path: ROUTES.RECOMMENDATIONS,
-                        query: frameworks.size > 1 && {
+                      <VerticalDiagramButton
+                        path={ROUTES.RECOMMENDATIONS}
+                        query={frameworks.size > 1 && {
                           arg: 'fwx',
                           value: fwId,
                           replace: true,
-                        },
-                        paletteDefault: 'recommendations',
-                        paletteHover: 'recommendationsHover',
-                        stateButton: `buttonRecs_${fwId}`,
-                        icon: `recommendations_${fwId}`,
-                        type: `recommendations_${fwId}`,
-                        count: recommendationCountByFw.get(fwId),
-                        draftCount: recommendationDraftCountByFw.get(fwId),
-                        multiple: frameworks.size > 1,
-                        onPageLink,
-                        intl,
-                      })}
+                        }}
+                        paletteDefault="recommendations"
+                        paletteHover="recommendationsHover"
+                        icon={`recommendations_${fwId}`}
+                        type={`recommendations_${fwId}`}
+                        count={recommendationCountByFw.get(fwId)}
+                        draftCount={recommendationDraftCountByFw.get(fwId)}
+                        multiple={frameworks.size > 1}
+                        onPageLink={onPageLink}
+                        intl={intl}
+                        ref={(node) => {
+                          this.setItemRef(node, `buttonRecs_${fwId}`);
+                        }}
+                      />
                     </DiagramButtonWrap>
                   );
                 }
@@ -482,17 +258,19 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
             </SectionLabel>
             <DiagramSectionVerticalCenter>
               <DiagramButtonWrap>
-                {this.renderButton({
-                  path: ROUTES.MEASURES,
-                  paletteDefault: 'measures',
-                  paletteHover: 'measuresHover',
-                  stateButton: 'buttonMeasures',
-                  icon: 'measures',
-                  type: 'measures',
-                  count: measureCount,
-                  draftCount: measureDraftCount,
-                  intl,
-                })}
+                <VerticalDiagramButton
+                  path={ROUTES.MEASURES}
+                  paletteDefault="measures"
+                  paletteHover="measuresHover"
+                  icon="measures"
+                  type="measures"
+                  count={measureCount}
+                  draftCount={measureDraftCount}
+                  intl={intl}
+                  ref={(node) => {
+                    this.setItemRef(node, 'buttonMeasures');
+                  }}
+                />
               </DiagramButtonWrap>
             </DiagramSectionVerticalCenter>
           </DiagramSectionVertical>
@@ -502,17 +280,19 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
             </SectionLabel>
             <DiagramSectionVerticalCenter>
               <DiagramButtonWrap>
-                {this.renderButton({
-                  path: ROUTES.INDICATORS,
-                  paletteDefault: 'indicators',
-                  paletteHover: 'indicatorsHover',
-                  stateButton: 'buttonIndicators',
-                  icon: 'indicators',
-                  type: 'indicators',
-                  count: indicatorCount,
-                  draftCount: indicatorDraftCount,
-                  intl,
-                })}
+                <VerticalDiagramButton
+                  path={ROUTES.INDICATORS}
+                  paletteDefault="indicators"
+                  paletteHover="indicatorsHover"
+                  icon="indicators"
+                  type="indicators"
+                  count={indicatorCount}
+                  draftCount={indicatorDraftCount}
+                  intl={intl}
+                  ref={(node) => {
+                    this.setItemRef(node, 'buttonIndicators');
+                  }}
+                />
               </DiagramButtonWrap>
             </DiagramSectionVerticalCenter>
           </DiagramSectionVertical>
