@@ -11,25 +11,25 @@ import coolorsToHex from 'coolors-to-hex';
 // import impactossLogo from 'themes/media/impactoss.png';
 // import impactossLogo2x from 'themes/media/impactoss@2x.png';
 
-// import partner1 from 'themes/media/partner1.png';
-// import partner2 from 'themes/media/partner2.png';
-// import partner3 from 'themes/media/partner3.png';
-// import partner4 from 'themes/media/partner4.png';
-// import partner1x2x from 'themes/media/partner1@2x.png';
-// import partner2x2x from 'themes/media/partner2@2x.png';
-// import partner3x2x from 'themes/media/partner3@2x.png';
-// import partner4x2x from 'themes/media/partner4@2x.png';
+import partner1 from 'themes/media/partner1.png';
+import partner2 from 'themes/media/partner2.png';
+import partner3 from 'themes/media/partner3.png';
+import partner4 from 'themes/media/partner4.png';
+import partner1x2x from 'themes/media/partner1@2x.png';
+import partner2x2x from 'themes/media/partner2@2x.png';
+import partner3x2x from 'themes/media/partner3@2x.png';
+import partner4x2x from 'themes/media/partner4@2x.png';
 
-import headerLogo from 'themes/media/header-logo.png';
-import headerLogo2x from 'themes/media/header-logo@2x.png';
+import headerLogo from 'themes/media/headerLogo.png';
+import headerLogo2x from 'themes/media/headerLogo@2x.png';
 
-import footerLogo1 from 'themes/media/footer-logo-nzgov.png';
-import footerLogo1_2x from 'themes/media/footer-logo-nzgov@2x.png';
+// import footerLogo1 from 'themes/media/footer-logo-nzgov.png';
+// import footerLogo1_2x from 'themes/media/footer-logo-nzgov@2x.png';
 // import footerLogo2 from 'themes/media/footer-logo-nzjustice.png';
 // import footerLogo2_2x from 'themes/media/footer-logo-nzjustice@2x.png';
 
-import graphicHome from 'themes/media/home-graphic.png';
-import graphicHome2x from 'themes/media/home-graphic@2x.png';
+import graphicHome from 'themes/media/homeGraphic.png';
+import graphicHome2x from 'themes/media/homeGraphic@2x.png';
 
 import impactossLogo from 'themes/media/impactoss-logo.png';
 import impactossLogo2x from 'themes/media/impactoss-logo@2x.png';
@@ -62,13 +62,13 @@ theme.media = {
   // up to 6 partner logos,
   // link text and title to be set in translations/[lang].js > app.components.Footer.partners.[]
   // partnerLogos: [
-  //   [partner1, partner1x2x],
-  //   [partner2, partner2x2x],
-  //   [partner3, partner3x2x],
-  //   [partner4, partner4x2x],
   // ],
   agencyLogos: [
-    [footerLogo1, footerLogo1_2x],
+    [partner1, partner1x2x],
+    [partner2, partner2x2x],
+    [partner3, partner3x2x],
+    [partner4, partner4x2x],
+    // [footerLogo1, footerLogo1_2x],
   ],
 };
 
