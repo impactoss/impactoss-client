@@ -10,6 +10,7 @@ import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage, injectIntl } from 'react-intl';
 
 import styled, { withTheme } from 'styled-components';
+import { palette } from 'styled-theme';
 
 // containers
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
@@ -56,9 +57,9 @@ const ViewContainer = styled(Container)`
 `;
 
 const AboutLink = styled(A)`
-  color: #ba5d03;
+  color: ${palette('primary', 1)};
   &:hover {
-    color: #ba5d03;
+    color: ${palette('primary', 0)};
     text-decoration: underline;
   }
 `;

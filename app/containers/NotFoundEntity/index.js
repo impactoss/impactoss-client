@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 
 import { showSettingsModal } from 'containers/App/actions';
 import { selectSettingsFromQuery } from 'containers/App/selectors';
@@ -11,9 +12,9 @@ import A from 'components/styled/A';
 import messages from './messages';
 
 const SettingsLink = styled(A)`
-  color: #ba5d03;
+  color: ${palette('primary', 1)};
   &:hover {
-    color: #ba5d03;
+    color: ${palette('primary', 0)};
     text-decoration: underline;
   }
 `;
