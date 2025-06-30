@@ -370,7 +370,7 @@ theme.palette = {
   buttonInverse: [primary[2], primary[4]], // used for taxonomy tags, background only
   buttonInverseHover: [primary[0], primary[4]],
   // checkbox
-  checkbox: [dark[2]],
+  checkbox: [primary[1]],
 };
 
 // fonts
@@ -527,6 +527,7 @@ theme.global = {
   },
   colors: {
     aHover: '#0063b5',
+    highlight: '#0070cc',
   },
   edgeSize: {
     hair: '1px',
