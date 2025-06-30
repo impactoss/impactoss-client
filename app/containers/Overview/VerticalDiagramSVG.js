@@ -42,10 +42,16 @@ const SectionLabel = styled.div`
   }
 `;
 
-const getConnectionPoint = (node, nodeReference, side = 'bottom') => {
-  const boundingRect = node.getBoundingClientRect();
-  const boundingRectReference = nodeReference.getBoundingClientRect();
+const roundRect = (rect) => ({
+  right: Math.round(rect.right * 10)/10,
+  left: Math.round(rect.left * 10)/10,
+  top: Math.round(rect.top * 10)/10,
+  bottom: Math.round(rect.bottom * 10)/10,
+})
 
+const getConnectionPoint = (node, nodeReference, side = 'bottom') => {
+  const boundingRect = roundRect(node.getBoundingClientRect());
+  const boundingRectReference = roundRect(nodeReference.getBoundingClientRect());
   if (side === 'right' || side === 'left') {
     return ({
       x: side === 'right'
@@ -55,13 +61,15 @@ const getConnectionPoint = (node, nodeReference, side = 'bottom') => {
         + (((boundingRect.bottom - boundingRectReference.top) - (boundingRect.top - boundingRectReference.top)) / 2),
     });
   }
-  return ({
+
+  const ret = ({
     x: (boundingRect.left - boundingRectReference.left)
       + (((boundingRect.right - boundingRectReference.left) - (boundingRect.left - boundingRectReference.left)) / 2),
     y: side === 'bottom'
       ? (boundingRect.bottom - boundingRectReference.top)
       : (boundingRect.top - boundingRectReference.top),
   });
+  return ret;
 };
 
 const getConnectionPath = (start, end) => [
@@ -69,7 +77,13 @@ const getConnectionPath = (start, end) => [
   { x: end.x, y: end.y - 5 },
 ];
 
-const getCurvedConnectionPath = (direction = 'vertical', start, end, curve = 0.2) => {
+const getCurvedConnectionPath = (
+  direction = 'vertical',
+  start,
+  end,
+  curve = 0.2,
+  offset,
+) => {
   if (direction === 'right') {
     return [
       { x: start.x + 5, y: start.y },
@@ -77,6 +91,17 @@ const getCurvedConnectionPath = (direction = 'vertical', start, end, curve = 0.2
       { x: Math.max(start.x, end.x) + 25, y: end.y },
       { x: end.x + 5, y: end.y },
     ];
+  }
+  if (offset) {
+    return [
+      { x: start.x + 12, y: start.y + 5 },
+      { x: start.x + 12, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
+      { x: end.x, y: (start.y + 5) + ((end.y - start.y - 10) * curve) },
+      { x: end.x, y: end.y - 5 },
+    ];
+  }
+  if (start.x === end.x) {
+    return getConnectionPath(start, end);
   }
   return [
     { x: start.x, y: start.y + 5 },
@@ -111,7 +136,12 @@ const connectRecommendationsMeasures = (itemRefs, fwId) => getCurvedConnectionPa
   0.25,
 );
 
-const connectRecommendationsIndicators = (itemRefs, direction = 'vertical', fwId) => getCurvedConnectionPath(
+const connectRecommendationsIndicators = (
+  itemRefs,
+  direction = 'vertical',
+  fwId,
+  offset,
+) => getCurvedConnectionPath(
   direction,
   getConnectionPoint(
     itemRefs[`buttonRecs_${fwId}`],
@@ -124,6 +154,7 @@ const connectRecommendationsIndicators = (itemRefs, direction = 'vertical', fwId
     direction === 'vertical' ? 'top' : direction,
   ),
   0.9, // curve
+  offset,
 );
 
 const connectMeasuresIndicators = (itemRefs) => getConnectionPath(
@@ -132,7 +163,7 @@ const connectMeasuresIndicators = (itemRefs) => getConnectionPath(
 );
 
 const VerticalDiagramSVG = ({ frameworks, itemRefs, version }) => {
-  const radius = 10;
+  const radius = 6;
 
   return (
     <DiagramSvgWrapper>
@@ -155,6 +186,7 @@ const VerticalDiagramSVG = ({ frameworks, itemRefs, version }) => {
                     itemRefs,
                     frameworks.size === 1 ? 'right' : 'vertical',
                     fwId,
+                    true, // offset
                   )}
                 />
               );

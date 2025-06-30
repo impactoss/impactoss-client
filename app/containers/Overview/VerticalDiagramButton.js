@@ -26,14 +26,15 @@ const DiagramButton = styled((p) => <Button {...p} />)`
   font-size: 0.7em;
   border-radius: 15px;
   max-width: ${({ multiple }) => multiple ? '70px' : 'none'};
-  min-width: none;
+  min-width: 0;
   &:hover {
     background-color: ${(props) => palette(props.paletteHover, 0)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 1em;
     padding: ${({ draft }) => draft ? '0.4em 0.5em 0.4em' : '0.6em 0.5em'};
-    max-width: ${({ multiple }) => multiple ? '100px' : 'none'};
+    max-width: ${({ multiple }) => multiple ? '140px' : 'none'};
+    min-width: ${({ multiple }) => multiple ? '120px' : 'none'};
     box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
   }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
@@ -43,6 +44,7 @@ const DiagramButton = styled((p) => <Button {...p} />)`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     font-weight: bold;
     max-width: none;
+    min-width: 200px;
     padding: ${({ draft }) => draft ? '0.6em 1em 0.2em' : '0.8em 1em'};
   }
   @media print {
@@ -85,6 +87,7 @@ const VerticalDiagramButton = React.forwardRef((props, ref) => {
     onPageLink,
     intl,
   } = props;
+  console.log('multiple', multiple)
   return (
     <div ref={ref}>
       <DiagramButton
