@@ -33,6 +33,7 @@ import {
   IS_CURRENT_STATUSES,
   IS_ARCHIVE_STATUSES,
   SUPPORT_LEVELS,
+  CYCLE_TAXONOMY_ID,
 } from 'themes/config';
 
 import Loading from 'components/Loading';
@@ -98,11 +99,12 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     },
   ]);
 
-  getHeaderAsideFields = (entity) => ([
+  getHeaderAsideFields = (entity, hasCycles) => ([
     {
       fields: [
         getStatusField(entity),
         !entity.getIn(['attributes', 'draft'])
+        && hasCycles
         && getStatusField(
           entity,
           'is_current',
@@ -210,6 +212,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       frameworks,
       intl,
     } = this.props;
+
     const frameworkId = viewEntity && viewEntity.getIn(['attributes', 'framework_id']);
     const type = intl.formatMessage(
       appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single
@@ -222,6 +225,13 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
         )
         || frameworks.first()
       );
+    const cycleTaxonomy = dataReady && taxonomies.get(`${CYCLE_TAXONOMY_ID}`)
+    const hasCycles = dataReady
+      && currentFramework
+      && cycleTaxonomy
+      && cycleTaxonomy.get('frameworkIds')
+      && cycleTaxonomy.get('frameworkIds').some((id) => qe(id, currentFramework.get('id')))
+
     const hasResponse = dataReady
       && currentFramework
       && currentFramework.getIn(['attributes', 'has_response']);
@@ -287,7 +297,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
                 fields={{
                   header: {
                     main: this.getHeaderMainFields(viewEntity, isManager),
-                    aside: isManager && this.getHeaderAsideFields(viewEntity, isManager),
+                    aside: isManager && this.getHeaderAsideFields(viewEntity, hasCycles, isManager),
                   },
                   body: {
                     main: this.getBodyMainFields(

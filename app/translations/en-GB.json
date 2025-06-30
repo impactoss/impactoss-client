@@ -217,7 +217,7 @@
   "app.containers.App.attributes.is_current": "Latest/previous cycle",
   "app.containers.App.attributes.manager_id.categories": "Lead agency manager",
   "app.containers.App.attributes.manager_id.categoriesEmpty": "No lead agency manager assigned",
-  "app.containers.App.attributes.manager_id.indicators": "Assigned user (contributor from responsible agency)",
+  "app.containers.App.attributes.manager_id.indicators": "Assigned contributor",
   "app.containers.App.attributes.manager_id.indicatorsEmpty": "No contributor assigned",
   "app.containers.App.attributes.menu_title": "Menu title",
   "app.containers.App.attributes.metaTitle": "History",

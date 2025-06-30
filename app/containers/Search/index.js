@@ -100,9 +100,9 @@ const ListHint = styled.div`
 const ListWrapper = styled.div``;
 
 const SettingsLink = styled(A)`
-  color: #ba5d03;
+  color: ${palette('primary', 1)};
   &:hover {
-    color: #ba5d03;
+    color: ${palette('primary', 0)};
     text-decoration: underline;
   }
 `;

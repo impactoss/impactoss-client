@@ -30,7 +30,7 @@ const version_text = IS_PROD ? '' : ` [${SERVER}]`;
 export const VERSION = `${packageJson.version}${version_text}`;
 
 // enable azure for test and prod environments but not for dev
-export const ENABLE_AZURE = IS_PROD || IS_TEST;
+export const ENABLE_AZURE = false; // IS_PROD || IS_TEST;
 
 // default language locale
 export const DEFAULT_LOCALE = 'en-GB';
@@ -110,7 +110,7 @@ export const TEXT_TRUNCATE = {
   META_TITLE: 20,
 };
 
-export const PROGRESS_TAXONOMY_ID = 9;
+export const PROGRESS_TAXONOMY_ID = 8;
 // categories where "is_current" is relevant
 export const CURRENT_TAXONOMY_IDS = [
   2, // reporting cycles

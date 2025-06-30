@@ -322,15 +322,19 @@ theme.palette = {
 
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
-  asideListItem: [dark[2], primary[4], primary[4], dark[2], light[0]],
-  asideListItemHover: [dark[1], primary[4], primary[4], dark[2], light[0]],
+  // asideListItem: [dark[0], dark[0], primary[4], light[0], light[0]],
+  asideListItem: [dark[2], '#fff', '#fff', dark[2], light[0]],
+  // asideListItemHover: [dark[0], dark[0], light[2], light[1], light[0]],
+  asideListItemHover: [dark[1], '#fff', light[0], dark[2], light[0]],
+
+
 
   // asideHeader: [#color, '#bg',]
   asideListGroup: [dark[2], light[1]],
   asideListGroupHover: [dark[3], light[0]],
 
   // mainListHeader
-  mainListHeader: [dark[0], '#E5E7E8'],
+  mainListHeader: [dark[0], '#e0e6e6'],
 
   // mainListItem: [#color, '#bg',], eg category and entity list items
   mainListItem: [dark[0], primary[4]],
@@ -522,7 +526,7 @@ theme.global = {
     xlarge: {},
   },
   colors: {
-    aHover: '#08586c',
+    aHover: '#0063b5',
   },
   edgeSize: {
     hair: '1px',

@@ -12,13 +12,7 @@ import { palette } from 'styled-theme';
 import EntityListSidebarGroupLabel from './EntityListSidebarGroupLabel';
 import EntityListSidebarOption from './EntityListSidebarOption';
 
-const Group = styled.div`
-  border-top: 1px solid;
-  border-color: ${(props) => props.expanded ? palette('aside', 0) : palette('light', 2)};
-  &:last-child {
-    border-bottom: 0;
-  }
-`;
+const Group = styled.div``;
 
 class EntityListSidebarGroups extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
