@@ -53,6 +53,7 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
   if (valueA === valueB) {
     return 0;
   }
+
   let result;
   if (typeof valueA === 'undefined' || valueA === null) {
     result = 1;
@@ -73,7 +74,7 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
       result = 0;
     }
   } else if (isNumber(valueA) && isNumber(valueB)) {
-    result = parseInt(valueA, 10) < parseInt(valueB, 10) ? -1 : 1;
+    result = parseFloat(valueA, 10) < parseFloat(valueB, 10) ? -1 : 1;
   } else {
     // compare stings incl partial numbers
     // 1. prep sort targets
