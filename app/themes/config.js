@@ -282,8 +282,6 @@ export const ENTITY_FIELDS = {
         skipImport: true,
         exportRequired: true,
         roleExport: USER_ROLES.CONTRIBUTOR.value,
-        exportColumn: 'public',
-        exportFlip: true,
       },
       title: {
         type: 'text',
@@ -352,8 +350,6 @@ export const ENTITY_FIELDS = {
         skipImport: true,
         exportRequired: true,
         roleExport: USER_ROLES.CONTRIBUTOR.value,
-        exportColumn: 'public',
-        exportFlip: true,
       },
       title: {
         type: 'text',
@@ -423,8 +419,6 @@ export const ENTITY_FIELDS = {
         skipImport: true,
         exportRequired: true,
         roleExport: USER_ROLES.CONTRIBUTOR.value,
-        exportColumn: 'public',
-        exportFlip: true,
       },
       title: {
         type: 'text',
