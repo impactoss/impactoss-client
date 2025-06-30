@@ -56,7 +56,7 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
   }
 
   render() {
-    const { intl } = this.props; 
+    const { intl } = this.props;
     return (
       <div>
         <HelmetCanonical
@@ -91,6 +91,12 @@ export class RecommendationImport extends React.PureComponent { // eslint-disabl
               filename: `${intl.formatMessage(messages.filename)}`,
               data: getImportFields({
                 fields: [
+                  {
+                    attribute: 'framework_id',
+                    type: 'number',
+                    required: true,
+                    import: true,
+                  },
                   {
                     attribute: 'reference',
                     type: 'text',
@@ -175,9 +181,10 @@ function mapDispatchToProps(dispatch) {
             .mapKeys((k) => getColumnAttribute(k))
             .set('draft', true)
             .toJS();
-          if (!attributes.framework_id) {
-            attributes.framework_id = 1;
-          }
+          // console.log(attributes)
+          // if (!attributes.framework_id) {
+          //   attributes.framework_id = 1;
+          // }
           dispatch(save({
             attributes,
             saveRef: index + 1,
