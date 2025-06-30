@@ -137,7 +137,7 @@ const GlobalStyle = createGlobalStyle`
       font-size: 1em;
     }
     a {
-      color: #BA5D03;
+      color: #0070cc;
       font-weight: 500;
       &:hover {
         text-decoration: underline;

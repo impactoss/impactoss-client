@@ -72,7 +72,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
     } else {
       formTitle = formOptions.title;
     }
-    console.log(appMessage(intl, formOptions.message), formTitle)
+
     const fieldName = 'values';
     return (
       <Styled

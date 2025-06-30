@@ -10,6 +10,8 @@ import { palette } from 'styled-theme';
 
 import styled from 'styled-components';
 
+const RADIUS = 6;
+
 const DiagramSvg = styled.svg``;
 const DiagramSvgWrapper = styled.div`
   position: absolute;
@@ -43,10 +45,10 @@ const SectionLabel = styled.div`
 `;
 
 const roundRect = (rect) => ({
-  right: Math.round(rect.right * 10)/10,
-  left: Math.round(rect.left * 10)/10,
-  top: Math.round(rect.top * 10)/10,
-  bottom: Math.round(rect.bottom * 10)/10,
+  right: Math.floor(rect.right),
+  left: Math.floor(rect.left),
+  top: Math.floor(rect.top),
+  bottom: Math.floor(rect.bottom),
 })
 
 const getConnectionPoint = (node, nodeReference, side = 'bottom') => {
@@ -100,8 +102,11 @@ const getCurvedConnectionPath = (
       { x: end.x, y: end.y - 5 },
     ];
   }
-  if (start.x === end.x) {
-    return getConnectionPath(start, end);
+  if (Math.abs(start.x - end.x) < RADIUS * 2) {
+    return getConnectionPath(
+      {...start, x: end.x},
+      end,
+    );
   }
   return [
     { x: start.x, y: start.y + 5 },
@@ -163,8 +168,6 @@ const connectMeasuresIndicators = (itemRefs) => getConnectionPath(
 );
 
 const VerticalDiagramSVG = ({ frameworks, itemRefs, version }) => {
-  const radius = 6;
-
   return (
     <DiagramSvgWrapper>
       {itemRefs.diagram && (
@@ -180,7 +183,7 @@ const VerticalDiagramSVG = ({ frameworks, itemRefs, version }) => {
               && (
                 <PathLineCustom
                   key={fwId}
-                  r={radius}
+                  r={RADIUS}
                   strokeDasharray="5,5"
                   points={connectRecommendationsIndicators(
                     itemRefs,
@@ -221,7 +224,7 @@ const VerticalDiagramSVG = ({ frameworks, itemRefs, version }) => {
               && (
                 <PathLineCustom
                   key={fwId}
-                  r={frameworks.size > 1 ? radius : 0}
+                  r={frameworks.size > 1 ? RADIUS : 0}
                   points={connectRecommendationsMeasures(itemRefs, fwId)}
                 />
               );

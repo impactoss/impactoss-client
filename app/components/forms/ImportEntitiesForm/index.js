@@ -93,9 +93,9 @@ const CsvDownload = styled.span`
 `;
 
 const NoteLink = styled(A)`
-  color: #BA5D03;
+  color: ${palette('primary', 1)};
   &:hover {
-    color: #BA5D03;
+    color: ${palette('primary', 0)};
     text-decoration: underline;
   }
 `;
