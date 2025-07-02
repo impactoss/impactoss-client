@@ -20,6 +20,7 @@ import {
   selectRecommendationCategoriesByRecommendation,
   selectRecommendationIndicatorsByRecommendation,
   selectFrameworks,
+  selectSettingsFromQuery,
 } from 'containers/App/selectors';
 
 import {
@@ -29,6 +30,8 @@ import {
 import { qe } from 'utils/quasi-equals';
 
 import { sortEntities, sortCategories } from 'utils/sort';
+import { CURRENT_TAXONOMY_IDS } from 'themes/config';
+
 
 import { DEPENDENCIES } from './constants';
 
@@ -99,7 +102,8 @@ export const selectChildTaxonomies = createSelector(
   selectCategory,
   selectTaxonomiesSorted,
   (state) => selectEntities(state, 'categories'),
-  (entity, taxonomies, categories) => {
+  selectSettingsFromQuery,
+  (entity, taxonomies, categories, settingsFromQuery) => {
     if (entity && taxonomies) {
       const taxonomy = taxonomies.find(
         (tax) => qe(
@@ -123,6 +127,12 @@ export const selectChildTaxonomies = createSelector(
               ) && qe(
                 cat.getIn(['attributes', 'taxonomy_id']),
                 tax.get('id')
+              ) && (
+                CURRENT_TAXONOMY_IDS.indexOf(parseInt(tax.get('id'), 10)) === -1
+                || settingsFromQuery.loadNonCurrent
+                || !!cat.getIn(['attributes', 'is_current'])
+              ) && (
+                settingsFromQuery.loadArchived || !cat.getIn(['attributes', 'is_archive'])
               )
             ),
             tax.get('id'),

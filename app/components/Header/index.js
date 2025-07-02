@@ -317,7 +317,6 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     const bookmarks = navItemsSecondary && navItemsSecondary.find(i => i.isBookmarks);
     const userAdmin = navItemsSecondary && navItemsSecondary.find(i => i.isUserAdmin);
     const pageAdmin = navItemsSecondary && navItemsSecondary.find(i => i.isPageAdmin);
-    console.log('size', size)
     return (
       <PrintHide>
         <ShowSecondary
