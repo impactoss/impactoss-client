@@ -45,7 +45,22 @@ const GlobalStyle = createGlobalStyle`
     color: #0077d8;
     text-decoration: none;
     &:hover {
-      color: #d66149;
+      color: #0063b5;
+    }
+  }
+  .ioss-csv-downloader {
+    background: transparent;
+    border: none;
+    text-align: left;
+    color: #0077d8;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    &:hover {
+      color: #0063b5;
+      text-decoration: underline;
     }
   }
   h1, h2, h3, h4, h5, h6 {

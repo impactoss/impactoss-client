@@ -1,6 +1,11 @@
 import { Map } from 'immutable';
 
-import { TEXT_TRUNCATE, SUPPORT_LEVELS, SEARCH } from 'themes/config';
+import {
+  TEXT_TRUNCATE,
+  SUPPORT_LEVELS,
+  SEARCH,
+  ENTITY_FIELDS,
+} from 'themes/config';
 import { find, reduce, every } from 'lodash/collection';
 
 import { cleanupSearchTarget, regExMultipleWords, truncateText } from 'utils/string';
@@ -644,4 +649,56 @@ export const getTaxonomyCategories = (
         : category;
     }
   );
+};
+
+export const checkActionAttribute = (att, isAdmin) => ENTITY_FIELDS.measures
+  && ENTITY_FIELDS.measures.ATTRIBUTES
+  && checkAttribute({
+    att,
+    attributes: ENTITY_FIELDS.measures.ATTRIBUTES,
+    isAdmin,
+  });
+
+export const checkAttribute = ({
+  typeId,
+  att,
+  attributes,
+  isAdmin,
+}) => {
+  if (typeId && attributes && attributes[att]) {
+    if (
+      attributes[att].adminOnly
+      && !isAdmin
+    ) {
+      return false;
+    }
+    if (attributes[att].adminOnlyForTypes
+      && attributes[att].adminOnlyForTypes.indexOf(typeId.toString()) > -1
+      && !isAdmin
+    ) {
+      return false;
+    }
+    if (attributes[att].optional) {
+      return Array.isArray(attributes[att].optional)
+        ? attributes[att].optional.indexOf(typeId.toString()) > -1
+        : attributes[att].optional;
+    }
+    if (attributes[att].required) {
+      return Array.isArray(attributes[att].required)
+        ? attributes[att].required.indexOf(typeId.toString()) > -1
+        : attributes[att].required;
+    }
+  } else if (!typeId && attributes && attributes[att]) {
+    if (attributes[att].adminOnly && !isAdmin) {
+      return false;
+    }
+    // if (attributes[att].optional) {
+    //   return !!attributes[att].optional;
+    // }
+    // if (attributes[att].required) {
+    //   return !!attributes[att].required;
+    // }
+    return true;
+  }
+  return false;
 };
