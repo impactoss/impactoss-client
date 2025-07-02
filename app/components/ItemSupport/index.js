@@ -18,7 +18,6 @@ const Status = styled.div`
 class ItemSupport extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { supportLevel, intl } = this.props;
-    console.log(supportLevel)
     return supportLevel && supportLevel.value !== 'null'
       ? (
         <Status>

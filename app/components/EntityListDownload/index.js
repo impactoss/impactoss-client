@@ -393,8 +393,8 @@ export function EntityListDownload({
               margin={{ top: 'xlarge' }}
             >
               <Box
-                direction={(isMinSize(size, 'medium') || !csvSuffix) ? 'row' : 'column'}
-                align={(isMinSize(size, 'medium') || !csvSuffix) ? 'center' : 'start'}
+                direction={(isMinSize(size, 'small') || !csvSuffix) ? 'row' : 'column'}
+                align={(isMinSize(size, 'small') || !csvSuffix) ? 'center' : 'start'}
                 gap="small"
                 fill={false}
               >
@@ -402,16 +402,16 @@ export function EntityListDownload({
                   <FormattedMessage {...messages.filenameLabel} />
                 </OptionLabel>
                 <Box
-                  direction={(isMinSize(size, 'medium') || !csvSuffix) ? 'row' : 'column'}
-                  align={(isMinSize(size, 'medium') || !csvSuffix) ? 'center' : 'start'}
-                  gap={(isMinSize(size, 'medium') || !csvSuffix) ? 'none' : 'small'}
+                  direction={(isMinSize(size, 'small') || !csvSuffix) ? 'row' : 'column'}
+                  align={(isMinSize(size, 'small') || !csvSuffix) ? 'center' : 'start'}
+                  gap={(isMinSize(size, 'small') || !csvSuffix) ? 'none' : 'small'}
                 >
                   <TextInput
                     minLength={1}
                     debounceTimeout={500}
                     value={csvFilename}
                     onChange={(evt) => setCSVFilename(evt.target.value)}
-                    style={{ maxWidth: '250px', textAlign: isMinSize(size, 'medium') ? 'right' : 'left' }}
+                    style={{ maxWidth: '250px', textAlign: isMinSize(size, 'small') ? 'right' : 'left' }}
                   />
                   <Text size="xsmall">
                     {`${csvSuffix ? csvDateSuffix : ''}.csv`}

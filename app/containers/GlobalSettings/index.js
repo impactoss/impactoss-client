@@ -160,10 +160,10 @@ const GlobalSettings = ({
                         </Box>
                         <FormFieldWrap>
                           <Box
-                            direction={isMinSize(size, 'medium') ? 'row' : 'column'}
+                            direction={isMinSize(size, 'small') ? 'row' : 'column'}
                             gap="medium"
                           >
-                            <Box basis={isMinSize(size, 'medium') ? '1/2' : '1'}>
+                            <Box basis={isMinSize(size, 'small') ? '1/2' : '1'}>
                               <Toggle
                                 toggle
                                 name="radio-ignore-noncurrent"
@@ -182,7 +182,7 @@ const GlobalSettings = ({
                                 }}
                               />
                             </Box>
-                            <Box basis={isMinSize(size, 'medium') ? '1/2' : '1'}>
+                            <Box basis={isMinSize(size, 'small') ? '1/2' : '1'}>
                               {messages.description[key] && (
                                 <StyledBodyText weight={300}>
                                   <FormattedMessage {...messages.description[key]} />

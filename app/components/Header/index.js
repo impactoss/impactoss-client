@@ -4,9 +4,10 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { filter } from 'lodash/collection';
-import { Box } from 'grommet';
+import { Box, ResponsiveContext } from 'grommet';
 
 import { truncateText } from 'utils/string';
+import { isMinSize } from 'utils/responsive';
 
 import {
   SHOW_HEADER_TITLE,
@@ -30,7 +31,6 @@ import BrandText from './BrandText';
 import BrandTitle from './BrandTitle';
 import BrandClaim from './BrandClaim';
 import NavPages from './NavPages';
-import NavAdmin from './NavAdmin';
 import LinkPage from './LinkPage';
 import NavAccount from './NavAccount';
 import NavMain from './NavMain';
@@ -98,8 +98,9 @@ const NavSecondary = styled(PrintHide)`
   bottom: 0;
   width: 100%;
   z-index: 99999;
-  background-color: transparent;
+  background-color: ${palette('headerNavPages', 0)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    background-color: transparent;
     position: relative;
     top: auto;
     bottom: auto;
@@ -169,12 +170,11 @@ const Search = styled(LinkMain)`
     display: inline-block;
     min-width: auto;
     padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px 0;
-    float: right;
     border-left: none;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: 18px;
+    padding-right: 18px;
   }
 `;
 const Config = styled(LinkMain)`
@@ -184,12 +184,11 @@ const Config = styled(LinkMain)`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: inline-block;
     min-width: auto;
-    padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px;
-    float: right;
+    padding: 13px ${(props) => props.theme.sizes.header.paddingLeft.small}px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: 18px;
+    padding-right: 18px;
   }
 `;
 const SearchSecondary = styled(LinkPage)`
@@ -226,10 +225,10 @@ const FrameworkOption = styled(Button)`
   display: block;
   width: 100%;
   text-align: left;
+  color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
   &:hover {
     color:${palette('headerNavMainItemHover', 0)};
   }
-  color: ${(props) => props.active ? palette('headerNavMainItem', 1) : 'inherit'};
 `;
 const STATE_INITIAL = {
   showSecondary: false,
@@ -314,105 +313,152 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     this.forceUpdate();
   };
 
-  renderSecondary = (navItemsAdmin, search, hasSettings, onShowSettings) => (
-    <PrintHide>
-      <ShowSecondary
-        visible={!this.state.showSecondary}
-        onClick={this.onShowSecondary}
-      >
-        <ScreenReaderOnly>
-          <FormattedMessage {...appMessages.screenreader.showSecondaryNavigation} />
-        </ScreenReaderOnly>
-        <Icon name="menu" hasStroke />
-      </ShowSecondary>
-      <NavSecondary
-        visible={this.state.showSecondary}
-        onClick={(evt) => {
-          evt.stopPropagation();
-          this.onHideSecondary();
-        }}
-      >
-        <HideSecondaryWrap>
-          <HideSecondary
-            onClick={this.onHideSecondary}
-          >
-            <ScreenReaderOnly>
-              <FormattedMessage {...appMessages.screenreader.hideSecondaryNavigation} />
-            </ScreenReaderOnly>
-            <Icon name="close" size="30px" />
-          </HideSecondary>
-        </HideSecondaryWrap>
-        <NavAccount
-          isSignedIn={this.props.isSignedIn}
-          user={this.props.user}
-          onPageLink={(evt, path, query) => {
-            if (evt !== undefined && evt.stopPropagation) evt.stopPropagation();
+  renderSecondary = (navItemsSecondary, search, hasSettings, onShowSettings, size) => {
+    const bookmarks = navItemsSecondary && navItemsSecondary.find(i => i.isBookmarks);
+    const userAdmin = navItemsSecondary && navItemsSecondary.find(i => i.isUserAdmin);
+    const pageAdmin = navItemsSecondary && navItemsSecondary.find(i => i.isPageAdmin);
+    console.log('size', size)
+    return (
+      <PrintHide>
+        <ShowSecondary
+          visible={!this.state.showSecondary}
+          onClick={this.onShowSecondary}
+        >
+          <ScreenReaderOnly>
+            <FormattedMessage {...appMessages.screenreader.showSecondaryNavigation} />
+          </ScreenReaderOnly>
+          <Icon name="menu" hasStroke />
+        </ShowSecondary>
+        <NavSecondary
+          visible={this.state.showSecondary}
+          onClick={(evt) => {
+            evt.stopPropagation();
             this.onHideSecondary();
-            this.props.onPageLink(path, query);
           }}
-          currentPath={this.props.currentPath}
-          fullPath={this.props.fullPath}
-        />
-        {navItemsAdmin
-          && (
-            <NavAdmin>
-              {navItemsAdmin.map((item, i) => (
-                <LinkAdmin
-                  key={i}
-                  href={item.path}
-                  active={item.active}
+        >
+          <Box
+            direction={isMinSize(size, 'small') ? 'row' : 'column'}
+            justify={isMinSize(size, 'small') ? 'end' : 'start'}
+          >
+            <HideSecondaryWrap>
+              <HideSecondary
+                onClick={this.onHideSecondary}
+              >
+                <ScreenReaderOnly>
+                  <FormattedMessage {...appMessages.screenreader.hideSecondaryNavigation} />
+                </ScreenReaderOnly>
+                <Icon name="close" size="30px" />
+              </HideSecondary>
+            </HideSecondaryWrap>
+            {search && (
+              <SearchSecondary
+                href={search.path}
+                active={search.active}
+                onClick={(evt) => this.onClick(evt, search.path)}
+              >
+                <Box direction="row" gap="xsmall" align="center">
+                  <span>{search.title}</span>
+                  {search.icon
+                    && <Icon title={search.title} name={search.icon} text textRight size="1em" />
+                  }
+                </Box>
+              </SearchSecondary>
+            )}
+            {hasSettings && onShowSettings && (
+              <ConfigSecondary
+                as="button"
+                onClick={() => onShowSettings()}
+              >
+                <Box direction="row" gap="xsmall" align="center">
+                  <FormattedMessage {...appMessages.labels.settings} />
+                  <Icon name="settings" size="18px" />
+                </Box>
+              </ConfigSecondary>
+            )}
+            {(userAdmin || pageAdmin) && (
+              <NavPages
+                direction={isMinSize(size, 'small') ? 'row' : 'column'}
+                justify={isMinSize(size, 'small') ? 'end' : 'start'}
+              >
+                {userAdmin && (
+                  <LinkAdmin
+                    href={userAdmin.path}
+                    active={userAdmin.active}
+                    onClick={(evt) => {
+                      evt.stopPropagation();
+                      this.onHideSecondary();
+                      this.onClick(evt, userAdmin.path);
+                    }}
+                  >
+                    {userAdmin.title}
+                  </LinkAdmin>
+                )}
+                {pageAdmin && (
+                  <LinkAdmin
+                    href={pageAdmin.path}
+                    active={pageAdmin.active}
+                    onClick={(evt) => {
+                      evt.stopPropagation();
+                      this.onHideSecondary();
+                      this.onClick(evt, pageAdmin.path);
+                    }}
+                  >
+                    {pageAdmin.title}
+                  </LinkAdmin>
+                )}
+              </NavPages>
+            )}
+            {this.props.pages && (
+              <NavPages
+                direction={isMinSize(size, 'small') ? 'row' : 'column'}
+                justify={isMinSize(size, 'small') ? 'end' : 'start'}
+              >
+                {this.props.pages.map((page, i) => (
+                  <LinkPage
+                    key={i}
+                    href={page.path}
+                    active={page.active || this.props.currentPath === page.path}
+                    onClick={(evt) => this.onClick(evt, page.path)}
+                  >
+                    {page.title}
+                  </LinkPage>
+                ))}
+              </NavPages>
+            )}
+            {bookmarks && (
+              <NavPages
+                direction={isMinSize(size, 'small') ? 'row' : 'column'}
+                justify={isMinSize(size, 'small') ? 'end' : 'start'}
+              >
+                <LinkPage
+                  href={bookmarks.path}
+                  active={bookmarks.active}
                   onClick={(evt) => {
                     evt.stopPropagation();
                     this.onHideSecondary();
-                    this.onClick(evt, item.path);
+                    this.onClick(evt, bookmarks.path);
                   }}
                 >
-                  {item.title}
-                </LinkAdmin>
-              ))}
-            </NavAdmin>
-          )
-        }
-        <NavPages>
-          {this.props.pages && this.props.pages.map((page, i) => (
-            <LinkPage
-              key={i}
-              href={page.path}
-              active={page.active || this.props.currentPath === page.path}
-              onClick={(evt) => this.onClick(evt, page.path)}
-            >
-              {page.title}
-            </LinkPage>
-          ))}
-          {search && (
-            <SearchSecondary
-              href={search.path}
-              active={search.active}
-              onClick={(evt) => this.onClick(evt, search.path)}
-            >
-              <Box direction="row" gap="xsmall" align="center">
-                <span>{search.title}</span>
-                {search.icon
-                  && <Icon title={search.title} name={search.icon} text textRight size="1em" />
-                }
-              </Box>
-            </SearchSecondary>
-          )}
-          {hasSettings && onShowSettings && (
-            <ConfigSecondary
-              as="button"
-              onClick={() => onShowSettings()}
-            >
-              <Box direction="row" gap="xsmall" align="center">
-                <FormattedMessage {...appMessages.labels.settings} />
-                <Icon name="settings" size="18px" />
-              </Box>
-            </ConfigSecondary>
-          )}
-        </NavPages>
-      </NavSecondary>
-    </PrintHide>
-  );
+                  {bookmarks.title}
+                </LinkPage>
+              </NavPages>
+            )}
+            <NavAccount
+              isSignedIn={this.props.isSignedIn}
+              user={this.props.user}
+              onPageLink={(evt, path, query) => {
+                if (evt !== undefined && evt.stopPropagation) evt.stopPropagation();
+                this.onHideSecondary();
+                this.props.onPageLink(path, query);
+              }}
+              currentPath={this.props.currentPath}
+              fullPath={this.props.fullPath}
+            />
+          </Box>
+        </NavSecondary>
+      </PrintHide>
+    );
+  };
 
   render() {
     const {
@@ -425,140 +471,149 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       hasSettings,
       intl,
     } = this.props;
-    const navItems = filter(this.props.navItems, (item) => !item.isAdmin);
-    const navItemsAdmin = filter(this.props.navItems, (item) => item.isAdmin);
+    const navItems = filter(this.props.navItems, (item) => !item.isSecondary);
+    const navItemsSecondary = filter(this.props.navItems, (item) => item.isSecondary);
 
     const appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
 
     const currentFrameworkOption = frameworkOptions
       && frameworkOptions.find((option) => option.active);
-
     return (
-      <Styled
-        isHome={isHome}
-        fixed={isHome}
-        sticky={!isHome}
-        hasBackground={!isHome}
-        hasShadow={!isHome || SHOW_HEADER_SHADOW_ON_HOME}
-        hasNav={!isHome}
-        hasBrand={SHOW_BRAND_ON_HOME || !isHome}
-      >
-        {this.state.showFrameworks && (
-          <FrameworkOptions ref={this.fwWrapperRef}>
-            {frameworkOptions && frameworkOptions.map((option) => (
-              <FrameworkOption
-                key={option.value}
-                active={option.active}
-                onClick={() => {
-                  onSelectFramework(option.value);
-                  this.onHideFrameworks();
-                }}
-              >
-                {option.label}
-              </FrameworkOption>
-            ))}
-          </FrameworkOptions>
-        )}
-        {!SHOW_BRAND_ON_HOME && isHome
-          && (
-            <HomeNavWrap>
-              {this.renderSecondary(navItemsAdmin, search, hasSettings, onShowSettings)}
-            </HomeNavWrap>
-          )
-        }
-        {(SHOW_BRAND_ON_HOME || !isHome) && (
-          <Banner
-            showPattern={(!isHome && SHOW_HEADER_PATTERN)}
+      <ResponsiveContext.Consumer>
+          {(size) => (
+          <Styled
+            isHome={isHome}
+            fixed={isHome}
+            sticky={!isHome}
+            hasBackground={!isHome}
+            hasShadow={!isHome || SHOW_HEADER_SHADOW_ON_HOME}
+            hasNav={!isHome}
+            hasBrand={SHOW_BRAND_ON_HOME || !isHome}
           >
-            <Brand
-              href={brandPath}
-              onClick={(evt) => this.onClick(evt, brandPath)}
-              title={appTitle}
-            >
-              <Logo src={this.props.theme.media.headerLogo} alt={appTitle} />
-              {SHOW_HEADER_TITLE && (
-                <BrandText>
-                  <BrandTitle>
-                    <FormattedMessage {...appMessages.app.title} />
-                  </BrandTitle>
-                  <BrandClaim>
-                    <FormattedMessage {...appMessages.app.claim} />
-                  </BrandClaim>
-                </BrandText>
-              )}
-            </Brand>
-            {this.renderSecondary(navItemsAdmin, search, hasSettings, onShowSettings)}
-          </Banner>
-        )}
-        {!isHome && (
-          <NavMain hasBorder role="navigation" aria-label="primary">
-            {frameworkOptions && (
-              <SelectFrameworks
-                as="button"
-                ref={this.fwButtonRef}
-                onClick={(evt) => this.state.showFrameworks
-                  ? this.onHideFrameworks(evt)
-                  : this.onShowFrameworks(evt)
-                }
+            {this.state.showFrameworks && (
+              <FrameworkOptions ref={this.fwWrapperRef}>
+                {frameworkOptions && frameworkOptions.map((option) => (
+                  <FrameworkOption
+                    key={option.value}
+                    active={option.active}
+                    onClick={() => {
+                      onSelectFramework(option.value);
+                      this.onHideFrameworks();
+                    }}
+                  >
+                    {option.label}
+                  </FrameworkOption>
+                ))}
+              </FrameworkOptions>
+            )}
+            {!SHOW_BRAND_ON_HOME && isHome
+              && (
+                <HomeNavWrap>
+                  {this.renderSecondary(navItemsAdmin, search, hasSettings, onShowSettings, size)}
+                </HomeNavWrap>
+              )
+            }
+            {(SHOW_BRAND_ON_HOME || !isHome) && (
+              <Banner
+                showPattern={(!isHome && SHOW_HEADER_PATTERN)}
               >
-                <LinkSuperTitle>
-                  Select framework
-                </LinkSuperTitle>
-                {currentFrameworkOption && (
-                  <LinkTitle>
-                    {truncateText(
-                      currentFrameworkOption.label,
-                      TEXT_TRUNCATE.FW_SELECT,
-                      false,
+                <Brand
+                  href={brandPath}
+                  onClick={(evt) => this.onClick(evt, brandPath)}
+                  title={appTitle}
+                >
+                  <Logo src={this.props.theme.media.headerLogo} alt={appTitle} />
+                  {SHOW_HEADER_TITLE && (
+                    <BrandText>
+                      <BrandTitle>
+                        <FormattedMessage {...appMessages.app.title} />
+                      </BrandTitle>
+                      <BrandClaim>
+                        <FormattedMessage {...appMessages.app.claim} />
+                      </BrandClaim>
+                    </BrandText>
+                  )}
+                </Brand>
+                {this.renderSecondary(navItemsSecondary, search, hasSettings, onShowSettings, size)}
+              </Banner>
+            )}
+            {!isHome && (
+              <NavMain hasBorder role="navigation" aria-label="primary">
+                <Box direction="row">
+                  {frameworkOptions && (
+                    <SelectFrameworks
+                      as="button"
+                      ref={this.fwButtonRef}
+                      onClick={(evt) => this.state.showFrameworks
+                        ? this.onHideFrameworks(evt)
+                        : this.onShowFrameworks(evt)
+                      }
+                    >
+                      <LinkSuperTitle>
+                        Select framework
+                      </LinkSuperTitle>
+                      {currentFrameworkOption && (
+                        <LinkTitle>
+                          {truncateText(
+                            currentFrameworkOption.label,
+                            TEXT_TRUNCATE.FW_SELECT,
+                            false,
+                          )}
+                          {!this.state.showFrameworks && (
+                            <Icon name="dropdownOpen" text textRight size="1em" />
+                          )}
+                          {this.state.showFrameworks && (
+                            <Icon name="dropdownClose" text textRight size="1em" />
+                          )}
+                        </LinkTitle>
+                      )}
+                    </SelectFrameworks>
+                  )}
+                  {navItems && navItems.map((item, i) => (
+                    <LinkMain
+                      key={i}
+                      href={item.path}
+                      active={item.active}
+                      onClick={(evt) => this.onClick(evt, item.path)}
+                    >
+                      <LinkSuperTitle active={item.active}>
+                        {item.titleSuper}
+                      </LinkSuperTitle>
+                      <LinkTitle active={item.active}>
+                        {item.title}
+                      </LinkTitle>
+                    </LinkMain>
+                  ))}
+                </Box>
+                {isMinSize(size, 'small') && (
+                  <Box direction="row">
+                    {search && (
+                      <Search
+                        href={search.path}
+                        active={search.active}
+                        onClick={(evt) => this.onClick(evt, search.path)}
+                      >
+                        {search.title}
+                        {search.icon
+                          && <Icon title={search.title} name={search.icon} text textRight size="1em" />
+                        }
+                      </Search>
                     )}
-                    {!this.state.showFrameworks && (
-                      <Icon name="dropdownOpen" text textRight size="1em" />
+                    {hasSettings && onShowSettings && (
+                      <Config
+                        as="button"
+                        onClick={() => onShowSettings()}
+                      >
+                        <Icon name="settings" size="24px" />
+                      </Config>
                     )}
-                    {this.state.showFrameworks && (
-                      <Icon name="dropdownClose" text textRight size="1em" />
-                    )}
-                  </LinkTitle>
+                  </Box>
                 )}
-              </SelectFrameworks>
+              </NavMain>
             )}
-            {navItems && navItems.map((item, i) => (
-              <LinkMain
-                key={i}
-                href={item.path}
-                active={item.active}
-                onClick={(evt) => this.onClick(evt, item.path)}
-              >
-                <LinkSuperTitle active={item.active}>
-                  {item.titleSuper}
-                </LinkSuperTitle>
-                <LinkTitle active={item.active}>
-                  {item.title}
-                </LinkTitle>
-              </LinkMain>
-            ))}
-            {hasSettings && onShowSettings && (
-              <Config
-                as="button"
-                onClick={() => onShowSettings()}
-              >
-                <Icon name="settings" size="24px" />
-              </Config>
-            )}
-            {search && (
-              <Search
-                href={search.path}
-                active={search.active}
-                onClick={(evt) => this.onClick(evt, search.path)}
-              >
-                {search.title}
-                {search.icon
-                  && <Icon title={search.title} name={search.icon} text textRight size="1em" />
-                }
-              </Search>
-            )}
-          </NavMain>
+          </Styled>
         )}
-      </Styled>
+      </ResponsiveContext.Consumer>
     );
   }
 }

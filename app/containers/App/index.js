@@ -186,6 +186,8 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           path: ROUTES.PAGES,
           title: intl.formatMessage(messages.nav.pages),
           isAdmin: true,
+          isPageAdmin: true,
+          isSecondary: true,
           active: currentPath === ROUTES.PAGES,
         },
       ]);
@@ -196,6 +198,8 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           path: ROUTES.USERS,
           title: intl.formatMessage(messages.nav.users),
           isAdmin: true,
+          isUserAdmin: true,
+          isSecondary: true,
           active: currentPath === ROUTES.USERS,
         },
       ]);
@@ -205,7 +209,8 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
         {
           path: ROUTES.BOOKMARKS,
           title: intl.formatMessage(messages.nav.bookmarks),
-          isAdmin: true,
+          isSecondary: true,
+          isBookmarks: true,
           active: currentPath === ROUTES.BOOKMARKS,
         },
       ]);

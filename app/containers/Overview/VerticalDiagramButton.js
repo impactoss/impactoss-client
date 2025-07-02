@@ -87,7 +87,6 @@ const VerticalDiagramButton = React.forwardRef((props, ref) => {
     onPageLink,
     intl,
   } = props;
-  console.log('multiple', multiple)
   return (
     <div ref={ref}>
       <DiagramButton

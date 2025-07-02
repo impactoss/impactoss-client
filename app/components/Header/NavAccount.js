@@ -15,9 +15,6 @@ import messages from './messages';
 
 const Styled = styled.div`
   background-color: ${palette('headerNavAccount', 0)};
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    float: right;
-  }
 `;
 class NavAccount extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   onClick = (evt, path, currentPath, fullPath) => {

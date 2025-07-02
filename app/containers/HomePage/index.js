@@ -44,8 +44,14 @@ import messages from './messages';
 
 /* eslint-disable react/no-children-prop */
 
-const StyledRow = styled(Row)`
-  display: flex;
+const StyledRow = styled((p) => <Box {...p} align="center" />)`
+  flex-direction: column;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    flex-direction: row;
+    margin-right: -${({ theme }) => theme.gutter}px;
+    margin-left: -${({ theme }) => theme.gutter}px;
+    margin-top: ${({ space }) => space ? 10 : 0}px;
+  }
 `;
 const GraphicHomeWrapper = styled.div`
   width: 100%;

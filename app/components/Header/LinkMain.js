@@ -19,17 +19,16 @@ export default styled(Link)`
   height: ${(props) => props.theme.sizes.header.nav.heightMobile - 1}px;
   border-left: 1px solid ${palette('dark', 3)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    min-width: 120px;
+    min-width: 100px;
     font-size: 0.9em;
     padding: 5px ${(props) => props.theme.sizes.header.paddingLeft.small}px;
     height: ${(props) => props.theme.sizes.header.nav.height}px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
-    min-width: 160px;
     padding-top: 4px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    min-width: 200px;
+    min-width: 160px;
     font-size: 1em;
     padding-top: 4px;
     padding-left: ${(props) => props.theme.sizes.header.paddingLeft.large}px;

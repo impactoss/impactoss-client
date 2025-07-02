@@ -1,8 +1,9 @@
+import React from 'react';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import PrintHide from 'components/styled/PrintHide';
+import { Box } from 'grommet';
 
-export default styled(PrintHide)`
+export default styled((p) => <Box direction="row" justify="between" {...p} />)`
   height:${(props) => props.theme.sizes.header.nav.heightMobile}px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     height:${(props) => props.theme.sizes.header.nav.height}px;
@@ -16,4 +17,7 @@ export default styled(PrintHide)`
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   -ms-overflow-style: -ms-autohiding-scrollbar;
+  @media print {
+    display: none !important;
+  }
 `;

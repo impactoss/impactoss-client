@@ -115,6 +115,7 @@ export const BREAKPOINTS = {
 };
 
 theme.breakpoints = {
+  xsmall: `${BREAKPOINTS.xsmall.min + 1}px`, // min
   small: `${BREAKPOINTS.small.min + 1}px`, // min
   medium: `${BREAKPOINTS.medium.min + 1}px`, // min
   large: `${BREAKPOINTS.large.min + 1}px`, // min
@@ -292,7 +293,7 @@ theme.palette = {
   // headerNavPages: [ '#bg' ],
   headerNavPages: [light[0]],
   // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
-  headerNavPagesItem: [dark[3], primary[4], 'transparent', primary[2]],
+  headerNavPagesItem: [dark[3], primary[4], 'transparent', primary[1]],
   headerNavPagesItemHover: [dark[2], primary[4], 'transparent', primary[0]],
 
   // headerNavAccount: [ '#bg' ],
@@ -453,7 +454,7 @@ theme.sizes = {
       claim: '9pt',
     },
     paddingLeft: {
-      mobile: 3,
+      mobile: 5,
       small: 6,
       large: 10,
     },
@@ -513,7 +514,10 @@ theme.global = {
     size: '16px',
     height: 1.42857,
   },
-  breakpoints: {
+  breakpoints: { // grommet assumes upper width
+    xsmall: {
+      value: BREAKPOINTS.xsmall.max,
+    },
     small: {
       value: BREAKPOINTS.small.max,
     },

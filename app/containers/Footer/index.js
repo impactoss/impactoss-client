@@ -92,7 +92,7 @@ const Footer = ({
 }) => {
   const intl = useIntl();
   const size = useContext(ResponsiveContext);
-  const isMobile = isMaxSize(size, 'small');
+  const isMobile = isMaxSize(size, 'xsmall');
   return (
     <FooterMain>
       <Container noPaddingBottom>
