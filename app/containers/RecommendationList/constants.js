@@ -1,6 +1,6 @@
 import {
   PUBLISH_STATUSES,
-  IS_CURRENT_STATUSES,
+  IS_CURRENT_STATUSES_FILTER,
   IS_ARCHIVE_STATUSES,
   ARCHIVE_MIN_ROLE,
   SEE_DRAFT_MIN_ROLE,
@@ -120,7 +120,7 @@ export const CONFIG = {
         edit: false,
         message: 'attributes.is_current',
         attribute: 'is_current',
-        options: IS_CURRENT_STATUSES,
+        options: IS_CURRENT_STATUSES_FILTER,
         forGlobalSettings: [{
           arg: 'loadNonCurrent',
           value: true,

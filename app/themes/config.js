@@ -197,6 +197,10 @@ export const IS_CURRENT_STATUSES = [
   { value: true, message: 'ui.currentStatuses.current' },
   { value: false, message: 'ui.currentStatuses.notCurrent' },
 ];
+export const IS_CURRENT_STATUSES_FILTER = [
+  { value: true, message: 'ui.currentStatuses.currentOrNA' },
+  { value: false, message: 'ui.currentStatuses.notCurrent' },
+];
 export const IS_ARCHIVE_STATUSES = [
   { value: true, message: 'ui.archiveStatuses.archived' },
   { value: false, message: 'ui.archiveStatuses.notArchived' },

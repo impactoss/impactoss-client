@@ -1629,6 +1629,10 @@ export default defineMessages({
         id: 'app.containers.App.ui.currentStatuses.current',
         defaultMessage: 'Latest cycle',
       },
+      currentOrNA: {
+        id: 'app.containers.App.ui.currentStatuses.currentOrNA',
+        defaultMessage: 'Latest cycle/NA',
+      },
       notCurrent: {
         id: 'app.containers.App.ui.currentStatuses.notCurrent',
         defaultMessage: 'Previous cycle',
