@@ -167,7 +167,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         ...field,
         formData: values,
         values: values.getIn(field.dataPath),
-        options: formData.getIn(field.dataPath) || List(),
+        // options: formData.getIn(field.dataPath) || List(),
       };
     } else {
       const modifiedField = field.modifyFieldAttributes
