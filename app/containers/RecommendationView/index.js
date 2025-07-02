@@ -104,6 +104,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       fields: [
         getStatusField(entity),
         !entity.getIn(['attributes', 'draft'])
+        && !entity.getIn(['attributes', 'is_current'])
         && hasCycles
         && getStatusField(
           entity,

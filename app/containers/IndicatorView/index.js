@@ -97,6 +97,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
     fields: [
       getStatusField(entity),
       !entity.getIn(['attributes', 'draft'])
+      && !entity.getIn(['attributes', 'is_current'])
       && getStatusField(
         entity,
         'is_current',

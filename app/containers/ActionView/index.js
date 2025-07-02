@@ -87,6 +87,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       fields: [
         getStatusField(entity),
         !entity.getIn(['attributes', 'draft'])
+        && !entity.getIn(['attributes', 'is_current'])
         && getStatusField(
           entity,
           'is_current',
@@ -213,6 +214,7 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
       frameworks,
       intl,
     } = this.props;
+
     const isManager = hasUserRole[USER_ROLES.MANAGER.value];
     let buttons = [];
     if (dataReady) {
