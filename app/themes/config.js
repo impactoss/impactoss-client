@@ -579,9 +579,11 @@ export const ENTITY_FIELDS = {
         exportDefault: true,
       },
       description: {
+        type: 'markdown',
         type: 'text',
       },
       response: {
+        type: 'markdown',
         type: 'text',
       },
       support_level: {
