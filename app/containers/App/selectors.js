@@ -611,10 +611,7 @@ export const selectFWTaxonomiesSorted = createSelector(
 );
 
 // select all categories
-export const selectCategories = createSelector(
-  (state) => selectEntities(state, API.CATEGORIES),
-  (entities) => entities
-);
+export const selectCategories = (state) => selectEntities(state, API.CATEGORIES);
 
 export const selectEntity = createSelector(
   (state, { path }) => selectEntities(state, path),
