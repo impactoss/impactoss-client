@@ -294,6 +294,10 @@ export const ENTITY_FIELDS = {
         exportRequired: true,
         roleExport: USER_ROLES.CONTRIBUTOR.value,
       },
+      reference: {
+        type: 'text',
+        required: true,
+      },
       title: {
         type: 'text',
         exportDefault: true,
@@ -303,9 +307,6 @@ export const ENTITY_FIELDS = {
       },
       outcome: {
         type: 'markdown',
-      },
-      reference: {
-        type: 'text',
       },
       indicator_summary: {
         type: 'markdown',
@@ -387,7 +388,7 @@ export const ENTITY_FIELDS = {
         },
         table: API.ACTION_INDICATORS,
         keyPair: ['measure_id', 'indicator_id'], // own, other
-        hint: 'one or more unique recommendation ids (as assigned by the database / comma-separated)',
+        hint: 'one or more unique indicator ids (as assigned by the database / comma-separated)',
       },
       // column: country-code
       'indicator-reference': {
@@ -513,6 +514,15 @@ export const ENTITY_FIELDS = {
         exportRequired: true,
         roleExport: USER_ROLES.CONTRIBUTOR.value,
       },
+      framework_id: {
+        type: 'number',
+        required: true,
+        import: true,
+      },
+      reference: {
+        type: 'text',
+        required: true,
+      },
       title: {
         type: 'text',
         exportDefault: true,
@@ -520,18 +530,16 @@ export const ENTITY_FIELDS = {
       description: {
         type: 'text',
       },
-      reference: {
-        type: 'text',
-      },
       response: {
         type: 'text',
       },
       support_level: {
-        type: 'int',
+        type: 'number',
       },
       created_at: {
         type: 'date',
         roleExport: USER_ROLES.MANAGER.value,
+        skipImport: true,
       },
       created_by_id: {
         skipImport: true,
@@ -543,6 +551,7 @@ export const ENTITY_FIELDS = {
       updated_at: {
         type: 'date',
         roleExport: USER_ROLES.MANAGER.value,
+        skipImport: true,
       },
       updated_by_id: {
         skipImport: true,
@@ -563,6 +572,86 @@ export const ENTITY_FIELDS = {
         table: 'users',
         roleExport: USER_ROLES.MANAGER.value,
         exportColumn: 'connection_updated_by',
+      },
+    },
+    RELATIONSHIPS_IMPORT: {
+      // column: recommendation-id
+      'action-id': {
+        type: 'number',
+        multiple: true,
+        table: API.RECOMMENDATION_ACTIONS,
+        lookup: {
+          table: API.ACTIONS, // id assumed
+        },
+        keyPair: ['recommendation_id', 'measure_id'], // own, other
+        hint: 'one or more unique measure ids (as assigned by the database / comma-separated)',
+      },
+      // column: country-code
+      'action-reference': {
+        type: 'text',
+        lookup: {
+          table: API.ACTIONS, // id assumed
+          attribute: 'reference',
+        },
+        multiple: true,
+        table: API.RECOMMENDATION_ACTIONS,
+        keyPair: ['recommendation_id', 'measure_id'], // own, other
+        hint: 'one or more unique measure references (as assigned by the users / comma-separated)',
+      },
+      // column: indicator-id
+      'indicator-id': {
+        type: 'number',
+        multiple: true,
+        lookup: {
+          table: API.INDICATORS, // id assumed
+        },
+        table: API.RECOMMENDATION_INDICATORS,
+        keyPair: ['recommendation_id', 'indicator_id'], // own, other
+        hint: 'one or more unique indicator ids (as assigned by the database / comma-separated)',
+      },
+      // column: country-code
+      'indicator-reference': {
+        type: 'text',
+        lookup: {
+          table: API.INDICATORS, // id assumed
+          attribute: 'reference',
+        },
+        multiple: true,
+        table: API.RECOMMENDATION_INDICATORS,
+        keyPair: ['recommendation_id', 'indicator_id'], // own, other
+        hint: 'one or more unique indicator references (as assigned by the users / comma-separated)',
+      },
+      // has category
+      'category-id': {
+        type: 'number',
+        table: API.RECOMMENDATION_CATEGORIES,
+        lookup: {
+          table: API.CATEGORIES, // id assumed
+        },
+        keyPair: ['recommendation_id', 'category_id'], // own, other
+        hint: 'one or more category ids (as assigned by the database / comma-separated)',
+      },
+      // has category
+      'category-short-title': {
+        type: 'text',
+        lookup: {
+          table: API.CATEGORIES, // id assumed
+          attribute: 'short_title',
+        },
+        table: API.RECOMMENDATION_CATEGORIES,
+        keyPair: ['recommendation_id', 'category_id'], // own, other
+        hint: 'one or more category short codes (as assigned by the users / comma-separated)',
+      },
+      // has category
+      'category-reference': {
+        type: 'text',
+        lookup: {
+          table: API.CATEGORIES, // id assumed
+          attribute: 'reference',
+        },
+        table: API.RECOMMENDATION_CATEGORIES,
+        keyPair: ['recommendation_id', 'category_id'], // own, other
+        hint: 'one or more category references (as assigned by the users / comma-separated)',
       },
     },
   },

@@ -659,6 +659,14 @@ export const checkActionAttribute = (att, isAdmin) => ENTITY_FIELDS.measures
     isAdmin,
   });
 
+export const checkRecommendationAttribute = (att, isAdmin) => ENTITY_FIELDS.recommendations
+  && ENTITY_FIELDS.recommendations.ATTRIBUTES
+  && checkAttribute({
+    att,
+    attributes: ENTITY_FIELDS.recommendations.ATTRIBUTES,
+    isAdmin,
+  });
+
 export const checkAttribute = ({
   typeId,
   att,

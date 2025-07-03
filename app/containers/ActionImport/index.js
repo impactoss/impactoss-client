@@ -64,7 +64,6 @@ function ActionImport({
   authReady,
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
-  params,
   categories,
   connections,
   handleCancel,
@@ -85,7 +84,7 @@ function ActionImport({
     if (authReady) {
       redirectIfNotPermitted();
     }
-  }, [dataReady]);
+  }, [authReady]);
 
   // console.log('errors', errors && errors.toJS())
   const typeLabel = intl.formatMessage(appMessages.entities.measures.plural);
@@ -189,7 +188,6 @@ ActionImport.propTypes = {
   progress: PropTypes.number,
   errors: PropTypes.object,
   success: PropTypes.object,
-  params: PropTypes.object,
   connections: PropTypes.object,
   categories: PropTypes.object,
   intl: PropTypes.object.isRequired,
