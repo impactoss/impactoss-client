@@ -305,7 +305,7 @@ export const ENTITY_FIELDS = {
         type: 'markdown',
       },
       reference: {
-        type: 'markdown',
+        type: 'text',
       },
       indicator_summary: {
         type: 'markdown',
@@ -360,6 +360,9 @@ export const ENTITY_FIELDS = {
         type: 'number',
         multiple: true,
         table: API.RECOMMENDATION_ACTIONS,
+        lookup: {
+          table: API.RECOMMENDATIONS, // id assumed
+        },
         keyPair: ['measure_id', 'recommendation_id'], // own, other
         hint: 'one or more unique recommendation ids (as assigned by the database / comma-separated)',
       },
@@ -379,7 +382,10 @@ export const ENTITY_FIELDS = {
       'indicator-id': {
         type: 'number',
         multiple: true,
-        table: API.RECOMMENDATION_ACTIONS,
+        lookup: {
+          table: API.INDICATORS, // id assumed
+        },
+        table: API.ACTION_INDICATORS,
         keyPair: ['measure_id', 'indicator_id'], // own, other
         hint: 'one or more unique recommendation ids (as assigned by the database / comma-separated)',
       },
@@ -399,6 +405,9 @@ export const ENTITY_FIELDS = {
       'category-id': {
         type: 'number',
         table: API.ACTION_CATEGORIES,
+        lookup: {
+          table: API.CATEGORIES, // id assumed
+        },
         keyPair: ['measure_id', 'category_id'], // own, other
         hint: 'one or more category ids (as assigned by the database / comma-separated)',
       },

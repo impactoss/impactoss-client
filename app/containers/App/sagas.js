@@ -209,7 +209,10 @@ export function* authenticateSaga(payload) {
     yield put(invalidateEntities()); // important invalidate before forward to allow for reloading of entities
     yield put(forwardOnAuthenticationChange());
   } catch (err) {
-    err.response.json = yield err.response.json();
+    console.log('ERROR in authenticateSaga');
+    if (err.response) {
+      err.response.json = yield err.response.json();
+    }
     yield put(authenticateError(err));
   }
 }
@@ -229,10 +232,11 @@ export function* authenticateWithAzureSaga() {
     location = `${location}&auth_origin_url=${encodeURIComponent(successLocation)}`;
     window.location.href = location;
   } catch (err) {
+    console.log('ERROR in authenticateWithAzureSaga');
     if (err.response) {
       err.response.json = yield err.response.json();
-      yield put(authenticateError(err));
     }
+    yield put(authenticateError(err));
   }
 }
 
@@ -254,7 +258,10 @@ export function* recoverSaga(payload) {
       }
     ));
   } catch (err) {
-    err.response.json = yield err.response.json();
+    console.log('ERROR in recoverSaga');
+    if (err.response) {
+      err.response.json = yield err.response.json();
+    }
     yield put(recoverError(err));
   }
 }
@@ -313,8 +320,11 @@ export function* validateTokenSaga() {
       yield put(authenticateSuccess(response.data)); // need to store currentUserData
     }
   } catch (err) {
+    console.log('ERROR in validateTokenSaga');
     yield call(clearAuthValues);
-    err.response.json = yield err.response.json();
+    if (err.response) {
+      err.response.json = yield err.response.json();
+    }
     yield put(authenticateError(err));
   }
 }
@@ -329,7 +339,7 @@ function stampPayload(payload, type) {
 
 
 function* createConnectionsSaga({
-  entityId, path, updates, keyPair,
+  entityId, path, updates, keyPair, saveRef,
 }) {
   // make sure to use new entity id for full payload
   // we should have either the one (recommendation_id) or the other (measure_id)
@@ -339,7 +349,7 @@ function* createConnectionsSaga({
     [keyPair[1]]: create[keyPair[1]] || entityId,
   }));
 
-  yield call(saveConnectionsSaga, { data: { path, updates: updatesUpdated } });
+  yield call(saveConnectionsSaga, { data: { path, updates: updatesUpdated, saveRef } });
 }
 
 export function* saveEntitySaga({ data }, updateClient = true, multiple = false) {
@@ -365,6 +375,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
           data: {
             path: 'user_roles',
             updates: data.entity.userRoles,
+            saveRef: data.saveRef,
           },
         });
       }
@@ -375,6 +386,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
           data: {
             path: 'user_categories',
             updates: data.entity.userCategories,
+            saveRef: data.saveRef,
           },
         });
       }
@@ -385,6 +397,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
           data: {
             path: 'recommendation_measures',
             updates: data.entity.recommendationMeasures,
+            saveRef: data.saveRef,
           },
         });
       }
@@ -394,6 +407,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
           data: {
             path: 'recommendation_indicators',
             updates: data.entity.recommendationIndicators,
+            saveRef: data.saveRef,
           },
         });
       }
@@ -404,6 +418,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
           data: {
             path: 'measure_indicators',
             updates: data.entity.measureIndicators,
+            saveRef: data.saveRef,
           },
         });
       }
@@ -414,6 +429,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
           data: {
             path: 'measure_categories',
             updates: data.entity.measureCategories,
+            saveRef: data.saveRef,
           },
         });
       }
@@ -424,6 +440,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
           data: {
             path: 'recommendation_categories',
             updates: data.entity.recommendationCategories,
+            saveRef: data.saveRef,
           },
         });
       }
@@ -436,8 +453,11 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
       yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
     }
   } catch (err) {
-    err.response.json = yield err.response.json();
-    yield put(saveError(err, dataTS));
+    console.log('ERROR in saveEntitySaga');
+    if (err.response) {
+      err.response.json = yield err.response.json();
+      yield put(saveError(err, dataTS));
+    }
     if (updateClient) {
       yield put(invalidateEntities(data.path));
     }
@@ -475,8 +495,11 @@ export function* deleteEntitySaga({ data }, updateClient = true, multiple = fals
     }
     yield put(deleteSuccess(dataTS));
   } catch (err) {
-    err.response.json = yield err.response.json();
-    yield put(deleteError(err, dataTS));
+    console.log('ERROR in deleteEntitySaga');
+    if (err.response) {
+      err.response.json = yield err.response.json();
+      yield put(deleteError(err, dataTS));
+    }
     if (updateClient) {
       yield put(invalidateEntities(data.path));
     }
@@ -519,6 +542,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
             path: 'recommendation_measures',
             updates: data.entity.recommendationMeasures,
             keyPair: ['recommendation_id', 'measure_id'],
+            saveRef: data.saveRef,
           });
         }
         // update sdgtarget-indicator connections
@@ -586,7 +610,10 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
       yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
     }
   } catch (err) {
-    err.response.json = yield err.response.json();
+    console.log('ERROR in newEntitySaga');
+    if (err.response) {
+      err.response.json = yield err.response.json();
+    }
     yield put(saveError(err, dataTS));
     if (updateClient) {
       yield put(invalidateEntities(data.path));
@@ -623,9 +650,12 @@ export function* saveConnectionsSaga({ data }) {
       yield put(updateConnections(data.path, connectionsUpdated));
       yield put(saveSuccess(dataTS));
     } catch (err) {
-      err.response.json = yield err.response.json();
+      console.log('ERROR in saveConnectionsSaga', err);
+      if (err.response) {
+        err.response.json = yield err.response.json();
+      }
       yield put(saveError(err, dataTS));
-      yield put(invalidateEntities(data.path));
+      // yield put(invalidateEntities(data.path));
     }
   }
 }

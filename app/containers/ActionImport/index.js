@@ -4,7 +4,7 @@
  *
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
@@ -16,6 +16,7 @@ import { fromJS } from 'immutable';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import {
+  API,
   USER_ROLES,
   ENTITY_FIELDS,
   DATE_FORMAT,
@@ -24,12 +25,14 @@ import {
 import { getImportFields, getColumnAttribute } from 'utils/import';
 import { checkActionAttribute, checkAttribute } from 'utils/entities';
 import { lowerCase  } from 'utils/string';
+import qe from 'utils/quasi-equals';
 
 import {
   redirectIfNotPermitted,
   updatePath,
   loadEntitiesIfNeeded,
   resetProgress,
+  saveError,
 } from 'containers/App/actions';
 
 import {
@@ -42,6 +45,7 @@ import {
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import ImportEntitiesForm from 'components/forms/ImportEntitiesForm';
+import validateDateFormat from 'components/forms/validators/validate-date-format';
 
 import appMessages from 'containers/App/messages';
 
@@ -53,153 +57,125 @@ import {
 
 import messages from './messages';
 import { save } from './actions';
-import { FORM_INITIAL } from './constants';
+import { FORM_INITIAL, DEPENDENCIES } from './constants';
 
-export class ActionImport extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    // reload entities if invalidated
-    if (!nextProps.dataReady) {
-      this.props.loadEntitiesIfNeeded();
+function ActionImport({
+  dataReady,
+  authReady,
+  loadEntitiesIfNeeded,
+  redirectIfNotPermitted,
+  params,
+  categories,
+  connections,
+  handleCancel,
+  handleSubmit,
+  resetProgress,
+  errors,
+  success,
+  progress,
+  intl,
+}) {
+  // reload entities if invalidated
+  useEffect(() => {
+    if (!dataReady) {
+      loadEntitiesIfNeeded();
     }
-    if (nextProps.authReady && !this.props.authReady) {
-      this.props.redirectIfNotPermitted();
+  }, [dataReady]);
+  useEffect(() => {
+    if (authReady) {
+      redirectIfNotPermitted();
     }
-  }
+  }, [dataReady]);
 
-  render() {
-    const { intl } = this.props;
-    const { connections, categories, params } = this.props;
-    const typeLabel = intl.formatMessage(appMessages.entities.measures.plural);
-
-    const fields = Object.keys(ENTITY_FIELDS.measures.ATTRIBUTES).reduce((memo, key) => {
-      const val = ENTITY_FIELDS.measures.ATTRIBUTES[key];
-      if (!val.skipImport && checkActionAttribute(key)) {
+  // console.log('errors', errors && errors.toJS())
+  const typeLabel = intl.formatMessage(appMessages.entities.measures.plural);
+  // console.log('render', categories, connections)
+  const fields = Object.keys(ENTITY_FIELDS.measures.ATTRIBUTES).reduce((memo, key) => {
+    const val = ENTITY_FIELDS.measures.ATTRIBUTES[key];
+    if (!val.skipImport && checkActionAttribute(key)) {
+      return [
+        ...memo,
+        {
+          attribute: key,
+          type: val.type || 'text',
+          value: null,
+          required: !!val.required,
+          import: true,
+        },
+      ];
+    }
+    return memo;
+  }, []);
+  const relationshipFields = Object.keys(
+    ENTITY_FIELDS.measures.RELATIONSHIPS_IMPORT
+  ).reduce(
+    (memo, key) => {
+      if (
+        checkAttribute({
+          att: key,
+          attributes: ENTITY_FIELDS.measures.RELATIONSHIPS_IMPORT,
+        })
+      ) {
+        const val = ENTITY_FIELDS.measures.RELATIONSHIPS_IMPORT[key];
         return [
           ...memo,
           {
             attribute: key,
             type: val.type || 'text',
-            value: null,
             required: !!val.required,
             import: true,
+            relationshipValue: val.attribute,
+            separator: val.separator,
+            hint: val.hint,
           },
         ];
       }
       return memo;
-    }, []);
-    const relationshipFields = Object.keys(
-      ENTITY_FIELDS.measures.RELATIONSHIPS_IMPORT
-    ).reduce(
-      (memo, key) => {
-        if (
-          checkAttribute({
-            att: key,
-            attributes: ENTITY_FIELDS.measures.RELATIONSHIPS_IMPORT,
-          })
-        ) {
-          const val = ENTITY_FIELDS.measures.RELATIONSHIPS_IMPORT[key];
-          return [
-            ...memo,
-            {
-              attribute: key,
-              type: val.type || 'text',
-              required: !!val.required,
-              import: true,
-              relationshipValue: val.attribute,
-              separator: val.separator,
-              hint: val.hint,
-            },
-          ];
-        }
-        return memo;
-      },
-      [],
-    );
-    //
-    // const fields = [
-    //   {
-    //     attribute: 'reference',
-    //     type: 'text',
-    //     required: true,
-    //     import: true,
-    //   },
-    //   {
-    //     attribute: 'title',
-    //     type: 'text',
-    //     required: true,
-    //     import: true,
-    //   },
-    //   {
-    //     attribute: 'description',
-    //     type: 'markdown',
-    //     import: true,
-    //   },
-    //   {
-    //     attribute: 'outcome',
-    //     type: 'markdown',
-    //     label: 'comment',
-    //     import: true,
-    //   },
-    //   {
-    //     disabled: true,
-    //     attribute: 'indicator_summary',
-    //     type: 'markdown',
-    //     import: true,
-    //   },
-    //   {
-    //     attribute: 'target_date',
-    //     type: 'date',
-    //     import: true,
-    //   },
-    //   {
-    //     attribute: 'target_date_comment',
-    //     type: 'text',
-    //     import: true,
-    //   },
-    // ];
+    },
+    [],
+  );
 
-    return (
-      <div>
-        <HelmetCanonical
-          title={`${intl.formatMessage(messages.pageTitle)}`}
-          meta={[
-            {
-              name: 'description',
-              content: intl.formatMessage(messages.metaDescription),
-            },
-          ]}
+  return (
+    <div>
+      <HelmetCanonical
+        title={`${intl.formatMessage(messages.pageTitle)}`}
+        meta={[
+          {
+            name: 'description',
+            content: intl.formatMessage(messages.metaDescription),
+          },
+        ]}
+      />
+      <Content>
+        <ContentHeader
+          title={intl.formatMessage(messages.pageTitle)}
+          type={CONTENT_SINGLE}
+          icon="measures"
+          buttons={[{
+            type: 'cancel',
+            onClick: handleCancel,
+          }]}
         />
-        <Content>
-          <ContentHeader
-            title={intl.formatMessage(messages.pageTitle)}
-            type={CONTENT_SINGLE}
-            icon="measures"
-            buttons={[{
-              type: 'cancel',
-              onClick: this.props.handleCancel,
-            }]}
-          />
-          <ImportEntitiesForm
-            typeLabel={typeLabel}
-            fieldModel="import"
-            formData={FORM_INITIAL}
-            handleSubmit={(formData) => {
-              this.props.handleSubmit(formData, connections, categories);
-            }}
-            handleCancel={this.props.handleCancel}
-            resetProgress={this.props.resetProgress}
-            errors={this.props.errors}
-            success={this.props.success}
-            progress={this.props.progress}
-            template={{
-              filename: `${intl.formatMessage(messages.filename, { type: lowerCase(typeLabel) })}.csv`,
-              data: getImportFields({ fields, relationshipFields }, intl.formatMessage),
-            }}
-          />
-        </Content>
-      </div>
-    );
-  }
+        <ImportEntitiesForm
+          typeLabel={typeLabel}
+          fieldModel="import"
+          formData={FORM_INITIAL}
+          handleSubmit={(formData) => {
+            handleSubmit(formData, connections, categories);
+          }}
+          handleCancel={handleCancel}
+          resetProgress={resetProgress}
+          errors={errors}
+          success={success}
+          progress={progress}
+          template={{
+            filename: `${intl.formatMessage(messages.filename, { type: lowerCase(typeLabel) })}`,
+            data: getImportFields({ fields, relationshipFields }, intl.formatMessage),
+          }}
+        />
+      </Content>
+    </div>
+  );
 }
 
 ActionImport.propTypes = {
@@ -225,11 +201,7 @@ const mapStateToProps = (state) => ({
   success: selectSuccess(state),
   connections: selectMeasureConnections(state),
   categories: selectCategories(state),
-  dataReady: selectReady(state, {
-    path: [
-      'user_roles',
-    ],
-  }),
+  dataReady: selectReady(state, { path: DEPENDENCIES }),
   authReady: selectReadyForAuthCheck(state),
 });
 
@@ -246,8 +218,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleSubmit: (formValues, connections, categories) => {
       const formData = fromJS(formValues);
+      let invalidConnections = [];
       if (formData.get('import') !== null) {
-        fromJS(formData.get('import').rows).forEach((row, index) => {
+        formData.getIn(['import', 'rows']).forEach((row, index) => {
           let rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
           // make sure type id is set
           let rowClean = {
@@ -278,13 +251,11 @@ function mapDispatchToProps(dispatch) {
               const hasRelData = key.indexOf('[rel:') > -1
                 && rowJS[key]
                 && rowJS[key].trim() !== '';
-              // console.log('hasRelData', hasRelData, key, rowJS[key])
               if (!hasRelData) return memo;
               const start = key.indexOf('[');
               const end = key.indexOf(']');
               const [, fieldValues] = key.substring(start + 1, end).split('rel:');
               const [field, values] = fieldValues.split('|');
-              // console.log('values', values);
               return checkAttribute({
                 att: field,
                 attributes: ENTITY_FIELDS.measures.RELATIONSHIPS_IMPORT,
@@ -305,9 +276,10 @@ function mapDispatchToProps(dispatch) {
           );
           // check relationships
           if (relRows) {
-            let recommendationActions;
-            let actionIndicators;
-            let actionCategories;
+            let recommendationMeasures;
+            let measureIndicators;
+            let measureCategories;
+            // console.log(relRows);
             Object.values(relRows).forEach(
               (relationship) => {
                 if (relationship.values) {
@@ -315,72 +287,104 @@ function mapDispatchToProps(dispatch) {
                   const relConfig = ENTITY_FIELDS.measures.RELATIONSHIPS_IMPORT[relationship.field];
                   relationship.values.forEach(
                     (relValue) => {
+                      // console.log(relValue)
                       const [id, value] = relValue.trim().split('|');
                       if (relConfig) {
-                        // assume field to referencet the id
-                        let connectionId = id;
+                        // check if connection id is valid
+                        let connectionId;
                         // unless attribute specified
-                        if (relConfig.lookup
-                          && relConfig.lookup.table
-                          && relConfig.lookup.attribute
-                        ) {
-                          if (categories && relConfig.lookup.table === API.CATEGORIES) {
-                            const category = categories.find(
-                              (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), id)
-                            );
-                            connectionId = category ? category.get('id') : 'INVALID';
-                          } else if (connections) {
-                            const connection = connections.get(relConfig.lookup.table)
-                              && connections.get(relConfig.lookup.table).find(
-                                (entity) => qe(entity.getIn(['attributes', relConfig.lookup.attribute]), id)
+                        if (relConfig.lookup && relConfig.lookup.table) {
+                          if (relConfig.lookup.attribute) {
+                            if (categories && relConfig.lookup.table === API.CATEGORIES) {
+                              const category = categories.find(
+                                (entity) => entity.getIn(['attributes', relConfig.lookup.attribute])
+                                  && qe(entity.getIn(['attributes', relConfig.lookup.attribute]).trim(), id)
                               );
-                            connectionId = connection ? connection.get('id') : 'INVALID';
-                          }
-                        }
-                        // actionIndicators by code
-                        if (
-                          relField === 'indicator-reference'
-                          || relField === 'indicator-id') {
-                          const create = { indicator_id: connectionId };
-                          if (actionIndicators && actionIndicators.create) {
-                            actionIndicators.create = [
-                              ...actionIndicators.create,
-                              create,
-                            ];
+                              if (category) {
+                                connectionId = category.get('id');
+                              }
+                            } else if (connections) {
+                              const connection = connections.get(relConfig.lookup.table)
+                                && connections.get(relConfig.lookup.table).find(
+                                  (entity) => entity.getIn(['attributes', relConfig.lookup.attribute])
+                                    && qe(entity.getIn(['attributes', relConfig.lookup.attribute]).trim(), id)
+                                );
+                              if (connection) {
+                                connectionId = connection.get('id');
+                              }
+                            }
                           } else {
-                            actionIndicators = { create: [create] };
-                          }
-                        }
-                        // recommendationActions by code or id
-                        if (
-                          relField === 'recommendation-reference'
-                          || relField === 'recommendation-id'
-                        ) {
-                          const create = { recommendation_id: connectionId };
-                          if (recommendationActions && recommendationActions.create) {
-                            recommendationActions.create = [
-                              ...recommendationActions.create,
-                              create,
-                            ];
-                          } else {
-                            recommendationActions = { create: [create] };
-                          }
-                        }
+                            if (categories && relConfig.lookup.table === API.CATEGORIES) {
+                              if (categories.get(`${id}`)) {
+                                connectionId = id;
+                              }
+                            } else if (connections) {
 
-                        // actionCategories by code or id
-                        if (
-                          relField === 'category-reference'
-                          || relField === 'category-short-title'
-                        || relField === 'category-id') {
-                          const create = { category_id: connectionId };
-                          if (actionCategories && actionCategories.create) {
-                            actionCategories.create = [
-                              ...actionCategories.create,
-                              create,
-                            ];
-                          } else {
-                            actionCategories = { create: [create] };
+                              if (
+                                connections.get(relConfig.lookup.table)
+                                && connections.getIn([relConfig.lookup.table, `${id}`])
+                              ) {
+                                connectionId = id;
+                              }
+                            }
                           }
+                        }
+                        if (typeof connectionId !== 'undefined') {
+                          // measureIndicators by code
+                          if (
+                            relField === 'indicator-reference'
+                            || relField === 'indicator-id') {
+                            const create = { indicator_id: connectionId };
+                            if (measureIndicators && measureIndicators.create) {
+                              measureIndicators.create = [
+                                ...measureIndicators.create,
+                                create,
+                              ];
+                            } else {
+                              measureIndicators = { create: [create] };
+                            }
+                          }
+                          // recommendationMeasures by code or id
+                          if (
+                            relField === 'recommendation-reference'
+                            || relField === 'recommendation-id'
+                          ) {
+                              const create = { recommendation_id: connectionId };
+                              if (recommendationMeasures && recommendationMeasures.create) {
+                                recommendationMeasures.create = [
+                                  ...recommendationMeasures.create,
+                                  create,
+                                ];
+                              } else {
+                                recommendationMeasures = { create: [create] };
+                              }
+                            }
+
+                          // measureCategories by code or id
+                          if (
+                            relField === 'category-reference'
+                            || relField === 'category-short-title'
+                            || relField === 'category-id'
+                          ) {
+                            const create = { category_id: connectionId };
+                            if (measureCategories && measureCategories.create) {
+                              measureCategories.create = [
+                                ...measureCategories.create,
+                                create,
+                              ];
+                            } else {
+                              measureCategories = { create: [create] };
+                            }
+                          }
+                        } else {
+                          invalidConnections = [
+                            ...invalidConnections,
+                            {
+                              id,
+                              relField,
+                              row: index + 1,
+                            },
+                          ];
                         }
                       } // relConfig
                     }
@@ -390,12 +394,32 @@ function mapDispatchToProps(dispatch) {
             );
             rowClean = {
               ...rowClean,
-              recommendationActions,
-              actionCategories,
-              actionIndicators,
+              recommendationMeasures,
+              measureCategories,
+              measureIndicators,
             };
           }
+          // console.log('rowClean', rowClean)
           dispatch(save(rowClean));
+          // dispatch errors for invalid entries
+          invalidConnections.forEach((invalidItem) => {
+            const error = {
+              error: `Invalid connection: ${JSON.stringify(invalidItem)}`,
+              data: invalidItem,
+              messages: [`Row ${invalidItem.row}: Invalid connection attribute for ${invalidItem.relField}: '${invalidItem.id}'`],
+              name: 'Invalid connection',
+            };
+            dispatch(saveError(
+              error,
+              invalidItem,
+              Object.assign(
+                invalidItem,
+                {
+                  timestamp: `${Date.now()}-${Math.random().toString(36).slice(-8)}`,
+                }
+              ),
+            ));
+          });
         });
       }
     },

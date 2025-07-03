@@ -310,7 +310,7 @@ function ImportEntitiesForm({
                                       .sortBy((error) => error && error.data && error.data.saveRef)
                                       .reduce((memo, error) => error.error.messages
                                         ? memo.concat(map(error.error.messages, (message) => error.data.saveRef
-                                          ? [`${error.data.saveRef}:`, message]
+                                          ? [`Row ${error.data.saveRef}:`, message]
                                           : message))
                                         : memo,
                                       [])
