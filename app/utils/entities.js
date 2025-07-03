@@ -666,6 +666,13 @@ export const checkRecommendationAttribute = (att, isAdmin) => ENTITY_FIELDS.reco
     attributes: ENTITY_FIELDS.recommendations.ATTRIBUTES,
     isAdmin,
   });
+export const checkIndicatorAttribute = (att, isAdmin) => ENTITY_FIELDS.indicators
+  && ENTITY_FIELDS.indicators.ATTRIBUTES
+  && checkAttribute({
+    att,
+    attributes: ENTITY_FIELDS.indicators.ATTRIBUTES,
+    isAdmin,
+  });
 
 export const checkAttribute = ({
   typeId,

@@ -445,6 +445,10 @@ export const ENTITY_FIELDS = {
         exportRequired: true,
         roleExport: USER_ROLES.CONTRIBUTOR.value,
       },
+      reference: {
+        type: 'text',
+        required: true,
+      },
       title: {
         type: 'text',
         exportDefault: true,
@@ -459,10 +463,7 @@ export const ENTITY_FIELDS = {
         type: 'date',
       },
       frequency_months: {
-        type: 'int',
-      },
-      reference: {
-        type: 'text',
+        type: 'number',
       },
       repeat: {
         defaultValue: false,
@@ -471,6 +472,7 @@ export const ENTITY_FIELDS = {
       created_at: {
         type: 'date',
         roleExport: USER_ROLES.MANAGER.value,
+        skipImport: true,
       },
       created_by_id: {
         skipImport: true,
@@ -481,6 +483,7 @@ export const ENTITY_FIELDS = {
       },
       updated_at: {
         type: 'date',
+        skipImport: true,
         roleExport: USER_ROLES.MANAGER.value,
       },
       updated_by_id: {
@@ -502,6 +505,54 @@ export const ENTITY_FIELDS = {
         table: 'users',
         roleExport: USER_ROLES.MANAGER.value,
         exportColumn: 'connection_updated_by',
+      },
+    },
+    RELATIONSHIPS_IMPORT: {
+      // column: recommendation-id
+      'action-id': {
+        type: 'number',
+        multiple: true,
+        table: API.ACTION_INDICATORS,
+        lookup: {
+          table: API.ACTIONS, // id assumed
+        },
+        keyPair: ['indicator_id', 'measure_id'], // own, other
+        hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
+      },
+      // column: country-code
+      'action-reference': {
+        type: 'text',
+        lookup: {
+          table: API.ACTIONS, // id assumed
+          attribute: 'reference',
+        },
+        multiple: true,
+        table: API.ACTION_INDICATORS,
+        keyPair: ['indicator_id', 'measure_id'], // own, other
+        hint: 'one or more unique action references (as assigned by the users / comma-separated)',
+      },
+      // column: indicator-id
+      'recommendation-id': {
+        type: 'number',
+        multiple: true,
+        lookup: {
+          table: API.RECOMMENDATIONS, // id assumed
+        },
+        table: API.RECOMMENDATION_INDICATORS,
+        keyPair: ['indicator_id', 'recommendation_id'], // own, other
+        hint: 'one or more unique indicator ids (as assigned by the database / comma-separated)',
+      },
+      // column: country-code
+      'recommendation-reference': {
+        type: 'text',
+        lookup: {
+          table: API.RECOMMENDATIONS, // id assumed
+          attribute: 'reference',
+        },
+        multiple: true,
+        table: API.RECOMMENDATION_INDICATORS,
+        keyPair: ['indicator_id', 'recommendation_id'], // own, other
+        hint: 'one or more unique recommendation references (as assigned by the users / comma-separated)',
       },
     },
   },
@@ -584,7 +635,7 @@ export const ENTITY_FIELDS = {
           table: API.ACTIONS, // id assumed
         },
         keyPair: ['recommendation_id', 'measure_id'], // own, other
-        hint: 'one or more unique measure ids (as assigned by the database / comma-separated)',
+        hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
       },
       // column: country-code
       'action-reference': {
@@ -596,7 +647,7 @@ export const ENTITY_FIELDS = {
         multiple: true,
         table: API.RECOMMENDATION_ACTIONS,
         keyPair: ['recommendation_id', 'measure_id'], // own, other
-        hint: 'one or more unique measure references (as assigned by the users / comma-separated)',
+        hint: 'one or more unique action references (as assigned by the users / comma-separated)',
       },
       // column: indicator-id
       'indicator-id': {
