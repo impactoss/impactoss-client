@@ -43,6 +43,9 @@ export function isContentJSON(response) {
 }
 
 export function checkResponseError(error) {
+  if (error.messages) {
+    return error;
+  }
   return error.response
     ? {
       messages: checkErrorMessagesExist(error.response),

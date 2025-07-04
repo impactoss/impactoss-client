@@ -17,6 +17,7 @@ import asList from 'utils/as-list';
 import { sortEntities } from 'utils/sort';
 
 import {
+  API,
   USER_ROLES,
   DB_TABLES,
   CATEGORY_ADMIN_MIN_ROLE,
@@ -608,6 +609,9 @@ export const selectFWTaxonomiesSorted = createSelector(
   (taxonomies) => taxonomies
     && sortEntities(taxonomies, 'asc', 'priority', null, false)
 );
+
+// select all categories
+export const selectCategories = (state) => selectEntities(state, API.CATEGORIES);
 
 export const selectEntity = createSelector(
   (state, { path }) => selectEntities(state, path),
