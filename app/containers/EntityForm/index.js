@@ -197,6 +197,14 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     />
   );
 
+  renderUploader = (field, formData, formikActions) => (
+    <UploadControl
+      value={field.value}
+      name={field.name}
+      onChange={(fileUrl) => formikActions.setFieldValue(field.name, fileUrl)}
+    />
+  );
+
   renderFieldChildren = (field) => {
     const { intl } = this.props;
     // handle known cases here
@@ -261,6 +269,13 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             formikActions
           );
           break;
+        case 'uploader':
+          formField = this.renderUploader(
+            field,
+            field.formData,
+            formikActions
+          );
+          break;
         default:
           formField = this.renderComponent(field);
       }
@@ -310,9 +325,9 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             !!field.dynamicValidators
             || !!field.modifyFieldAttributes
             || !!field.isFieldDisabled;
-          const FieldComponent = isContextRequiredForField ? FieldWithContext : FormikField;
+          const FieldComponentWrapper = isContextRequiredForField ? FieldWithContext : FormikField;
           return (
-            <FieldComponent
+            <FieldComponentWrapper
               key={i}
               name={field.name}
               validate={(value, formData) => this.fieldValidation(value, field, formData)}
@@ -342,7 +357,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                 );
               }
               }
-            </FieldComponent>
+            </FieldComponentWrapper>
           );
         }
         return (

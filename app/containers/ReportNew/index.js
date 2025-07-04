@@ -125,7 +125,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
   getInitialFormData = ({ indicator }) =>
     Map(FORM_INITIAL.setIn(
       ['attributes', 'due_date_id'],
-      indicator.get('dates')
+      indicator && indicator.get('dates')
         ? getDueDateDateOptions(indicator.get('dates'))[0].value
         : '0'
     ));
