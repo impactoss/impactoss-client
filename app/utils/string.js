@@ -22,7 +22,21 @@ export const cleanupSearchTarget = (str) => loCase(str)
   .replace(/[ē]/, 'e')
   .replace(/[ī]/, 'i')
   .replace(/[ō]/, 'o')
-  .replace(/[ū]/, 'u');
+  .replace(/[ū]/, 'u')
+  // Remove markdown bold, italic, strikethrough, inline code
+  .replace(/(\*\*|__)(.*?)\1/g, '$2') // bold
+  .replace(/(\*|_)(.*?)\1/g, '$2') // italic
+  .replace(/~~(.*?)~~/g, '$1') // strikethrough
+  .replace(/`(.*?)`/g, '$1') // inline code
+  // Remove links: [text](url) → text
+  .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
+  // Remove images: ![alt](url) → alt
+  .replace(/!\[([^\]]*)]\([^)]+\)/g, '$1')
+  // Remove remaining markdown special characters like #, >, -, etc.
+  .replace(/[#>*_~\-`]/g, ' ')
+  // Collapse multiple spaces
+  .replace(/\s+/g, ' ')
+  .trim();
 
 // adapted from
 // https://stackoverflow.com/questions/19793221/javascript-text-between-double-quotes
@@ -38,6 +52,8 @@ const extractAllPhrases = (str) => {
   return phrases;
 };
 
+const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 // match multiple words, incl substrings
 // also check for exact phrases in "quotes"
 export const regExMultipleWords = (str) => {
@@ -46,7 +62,7 @@ export const regExMultipleWords = (str) => {
   const phraseWords = phrases.length > 0
     ? reduce(
       phrases,
-      (memo, p) => `${memo}(?=.*${p})`,
+      (memo, p) => `${memo}(?=.*\\b${escapeRegex(p)}\\b)`,
       '',
     )
     : '';
@@ -59,10 +75,10 @@ export const regExMultipleWords = (str) => {
   );
   const words = reduce(
     strWithoutPhrases
-      .replace('"', '')
-      .split(' '),
+      .replace(/"/g, '')
+      .split(/\s+/),
     (memo, s) => s !== ''
-      ? `${memo}(?=.*${s})`
+      ? `${memo}(?=.*${escapeRegex(s)})`
       : memo,
     '',
   );
@@ -70,8 +86,12 @@ export const regExMultipleWords = (str) => {
   return `${phraseWords}${words}`;
 };
 
-// match multiple words
-export const regExMultipleWordsMatchStart = (str) => reduce(str.split(' '), (words, s) => `${words}(?=.*\\b${s})`, '');
+// // match multiple words
+// export const regExMultipleWordsMatchStart = (str) => reduce(
+//   str.split(' '),
+//   (words, s) => `${words}(?=.*\\b${s})`,
+//   '',
+// );
 
 export const truncateText = (text, limit, keepWords = true) => {
   if (!text) return '';
