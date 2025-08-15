@@ -1,14 +1,14 @@
 {
   "name": "impact-oss",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "NZ version of Integrated Management and Planning of ACTions Open Source Software",
   "repository": {
     "type": "git",
     "url": "git://github.com/impactoss/impactoss.git"
   },
   "engines": {
-    "npm": ">=5",
-    "node": ">=8.15.1"
+    "npm": ">=7.4",
+    "node": ">=15.6.0"
   },
   "author": "tmfrnz",
   "license": "MIT",
