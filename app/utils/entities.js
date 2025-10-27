@@ -73,7 +73,14 @@ export const testEntityAssociation = (entity, associatedPath) => {
 export const prepareEntitySearchTarget = (entity, fields, queryLength) => reduce(
   fields,
   (target, field) => queryLength > SEARCH.MIN_LENGTH || field === 'reference '
-    ? `${target} ${cleanupSearchTarget(entity.getIn(['attributes', field]))}`
+    ? `${target} ${cleanupSearchTarget(
+      entity.getIn(['attributes', field]),
+      field === 'description'
+      || field === 'content'
+      || field === 'response'
+      || field === 'outcome'
+      || field === 'indicator_summary'
+    )}`
     : target,
   entity.get('id')
 );

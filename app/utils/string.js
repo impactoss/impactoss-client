@@ -16,27 +16,32 @@ export const getPathFromUrl = (url) => url.split(/[?#]/)[0];
 
 export const getFilenameFromUrl = (url) => url.split('/').pop();
 
-export const cleanupSearchTarget = (str) => loCase(str)
-  .replace(/[’]/, '\'')
-  .replace(/[ā]/, 'a')
-  .replace(/[ē]/, 'e')
-  .replace(/[ī]/, 'i')
-  .replace(/[ō]/, 'o')
-  .replace(/[ū]/, 'u')
-  // Remove markdown bold, italic, strikethrough, inline code
-  .replace(/(\*\*|__)(.*?)\1/g, '$2') // bold
-  .replace(/(\*|_)(.*?)\1/g, '$2') // italic
-  .replace(/~~(.*?)~~/g, '$1') // strikethrough
-  .replace(/`(.*?)`/g, '$1') // inline code
-  // Remove links: [text](url) → text
-  .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
-  // Remove images: ![alt](url) → alt
-  .replace(/!\[([^\]]*)]\([^)]+\)/g, '$1')
-  // Remove remaining markdown special characters like #, >, -, etc.
-  .replace(/[#>*_~\-`]/g, ' ')
-  // Collapse multiple spaces
-  .replace(/\s+/g, ' ')
-  .trim();
+export const cleanupSearchTarget = (str, cleanupMarkdown) => {
+  let res = loCase(str)
+    .replace(/[’]/, '\'')
+    .replace(/[ā]/, 'a')
+    .replace(/[ē]/, 'e')
+    .replace(/[ī]/, 'i')
+    .replace(/[ō]/, 'o')
+    .replace(/[ū]/, 'u');
+  if (cleanupMarkdown) {
+    res = res
+      // Remove markdown bold, italic, strikethrough, inline code
+      .replace(/(\*\*|__)(.*?)\1/g, '$2') // bold
+      .replace(/(\*|_)(.*?)\1/g, '$2') // italic
+      .replace(/~~(.*?)~~/g, '$1') // strikethrough
+      .replace(/`(.*?)`/g, '$1') // inline code
+      // Remove links: [text](url) → text
+      .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
+      // Remove images: ![alt](url) → alt
+      .replace(/!\[([^\]]*)]\([^)]+\)/g, '$1')
+      // Remove remaining markdown special characters like #, >, -, etc.
+      .replace(/[#>*_~\-`]/g, ' ')
+      // Collapse multiple spaces
+      .replace(/\s+/g, ' ');
+  }
+  return res.trim();
+};
 
 // adapted from
 // https://stackoverflow.com/questions/19793221/javascript-text-between-double-quotes
