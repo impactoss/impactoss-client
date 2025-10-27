@@ -25,6 +25,8 @@ import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 import InfoOverlay from 'components/InfoOverlay';
 
 import appMessages from 'containers/App/messages';
+import SearchInfo from './SearchInfo';
+
 import messages from './messages';
 
 const Search = styled.div`
@@ -352,13 +354,13 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
         {showHint && (
           <Box style={{ minWidth: '36px' }}>
             <InfoOverlay
-              title="How to use the Search"
+              title={this.context.intl.formatMessage(messages.searchInfoTitle)}
               padButton="none"
               round
               content={(
-                <div>
-                  {inputPlaceholder}
-                </div>
+                <SearchInfo
+                  searchAttributes={searchAttributes}
+                />
               )}
             />
           </Box>
