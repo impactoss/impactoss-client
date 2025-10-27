@@ -190,13 +190,14 @@ export const filterEntitiesByKeywords = (
   searchAttributes,
 ) => {
   try {
-    const regex = new RegExp(regExMultipleWords(query), 'i');
+    const q = cleanupSearchTarget(query);
+    const regex = new RegExp(regExMultipleWords(q), 'i');
     return entities && entities.filter(
       (entity) => regex.test(
         prepareEntitySearchTarget(
           entity,
           searchAttributes,
-          query.length,
+          q.length,
         )
       )
     );
