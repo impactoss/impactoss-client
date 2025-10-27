@@ -23,7 +23,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   *:focus-visible {
-    outline: 2px solid black;
+    outline: 2px solid #510064;
     outline-offset: 2px;
   }
 

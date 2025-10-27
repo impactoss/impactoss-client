@@ -33,7 +33,7 @@ const TitleMedium = styled.h3`
 const ButtonWrap = styled.span`
   padding: 0 0.3em;
   &:last-child {
-    padding: 0;
+    padding: 0 2px;
   }
   @media print {
     display: none;
