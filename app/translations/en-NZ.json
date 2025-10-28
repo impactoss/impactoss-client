@@ -182,7 +182,7 @@
   "app.components.TagSearch.searchInfoSectionBehaviourDeburr": "**Macrons and accents are ignored** (e.g. searching for `maori` will also return content mentioning `māori`)",
   "app.components.TagSearch.searchInfoSectionBehaviourAllTerms": "Only results containing **all search terms** are returned",
   "app.components.TagSearch.searchInfoSectionBehaviourPartial": "Results will include **partial matches** (e.g. `child` will also return content mentioning `children`)",
-  "app.components.TagSearch.searchInfoSectionBehaviourQuotes": "Use **double quotes** to search for **exact terms and phrases** (thus ignoring partial matches: `\"child\"` will NOT return content mentioning `children`)",
+  "app.components.TagSearch.searchInfoSectionBehaviourQuotes": "Use **double quotes** to search for **exact terms and phrases** (thus ignoring partial matches: e.g. `\"child\"` will ignore `children`)",
   "app.components.TaxonomySidebar.hide": "Hide category groups",
   "app.components.TaxonomySidebar.show": "Select category group",
   "app.components.TaxonomySidebar.title": "Select category group",
