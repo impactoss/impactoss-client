@@ -14,6 +14,7 @@ import {
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+import FormattedMessageMarkdown from 'components/FormattedMessageMarkdown';
 import appMessages from 'containers/App/messages';
 import messages from './messages';
 
@@ -32,12 +33,12 @@ const SearchInfo = ({
       <Box gap="xsmall">
         <Box>
           <StyledLabel size="medium" weight="bold">
-            <FormattedMessage {...messages.searchInfoSectionAttributesTitle} />
+            <FormattedMessageMarkdown message={messages.searchInfoSectionAttributesTitle} />
           </StyledLabel>
         </Box>
         <Box>
           <StyledLabel>
-            <FormattedMessage {...messages.searchInfoSectionAttributesInfo} />
+            <FormattedMessageMarkdown message={messages.searchInfoSectionAttributesInfo} />
           </StyledLabel>
         </Box>
         <Box>
@@ -59,34 +60,34 @@ const SearchInfo = ({
     <Box gap="xsmall">
       <Box>
         <StyledLabel size="medium" weight="bold">
-          <FormattedMessage {...messages.searchInfoSectionBehaviourTitle} />
-        </StyledLabel>
-      </Box>
-      <Box>
-        <StyledLabel>
-          <FormattedMessage {...messages.searchInfoSectionBehaviourInfo} />
+          <FormattedMessageMarkdown message={messages.searchInfoSectionBehaviourTitle} />
         </StyledLabel>
       </Box>
       <Box>
         <UL>
           <li>
-            <StyledLabel size="small">
-              <FormattedMessage {...messages.searchInfoSectionBehaviourCapitalization} />
+            <StyledLabel>
+              <FormattedMessageMarkdown message={messages.searchInfoSectionBehaviourCapitalization} />
             </StyledLabel>
           </li>
           <li>
-            <StyledLabel size="small">
-              <FormattedMessage {...messages.searchInfoSectionBehaviourPartial} />
+            <StyledLabel>
+              <FormattedMessageMarkdown message={messages.searchInfoSectionBehaviourDeburr} />
             </StyledLabel>
           </li>
           <li>
-            <StyledLabel size="small">
-              <FormattedMessage {...messages.searchInfoSectionBehaviourQuotes} />
+            <StyledLabel>
+              <FormattedMessageMarkdown message={messages.searchInfoSectionBehaviourAllTerms} />
             </StyledLabel>
           </li>
           <li>
-            <StyledLabel size="small">
-              <FormattedMessage {...messages.searchInfoSectionBehaviourMacrons} />
+            <StyledLabel>
+              <FormattedMessageMarkdown message={messages.searchInfoSectionBehaviourPartial} />
+            </StyledLabel>
+          </li>
+          <li>
+            <StyledLabel>
+              <FormattedMessageMarkdown message={messages.searchInfoSectionBehaviourQuotes} />
             </StyledLabel>
           </li>
         </UL>
@@ -94,7 +95,11 @@ const SearchInfo = ({
     </Box>
   </Box>
 );
-
+// <Box>
+//   <StyledLabel>
+//     <FormattedMessageMarkdown message={messages.searchInfoSectionBehaviourInfo} />
+//   </StyledLabel>
+// </Box>
 SearchInfo.propTypes = {
   searchAttributes: PropTypes.array,
 };

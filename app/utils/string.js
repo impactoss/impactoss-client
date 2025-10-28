@@ -1,8 +1,8 @@
-import { toLower as loCase } from 'lodash/string';
+import { toLower, deburr } from 'lodash/string';
 import { reduce } from 'lodash/collection';
 import { TEXT_TRUNCATE } from 'themes/config';
 
-export const lowerCase = (str) => loCase(str)
+export const lowerCase = (str) => toLower(str)
   .replace('\bun\b', 'UN')
   .replace('\bhr\b', 'HR')
   .replace('\bupr\b', 'UPR')
@@ -17,13 +17,7 @@ export const getPathFromUrl = (url) => url.split(/[?#]/)[0];
 export const getFilenameFromUrl = (url) => url.split('/').pop();
 
 export const cleanupSearchTarget = (str, cleanupMarkdown) => {
-  let res = loCase(str)
-    .replace(/[’]/, '\'')
-    .replace(/[ā]/, 'a')
-    .replace(/[ē]/, 'e')
-    .replace(/[ī]/, 'i')
-    .replace(/[ō]/, 'o')
-    .replace(/[ū]/, 'u');
+  let res = deburr(toLower(str)).replace(/[’]/, '\'');
   if (cleanupMarkdown) {
     res = res
       // Remove markdown bold, italic, strikethrough, inline code

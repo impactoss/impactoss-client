@@ -43,38 +43,42 @@ export default defineMessages({
   },
   searchInfoTitle: {
     id: 'app.components.TagSearch.searchInfoTitle',
-    defaultMessage: 'How to use the Search',
+    defaultMessage: 'How to use the search',
   },
   searchInfoSectionAttributesTitle: {
     id: 'app.components.TagSearch.searchInfoSectionAttributesTitle',
-    defaultMessage: 'Matched attributes',
+    defaultMessage: 'What attributes are searched',
   },
   searchInfoSectionAttributesInfo: {
     id: 'app.components.TagSearch.searchInfoSectionAttributesInfo',
-    defaultMessage: 'The search terms entered are matched against the following content attributes (where available):',
+    defaultMessage: 'The search terms are checked against the following **content attributes** (where available):',
   },
   searchInfoSectionBehaviourTitle: {
     id: 'app.components.TagSearch.searchInfoSectionBehaviourTitle',
-    defaultMessage: 'Search behaviour',
+    defaultMessage: 'How the search works',
   },
   searchInfoSectionBehaviourInfo: {
     id: 'app.components.TagSearch.searchInfoSectionBehaviourInfo',
     defaultMessage: 'Please note:',
   },
+  searchInfoSectionBehaviourAllTerms: {
+    id: 'app.components.TagSearch.searchInfoSectionBehaviourAllTerms',
+    defaultMessage: 'Searches are **not case-sensitive**',
+  },
   searchInfoSectionBehaviourCapitalization: {
     id: 'app.components.TagSearch.searchInfoSectionBehaviourCapitalization',
-    defaultMessage: 'Searches are not case-sensitive',
+    defaultMessage: 'Searches are **not case-sensitive**',
   },
   searchInfoSectionBehaviourPartial: {
     id: 'app.components.TagSearch.searchInfoSectionBehaviourPartial',
-    defaultMessage: "Results will also include partial matches (e.g. 'child' will also return content mentioning 'children')",
+    defaultMessage: "Results will include **partial matches** (e.g. 'child' will also return content mentioning 'children')",
   },
   searchInfoSectionBehaviourQuotes: {
     id: 'app.components.TagSearch.searchInfoSectionBehaviourQuotes',
-    defaultMessage: 'Use double quotes to search for exact terms and phrases (e.g. "domestic violence")',
+    defaultMessage: "Use **double quotes** to search for **exact terms and phrases** (thus ignoring partial matches - \"child\" will not return content mentioning 'children', )",
   },
-  searchInfoSectionBehaviourMacrons: {
-    id: 'app.components.TagSearch.searchInfoSectionBehaviourMacrons',
-    defaultMessage: "Macrons are ignored (e.g. searching for 'maori' will also return results including 'māori')",
+  searchInfoSectionBehaviourDeburr: {
+    id: 'app.components.TagSearch.searchInfoSectionBehaviourDeburr',
+    defaultMessage: "**Macrons and accents are ignored** (e.g. searching for 'maori' will also return results including 'māori')",
   },
 });
