@@ -79,11 +79,11 @@ export const selectEntitiesByQuery = createSelector(
           .filter((target) => !!target)
           .reduce(
             (memo, target) => {
-              const targetEntties = allEntities.get(target.get('path'));
+              const targetEntities = allEntities.get(target.get('path'));
               // target by fw
               if (frameworks && target.get('groupByFramework')) {
                 return frameworks.reduce((innerMemo, fw) => {
-                  const fwEntities = targetEntties
+                  const fwEntities = targetEntities
                     .filter(
                       (entity) => qe(
                         entity.getIn(['attributes', 'framework_id']),
@@ -131,7 +131,7 @@ export const selectEntitiesByQuery = createSelector(
               // regular target
               const filteredEntities = searchQuery
                 ? filterEntitiesByKeywords(
-                  targetEntties,
+                  targetEntities,
                   searchQuery,
                   target.get('search').valueSeq().toArray()
                 )
