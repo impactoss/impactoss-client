@@ -356,6 +356,7 @@ class MultiSelect extends React.Component {
                   multiselect
                   searchAttributes={this.props.searchAttributes}
                   placeholderMessageId={this.props.placeholderMessageId}
+                  showHint={false}
                 />
               </Search>
             )
