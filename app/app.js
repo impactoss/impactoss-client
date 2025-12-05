@@ -40,7 +40,7 @@ import '!file-loader?name=[name].[ext]!./android-chrome-256x256.png';
 import '!file-loader?name=[name].[ext]!./mstile-150x150.png';
 import '!file-loader?name=[name].[ext]!./apple-touch-icon.png';
 import '!file-loader?name=[name].[ext]!./safari-pinned-tab.svg';
-import 'file-loader?name=[name].[ext]!./.htaccess';
+// import 'file-loader?name=[name].[ext]!./.htaccess';
 /* eslint-enable import/no-unresolved, import/extensions */
 
 import configureStore from './store';
