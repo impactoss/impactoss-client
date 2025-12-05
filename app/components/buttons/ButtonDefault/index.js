@@ -53,6 +53,13 @@ const ButtonDefault = styled(Button)`
     return 'none';
   }};
   }
+  &:focus-visible {
+    outline-offset: 2px;
+    outline: 1px solid  ${(props) => props.inactive
+    ? getInactiveHoverBackground(props.disabled)
+    : getActiveHoverBackground(props.disabled)
+};
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0.5em 1.75em;
   }

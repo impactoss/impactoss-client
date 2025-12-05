@@ -15,6 +15,7 @@ import { FormattedMessage } from 'react-intl';
 import { Box, Text } from 'grommet';
 import { FormUp, FormDown } from 'grommet-icons';
 import ReactMarkdown from 'react-markdown';
+import { reduce } from 'lodash/collection';
 
 import { startsWith } from 'utils/string';
 import qe from 'utils/quasi-equals';
@@ -49,7 +50,7 @@ import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
 
-import { DEPENDENCIES } from './constants';
+import { DEPENDENCIES, CONFIG } from './constants';
 
 import {
   selectEntitiesByQuery,
@@ -115,6 +116,25 @@ const Markdown = styled(ReactMarkdown)`
   }
 `;
 
+const compileSearchAttributes = (config) => {
+  const res = config.search
+    ? reduce(config.search, (memo, group) => {
+      if (group.targets && group.targets.length > 0) {
+        return reduce(group.targets, (memo2, target) => {
+          if (target.search && target.search.length > 0) {
+            return [...new Set([...memo2, ...target.search])];
+          }
+          return memo2;
+        }, memo);
+      }
+      if (group.categorySearch && group.categorySearch.length > 0) {
+        return [...new Set([...memo, ...group.categorySearch])];
+      }
+      return memo;
+    }, [])
+    : [];
+  return res;
+};
 
 export class Search extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   UNSAFE_componentWillMount() {
@@ -277,6 +297,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       onSkipToResults={() => {
                         this.focusResults();
                       }}
+                      searchAttributes={compileSearchAttributes(CONFIG)}
                     />
                   </EntityListSearch>
                   <ListWrapper

@@ -23,7 +23,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   *:focus-visible {
-    outline: 2px solid black;
+    outline: 2px solid #510064;
     outline-offset: 2px;
   }
 
@@ -147,6 +147,12 @@ const GlobalStyle = createGlobalStyle`
 
   .react-markdown-search strong{
     font-weight: 500;
+  }
+
+  .formatted-message-remarkable code {
+    background-color: #f2f3f4;
+    padding: 2px 4px;
+    border-radius: 4px;
   }
 
   .download-csv-modal {
