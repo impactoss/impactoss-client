@@ -25,7 +25,7 @@ export const CONFIG = {
         {
           path: 'measures',
           clientPath: 'actions',
-          search: ['title', 'description', 'outcome', 'indicator_summary'],
+          search: ['reference', 'title', 'description', 'outcome'],
           sorting: [
             {
               attribute: 'id', // proxy for created at
@@ -47,7 +47,7 @@ export const CONFIG = {
         },
         {
           path: 'indicators',
-          search: ['title', 'description', 'reference'],
+          search: ['reference', 'title', 'description'],
           sorting: [
             {
               attribute: 'id', // proxy for created at
@@ -74,7 +74,7 @@ export const CONFIG = {
         },
         {
           path: 'recommendations',
-          search: ['title', 'description', 'response', 'reference'],
+          search: ['reference', 'title', 'description', 'response'],
           groupByFramework: true,
           sorting: [
             {
@@ -131,7 +131,7 @@ export const CONFIG = {
         attribute: 'title',
         as: 'taxonomy',
       }],
-      categorySearch: ['title', 'short_title', 'description', 'url', 'taxonomy'],
+      categorySearch: ['reference', 'title', 'short_title', 'description', 'url', 'taxonomy'],
       sorting: [
         {
           attribute: 'reference',

@@ -31,10 +31,7 @@ const TitleMedium = styled.h3`
   display: inline-block;
 `;
 const ButtonWrap = styled.span`
-  padding: 0 0.3em;
-  &:last-child {
-    padding: 0;
-  }
+  padding: 0;
   @media print {
     display: none;
   }
@@ -48,6 +45,10 @@ const Table = styled.span`
   }
 `;
 const TableCell = styled.span`
+  padding: 0 0.3em;
+  &:last-child {
+    padding-right: 0;
+  }
   display: ${(props) => {
     if (props.hiddenMobile) {
       return 'none';
