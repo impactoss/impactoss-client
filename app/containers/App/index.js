@@ -25,7 +25,7 @@ import GlobalSettings from 'containers/GlobalSettings';
 import { sortEntities } from 'utils/sort';
 import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
 
-import { FOOTER, SHOW_HEADER_SHADOW_ON_HOME } from 'themes/config';
+import { FOOTER, SHOW_HEADER_SHADOW_ON_HOME, FEATURES } from 'themes/config';
 
 import { ROUTES, DEPENDENCIES } from './constants';
 
@@ -165,21 +165,25 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           || currentFrameworkId === viewRecommendationFramework
         ),
       },
-      {
+    ];
+    if (FEATURES.measures) {
+      navItems = navItems.concat([{
         path: ROUTES.MEASURES,
         titleSuper: intl.formatMessage(messages.nav.measuresSuper),
         title: intl.formatMessage(messages.nav.measures),
         active: currentPath.startsWith(ROUTES.MEASURES),
-      },
-    ];
-    navItems = navItems.concat([{
-      path: ROUTES.INDICATORS,
-      titleSuper: intl.formatMessage(messages.nav.indicatorsSuper),
-      title: intl.formatMessage(messages.nav.indicators),
-      active:
-        currentPath.startsWith(ROUTES.INDICATORS)
-        || currentPath.startsWith(ROUTES.PROGRESS_REPORTS),
-    }]);
+      }]);
+    }
+    if (FEATURES.measures) {
+      navItems = navItems.concat([{
+        path: ROUTES.INDICATORS,
+        titleSuper: intl.formatMessage(messages.nav.indicatorsSuper),
+        title: intl.formatMessage(messages.nav.indicators),
+        active:
+          currentPath.startsWith(ROUTES.INDICATORS)
+          || currentPath.startsWith(ROUTES.PROGRESS_REPORTS),
+      }]);
+    }
     if (canUserManagePages(highestRole)) {
       navItems = navItems.concat([
         {

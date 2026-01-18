@@ -11,9 +11,9 @@ export const DEPENDENCIES = [
   'categories',
   'taxonomies',
   'framework_taxonomies',
-  'measures',
-  'measure_categories',
-  'indicators',
+  // 'measures',
+  // 'measure_categories',
+  // 'indicators',
   'frameworks',
   'recommendations',
 ];

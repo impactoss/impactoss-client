@@ -145,7 +145,8 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     // make sure selected entities are still actually on page
     const {
       entityIdsSelected,
-      progress, viewDomain,
+      progress,
+      viewDomain,
       canEdit,
       progressTypes,
       onDismissAllErrors,
@@ -565,6 +566,9 @@ function mapDispatchToProps(dispatch, props) {
               });
             }
           });
+
+          console.log('activeEditOption.optionId', activeEditOption.optionId, newValue)
+          console.log('entities', entities.toJS())
           if (activeEditOption.optionId === 'support_level' && newValue === 'null') {
             newValue = null;
           }

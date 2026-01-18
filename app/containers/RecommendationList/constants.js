@@ -9,18 +9,18 @@ import {
 
 export const DEPENDENCIES = [
   'user_roles',
-  'measures',
   'users',
   'taxonomies',
   'categories',
-  'indicators',
   'recommendations',
-  'recommendation_measures',
   'recommendation_categories',
-  'recommendation_indicators',
-  'measure_categories',
   'frameworks',
   'framework_taxonomies',
+  // 'measures',
+  // 'indicators',
+  // 'recommendation_measures',
+  // 'recommendation_indicators',
+  // 'measure_categories',
 ];
 
 export const CONFIG = {
@@ -71,32 +71,32 @@ export const CONFIG = {
     groupBy: 'framework_id',
     editForFrameworks: true,
   },
-  connections: { // filter by associated entity
-    query: 'connected',
-    options: [
-      {
-        search: true,
-        message: 'entities.measures.plural',
-        path: 'measures', // filter by recommendation connection
-        clientPath: 'actions', // filter by recommendation connection
-        key: 'measure_id',
-        connectPath: 'recommendation_measures', // filter by recommendation connection
-        ownKey: 'recommendation_id',
-        editForFrameworks: true,
-        frameworkFilter: 'has_measures',
-      },
-    ],
-  },
+  // connections: { // filter by associated entity
+  //   query: 'connected',
+  //   options: [
+  //     // {
+  //     //   search: true,
+  //     //   message: 'entities.measures.plural',
+  //     //   path: 'measures', // filter by recommendation connection
+  //     //   clientPath: 'actions', // filter by recommendation connection
+  //     //   key: 'measure_id',
+  //     //   connectPath: 'recommendation_measures', // filter by recommendation connection
+  //     //   ownKey: 'recommendation_id',
+  //     //   editForFrameworks: true,
+  //     //   frameworkFilter: 'has_measures',
+  //     // },
+  //   ],
+  // },
   attributes: { // filter by attribute value
     options: [
-      {
-        search: false,
-        message: 'attributes.support_level',
-        attribute: 'support_level',
-        options: SUPPORT_LEVELS,
-        editForFrameworks: true,
-        frameworkFilter: 'has_response',
-      },
+      // {
+      //   search: false,
+      //   message: 'attributes.support_level',
+      //   attribute: 'support_level',
+      //   options: SUPPORT_LEVELS,
+      //   editForFrameworks: true,
+      //   frameworkFilter: 'has_response',
+      // },
       {
         search: false,
         message: 'attributes.draft',

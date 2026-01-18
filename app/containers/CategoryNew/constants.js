@@ -9,7 +9,7 @@ import { fromJS } from 'immutable';
 export const SAVE = 'impactoss/CategoryNew/SAVE';
 
 export const DEPENDENCIES = [
-  'measures',
+  // 'measures',
   'recommendations',
   'users',
   'user_roles',
@@ -17,7 +17,7 @@ export const DEPENDENCIES = [
   'taxonomies',
   'frameworks',
   'framework_taxonomies',
-  'measure_categories',
+  // 'measure_categories',
   'recommendation_categories',
 ];
 

@@ -344,6 +344,16 @@ export const selectCurrentFrameworkId = createSelector(
     return queryId;
   }
 );
+export const selectCurrentFramework = createSelector(
+  selectFrameworkQuery,
+  selectFrameworks,
+  (queryId, frameworks) => {
+    if (frameworks && frameworks.size === 1) {
+      return frameworks.first();
+    }
+    return null;
+  }
+);
 
 export const selectActiveFrameworks = createSelector(
   selectFrameworkQuery,
@@ -377,24 +387,30 @@ export const selectIndicatorReferences = createSelector(
 export const selectFWRecommendations = createSelector(
   (state) => selectEntities(state, 'recommendations'),
   selectCurrentFrameworkId,
-  (entities, frameworkId) => {
-    if (entities && frameworkId && frameworkId !== 'all') {
-      return entities.filter(
+  selectCurrentFramework,
+  (entities, frameworkId, framework) => {
+    console.log(entities && entities.toJS())
+    if (entities && frameworkId && frameworkId !== 'all' && framework) {
+      const result = entities.filter(
         (rec) => qe(
           frameworkId,
           rec.getIn(['attributes', 'framework_id']),
         )
-      ).map(
-        (rec) => {
-          if (
-            rec.getIn(['attributes', 'support_level']) === null
-            || typeof rec.getIn(['attributes', 'support_level']) === 'undefined'
-          ) {
-            return rec.setIn(['attributes', 'support_level'], 'null');
-          }
-          return rec;
-        }
       );
+      if (framework.getIn(['attributes', 'has_response'])) {
+        return result.map(
+          (rec) => {
+            if (
+              rec.getIn(['attributes', 'support_level']) === null
+              || typeof rec.getIn(['attributes', 'support_level']) === 'undefined'
+            ) {
+              return rec.setIn(['attributes', 'support_level'], null);
+            }
+            return rec;
+          }
+        );
+      }
+      return result;
     }
     return entities;
   }

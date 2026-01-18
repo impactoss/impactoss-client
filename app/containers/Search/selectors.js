@@ -108,6 +108,7 @@ export const selectEntitiesByQuery = createSelector(
                     || (
                       !path
                       && !active
+                      && filteredEntities
                       && filteredEntities.size > 0
                     )
                   ) {
@@ -143,6 +144,7 @@ export const selectEntitiesByQuery = createSelector(
                 || (
                   !path
                   && !active
+                  && filteredEntities
                   && filteredEntities.size > 0
                 )
               ) {

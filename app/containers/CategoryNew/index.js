@@ -37,7 +37,7 @@ import { hasNewError } from 'utils/entity-form';
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
+import { CATEGORY_ADMIN_MIN_ROLE, FEATURES } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
 
@@ -174,7 +174,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       fields: [getMarkdownFormField({ formatMessage: intl.formatMessage })],
     });
     if (!userOnly) {
-      if (taxonomy.getIn(['attributes', 'tags_measures']) && measures) {
+      if (FEATURES.measures && taxonomy.getIn(['attributes', 'tags_measures']) && measures) {
         groups.push({
           label: intl.formatMessage(appMessages.nav.measuresSuper),
           icon: 'measures',
@@ -264,7 +264,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
     }
-
+console.log('recommendationsByFw', recommendationsByFw && recommendationsByFw.toJS())
     return (
       <div>
         <HelmetCanonical
@@ -419,7 +419,7 @@ function mapDispatchToProps(dispatch) {
       const formData = fromJS(formValues);
       let saveData = formData.setIn(['attributes', 'taxonomy_id'], taxonomy.get('id'));
       if (!formData.getIn(['attributes', 'user_only'])) {
-        if (taxonomy.getIn(['attributes', 'tags_measures'])) {
+        if (FEATURES.measures && taxonomy.getIn(['attributes', 'tags_measures'])) {
           saveData = saveData.set(
             'measureCategories',
             getConnectionUpdatesFromFormData({

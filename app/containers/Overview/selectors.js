@@ -34,11 +34,11 @@ export const selectRecommendationCount = createSelector(
 
 export const selectMeasureCount = createSelector(
   (state) => selectMeasuresWhere(state, { where: { draft: false } }),
-  (entities) => entities.size
+  (entities) => entities && entities.size
 );
 export const selectIndicatorCount = createSelector(
   (state) => selectIndicatorsWhere(state, { where: { draft: false } }),
-  (entities) => entities.size
+  (entities) => entities && entities.size
 );
 export const selectRecommendationDraftCount = createSelector(
   (state) => selectRecommendationsWhere(state, { where: { draft: true } }),
@@ -48,9 +48,9 @@ export const selectRecommendationDraftCount = createSelector(
 );
 export const selectMeasureDraftCount = createSelector(
   (state) => selectMeasuresWhere(state, { where: { draft: true } }),
-  (entities) => entities.size
+  (entities) => entities && entities.size
 );
 export const selectIndicatorDraftCount = createSelector(
   (state) => selectIndicatorsWhere(state, { where: { draft: true } }),
-  (entities) => entities.size
+  (entities) => entities && entities.size
 );

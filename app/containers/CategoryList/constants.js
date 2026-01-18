@@ -6,9 +6,9 @@ export const DEPENDENCIES = [
   'framework_taxonomies',
   'recommendation_categories',
   'recommendations',
-  'measure_categories',
-  'recommendation_measures',
-  'measures',
+  // 'measure_categories',
+  // 'recommendation_measures',
+  // 'measures',
 ];
 
 export const TAXONOMY_DEFAULT = 1;
@@ -21,12 +21,12 @@ export const SORT_OPTIONS = [
     type: 'string',
     default: 'true',
   },
-  {
-    query: 'measures',
-    field: 'measures',
-    type: 'number',
-    order: 'desc',
-  },
+  // {
+  //   query: 'measures',
+  //   field: 'measures',
+  //   type: 'number',
+  //   order: 'desc',
+  // },
   {
     query: 'recommendations',
     field: 'recommendations',

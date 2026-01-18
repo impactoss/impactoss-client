@@ -13,6 +13,7 @@ import { getCategoryTitle } from 'utils/entities';
 import CategoryListHeader from 'components/categoryList/CategoryListHeader';
 import CategoryListItem from 'components/categoryList/CategoryListItem';
 
+import { FEATURES } from 'themes/config';
 import { SORT_ORDER_OPTIONS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 import messages from '../messages';
@@ -62,7 +63,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
   getHeaderAttributes = (taxonomy, frameworkId, intl) => {
     // figure out if tagged directly or via child category
     const tagsRecs = this.getTagsTax(taxonomy, 'tags_recommendations');
-    const tagsMeasures = this.getTagsTax(taxonomy, 'tags_measures');
+    const tagsMeasures = FEATURES.measures && this.getTagsTax(taxonomy, 'tags_measures');
     const isList = taxonomy.get('frameworkIds')
       && taxonomy.get('frameworkIds').size > 1;
     const fwSet = frameworkId && frameworkId !== 'all';
@@ -87,7 +88,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         label: recLabel,
       });
       // indirectly associated/inferred actions
-      if (!tagsMeasures) {
+      if (FEATURES.measures && !tagsMeasures) {
         attributes.push({
           via: intl.formatMessage(appMessages.entities.connected),
           query: 'measures',
@@ -96,7 +97,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       }
     }
     // directly associated measures
-    if (tagsMeasures) {
+    if (FEATURES.measures && tagsMeasures) {
       attributes.push({
         query: 'measures',
         label: intl.formatMessage(appMessages.entities.measures.plural),
@@ -159,7 +160,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         },
       },
     ];
-    // add columns for associated recs and measures
+    // add columns for associated recs and
     return userOnly
       ? columns
       : columns.concat(headerAttributes.map((attribute) => {
@@ -219,7 +220,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
   getCountAttributes = (taxonomy) => {
     // figure out if tagged directly or via child category
     const tagsRecs = this.getTagsTax(taxonomy, 'tags_recommendations');
-    const tagsMeasures = this.getTagsTax(taxonomy, 'tags_measures');
+    const tagsMeasures = FEATURES.measures && this.getTagsTax(taxonomy, 'tags_measures');
 
     const attributes = [];
     if (tagsRecs) {
@@ -231,7 +232,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
           taxonomy.get('frameworkIds')
           && taxonomy.get('frameworkIds').toArray(),
       });
-      if (!tagsMeasures) {
+      if (FEATURES.measures && !tagsMeasures) {
         attributes.push({
           total: 'measuresPublicCount',
           totalByFw: 'measuresPublicCountByFw',
@@ -242,7 +243,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         });
       }
     }
-    if (tagsMeasures) {
+    if (FEATURES.measures && tagsMeasures) {
       attributes.push({
         total: 'measuresPublicCount',
         totalByFw: 'measuresPublicCountByFw',

@@ -15,8 +15,8 @@ import { Map, fromJS } from 'immutable';
 import {
   taxonomyOptions,
   entityOptions,
-  renderMeasureControl,
-  renderIndicatorControl,
+  // renderMeasureControl,
+  // renderIndicatorControl,
   renderTaxonomyControl,
   getCategoryUpdatesFromFormData,
   getConnectionUpdatesFromFormData,
@@ -36,7 +36,7 @@ import { qe } from 'utils/quasi-equals';
 import { lowerCase } from 'utils/string';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, FEATURES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -69,8 +69,8 @@ import {
   selectDomain,
   selectViewEntity,
   selectTaxonomies,
-  selectMeasures,
-  selectIndicators,
+  // selectMeasures,
+  // selectIndicators,
   selectConnectedTaxonomies,
 } from './selectors';
 
@@ -106,7 +106,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     this.remoteSubmitForm = submitForm;
   };
 
-  getInitialFormData = ({ taxonomies, measures, indicators, viewEntity }) =>
+  getInitialFormData = ({ taxonomies, viewEntity }) =>
     viewEntity
       ? Map({
         id: viewEntity.get('id'),
@@ -115,12 +115,12 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           FORM_INITIAL.get('attributes')
         ),
         associatedTaxonomies: taxonomyOptions(taxonomies),
-        associatedMeasures: entityOptions(measures, true),
-        associatedIndicators: entityOptions(indicators, true),
+        // associatedMeasures: entityOptions(measures, true),
+        // associatedIndicators: entityOptions(indicators, true),
       })
       : Map();
 
-  getHeaderMainFields = (existingReferences, intl) => 
+  getHeaderMainFields = (existingReferences, intl) =>
     ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -148,8 +148,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   getBodyMainFields = (
     connectedTaxonomies,
     entity,
-    measures,
-    indicators,
+    // measures,
+    // indicators,
     onCreateOption,
     hasResponse,
     intl
@@ -164,31 +164,31 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           placeholder: 'fullRecommendation',
           hint: 'fullRecommendation',
         }),
-        hasResponse && getSupportField(intl.formatMessage, entity),
-        getMarkdownFormField({
-          formatMessage: intl.formatMessage,
-          attribute: 'response',
-        }),
+        // hasResponse && getSupportField(intl.formatMessage, entity),
+        // getMarkdownFormField({
+        //   formatMessage: intl.formatMessage,
+        //   attribute: 'response',
+        // }),
       ],
     });
-    if (measures) {
-      groups.push({
-        label: intl.formatMessage(appMessages.nav.measuresSuper),
-        icon: 'measures',
-        fields: [
-          renderMeasureControl(measures, connectedTaxonomies, onCreateOption, intl),
-        ],
-      });
-    }
-    if (indicators) {
-      groups.push({
-        label: intl.formatMessage(appMessages.nav.indicatorsSuper),
-        icon: 'indicators',
-        fields: [
-          renderIndicatorControl(indicators, onCreateOption, intl),
-        ],
-      });
-    }
+    // if (measures) {
+    //   groups.push({
+    //     label: intl.formatMessage(appMessages.nav.measuresSuper),
+    //     icon: 'measures',
+    //     fields: [
+    //       renderMeasureControl(measures, connectedTaxonomies, onCreateOption, intl),
+    //     ],
+    //   });
+    // }
+    // if (indicators) {
+    //   groups.push({
+    //     label: intl.formatMessage(appMessages.nav.indicatorsSuper),
+    //     icon: 'indicators',
+    //     fields: [
+    //       renderIndicatorControl(indicators, onCreateOption, intl),
+    //     ],
+    //   });
+    // }
     return groups;
   };
 
@@ -211,9 +211,9 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       dataReady,
       viewDomain,
       connectedTaxonomies,
-      measures,
       taxonomies,
-      indicators,
+      // measures,
+      // indicators,
       onCreateOption,
       frameworks,
       existingReferences,
@@ -231,8 +231,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
 
     const currentFramework = dataReady && frameworks.find((fw) => qe(fw.get('id'), frameworkId));
     const hasResponse = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_response']);
-    const hasMeasures = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_measures']);
-    const hasIndicators = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_indicators']);
+    const hasMeasures = FEATURES.measures && dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_measures']);
+    const hasIndicators = FEATURES.measures && dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_indicators']);
     const fwTaxonomies = taxonomies && taxonomies.filter((tax) => tax.get('frameworkIds').find((id) => qe(id, frameworkId))
       || qe(frameworkId, tax.getIn(['attributes', 'framework_id'])));
 
@@ -309,8 +309,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   fwTaxonomies,
-                  measures,
-                  indicators,
+                  // measures,
+                  // indicators,
                   currentFramework,
                   viewEntity,
                 )}
@@ -331,8 +331,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                     main: this.getBodyMainFields(
                       connectedTaxonomies,
                       viewEntity,
-                      hasMeasures && measures,
-                      hasIndicators && indicators,
+                      // hasMeasures && measures,
+                      // hasIndicators && indicators,
                       onCreateOption,
                       hasResponse,
                       intl
@@ -372,12 +372,12 @@ RecommendationEdit.propTypes = {
   highestRole: PropTypes.number,
   params: PropTypes.object,
   taxonomies: PropTypes.object,
-  measures: PropTypes.object,
-  indicators: PropTypes.object,
+  // measures: PropTypes.object,
+  // indicators: PropTypes.object,
+  // connectedTaxonomies: PropTypes.object,
   onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
-  connectedTaxonomies: PropTypes.object,
   frameworks: PropTypes.object,
   existingReferences: PropTypes.array,
   canUserAdministerCategories: PropTypes.bool,
@@ -391,9 +391,9 @@ const mapStateToProps = (state, props) => ({
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
-  measures: selectMeasures(state, props.params.id),
-  indicators: selectIndicators(state, props.params.id),
-  connectedTaxonomies: selectConnectedTaxonomies(state),
+  // measures: selectMeasures(state, props.params.id),
+  // indicators: selectIndicators(state, props.params.id),
+  // connectedTaxonomies: selectConnectedTaxonomies(state),
   frameworks: selectFrameworks(state),
   existingReferences: selectRecommendationReferences(state),
   canUserAdministerCategories: selectCanUserAdministerCategories(state),
@@ -419,8 +419,8 @@ function mapDispatchToProps(dispatch, props) {
     handleSubmit: (
       formValues,
       taxonomies,
-      measures,
-      indicators,
+      // measures,
+      // indicators,
       currentFramework,
       viewEntity,
     ) => {
@@ -433,26 +433,26 @@ function mapDispatchToProps(dispatch, props) {
             taxonomies,
             createKey: 'recommendation_id',
           })
-        )
-        .set(
-          'recommendationMeasures',
-          getConnectionUpdatesFromFormData({
-            formData,
-            connections: measures,
-            connectionAttribute: 'associatedMeasures',
-            createConnectionKey: 'measure_id',
-            createKey: 'recommendation_id',
-          })
-        )
-        .set(
-          'recommendationIndicators',
-          getConnectionUpdatesFromFormData({
-            formData,
-            connections: indicators,
-            connectionAttribute: 'associatedIndicators',
-            createConnectionKey: 'indicator_id',
-            createKey: 'recommendation_id',
-          })
+        // )
+        // .set(
+        //   'recommendationMeasures',
+        //   getConnectionUpdatesFromFormData({
+        //     formData,
+        //     connections: measures,
+        //     connectionAttribute: 'associatedMeasures',
+        //     createConnectionKey: 'measure_id',
+        //     createKey: 'recommendation_id',
+        //   })
+        // )
+        // .set(
+        //   'recommendationIndicators',
+        //   getConnectionUpdatesFromFormData({
+        //     formData,
+        //     connections: indicators,
+        //     connectionAttribute: 'associatedIndicators',
+        //     createConnectionKey: 'indicator_id',
+        //     createKey: 'recommendation_id',
+        //   })
         );
       // cleanup attributes for framework
       if (!currentFramework || !currentFramework.getIn(['attributes', 'has_response'])) {

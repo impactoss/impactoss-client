@@ -8,7 +8,7 @@ import validateDateFormat from 'components/forms/validators/validate-date-format
 import { DayPicker } from 'react-day-picker';
 import { useField, useFormikContext } from "formik";
 
-import { DATE_FORMAT, DB_DATE_FORMAT } from 'themes/config';
+import { DATE_FORMAT, API_DATE_FORMAT } from 'themes/config';
 
 import InputComponent from './InputComponent';
 import DatePickerStyle from './styles';
@@ -23,7 +23,7 @@ const DateControl = (props) => {
 
   const handleDateChange = (valueDate) => {
     if (valueDate) {
-      const formattedDB = format(valueDate, DB_DATE_FORMAT);
+      const formattedDB = format(valueDate, API_DATE_FORMAT);
       if (formattedDB) {
         setShowDayPicker(false);
         setFieldValue(field.name, formattedDB);
@@ -40,7 +40,7 @@ const DateControl = (props) => {
       // parse from input format to db format
       const formattedDB = format(
         parse(inputValue, DATE_FORMAT, new Date()),
-        DB_DATE_FORMAT,
+        API_DATE_FORMAT,
       );
       setFieldValue(field.name, formattedDB);
       onChange(formattedDB);
@@ -52,11 +52,11 @@ const DateControl = (props) => {
   };
 
   const formattedDay = value
-    && validateDateFormat(value, DB_DATE_FORMAT)
-    ? format(parse(value, DB_DATE_FORMAT, new Date()), DATE_FORMAT)
+    && validateDateFormat(value, API_DATE_FORMAT)
+    ? format(parse(value, API_DATE_FORMAT, new Date()), DATE_FORMAT)
     : value;
 
-  const selected = value && validateDateFormat(value, DB_DATE_FORMAT) ? parse(value, DB_DATE_FORMAT, new Date()) : null;
+  const selected = value && validateDateFormat(value, API_DATE_FORMAT) ? parse(value, API_DATE_FORMAT, new Date()) : null;
 
   const handleInputFocus = () => {
     setShowDayPicker(true);

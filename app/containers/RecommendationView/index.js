@@ -16,8 +16,8 @@ import {
   getStatusField,
   getMetaField,
   getMarkdownField,
-  getMeasureConnectionField,
-  getIndicatorConnectionField,
+  // getMeasureConnectionField,
+  // getIndicatorConnectionField,
   getTaxonomyFields,
   hasTaxonomyCategories,
 } from 'utils/fields';
@@ -34,6 +34,7 @@ import {
   IS_ARCHIVE_STATUSES,
   SUPPORT_LEVELS,
   CYCLE_TAXONOMY_ID,
+  FEATURES,
 } from 'themes/config';
 
 import Loading from 'components/Loading';
@@ -45,9 +46,9 @@ import NotFoundEntity from 'containers/NotFoundEntity';
 import {
   selectReady,
   selectIsUserManager,
-  selectMeasureTaxonomies,
-  selectMeasureConnections,
-  selectIndicatorConnections,
+  // selectMeasureTaxonomies,
+  // selectMeasureConnections,
+  // selectIndicatorConnections,
   selectActiveFrameworks,
 } from 'containers/App/selectors';
 
@@ -58,8 +59,8 @@ import messages from './messages';
 import {
   selectViewEntity,
   selectTaxonomies,
-  selectMeasures,
-  selectIndicators,
+  // selectMeasures,
+  // selectIndicators,
 } from './selectors';
 
 import { DEPENDENCIES } from './constants';
@@ -129,11 +130,11 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
 
   getBodyMainFields = (
     entity,
-    measures,
-    measureTaxonomies,
-    measureConnections,
-    indicators,
-    indicatorConnections,
+    // measures,
+    // measureTaxonomies,
+    // measureConnections,
+    // indicators,
+    // indicatorConnections,
     onEntityClick,
     hasResponse,
   ) => {
@@ -142,49 +143,49 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     fields.push({
       fields: [
         getMarkdownField(entity, 'description', true, 'fullRecommendation'),
-        hasResponse
-        && entity.getIn(['attributes', 'support_level']) !== null
-        && entity.getIn(['attributes', 'support_level']) !== 'null'
-        && typeof entity.getIn(['attributes', 'support_level']) !== 'undefined'
-        && getStatusField(
-          entity,
-          'support_level',
-          SUPPORT_LEVELS,
-          appMessages.attributes.support_level,
-          0 // defaultValue
-        ),
-        getMarkdownField(entity, 'response', true),
+        // hasResponse
+        // && entity.getIn(['attributes', 'support_level']) !== null
+        // && entity.getIn(['attributes', 'support_level']) !== 'null'
+        // && typeof entity.getIn(['attributes', 'support_level']) !== 'undefined'
+        // && getStatusField(
+        //   entity,
+        //   'support_level',
+        //   SUPPORT_LEVELS,
+        //   appMessages.attributes.support_level,
+        //   0 // defaultValue
+        // ),
+        // getMarkdownField(entity, 'response', true),
       ],
     });
     // indicators
-    if (indicators) {
-      fields.push({
-        label: appMessages.nav.indicatorsSuper,
-        icon: 'indicators',
-        fields: [
-          getIndicatorConnectionField(
-            indicators,
-            indicatorConnections,
-            onEntityClick,
-          ),
-        ],
-      });
-    }
+    // if (indicators) {
+    //   fields.push({
+    //     label: appMessages.nav.indicatorsSuper,
+    //     icon: 'indicators',
+    //     fields: [
+    //       getIndicatorConnectionField(
+    //         indicators,
+    //         indicatorConnections,
+    //         onEntityClick,
+    //       ),
+    //     ],
+    //   });
+    // }
     // measures
-    if (measures) {
-      fields.push({
-        label: appMessages.nav.measuresSuper,
-        icon: 'measures',
-        fields: [
-          getMeasureConnectionField(
-            measures,
-            measureTaxonomies,
-            measureConnections,
-            onEntityClick,
-          ),
-        ],
-      });
-    }
+    // if (measures) {
+    //   fields.push({
+    //     label: appMessages.nav.measuresSuper,
+    //     icon: 'measures',
+    //     fields: [
+    //       getMeasureConnectionField(
+    //         measures,
+    //         measureTaxonomies,
+    //         measureConnections,
+    //         onEntityClick,
+    //       ),
+    //     ],
+    //   });
+    // }
     return fields;
   };
 
@@ -203,12 +204,12 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       viewEntity,
       dataReady,
       isManager,
-      measures,
       taxonomies,
-      measureTaxonomies,
-      measureConnections,
-      indicators,
-      indicatorConnections,
+      // measures,
+      // measureTaxonomies,
+      // measureConnections,
+      // indicators,
+      // indicatorConnections,
       onEntityClick,
       frameworks,
       intl,
@@ -303,11 +304,11 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
                   body: {
                     main: this.getBodyMainFields(
                       viewEntity,
-                      hasMeasures && measures,
-                      measureTaxonomies,
-                      measureConnections,
-                      hasIndicators && indicators,
-                      indicatorConnections,
+                      // hasMeasures && measures,
+                      // measureTaxonomies,
+                      // measureConnections,
+                      // hasIndicators && indicators,
+                      // indicatorConnections,
                       onEntityClick,
                       hasResponse,
                     ),
@@ -331,11 +332,11 @@ RecommendationView.propTypes = {
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   taxonomies: PropTypes.object,
-  measureTaxonomies: PropTypes.object,
-  measureConnections: PropTypes.object,
-  measures: PropTypes.object,
-  indicators: PropTypes.object,
-  indicatorConnections: PropTypes.object,
+  // measureTaxonomies: PropTypes.object,
+  // measureConnections: PropTypes.object,
+  // measures: PropTypes.object,
+  // indicators: PropTypes.object,
+  // indicatorConnections: PropTypes.object,
   params: PropTypes.object,
   isManager: PropTypes.bool,
   frameworks: PropTypes.object,
@@ -348,11 +349,11 @@ const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
-  measures: selectMeasures(state, props.params.id),
-  measureTaxonomies: selectMeasureTaxonomies(state),
-  measureConnections: selectMeasureConnections(state),
-  indicators: selectIndicators(state, props.params.id),
-  indicatorConnections: selectIndicatorConnections(state),
+  // measures: selectMeasures(state, props.params.id),
+  // measureTaxonomies: selectMeasureTaxonomies(state),
+  // measureConnections: selectMeasureConnections(state),
+  // indicators: selectIndicators(state, props.params.id),
+  // indicatorConnections: selectIndicatorConnections(state),
   frameworks: selectActiveFrameworks(state),
 });
 

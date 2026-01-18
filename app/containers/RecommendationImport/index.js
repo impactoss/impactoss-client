@@ -239,6 +239,7 @@ function mapDispatchToProps(dispatch) {
                 return val;
               })
               .set('draft', true)
+              .set('framework_id', 1)
               .toJS(),
             saveRef: index + 1,
           };

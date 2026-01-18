@@ -26,6 +26,7 @@ export default class EntityListItemMainTop extends React.PureComponent { // esli
 
   render() {
     const { entity } = this.props;
+    console.log(entity.support)
     return (
       <Component>
         {entity.draft && (

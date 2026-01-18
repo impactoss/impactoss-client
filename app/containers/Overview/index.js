@@ -21,7 +21,7 @@ import {
   selectActiveFrameworks,
   selectCurrentFrameworkId,
 } from 'containers/App/selectors';
-import { ABOUT_PAGE_ID } from 'themes/config';
+import { ABOUT_PAGE_ID, FEATURES } from 'themes/config';
 import { ROUTES, CONTENT_LIST } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
@@ -194,7 +194,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 indicatorDraftCount={this.props.indicatorDraftCount}
               />
             )}
-            {dataReady && allFrameworks.size === 1 && (
+            {FEATURES.measure && dataReady && allFrameworks.size === 1 && (
               <HorizontalDiagram
                 onPageLink={onPageLink}
                 onTaxonomyIconMouseOver={this.onTaxonomyIconMouseOver}

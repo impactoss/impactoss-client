@@ -7,7 +7,7 @@
     "url": "git://github.com/impactoss/impactoss.git"
   },
   "engines": {
-    "npm": ">=10.5.0",
+    "npm": ">=10.2.0",
     "node": ">=21.1.0"
   },
   "author": "tmfrnz",

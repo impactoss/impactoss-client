@@ -12,7 +12,7 @@ import { palette } from 'styled-theme';
 import styled, { withTheme } from 'styled-components';
 
 import { ROUTES, VIEWPORTS } from 'containers/App/constants';
-import { ENABLE_SDGS } from 'themes/config';
+import { FEATURES } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
 
@@ -401,7 +401,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
     this.setState({ viewport });
   }
 
-  connectRecommendationsMeasures = (vertical = false) => ENABLE_SDGS
+  connectRecommendationsMeasures = (vertical = false) => FEATURES.sdgs
     ? this.getCurvedConnectionPath(
       vertical,
       this.getConnectionPoint(this.state.buttonRecs, this.state.diagram, vertical ? 'bottom' : 'right'),
@@ -515,12 +515,12 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
             && this.state.buttonMeasures
             && this.renderArrow(this.connectMeasuresIndicators(vertical), vertical)
           }
-          {ENABLE_SDGS
+          {FEATURES.sdgs
             && this.state.buttonSdgtargets
             && this.state.buttonIndicators
             && this.renderPath(this.connectSdgtargetsIndicators(vertical), true)
           }
-          {ENABLE_SDGS
+          {FEATURES.sdgs
             && this.state.buttonSdgtargets
             && this.state.buttonMeasures
             && this.renderPath(this.connectSdgtargetsMeasures(vertical))
@@ -785,7 +785,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
           && (
             <div>
               <DiagramSectionVertical>
-                {ENABLE_SDGS && (
+                {FEATURES.sdgs && (
                   <DiagramSectionVerticalHalf>
                     {this.renderRecommendationsButton(
                       recommendationCount,
@@ -799,7 +799,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                     )}
                   </DiagramSectionVerticalHalf>
                 )}
-                {!ENABLE_SDGS && (
+                {!FEATURES.sdgs && (
                   <DiagramSectionVerticalCenter>
                     {this.renderRecommendationsButton(
                       recommendationCount,
@@ -813,7 +813,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                     )}
                   </DiagramSectionVerticalCenter>
                 )}
-                {ENABLE_SDGS && (
+                {FEATURES.sdgs && (
                   <DiagramSectionVerticalHalf>
                     {this.renderSdgtargetButton(
                       sdgtargetCount,
@@ -827,7 +827,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                   </DiagramSectionVerticalHalf>
                 )}
               </DiagramSectionVertical>
-              <AnnotationVertical hasSDGs={ENABLE_SDGS}>
+              <AnnotationVertical hasSDGs={FEATURES.sdgs}>
                 <FormattedMessage {...messages.diagram.addressed} />
               </AnnotationVertical>
               <DiagramSectionVertical>
@@ -862,7 +862,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
           && ( // HORIZONTAL
             <div>
               <DiagramSectionHorizontalHalf>
-                {ENABLE_SDGS && (
+                {FEATURES.sdgs && (
                   <DiagramSectionHorizontalTop>
                     {this.renderRecommendationsButton(
                       recommendationCount,
@@ -876,7 +876,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                     )}
                   </DiagramSectionHorizontalTop>
                 )}
-                {!ENABLE_SDGS && (
+                {!FEATURES.sdgs && (
                   <DiagramSectionHorizontalVCenter>
                     {this.renderRecommendationsButton(
                       recommendationCount,
@@ -890,7 +890,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                     )}
                   </DiagramSectionHorizontalVCenter>
                 )}
-                {ENABLE_SDGS && (
+                {FEATURES.sdgs && (
                   <DiagramSectionHorizontalBottom>
                     {this.renderSdgtargetButton(
                       sdgtargetCount,
@@ -904,7 +904,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
                   </DiagramSectionHorizontalBottom>
                 )}
               </DiagramSectionHorizontalHalf>
-              <Annotation hasSDGs={ENABLE_SDGS}>
+              <Annotation hasSDGs={FEATURES.sdgs}>
                 <FormattedMessage {...messages.diagram.addressed} />
               </Annotation>
               <DiagramSectionHorizontalCenter>

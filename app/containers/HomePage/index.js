@@ -247,7 +247,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             >
               <GraphicHome src={theme.media.graphicHome} alt={intl.formatMessage(appMessages.app.title)} />
             </GraphicHomeWrapper>
-            { !SHOW_HOME_TITLE
+            { !SHOW_HOME_TITLE && theme.media.titleHome
               && <GraphicHome src={theme.media.titleHome} alt={appTitle} />
             }
             <Container noPaddingBottom>

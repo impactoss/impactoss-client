@@ -12,6 +12,7 @@ export default styled.h1`
     padding: 0px 5px;
     font-size: ${(props) => props.theme.sizes.header.text.title};
     line-height: ${(props) => props.theme.sizes.header.text.title};
+    margin-bottom: -5px;
   }
   @media print {
     font-size: ${(props) => props.theme.sizes.header.print.title};

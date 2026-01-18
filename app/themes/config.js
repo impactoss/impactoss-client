@@ -15,14 +15,14 @@ import packageJson from '../../package.json';
 
 export const SERVER = (process && process.env && process.env.SERVER) || 'development';
 const SERVER_ENDPOINTS = {
-  production: 'https://impactoss-frameworks.herokuapp.com',
-  UAT: 'https://impactoss-frameworks.herokuapp.com',
-  development: 'https://impactoss-frameworks.herokuapp.com/',
+  production: 'https://sg-api-dev.impactoss.org/',
+  UAT: 'https://sg-api-dev.impactoss.org/',
+  development: 'https://sg-api-dev.impactoss.org/',
 };
 export const SERVER_ENDPOINT = SERVER_ENDPOINTS[SERVER];
 // used for redirect and canonical tag
 
-export const CLIENT_URL = 'https://impactoss-demo-fw.web.app';
+export const CLIENT_URL = 'https://impactoss-sg-dev.web.app';
 export const IS_PROD = SERVER === 'production';
 export const IS_TEST = SERVER === 'UAT';
 // const IS_DEV = SERVER === 'development';
@@ -41,13 +41,21 @@ export const API_DATE_FORMAT = 'yyyy-MM-dd';
 
 export const NODE_ENV = sessionStorage.NODE_ENV || 'production';
 
+export const FEATURES = {
+  measures: false,
+  indicators: false,
+  progress_reports: false,
+  sdgs: false,
+};
+
 // UI settings ************************
 
 // show app title and claim in header when not included in graphic
 // set in translations/[LOCALE].js
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
-export const SHOW_HEADER_TITLE = false;
+export const SHOW_HEADER_TITLE = true;
+export const SHOW_HEADER_LOGO = false;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.header
@@ -63,7 +71,7 @@ export const SHOW_SIDEBAR_HEADER_PATTERN = false;
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
 export const SHOW_HOME_TITLE_OR_CLAIM = true;
-export const SHOW_HOME_TITLE = true;
+export const SHOW_HOME_TITLE = false;
 export const SHOW_HEADER_SHADOW_ON_HOME = false;
 
 export const SHOW_BRAND_ON_HOME = true;
@@ -113,7 +121,8 @@ export const TEXT_TRUNCATE = {
   META_TITLE: 20,
 };
 
-export const PROGRESS_TAXONOMY_ID = 8;
+export const CYCLE_TAXONOMY_ID = 2;
+export const PROGRESS_TAXONOMY_ID = null;
 // categories where "is_current" is relevant
 export const CURRENT_TAXONOMY_IDS = [
   2, // reporting cycles
@@ -121,10 +130,9 @@ export const CURRENT_TAXONOMY_IDS = [
 
 // WARNING: references as assigned by user
 export const PROGRESS_CATEGORY_ID = {
-  COMPLETED: 8,
+  COMPLETED: null,
 };
 
-export const CYCLE_TAXONOMY_ID = 2;
 
 /**
  * Server settings
@@ -134,7 +142,7 @@ export const CYCLE_TAXONOMY_ID = 2;
 
 export const ENDPOINTS = {
   API: SERVER_ENDPOINTS[SERVER], // server API endpoint
-  SIGNING_URL: 's3/sign', // server AWS S3 signing url endpoint
+  // SIGNING_URL: 's3/sign', // server AWS S3 signing url endpoint
   SIGN_IN: 'auth/sign_in',
   SIGN_OUT: 'auth/sign_out',
   PASSWORD: 'auth/password',
@@ -151,9 +159,6 @@ export const KEYS = {
   UID: 'uid',
   RESET_PASSWORD: 'reset_password',
 };
-
-// database date format
-export const DB_DATE_FORMAT = 'yyyy-MM-dd';
 
 
 // Map server messages *********************************
@@ -217,7 +222,7 @@ export const REPORT_FREQUENCIES = [
 ];
 
 export const DEFAULT_FRAMEWORK = 1;
-export const ENABLE_SDGS = false;
+
 // set to min role required or null to disable
 export const DELETE_MIN_ROLE = null;
 export const PAGE_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value;
@@ -225,7 +230,7 @@ export const USER_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value;
 export const CATEGORY_MANAGER_MIN_ROLE = USER_ROLES.MANAGER.value; // can be assigned to category
 export const CONTRIBUTOR_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create
 export const CATEGORY_ADMIN_MIN_ROLE = USER_ROLES.ADMIN.value; // can edit or create categories
-export const CONTRIBUTOR_MIN_ROLE_PUBLISH = USER_ROLES.MANAGER.value; // publish
+export const CONTRIBUTOR_MIN_ROLE_PUBLISH = USER_ROLES.CONTRIBUTOR.value; // publish
 export const CONTRIBUTOR_MIN_ROLE_ASSIGNED = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
 export const SEE_DRAFT_MIN_ROLE = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
 export const SEE_ARCHIVED_MIN_ROLE = USER_ROLES.CONTRIBUTOR.value; // edit or create when assigned
@@ -251,19 +256,19 @@ export const API = {
   BOOKMARKS: 'bookmarks',
   TAXONOMIES: 'taxonomies',
   CATEGORIES: 'categories',
-  INDICATORS: 'indicators', // actions/ACTIONS
-  ACTION_CATEGORIES: 'measure_categories', // measure_categories
-  ACTION_INDICATORS: 'measure_indicators', // linking actions with indicators
-  ACTIONS: 'measures', // actions/ACTIONS
+  // INDICATORS: 'indicators', // actions/ACTIONS
+  // ACTION_CATEGORIES: 'measure_categories', // measure_categories
+  // ACTION_INDICATORS: 'measure_indicators', // linking actions with indicators
+  // ACTIONS: 'measures', // actions/ACTIONS
   RECOMMENDATION_CATEGORIES: 'recommendation_categories',
-  RECOMMENDATION_ACTIONS: 'recommendation_measures',
+  // RECOMMENDATION_ACTIONS: 'recommendation_measures',
   RECOMMENDATIONS: 'recommendations',
   USER_CATEGORIES: 'user_categories',
-  PROGRESS_REPORTS: 'progress_reports',
-  DUE_DATES: 'due_dates',
+  // PROGRESS_REPORTS: 'progress_reports',
+  // DUE_DATES: 'due_dates',
   FRAMEWORKS: 'frameworks',
   FRAMEWORK_TAXONOMIES: 'framework_taxonomies',
-  RECOMMENDATION_INDICATORS: 'recommendation_indicators',
+  // RECOMMENDATION_INDICATORS: 'recommendation_indicators',
 };
 
 
@@ -271,16 +276,16 @@ export const API = {
 export const DB_TABLES = Object.values(API);
 
 export const DB_TABLES_CURRENT = [
-  API.INDICATORS,
-  API.ACTIONS,
+  // API.INDICATORS,
+  // API.ACTIONS,
   API.RECOMMENDATIONS,
 ];
 export const DB_TABLES_ARCHIVED = [
   API.USERS,
   API.PAGES,
   API.CATEGORIES,
-  API.INDICATORS,
-  API.ACTIONS,
+  // API.INDICATORS,
+  // API.ACTIONS,
   API.RECOMMENDATIONS,
 ];
 
@@ -569,6 +574,7 @@ export const ENTITY_FIELDS = {
         type: 'number',
         required: true,
         import: true,
+        skipImport: true,
       },
       reference: {
         type: 'text',
@@ -582,13 +588,13 @@ export const ENTITY_FIELDS = {
         type: 'markdown',
         type: 'text',
       },
-      response: {
-        type: 'markdown',
-        type: 'text',
-      },
-      support_level: {
-        type: 'number',
-      },
+      // response: {
+      //   type: 'markdown',
+      //   type: 'text',
+      // },
+      // support_level: {
+      //   type: 'number',
+      // },
       created_at: {
         type: 'date',
         roleExport: USER_ROLES.MANAGER.value,
@@ -629,51 +635,51 @@ export const ENTITY_FIELDS = {
     },
     RELATIONSHIPS_IMPORT: {
       // column: recommendation-id
-      'action-id': {
-        type: 'number',
-        multiple: true,
-        table: API.RECOMMENDATION_ACTIONS,
-        lookup: {
-          table: API.ACTIONS, // id assumed
-        },
-        keyPair: ['recommendation_id', 'measure_id'], // own, other
-        hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
-      },
-      // column: country-code
-      'action-reference': {
-        type: 'text',
-        lookup: {
-          table: API.ACTIONS, // id assumed
-          attribute: 'reference',
-        },
-        multiple: true,
-        table: API.RECOMMENDATION_ACTIONS,
-        keyPair: ['recommendation_id', 'measure_id'], // own, other
-        hint: 'one or more unique action references (as assigned by the users / comma-separated)',
-      },
-      // column: indicator-id
-      'indicator-id': {
-        type: 'number',
-        multiple: true,
-        lookup: {
-          table: API.INDICATORS, // id assumed
-        },
-        table: API.RECOMMENDATION_INDICATORS,
-        keyPair: ['recommendation_id', 'indicator_id'], // own, other
-        hint: 'one or more unique indicator ids (as assigned by the database / comma-separated)',
-      },
-      // column: country-code
-      'indicator-reference': {
-        type: 'text',
-        lookup: {
-          table: API.INDICATORS, // id assumed
-          attribute: 'reference',
-        },
-        multiple: true,
-        table: API.RECOMMENDATION_INDICATORS,
-        keyPair: ['recommendation_id', 'indicator_id'], // own, other
-        hint: 'one or more unique indicator references (as assigned by the users / comma-separated)',
-      },
+      // 'action-id': {
+      //   type: 'number',
+      //   multiple: true,
+      //   table: API.RECOMMENDATION_ACTIONS,
+      //   lookup: {
+      //     table: API.ACTIONS, // id assumed
+      //   },
+      //   keyPair: ['recommendation_id', 'measure_id'], // own, other
+      //   hint: 'one or more unique action ids (as assigned by the database / comma-separated)',
+      // },
+      // // column: country-code
+      // 'action-reference': {
+      //   type: 'text',
+      //   lookup: {
+      //     table: API.ACTIONS, // id assumed
+      //     attribute: 'reference',
+      //   },
+      //   multiple: true,
+      //   table: API.RECOMMENDATION_ACTIONS,
+      //   keyPair: ['recommendation_id', 'measure_id'], // own, other
+      //   hint: 'one or more unique action references (as assigned by the users / comma-separated)',
+      // },
+      // // column: indicator-id
+      // 'indicator-id': {
+      //   type: 'number',
+      //   multiple: true,
+      //   lookup: {
+      //     table: API.INDICATORS, // id assumed
+      //   },
+      //   table: API.RECOMMENDATION_INDICATORS,
+      //   keyPair: ['recommendation_id', 'indicator_id'], // own, other
+      //   hint: 'one or more unique indicator ids (as assigned by the database / comma-separated)',
+      // },
+      // // column: country-code
+      // 'indicator-reference': {
+      //   type: 'text',
+      //   lookup: {
+      //     table: API.INDICATORS, // id assumed
+      //     attribute: 'reference',
+      //   },
+      //   multiple: true,
+      //   table: API.RECOMMENDATION_INDICATORS,
+      //   keyPair: ['recommendation_id', 'indicator_id'], // own, other
+      //   hint: 'one or more unique indicator references (as assigned by the users / comma-separated)',
+      // },
       // has category
       'category-id': {
         type: 'number',

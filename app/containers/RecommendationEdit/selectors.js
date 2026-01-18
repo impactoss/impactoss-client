@@ -3,12 +3,12 @@ import { createSelector } from 'reselect';
 import {
   selectEntity,
   selectEntities,
-  selectMeasuresCategorised,
+  // selectMeasuresCategorised,
   selectFWTaxonomiesSorted,
-  selectFWIndicators,
-  selectRecommendationMeasuresByRecommendation,
+  // selectFWIndicators,
+  // selectRecommendationMeasuresByRecommendation,
   selectRecommendationCategoriesByRecommendation,
-  selectRecommendationIndicatorsByRecommendation,
+  // selectRecommendationIndicatorsByRecommendation,
 } from 'containers/App/selectors';
 
 import {
@@ -46,34 +46,34 @@ export const selectTaxonomies = createSelector(
   )
 );
 
-export const selectConnectedTaxonomies = createSelector(
-  selectFWTaxonomiesSorted,
-  (state) => selectEntities(state, 'categories'),
-  (taxonomies, categories) => prepareTaxonomiesMultiple(
-    taxonomies,
-    categories,
-    ['tags_measures'],
-    false,
-  )
-);
-
-export const selectMeasures = createSelector(
-  (state, id) => id,
-  selectMeasuresCategorised,
-  selectRecommendationMeasuresByRecommendation,
-  (id, entities, associations) => entitiesSetAssociated(
-    entities,
-    associations,
-    id,
-  )
-);
-export const selectIndicators = createSelector(
-  (state, id) => id,
-  selectFWIndicators,
-  selectRecommendationIndicatorsByRecommendation,
-  (id, entities, associations) => entitiesSetAssociated(
-    entities,
-    associations,
-    id,
-  )
-);
+// export const selectConnectedTaxonomies = createSelector(
+//   selectFWTaxonomiesSorted,
+//   (state) => selectEntities(state, 'categories'),
+//   (taxonomies, categories) => prepareTaxonomiesMultiple(
+//     taxonomies,
+//     categories,
+//     ['tags_measures'],
+//     false,
+//   )
+// );
+//
+// // export const selectMeasures = createSelector(
+// //   (state, id) => id,
+// //   selectMeasuresCategorised,
+// //   selectRecommendationMeasuresByRecommendation,
+// //   (id, entities, associations) => entitiesSetAssociated(
+// //     entities,
+// //     associations,
+// //     id,
+// //   )
+// // );
+// // export const selectIndicators = createSelector(
+// //   (state, id) => id,
+// //   selectFWIndicators,
+// //   selectRecommendationIndicatorsByRecommendation,
+// //   (id, entities, associations) => entitiesSetAssociated(
+// //     entities,
+// //     associations,
+// //     id,
+// //   )
+// // );

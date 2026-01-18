@@ -48,23 +48,23 @@ export const selectTaxonomy = createSelector(
   }
 );
 
-const selectMeasures = createSelector(
-  selectFWMeasures,
-  selectMeasureCategoriesByMeasure,
-  selectRecommendationMeasuresByMeasure,
-  (entities, measureCategories, measureRecommendations) => entities
-    && measureCategories
-    && measureRecommendations
-    && entities.map(
-      (entity, id) => entity.set(
-        'category_ids',
-        measureCategories.get(parseInt(id, 10)) || Map(),
-      ).set(
-        'recommendation_ids',
-        measureRecommendations.get(parseInt(id, 10)) || Map(),
-      )
-    )
-);
+// const selectMeasures = createSelector(
+//   selectFWMeasures,
+//   selectMeasureCategoriesByMeasure,
+//   selectRecommendationMeasuresByMeasure,
+//   (entities, measureCategories, measureRecommendations) => entities
+//     && measureCategories
+//     && measureRecommendations
+//     && entities.map(
+//       (entity, id) => entity.set(
+//         'category_ids',
+//         measureCategories.get(parseInt(id, 10)) || Map(),
+//       ).set(
+//         'recommendation_ids',
+//         measureRecommendations.get(parseInt(id, 10)) || Map(),
+//       )
+//     )
+// );
 
 const selectRecommendations = createSelector(
   selectFWRecommendations,
@@ -103,50 +103,49 @@ const filterChildConnections = (
   )
 );
 
-const getCategoryCounts = (
+const getCategoryCounts = ({
   taxonomyCategories,
   taxonomy,
-  measures,
   recommendations,
   categories,
-) => taxonomyCategories.map(
+}) => taxonomyCategories.map(
   (cat, categoryId) => {
     let category = cat;
     // measures
-    const tagsMeasures = taxonomy.getIn(['attributes', 'tags_measures']);
-    const childCatsTagMeasures = taxonomy.get('children')
-      && taxonomy.get('children').some(
-        (childTax) => childTax.getIn(['attributes', 'tags_measures'])
-      );
-    if (tagsMeasures || childCatsTagMeasures) {
-      let associatedMeasures;
-      // recommendations tagged by child categories
-      if (childCatsTagMeasures) {
-        associatedMeasures = filterChildConnections(
-          measures,
-          categories,
-          categoryId
-        );
-      } else if (tagsMeasures) {
-        associatedMeasures = measures.filter(
-          (entity) => entity.get('category_ids').includes(parseInt(categoryId, 10))
-        );
-      }
-      category = category.set('measuresCount', associatedMeasures.size);
-      // get all public associated measures
-      const associatedMeasuresPublic = associatedMeasures.filter(
-        (measure) => !measure.getIn(['attributes', 'draft'])
-      );
-      category = category.set(
-        'measuresPublicCount',
-        associatedMeasuresPublic ? associatedMeasuresPublic.size : 0,
-      );
-      // for sorting
-      category = category.set(
-        'measures',
-        associatedMeasuresPublic ? associatedMeasuresPublic.size : 0,
-      );
-    }
+    // const tagsMeasures = taxonomy.getIn(['attributes', 'tags_measures']);
+    // const childCatsTagMeasures = taxonomy.get('children')
+    //   && taxonomy.get('children').some(
+    //     (childTax) => childTax.getIn(['attributes', 'tags_measures'])
+    //   );
+    // if (tagsMeasures || childCatsTagMeasures) {
+    //   let associatedMeasures;
+    //   // recommendations tagged by child categories
+    //   if (childCatsTagMeasures) {
+    //     associatedMeasures = filterChildConnections(
+    //       measures,
+    //       categories,
+    //       categoryId
+    //     );
+    //   } else if (tagsMeasures) {
+    //     associatedMeasures = measures.filter(
+    //       (entity) => entity.get('category_ids').includes(parseInt(categoryId, 10))
+    //     );
+    //   }
+    //   category = category.set('measuresCount', associatedMeasures.size);
+    //   // get all public associated measures
+    //   const associatedMeasuresPublic = associatedMeasures.filter(
+    //     (measure) => !measure.getIn(['attributes', 'draft'])
+    //   );
+    //   category = category.set(
+    //     'measuresPublicCount',
+    //     associatedMeasuresPublic ? associatedMeasuresPublic.size : 0,
+    //   );
+    //   // for sorting
+    //   category = category.set(
+    //     'measures',
+    //     associatedMeasuresPublic ? associatedMeasuresPublic.size : 0,
+    //   );
+    // }
 
     // recommendations
     const tagsRecs = taxonomy.getIn(['attributes', 'tags_recommendations']);
@@ -201,50 +200,50 @@ const getCategoryCounts = (
       );
 
       // measures connected via recommendation
-      if (!tagsMeasures && !childCatsTagMeasures) {
-        const connectedMeasures = filterAssociatedEntities(
-          measures,
-          'recommendation_ids',
-          associatedRecsPublic,
-        );
-        category = category.set(
-          'measuresCount',
-          connectedMeasures ? connectedMeasures.size : 0
-        );
-        const connectedMeasuresPublic = connectedMeasures.filter(
-          (measure) => !measure.getIn(['attributes', 'draft'])
-        );
-        category = category.set(
-          'measuresPublicCount',
-          connectedMeasuresPublic ? connectedMeasuresPublic.size : 0
-        );
-        // for sorting
-        category = category.set(
-          'measures',
-          connectedMeasuresPublic ? connectedMeasuresPublic.size : 0
-        );
-        // by framework
-        category = category.set(
-          'measuresPublicCountByFw',
-          associatedRecsPublic
-            ? associatedRecsPublic.groupBy(
-              (rec) => rec.getIn(['attributes', 'framework_id'])
-            ).map((group) => {
-              const connectedMeasuresForGroup = filterAssociatedEntities(
-                measures,
-                'recommendation_ids',
-                group,
-              );
-              const connectedMeasuresPublicForGroup = connectedMeasuresForGroup.filter(
-                (measure) => !measure.getIn(['attributes', 'draft'])
-              );
-              return connectedMeasuresPublicForGroup
-                ? connectedMeasuresPublicForGroup.size
-                : 0;
-            })
-            : 0,
-        );
-      }
+      // if (!tagsMeasures && !childCatsTagMeasures) {
+      //   const connectedMeasures = filterAssociatedEntities(
+      //     measures,
+      //     'recommendation_ids',
+      //     associatedRecsPublic,
+      //   );
+      //   category = category.set(
+      //     'measuresCount',
+      //     connectedMeasures ? connectedMeasures.size : 0
+      //   );
+      //   const connectedMeasuresPublic = connectedMeasures.filter(
+      //     (measure) => !measure.getIn(['attributes', 'draft'])
+      //   );
+      //   category = category.set(
+      //     'measuresPublicCount',
+      //     connectedMeasuresPublic ? connectedMeasuresPublic.size : 0
+      //   );
+      //   // for sorting
+      //   category = category.set(
+      //     'measures',
+      //     connectedMeasuresPublic ? connectedMeasuresPublic.size : 0
+      //   );
+      //   // by framework
+      //   category = category.set(
+      //     'measuresPublicCountByFw',
+      //     associatedRecsPublic
+      //       ? associatedRecsPublic.groupBy(
+      //         (rec) => rec.getIn(['attributes', 'framework_id'])
+      //       ).map((group) => {
+      //         const connectedMeasuresForGroup = filterAssociatedEntities(
+      //           measures,
+      //           'recommendation_ids',
+      //           group,
+      //         );
+      //         const connectedMeasuresPublicForGroup = connectedMeasuresForGroup.filter(
+      //           (measure) => !measure.getIn(['attributes', 'draft'])
+      //         );
+      //         return connectedMeasuresPublicForGroup
+      //           ? connectedMeasuresPublicForGroup.size
+      //           : 0;
+      //       })
+      //       : 0,
+      //   );
+      // }
     }
     return category;
   }
@@ -253,11 +252,11 @@ const getCategoryCounts = (
 const selectCategoryCountGroups = createSelector(
   selectTaxonomy,
   selectRecommendations,
-  selectMeasures,
+  // selectMeasures,
   (state) => selectEntities(state, 'categories'),
   selectSettingsFromQuery,
-  (taxonomy, recommendations, measures, categories, settingsFromQuery) => {
-    if (taxonomy && recommendations && measures && categories) {
+  (taxonomy, recommendations, categories, settingsFromQuery) => {
+    if (taxonomy && recommendations && categories) {
       const taxonomyCategories = taxonomy && categories && categories.filter(
         (cat) => qe(
           cat.getIn(['attributes', 'taxonomy_id']),
@@ -272,13 +271,12 @@ const selectCategoryCountGroups = createSelector(
       );
       if (taxonomyCategories) {
         if (!taxonomy.get('parent')) {
-          const catCounts = getCategoryCounts(
+          const catCounts = getCategoryCounts({
             taxonomyCategories,
             taxonomy,
-            measures,
             recommendations,
             categories,
-          );
+          });
           return catCounts
             ? Map().set(
               taxonomy.get('id'),
@@ -301,13 +299,12 @@ const selectCategoryCountGroups = createSelector(
                   parentCat.get('id')
                 )
               );
-              const catCounts = getCategoryCounts(
-                taxChildCategories,
+              const catCounts = getCategoryCounts({
+                taxonomyCategories: taxChildCategories,
                 taxonomy,
-                measures,
                 recommendations,
                 categories,
-              );
+              });
               return parentCat.set('categories', catCounts);
             }
           );
@@ -334,12 +331,12 @@ const mapCategoryGroups = (
           : !cat.getIn(['attributes', 'user_only'])
       );
       return group.set(
-        'measures',
-        filteredCategories.reduce(
-          (sum, cat) => sum + cat.get('measuresPublicCount'),
-          0,
-        ),
-      ).set(
+      //   'measures',
+      //   filteredCategories.reduce(
+      //     (sum, cat) => sum + cat.get('measuresPublicCount'),
+      //     0,
+      //   ),
+      // ).set(
         'recommendations',
         filteredCategories.reduce(
           (sum, cat) => sum + cat.get('recommendationsPublicCount'),

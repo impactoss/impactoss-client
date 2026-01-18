@@ -31,7 +31,7 @@ import { hasNewError } from 'utils/entity-form';
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES, DEFAULT_FRAMEWORK } from 'themes/config';
+import { USER_ROLES, DEFAULT_FRAMEWORK, FEATURES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -149,14 +149,14 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
           placeholder: 'fullRecommendation',
           hint: 'fullRecommendation',
         }),
-        hasResponse && getSupportField(intl.formatMessage),
-        getMarkdownFormField({
-          formatMessage: intl.formatMessage,
-          attribute: 'response',
-        }),
+        // hasResponse && getSupportField(intl.formatMessage),
+        // getMarkdownFormField({
+        //   formatMessage: intl.formatMessage,
+        //   attribute: 'response',
+        // }),
       ],
     });
-    if (measures) {
+    if (FEATURES.measures && measures) {
       groups.push({
         label: intl.formatMessage(appMessages.nav.measuresSuper),
         icon: 'measures',
@@ -165,7 +165,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
         ],
       });
     }
-    if (indicators) {
+    if (FEATURES.indicators && indicators) {
       groups.push({
         label: intl.formatMessage(appMessages.nav.indicatorsSuper),
         icon: 'indicators',
@@ -177,7 +177,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) => 
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) =>
     ([ // fieldGroup
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),
