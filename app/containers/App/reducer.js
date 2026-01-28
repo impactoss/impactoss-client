@@ -35,6 +35,12 @@ import {
   OPEN_NEW_ENTITY_MODAL,
   SHOW_SETTINGS_MODAL,
   INITIALIZE_SETTINGS,
+  OTP_REQUIRED,
+  VERIFY_OTP_SENDING,
+  VERIFY_OTP_SUCCESS,
+  VERIFY_OTP_ERROR,
+  RESEND_OTP_SUCCESS,
+  RESEND_OTP_ERROR,
 } from './constants';
 
 // The initial state of the App
@@ -46,6 +52,8 @@ const initialState = fromJS({
     sending: false,
     error: false,
     messages: [],
+    otpRequired: false,
+    tempToken: null,
   },
   /* eslint-disable no-param-reassign */
   // Record the time that entities where requested from the server
@@ -83,6 +91,35 @@ function appReducer(state = initialState, payload) {
       return state
         .setIn(['auth', 'sending'], true)
         .setIn(['auth', 'error'], false);
+    case OTP_REQUIRED:
+      return state
+        .setIn(['auth', 'sending'], false)
+        .setIn(['auth', 'otpRequired'], true)
+        .setIn(['auth', 'tempToken'], payload.tempToken)
+        .setIn(['auth', 'messages'], payload.message ? [payload.message] : []);
+    case VERIFY_OTP_SENDING:
+      return state
+        .setIn(['auth', 'sending'], true)
+        .setIn(['auth', 'error'], false);
+    case VERIFY_OTP_SUCCESS:
+      return state
+        .setIn(['user', 'attributes'], payload.user)
+        .setIn(['user', 'isSignedIn'], true)
+        .setIn(['auth', 'sending'], false)
+        .setIn(['auth', 'otpRequired'], false)
+        .setIn(['auth', 'tempToken'], null);
+    case VERIFY_OTP_ERROR:
+      return state
+        .setIn(['auth', 'error'], checkResponseError(payload.error))
+        .setIn(['auth', 'sending'], false);
+    case RESEND_OTP_SUCCESS:
+      return state
+        .setIn(['auth', 'messages'], payload.message ? [payload.message] : [])
+        .setIn(['auth', 'sending'], false);
+    case RESEND_OTP_ERROR:
+      return state
+        .setIn(['auth', 'error'], checkResponseError(payload.error))
+        .setIn(['auth', 'sending'], false);
     case SET_AUTHENTICATION_STATE:
       return state
         .setIn(['user', 'isSignedIn'], payload.newAuthState);

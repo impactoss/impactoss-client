@@ -32,6 +32,14 @@ export const LOGOUT_SUCCESS = 'impactoss/App/LOGOUT_SUCCESS';
 export const LOGOUT_ERROR = 'impactoss/App/LOGOUT_ERROR';
 export const VALIDATE_TOKEN = 'impactoss/App/VALIDATE_TOKEN';
 export const AUTHENTICATE_FORWARD = 'impactoss/App/AUTHENTICATE_FORWARD';
+export const OTP_REQUIRED = 'impactoss/App/OTP_REQUIRED';
+export const VERIFY_OTP = 'impactoss/App/VERIFY_OTP';
+export const VERIFY_OTP_SENDING = 'impactoss/App/VERIFY_OTP_SENDING';
+export const VERIFY_OTP_SUCCESS = 'impactoss/App/VERIFY_OTP_SUCCESS';
+export const VERIFY_OTP_ERROR = 'impactoss/App/VERIFY_OTP_ERROR';
+export const RESEND_OTP = 'impactoss/App/RESEND_OTP';
+export const RESEND_OTP_SUCCESS = 'impactoss/App/RESEND_OTP_SUCCESS';
+export const RESEND_OTP_ERROR = 'impactoss/App/RESEND_OTP_ERROR';
 
 export const ADD_ENTITY = 'impactoss/App/ADD_ENTITY';
 export const UPDATE_ENTITY = 'impactoss/App/UPDATE_ENTITY';

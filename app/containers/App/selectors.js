@@ -57,6 +57,16 @@ export const selectIsAuthenticating = createSelector(
   (globalState) => globalState.getIn(['auth', 'sending'])
 );
 
+export const selectOtpRequired = createSelector(
+  getGlobal,
+  (globalState) => globalState.getIn(['auth', 'otpRequired'])
+);
+
+export const selectTempToken = createSelector(
+  getGlobal,
+  (globalState) => globalState.getIn(['auth', 'tempToken'])
+);
+
 const selectReadyUserRoles = (state) => !!state.getIn(['global', 'ready', 'user_roles']);
 
 export const selectReadyForAuthCheck = createSelector(

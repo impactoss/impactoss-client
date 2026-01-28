@@ -74,6 +74,14 @@ import {
   SET_LOAD_NONCURRENT,
   SHOW_SETTINGS_MODAL,
   INITIALIZE_SETTINGS,
+  OTP_REQUIRED,
+  VERIFY_OTP,
+  VERIFY_OTP_SENDING,
+  VERIFY_OTP_SUCCESS,
+  VERIFY_OTP_ERROR,
+  RESEND_OTP,
+  RESEND_OTP_SUCCESS,
+  RESEND_OTP_ERROR,
 } from './constants';
 
 export function submitInvalid(valid) {
@@ -421,6 +429,62 @@ export function authenticateSuccess(user) {
 export function authenticateError(error) {
   return {
     type: AUTHENTICATE_ERROR,
+    error,
+  };
+}
+
+export function otpRequired(tempToken, message) {
+  return {
+    type: OTP_REQUIRED,
+    tempToken,
+    message,
+  };
+}
+
+export function verifyOtp(data) {
+  return {
+    type: VERIFY_OTP,
+    data,
+  };
+}
+
+export function verifyOtpSending() {
+  return {
+    type: VERIFY_OTP_SENDING,
+  };
+}
+
+export function verifyOtpSuccess(user) {
+  return {
+    type: VERIFY_OTP_SUCCESS,
+    user,
+  };
+}
+
+export function verifyOtpError(error) {
+  return {
+    type: VERIFY_OTP_ERROR,
+    error,
+  };
+}
+
+export function resendOtp(tempToken) {
+  return {
+    type: RESEND_OTP,
+    tempToken,
+  };
+}
+
+export function resendOtpSuccess(message) {
+  return {
+    type: RESEND_OTP_SUCCESS,
+    message,
+  };
+}
+
+export function resendOtpError(error) {
+  return {
+    type: RESEND_OTP_ERROR,
     error,
   };
 }

@@ -148,6 +148,8 @@ export const ENDPOINTS = {
   PASSWORD: 'auth/password',
   VALIDATE_TOKEN: 'auth/validate_token',
   SIGN_IN_AZURE: 'auth/azure_activedirectory_v2',
+  VERIFY_OTP: 'auth/verify_multi_factor',
+  RESEND_OTP: 'auth/resend_multi_factor',
 };
 
 // API request Authentification keys
@@ -158,6 +160,7 @@ export const KEYS = {
   EXPIRY: 'expiry',
   UID: 'uid',
   RESET_PASSWORD: 'reset_password',
+  TEMP_TOKEN: 'temp_token',
 };
 
 

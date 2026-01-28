@@ -47,6 +47,8 @@ import {
   SET_LOAD_ARCHIVED,
   SET_LOAD_NONCURRENT,
   OPEN_BOOKMARK,
+  VERIFY_OTP,
+  RESEND_OTP,
 } from 'containers/App/constants';
 
 import {
@@ -85,6 +87,12 @@ import {
   forwardOnAuthenticationChange,
   updatePath,
   initializeSettings,
+  otpRequired,
+  verifyOtpSending,
+  verifyOtpSuccess,
+  verifyOtpError,
+  resendOtpSuccess,
+  resendOtpError,
 } from 'containers/App/actions';
 
 import {
@@ -205,9 +213,16 @@ export function* authenticateSaga(payload) {
   try {
     yield put(authenticateSending());
     const response = yield call(apiRequest, 'post', ENDPOINTS.SIGN_IN, { email, password });
-    yield put(authenticateSuccess(response.data));
-    yield put(invalidateEntities()); // important invalidate before forward to allow for reloading of entities
-    yield put(forwardOnAuthenticationChange());
+
+    // Check if OTP is required (202 response)
+    if (response.otp_required) {
+      yield put(otpRequired(response.temp_token, response.message));
+    } else {
+      // Normal sign-in flow
+      yield put(authenticateSuccess(response.data));
+      yield put(invalidateEntities()); // important invalidate before forward to allow for reloading of entities
+      yield put(forwardOnAuthenticationChange());
+    }
   } catch (err) {
     console.log('ERROR in authenticateSaga');
     if (err.response) {
@@ -237,6 +252,38 @@ export function* authenticateWithAzureSaga() {
       err.response.json = yield err.response.json();
     }
     yield put(authenticateError(err));
+  }
+}
+
+export function* verifyOtpSaga(payload) {
+  const { temp_token, otp_code } = payload.data;
+  try {
+    yield put(verifyOtpSending());
+    const response = yield call(apiRequest, 'post', ENDPOINTS.VERIFY_OTP, { temp_token, otp_code });
+    yield put(verifyOtpSuccess(response.data));
+    yield put(invalidateEntities()); // important invalidate before forward to allow for reloading of entities
+    yield put(forwardOnAuthenticationChange());
+  } catch (err) {
+    console.log('ERROR in verifyOtpSaga');
+    if (err.response) {
+      err.response.json = yield err.response.json();
+    }
+    yield put(verifyOtpError(err));
+  }
+}
+
+export function* resendOtpSaga(payload) {
+  const { tempToken } = payload;
+  try {
+    yield put(verifyOtpSending());
+    const response = yield call(apiRequest, 'post', ENDPOINTS.RESEND_OTP, { temp_token: tempToken });
+    yield put(resendOtpSuccess(response.message));
+  } catch (err) {
+    console.log('ERROR in resendOtpSaga');
+    if (err.response) {
+      err.response.json = yield err.response.json();
+    }
+    yield put(resendOtpError(err));
   }
 }
 
@@ -881,6 +928,8 @@ export default function* rootSaga() {
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
   yield takeLatest(AUTHENTICATE_AZURE, authenticateWithAzureSaga);
+  yield takeLatest(VERIFY_OTP, verifyOtpSaga);
+  yield takeLatest(RESEND_OTP, resendOtpSaga);
   yield takeLatest(RECOVER_PASSWORD, recoverSaga);
   yield takeLatest(LOGOUT, logoutSaga);
   yield takeLatest(AUTHENTICATE_FORWARD, authChangeSaga);
