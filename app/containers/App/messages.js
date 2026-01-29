@@ -576,6 +576,10 @@ export default defineMessages({
       id: 'app.containers.App.attributes.domain',
       defaultMessage: 'Domain (from Email)',
     },
+    multiFactorAuthenticationStatus: {
+      id: 'app.containers.App.attributes.multiFactorAuthenticationStatus',
+      defaultMessage: 'Multi-Factor Authentication',
+    },
     status: {
       id: 'app.containers.App.attributes.status',
       defaultMessage: 'Status',

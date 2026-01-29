@@ -17,6 +17,7 @@ import {
   getEmailField,
   getTaxonomyFields,
   getTextField,
+  getMultiFactorAuthenticationStatusField,
 } from 'utils/fields';
 
 import { getEntityTitle } from 'utils/entities';
@@ -31,7 +32,7 @@ import {
 } from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
+import { USER_ROLES, ENABLE_AZURE, ENABLE_MULTI_FACTOR_AUTHENTICATION } from 'themes/config';
 
 import Loading from 'components/Loading';
 import Content from 'components/Content';
@@ -110,6 +111,17 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
           onClick: () => handleEditPassword(userId),
         },
       ];
+
+      if (ENABLE_MULTI_FACTOR_AUTHENTICATION) {
+        buttons = [
+          ...buttons,
+          {
+            type: 'edit',
+            title: intl.formatMessage(messages.configureMfa),
+            onClick: () => this.props.handleEditMfa(userId),
+          },
+        ];
+      }
     }
     if (
       canUserManageUsers(sessionUserHighestRoleId)
@@ -156,12 +168,19 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     return [{ fields }];
   };
 
-  getBodyMainFields = (entity) => ([{
-    fields: [
+  getBodyMainFields = (entity, userId, sessionUserId) => {
+    const fields = [
       getEmailField(entity),
       getTextField(entity, 'domain'),
-    ],
-  }]);
+    ];
+
+    // Only show MFA status to the user themselves
+    if (userId === sessionUserId && !ENABLE_AZURE && ENABLE_MULTI_FACTOR_AUTHENTICATION) {
+      fields.push(getMultiFactorAuthenticationStatusField(entity));
+    }
+
+    return [{fields}];
+  };
 
   getBodyAsideFields = (taxonomies) => ([
     { // fieldGroup
@@ -223,7 +242,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
                     aside: this.getHeaderAsideFields(user, sessionUserId, sessionUserHighestRoleId),
                   },
                   body: {
-                    main: this.getBodyMainFields(user),
+                    main: this.getBodyMainFields(user, user.get('id'), sessionUserId),
                     aside: canSeeOrg && this.getBodyAsideFields(taxonomies),
                   },
                 }}
@@ -274,6 +293,9 @@ function mapDispatchToProps(dispatch) {
     },
     handleEditPassword: (userId) => {
       dispatch(updatePath(`${ROUTES.USERS}${ROUTES.PASSWORD}/${userId}`, { replace: true }));
+    },
+    handleEditMfa: (userId) => {
+      dispatch(updatePath(`${ROUTES.USERS}${ROUTES.MFA}/${userId}`, { replace: true }));
     },
     handleClose: () => {
       dispatch(closeEntity(ROUTES.USERS));

@@ -32,6 +32,9 @@ export const VERSION = `${packageJson.version}${version_text}`;
 // enable azure for test and prod environments but not for dev
 export const ENABLE_AZURE = false; // IS_PROD || IS_TEST;
 
+// enable multi-factor authentication
+export const ENABLE_MULTI_FACTOR_AUTHENTICATION = true;
+
 // default language locale
 export const DEFAULT_LOCALE = 'en-GB';
 // date format - change to format according to locale, only used for form error message
@@ -133,7 +136,6 @@ export const PROGRESS_CATEGORY_ID = {
   COMPLETED: null,
 };
 
-
 /**
  * Server settings
  * */
@@ -163,18 +165,17 @@ export const KEYS = {
   TEMP_TOKEN: 'temp_token',
 };
 
-
 // Map server messages *********************************
 
 // Map server error messages to allow client-side translation
 export const SERVER_ERRORS = {
   RECORD_OUTDATED: 'Record outdated',
   EMAIL_FORMAT: 'Email: is not an email',
-  PASSWORD_MISMATCH: 'Password confirmation doesn\'t match Password',
+  PASSWORD_MISMATCH: "Password confirmation doesn't match Password",
   PASSWORD_SHORT: 'Password is too short (minimum is 6 characters)',
   PASSWORD_INVALID: 'Current password is invalid',
-  TITLE_REQUIRED: 'Title: can\'t be blank',
-  REFERENCE_REQUIRED: 'Reference: can\'t be blank',
+  TITLE_REQUIRED: "Title: can't be blank",
+  REFERENCE_REQUIRED: "Reference: can't be blank",
 };
 
 // Map server attribute values **************************
@@ -273,7 +274,6 @@ export const API = {
   FRAMEWORK_TAXONOMIES: 'framework_taxonomies',
   // RECOMMENDATION_INDICATORS: 'recommendation_indicators',
 };
-
 
 // Map server database tables **************************
 export const DB_TABLES = Object.values(API);
@@ -589,7 +589,7 @@ export const ENTITY_FIELDS = {
       },
       description: {
         type: 'markdown',
-        type: 'text',
+        // type: 'text',
       },
       // response: {
       //   type: 'markdown',
@@ -726,7 +726,8 @@ export const SETTINGS = {
     available: null,
     value: false,
   },
-  loadArchived: { // key also query arg
+  loadArchived: {
+    // key also query arg
     available: null, // will only be set once, once data is loaded
     value: false, // default value
     minRole: SEE_ARCHIVED_MIN_ROLE,

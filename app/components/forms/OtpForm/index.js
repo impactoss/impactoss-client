@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Field, Form, Formik, ErrorMessage } from 'formik';
+import { Form, Formik, ErrorMessage } from 'formik';
 import styled from 'styled-components';
 
 import ButtonSubmit from 'components/buttons/ButtonSubmit';
@@ -9,7 +9,8 @@ import ButtonCancel from 'components/buttons/ButtonCancel';
 import Clear from 'components/styled/Clear';
 import Main from 'components/EntityView/Main';
 import ViewPanel from 'components/EntityView/ViewPanel';
-import Field as FieldWrapper from 'components/fields/Field';
+import FieldGroupWrapper from 'components/fields/FieldGroupWrapper';
+import Field from 'components/fields/Field';
 
 import ErrorWrapper from '../ErrorWrapper';
 import FormWrapper from '../FormWrapper';
@@ -18,7 +19,6 @@ import FormFooter from '../FormFooter';
 import FormFooterButtons from '../FormFooterButtons';
 import Label from '../Label';
 import Required from '../Required';
-import ControlInput from '../ControlInput';
 
 import messages from './messages';
 
@@ -27,11 +27,70 @@ const StyledForm = styled(Form)`
   width: 100%;
 `;
 
-const OtpInput = styled(ControlInput)`
-  font-size: 24px;
-  letter-spacing: 8px;
+const OtpInputContainer = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: nowrap;
+
+  @media (max-width: 768px) {
+    gap: 8px;
+  }
+
+  @media (max-width: 600px) {
+    gap: 6px;
+  }
+`;
+
+const OtpDigitInput = styled.input`
+  width: 40px;
+  height: 60px;
+  padding: 6px 2px;
+  font-size: 22px;
   text-align: center;
-  max-width: 300px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  transition: border-color 0.2s;
+  font-family: monospace;
+  box-sizing: border-box;
+  line-height: 1.4;
+
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 56px;
+    font-size: 22px;
+    padding: 8px 4px;
+  }
+
+  @media (max-width: 600px) {
+    width: 36px;
+    height: 52px;
+    font-size: 20px;
+    padding: 6px 3px;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #0077cc;
+    box-shadow: 0 0 0 2px rgba(0, 119, 204, 0.1);
+  }
+
+  &:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+  }
+
+  &::selection {
+    background-color: #0077cc;
+    color: white;
+  }
+`;
+
+const HelpText = styled.div`
+  margin: 16px 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
 `;
 
 const ResendButton = styled.button`
@@ -40,8 +99,9 @@ const ResendButton = styled.button`
   color: #0077cc;
   cursor: pointer;
   text-decoration: underline;
-  padding: 8px 0;
+  padding: 0;
   font-size: 14px;
+  margin-bottom: 16px;
 
   &:hover {
     color: #005599;
@@ -54,20 +114,60 @@ const ResendButton = styled.button`
   }
 `;
 
-const HelpText = styled.div`
-  margin-top: 16px;
-  margin-bottom: 16px;
-  font-size: 14px;
-  color: #666;
-`;
-
 class OtpForm extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this.inputRefs = Array(6)
+      .fill(0)
+      .map(() => React.createRef());
+  }
+
+  handleDigitChange = (index, value, setFieldValue) => {
+    const digit = value.replace(/\D/g, '').slice(-1);
+    const currentValue = this.getCurrentValue();
+    const newValue = currentValue.split('');
+    newValue[index] = digit;
+    setFieldValue('otp_code', newValue.join(''));
+
+    if (digit && index < 5) {
+      this.inputRefs[index + 1].current?.focus();
+    }
+  };
+
+  handleDigitKeyDown = (index, e, setFieldValue) => {
+    if (e.key === 'Backspace') {
+      const currentValue = this.getCurrentValue();
+      const newValue = currentValue.split('');
+
+      if (!newValue[index] && index > 0) {
+        newValue[index - 1] = '';
+        setFieldValue('otp_code', newValue.join(''));
+        this.inputRefs[index - 1].current?.focus();
+      } else {
+        newValue[index] = '';
+        setFieldValue('otp_code', newValue.join(''));
+      }
+      e.preventDefault();
+    } else if (e.key === 'ArrowLeft' && index > 0) {
+      this.inputRefs[index - 1].current?.focus();
+    } else if (e.key === 'ArrowRight' && index < 5) {
+      this.inputRefs[index + 1].current?.focus();
+    }
+  };
+
+  handleDigitPaste = (e, setFieldValue) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    setFieldValue('otp_code', pastedData.padEnd(6, ''));
+    const nextIndex = Math.min(pastedData.length, 5);
+    this.inputRefs[nextIndex].current?.focus();
+  };
+
+  getCurrentValue = () => this.inputRefs.map((ref) => ref.current?.value || '').join('');
+
   renderError = (name) => (
     <ErrorWrapper>
-      <ErrorMessage
-        className="errors"
-        name={name}
-      />
+      <ErrorMessage className="errors" name={name} />
     </ErrorWrapper>
   );
 
@@ -85,73 +185,79 @@ class OtpForm extends React.PureComponent {
     const { handleSubmit, handleCancel, handleResend, sending } = this.props;
 
     return (
-      <Main hasAside={false}>
-        <ViewPanel>
-          <Formik
-            initialValues={{ otp_code: '' }}
-            onSubmit={handleSubmit}
-          >
-            {({ isSubmitting }) => (
-              <FormWrapper>
-                <StyledForm>
-                  <FormBody>
-                    <FieldWrapper>
-                      <Label htmlFor="otp_code">
-                        <FormattedMessage {...messages.otpCode} />
-                        <Required />
-                      </Label>
-                      <Field
-                        as={OtpInput}
-                        id="otp_code"
-                        name="otp_code"
-                        type="text"
-                        placeholder="000000"
-                        maxLength="6"
-                        autoComplete="off"
-                        validate={this.validateOtpCode}
-                        disabled={sending || isSubmitting}
-                      />
-                      {this.renderError('otp_code')}
-                    </FieldWrapper>
-                    <HelpText>
-                      <FormattedMessage {...messages.otpHelpText} />
-                    </HelpText>
-                    <div>
-                      <ResendButton
-                        type="button"
-                        onClick={handleResend}
-                        disabled={sending || isSubmitting}
-                      >
-                        <FormattedMessage {...messages.resendOtp} />
-                      </ResendButton>
-                    </div>
-                  </FormBody>
-                  <FormFooter>
-                    <FormFooterButtons>
-                      <ButtonSubmit
-                        type="submit"
-                        disabled={sending || isSubmitting}
-                      >
-                        <FormattedMessage {...messages.submit} />
-                      </ButtonSubmit>
-                      {handleCancel && (
-                        <ButtonCancel
-                          type="button"
-                          onClick={handleCancel}
-                          disabled={sending || isSubmitting}
-                        >
-                          <FormattedMessage {...messages.cancel} />
-                        </ButtonCancel>
-                      )}
-                    </FormFooterButtons>
-                  </FormFooter>
-                  <Clear />
-                </StyledForm>
-              </FormWrapper>
-            )}
-          </Formik>
-        </ViewPanel>
-      </Main>
+      <FormWrapper>
+        <Formik
+          initialValues={{ otp_code: '' }}
+          onSubmit={handleSubmit}
+          validate={(values) => {
+            const errors = {};
+            const otpError = this.validateOtpCode(values.otp_code);
+            if (otpError) {
+              errors.otp_code = otpError;
+            }
+            return errors;
+          }}
+        >
+          {({ isSubmitting, setFieldValue, values }) => (
+            <StyledForm>
+              <FormBody>
+                <ViewPanel>
+                  <Main bottom>
+                    <FieldGroupWrapper>
+                      <Field>
+                        <Label>
+                          <FormattedMessage {...messages.otpCode} />
+                          <Required>*</Required>
+                        </Label>
+                        <OtpInputContainer>
+                          {[0, 1, 2, 3, 4, 5].map((index) => (
+                            <OtpDigitInput
+                              key={index}
+                              ref={this.inputRefs[index]}
+                              type="text"
+                              inputMode="numeric"
+                              maxLength="1"
+                              value={values.otp_code[index] || ''}
+                              onChange={(e) => this.handleDigitChange(index, e.target.value, setFieldValue)}
+                              onKeyDown={(e) => this.handleDigitKeyDown(index, e, setFieldValue)}
+                              onPaste={(e) => this.handleDigitPaste(e, setFieldValue)}
+                              disabled={sending || isSubmitting}
+                              autoComplete="off"
+                              autoFocus={index === 0}
+                            />
+                          ))}
+                        </OtpInputContainer>
+                        {this.renderError('otp_code')}
+                      </Field>
+                      <HelpText>
+                        <FormattedMessage {...messages.otpHelpText} />
+                      </HelpText>
+                      <div>
+                        <ResendButton type="button" onClick={handleResend} disabled={sending || isSubmitting}>
+                          <FormattedMessage {...messages.resendOtp} />
+                        </ResendButton>
+                      </div>
+                    </FieldGroupWrapper>
+                  </Main>
+                </ViewPanel>
+              </FormBody>
+              <FormFooter>
+                <FormFooterButtons>
+                  <ButtonSubmit type="submit" disabled={sending || isSubmitting}>
+                    <FormattedMessage {...messages.submit} />
+                  </ButtonSubmit>
+                  {handleCancel && (
+                    <ButtonCancel type="button" onClick={handleCancel} disabled={sending || isSubmitting}>
+                      <FormattedMessage {...messages.cancel} />
+                    </ButtonCancel>
+                  )}
+                </FormFooterButtons>
+              </FormFooter>
+              <Clear />
+            </StyledForm>
+          )}
+        </Formik>
+      </FormWrapper>
     );
   }
 }

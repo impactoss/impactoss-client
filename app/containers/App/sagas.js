@@ -367,7 +367,7 @@ export function* validateTokenSaga() {
       yield put(authenticateSuccess(response.data)); // need to store currentUserData
     }
   } catch (err) {
-    console.log('ERROR in validateTokenSaga');
+    console.log('ERROR in validateTokenSaga', err);
     yield call(clearAuthValues);
     if (err.response) {
       err.response.json = yield err.response.json();

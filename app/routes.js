@@ -277,6 +277,27 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
+    }, {
+      path: `${ROUTES.USERS}${ROUTES.MFA}${ROUTES.ID}`,
+      name: 'userMfa',
+      onEnter: redirectIfNotSignedIn(),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/UserMfa/reducer'),
+          import('containers/UserMfa/sagas'),
+          import('containers/UserMfa'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('userMfa', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
     // }, {
     //   path: ROUTES.MEASURES,
     //   name: 'actionList',

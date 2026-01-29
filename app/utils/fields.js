@@ -466,3 +466,10 @@ export const getEmailField = (entity) => ({
   type: 'email',
   value: entity.getIn(['attributes', 'email']),
 });
+
+export const getMultiFactorAuthenticationStatusField = (entity) => ({
+  controlType: 'info',
+  type: 'text',
+  value: entity.getIn(['attributes', 'multi_factor_email_code_enabled']) ? 'Enabled' : 'Disabled',
+  label: appMessages.attributes.multiFactorAuthenticationStatus,
+});

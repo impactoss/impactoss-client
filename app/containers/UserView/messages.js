@@ -22,4 +22,8 @@ export default defineMessages({
     id: 'app.containers.UserView.editPassword',
     defaultMessage: 'Change password',
   },
+  configureMfa: {
+    id: 'app.containers.UserView.configureMfa',
+    defaultMessage: 'Configure MFA',
+  },
 });

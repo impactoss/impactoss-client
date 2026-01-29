@@ -137,6 +137,7 @@ export const ROUTES = {
   INTRO: '/',
   OVERVIEW: '/overview',
   PASSWORD: '/password',
+  MFA: '/mfa',
   LOGIN: '/login',
   LOGIN_OAUTH_SUCCESS: '/loginOAuthSuccess',
   LOGIN_OAUTH_ERROR: '/loginOAuthError',
