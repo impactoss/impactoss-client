@@ -14,6 +14,7 @@ import { fromJS } from 'immutable';
 
 import { checkResponseError } from 'utils/request';
 import { isSignedIn } from 'utils/api-request';
+import { get, set } from 'utils/session-storage';
 import { DB_TABLES, SETTINGS } from 'themes/config';
 
 import {
@@ -43,6 +44,10 @@ import {
   RESEND_OTP_ERROR,
 } from './constants';
 
+// Check for persisted OTP state from sessionStorage
+const persistedOtpToken = get('otp_temp_token');
+const persistedOtpMessage = get('otp_message');
+
 // The initial state of the App
 const initialState = fromJS({
   server: {
@@ -51,16 +56,25 @@ const initialState = fromJS({
   auth: {
     sending: false,
     error: false,
-    messages: [],
-    otpRequired: false,
-    tempToken: null,
+    messages: persistedOtpMessage ? [persistedOtpMessage] : [],
+    otpRequired: !!persistedOtpToken,
+    tempToken: persistedOtpToken,
   },
   /* eslint-disable no-param-reassign */
   // Record the time that entities where requested from the server
-  requested: DB_TABLES.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
+  requested: DB_TABLES.reduce((memo, table) => {
+    memo[table] = null;
+    return memo;
+  }, {}),
   // Record the time that entities where returned from the server
-  ready: DB_TABLES.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
-  entities: DB_TABLES.reduce((memo, table) => { memo[table] = {}; return memo; }, {}),
+  ready: DB_TABLES.reduce((memo, table) => {
+    memo[table] = null;
+    return memo;
+  }, {}),
+  entities: DB_TABLES.reduce((memo, table) => {
+    memo[table] = {};
+    return memo;
+  }, {}),
   /* eslint-enable no-param-reassign */
   user: {
     attributes: null,
@@ -74,6 +88,9 @@ const initialState = fromJS({
 function appReducer(state = initialState, payload) {
   switch (payload.type) {
     case LOGOUT_SUCCESS:
+      // Clear persisted OTP state
+      set('otp_temp_token', null);
+      set('otp_message', null);
       return initialState.setIn(['user', 'isSignedIn'], false);
     case AUTHENTICATE_SUCCESS:
       return state
@@ -88,20 +105,22 @@ function appReducer(state = initialState, payload) {
         .setIn(['user', 'isSignedIn'], false);
     }
     case AUTHENTICATE_SENDING:
-      return state
-        .setIn(['auth', 'sending'], true)
-        .setIn(['auth', 'error'], false);
+      return state.setIn(['auth', 'sending'], true).setIn(['auth', 'error'], false);
     case OTP_REQUIRED:
+      // Persist OTP state to sessionStorage so it survives page reloads
+      set('otp_temp_token', payload.tempToken);
+      set('otp_message', payload.message || null);
       return state
         .setIn(['auth', 'sending'], false)
         .setIn(['auth', 'otpRequired'], true)
         .setIn(['auth', 'tempToken'], payload.tempToken)
         .setIn(['auth', 'messages'], payload.message ? [payload.message] : []);
     case VERIFY_OTP_SENDING:
-      return state
-        .setIn(['auth', 'sending'], true)
-        .setIn(['auth', 'error'], false);
+      return state.setIn(['auth', 'sending'], true).setIn(['auth', 'error'], false);
     case VERIFY_OTP_SUCCESS:
+      // Clear persisted OTP state after successful verification
+      set('otp_temp_token', null);
+      set('otp_message', null);
       return state
         .setIn(['user', 'attributes'], payload.user)
         .setIn(['user', 'isSignedIn'], true)
@@ -109,68 +128,56 @@ function appReducer(state = initialState, payload) {
         .setIn(['auth', 'otpRequired'], false)
         .setIn(['auth', 'tempToken'], null);
     case VERIFY_OTP_ERROR:
-      return state
-        .setIn(['auth', 'error'], checkResponseError(payload.error))
-        .setIn(['auth', 'sending'], false);
+      return state.setIn(['auth', 'error'], checkResponseError(payload.error)).setIn(['auth', 'sending'], false);
     case RESEND_OTP_SUCCESS:
       return state
         .setIn(['auth', 'messages'], payload.message ? [payload.message] : [])
         .setIn(['auth', 'sending'], false);
     case RESEND_OTP_ERROR:
-      return state
-        .setIn(['auth', 'error'], checkResponseError(payload.error))
-        .setIn(['auth', 'sending'], false);
+      return state.setIn(['auth', 'error'], checkResponseError(payload.error)).setIn(['auth', 'sending'], false);
     case SET_AUTHENTICATION_STATE:
-      return state
-        .setIn(['user', 'isSignedIn'], payload.newAuthState);
+      return state.setIn(['user', 'isSignedIn'], payload.newAuthState);
     case ADD_ENTITY:
-      return state
-        .setIn(['entities', payload.path, payload.entity.id], fromJS(payload.entity));
+      return state.setIn(['entities', payload.path, payload.entity.id], fromJS(payload.entity));
     case UPDATE_ENTITIES:
-      return payload.entities.reduce((stateUpdated, entity) => stateUpdated.setIn(
-        ['entities', payload.path, entity.data.id, 'attributes'],
-        fromJS(entity.data.attributes)
-      ),
-      state);
+      return payload.entities.reduce(
+        (stateUpdated, entity) =>
+          stateUpdated.setIn(['entities', payload.path, entity.data.id, 'attributes'], fromJS(entity.data.attributes)),
+        state,
+      );
     case UPDATE_CONNECTIONS:
       return payload.updates.reduce(
-        (stateUpdated, connection) => connection.type === 'delete'
-          ? stateUpdated.deleteIn(['entities', payload.path, connection.id && connection.id.toString()])
-          : stateUpdated.setIn(
-            ['entities', payload.path, connection.data.id && connection.data.id.toString()],
-            fromJS(connection.data)
-          ),
+        (stateUpdated, connection) =>
+          connection.type === 'delete'
+            ? stateUpdated.deleteIn(['entities', payload.path, connection.id && connection.id.toString()])
+            : stateUpdated.setIn(
+                ['entities', payload.path, connection.data.id && connection.data.id.toString()],
+                fromJS(connection.data),
+              ),
         state,
       );
     case UPDATE_ENTITY:
-      return state
-        .setIn(['entities', payload.path, payload.entity.id, 'attributes'], fromJS(payload.entity.attributes));
+      return state.setIn(
+        ['entities', payload.path, payload.entity.id, 'attributes'],
+        fromJS(payload.entity.attributes),
+      );
     case REMOVE_ENTITY:
-      return state
-        .deleteIn(['entities', payload.path, payload.id]);
+      return state.deleteIn(['entities', payload.path, payload.id]);
     case ENTITIES_REQUESTED:
-      return state
-        .setIn(['requested', payload.path], payload.time);
+      return state.setIn(['requested', payload.path], payload.time);
     case LOAD_ENTITIES_SUCCESS:
       return state
         .setIn(['entities', payload.path], fromJS(payload.entities))
         .setIn(['ready', payload.path], payload.time);
     case LOAD_ENTITIES_ERROR:
       // check unauthorised (401)
-      if (
-        payload
-        && payload.error
-        && payload.error.response
-        && payload.error.response.status === 401
-      ) {
+      if (payload && payload.error && payload.error.response && payload.error.response.status === 401) {
         return state
           .setIn(['server', 'error'], payload.error)
           .setIn(['entities', payload.path], fromJS([]))
           .setIn(['ready', payload.path], Date.now());
       }
-      return state
-        .setIn(['server', 'error'], payload.error)
-        .setIn(['ready', payload.path], null);
+      return state.setIn(['server', 'error'], payload.error).setIn(['ready', payload.path], null);
     case INVALIDATE_ENTITIES:
       // reset requested to initial state
       if (payload.path) {

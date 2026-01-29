@@ -98,12 +98,7 @@ export const CONTENT_SINGLE = 'single';
 export const CONTENT_PAGE = 'page';
 export const CONTENT_MODAL = 'modal';
 
-export const DEPENDENCIES = [
-  'user_roles',
-  'pages',
-  'frameworks',
-  'categories',
-];
+export const DEPENDENCIES = ['user_roles', 'pages', 'frameworks', 'categories'];
 export const SORT_ORDER_OPTIONS = [
   {
     value: 'asc',
@@ -137,7 +132,6 @@ export const ROUTES = {
   INTRO: '/',
   OVERVIEW: '/overview',
   PASSWORD: '/password',
-  MFA: '/mfa',
   LOGIN: '/login',
   LOGIN_OAUTH_SUCCESS: '/loginOAuthSuccess',
   LOGIN_OAUTH_ERROR: '/loginOAuthError',
