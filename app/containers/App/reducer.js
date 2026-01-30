@@ -37,6 +37,7 @@ import {
   SHOW_SETTINGS_MODAL,
   INITIALIZE_SETTINGS,
   OTP_REQUIRED,
+  RESET_OTP_REQUIRED,
   VERIFY_OTP_SENDING,
   VERIFY_OTP_SUCCESS,
   VERIFY_OTP_ERROR,
@@ -115,6 +116,15 @@ function appReducer(state = initialState, payload) {
         .setIn(['auth', 'otpRequired'], true)
         .setIn(['auth', 'tempToken'], payload.tempToken)
         .setIn(['auth', 'messages'], payload.message ? [payload.message] : []);
+    case RESET_OTP_REQUIRED:
+      // Reset OTP state
+      set('otp_temp_token', null);
+      set('otp_message', null);
+      return state
+        .setIn(['auth', 'sending'], false)
+        .setIn(['auth', 'otpRequired'], false)
+        .setIn(['auth', 'tempToken'], null)
+        .setIn(['auth', 'messages'], []);
     case VERIFY_OTP_SENDING:
       return state.setIn(['auth', 'sending'], true).setIn(['auth', 'error'], false);
     case VERIFY_OTP_SUCCESS:

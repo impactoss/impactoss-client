@@ -27,7 +27,13 @@ import OtpForm from 'components/forms/OtpForm';
 import A from 'components/styled/A';
 
 import { selectQueryMessages, selectOtpRequired, selectTempToken } from 'containers/App/selectors';
-import { updatePath, dismissQueryMessages, verifyOtp, resendOtp } from 'containers/App/actions';
+import {
+  updatePath,
+  dismissQueryMessages,
+  verifyOtp,
+  resendOtp,
+  resetOtp,
+} from 'containers/App/actions';
 
 import { ROUTES } from 'containers/App/constants';
 import { ENABLE_AZURE, IS_PROD, SERVER } from 'themes/config';
@@ -63,6 +69,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
       handleSubmitWithAzure,
       otpRequired,
       tempToken,
+      handleOtpCancel,
     } = this.props;
 
     return (
@@ -154,7 +161,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
               sending={authSending}
               handleSubmit={(formData) => handleOtpSubmit(formData, tempToken)}
               handleResend={() => handleOtpResend(tempToken)}
-              handleCancel={handleCancel}
+              handleCancel={handleOtpCancel}
             />
           )}
           {ENABLE_AZURE && (
@@ -182,6 +189,7 @@ UserLogin.propTypes = {
   handleOtpSubmit: PropTypes.func.isRequired,
   handleOtpResend: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  handleOtpCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
   onDismissQueryMessages: PropTypes.func,
   queryMessages: PropTypes.object,
@@ -214,6 +222,9 @@ export function mapDispatchToProps(dispatch) {
     },
     handleCancel: () => {
       dispatch(updatePath('/'));
+    },
+    handleOtpCancel: () => {
+      dispatch(resetOtp())
     },
     handleLink: (path, args) => {
       dispatch(updatePath(path, args));

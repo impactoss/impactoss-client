@@ -33,6 +33,7 @@ export const LOGOUT_ERROR = 'impactoss/App/LOGOUT_ERROR';
 export const VALIDATE_TOKEN = 'impactoss/App/VALIDATE_TOKEN';
 export const AUTHENTICATE_FORWARD = 'impactoss/App/AUTHENTICATE_FORWARD';
 export const OTP_REQUIRED = 'impactoss/App/OTP_REQUIRED';
+export const RESET_OTP_REQUIRED = 'impactoss/App/RESET_OTP_REQUIRED';
 export const VERIFY_OTP = 'impactoss/App/VERIFY_OTP';
 export const VERIFY_OTP_SENDING = 'impactoss/App/VERIFY_OTP_SENDING';
 export const VERIFY_OTP_SUCCESS = 'impactoss/App/VERIFY_OTP_SUCCESS';

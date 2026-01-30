@@ -75,6 +75,7 @@ import {
   SHOW_SETTINGS_MODAL,
   INITIALIZE_SETTINGS,
   OTP_REQUIRED,
+  RESET_OTP_REQUIRED,
   VERIFY_OTP,
   VERIFY_OTP_SENDING,
   VERIFY_OTP_SUCCESS,
@@ -438,6 +439,11 @@ export function otpRequired(tempToken, message) {
     type: OTP_REQUIRED,
     tempToken,
     message,
+  };
+}
+export function resetOtp() {
+  return {
+    type: RESET_OTP_REQUIRED,
   };
 }
 
