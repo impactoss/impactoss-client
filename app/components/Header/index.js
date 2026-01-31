@@ -314,9 +314,9 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
   };
 
   renderSecondary = (navItemsSecondary, search, hasSettings, onShowSettings, size) => {
-    const bookmarks = navItemsSecondary && navItemsSecondary.find(i => i.isBookmarks);
-    const userAdmin = navItemsSecondary && navItemsSecondary.find(i => i.isUserAdmin);
-    const pageAdmin = navItemsSecondary && navItemsSecondary.find(i => i.isPageAdmin);
+    const bookmarks = navItemsSecondary && navItemsSecondary.find((i) => i.isBookmarks);
+    const userAdmin = navItemsSecondary && navItemsSecondary.find((i) => i.isUserAdmin);
+    const pageAdmin = navItemsSecondary && navItemsSecondary.find((i) => i.isPageAdmin);
     return (
       <PrintHide>
         <ShowSecondary
@@ -479,7 +479,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
       && frameworkOptions.find((option) => option.active);
     return (
       <ResponsiveContext.Consumer>
-          {(size) => (
+        {(size) => (
           <Styled
             isHome={isHome}
             fixed={isHome}

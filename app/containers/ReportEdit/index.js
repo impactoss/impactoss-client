@@ -365,7 +365,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, viewEntity) => {
-      const formData = fromJS(formValues)
+      const formData = fromJS(formValues);
       let saveData = formData;
       const previousDateAssigned = viewEntity.getIn(['attributes', 'due_date_id']);
       const dateAssigned = formData.getIn(['attributes', 'due_date_id']);

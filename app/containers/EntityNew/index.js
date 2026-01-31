@@ -288,7 +288,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, attributes) => {
-      const formData = fromJS(formValues)
+      const formData = fromJS(formValues);
       let saveData = attributes
         ? formData.mergeIn(['attributes'], attributes)
         : formData;

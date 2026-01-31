@@ -23,7 +23,7 @@ import isNumber from 'utils/is-number';
 import appMessages from 'containers/App/messages';
 import messages from './messages';
 import VerticalDiagramButton from './VerticalDiagramButton';
-import VerticalDiagramSVG  from './VerticalDiagramSVG';
+import VerticalDiagramSVG from './VerticalDiagramSVG';
 
 const Diagram = styled(
   React.forwardRef((p, ref) => <div ref={ref} {...p} />)
@@ -187,7 +187,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
 
   resize = () => {
     // reset
-    this.itemRefs={};
+    this.itemRefs = {};
     this.setState((prev) => ({ diagramVersion: (prev.diagramVersion || 0) + 1 }));
   };
 
@@ -197,7 +197,6 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
       // Force update to re-render DiagramSVG and cause effect to re-run
       this.setState((prev) => ({ diagramVersion: (prev.diagramVersion || 0) + 1 }));
     }
-
   };
 
   render() {

@@ -89,7 +89,6 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -110,7 +109,9 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     this.remoteSubmitForm = submitForm;
   };
 
-  getInitialFormData = ({ viewEntity, taxonomies, recommendationsByFw, indicators }) => {
+  getInitialFormData = ({
+    viewEntity, taxonomies, recommendationsByFw, indicators
+  }) => {
     let attributes = viewEntity.get('attributes');
     if (!attributes.get('reference') || attributes.get('reference') === '') {
       attributes = attributes.set('reference', viewEntity.get('id'));

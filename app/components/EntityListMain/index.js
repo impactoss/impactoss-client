@@ -128,7 +128,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
         /* eslint-disable prefer-destructuring */
         groupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][1];
         /* eslint-enable prefer-destructuring */
-      } else if (currentFWid !== 'all'){
+      } else if (currentFWid !== 'all') {
         groupSelectValue = getGroupValue(
           taxonomies,
           config.taxonomies.defaultGroupAttribute,

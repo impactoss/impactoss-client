@@ -110,6 +110,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       scrollToTop(this.scrollContainer.current);
     }
   }
+
   componentDidMount() {
     if (this.props.dataReady && this.props.viewEntity && this.state.repeat === null) {
       this.setState({ repeat: this.props.viewEntity.getIn(['attributes', 'repeat']) || false });
@@ -120,7 +121,9 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     this.remoteSubmitForm = submitForm;
   };
 
-  getInitialFormData = ({ measures, viewEntity, users, recommendationsByFw }) => {
+  getInitialFormData = ({
+    measures, viewEntity, users, recommendationsByFw
+  }) => {
     let attributes = viewEntity.get('attributes');
     if (!attributes.get('reference')) {
       attributes = attributes.set('reference', viewEntity.get('id'));
@@ -217,7 +220,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             attribute: 'start_date',
             repeat,
             label: repeat ? 'start_date' : 'start_date_only',
-            modifyFieldAttributes: 
+            modifyFieldAttributes:
             (field, formData) =>
               modifyStartDateField(
                 field,
@@ -255,7 +258,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         ],
       },
     ]);
-  }
+  };
 
   render() {
     const {
@@ -433,7 +436,7 @@ function mapDispatchToProps(dispatch, props) {
         && !validateDateAfterDate(dateValue, formData.getIn(['attributes', 'start_date']))
       ) {
         errors = formatMessage(appMessages.forms.endDateBeforeStartDateError);
-      } 
+      }
       return errors;
     },
     onErrorDismiss: () => {

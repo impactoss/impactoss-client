@@ -116,7 +116,9 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
     this.remoteSubmitForm = submitForm;
   };
 
-  getInitialFormData = ({ viewEntity, users, measures, recommendationsByFw, parentOptions }) =>
+  getInitialFormData = ({
+    viewEntity, users, measures, recommendationsByFw, parentOptions
+  }) =>
     viewEntity
       ? Map({
         id: viewEntity.get('id'),

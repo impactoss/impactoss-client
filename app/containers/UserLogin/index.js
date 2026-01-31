@@ -47,7 +47,6 @@ const AzureButton = styled(ButtonHero)`
 
 
 export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
   render() {
     const { intl } = this.props;
     const { authError, authSending } = this.props.viewDomain.get('page').toJS();

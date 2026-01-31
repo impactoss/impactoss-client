@@ -108,7 +108,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     this.remoteSubmitForm = submitForm;
   };
 
-  getInitialFormData = ({ users, measures, recommendationsByFw, parentOptions,
+  getInitialFormData = ({
+    users, measures, recommendationsByFw, parentOptions,
   }) => FORM_INITIAL
     .set('associatedMeasures', measures && entityOptions(measures, true))
     .set('associatedCategory', parentOptions && parentCategoryOptions(parentOptions, null))

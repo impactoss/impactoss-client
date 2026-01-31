@@ -3,10 +3,12 @@ import PropTypes from 'prop-types';
 import { toLower } from 'lodash/string';
 
 // eslint-disable-next-line import/no-unresolved
-import { isValid, format, parse, startOfToday, getYear, getMonth } from 'date-fns';
+import {
+  isValid, format, parse, startOfToday, getYear, getMonth
+} from 'date-fns';
 import validateDateFormat from 'components/forms/validators/validate-date-format';
 import { DayPicker } from 'react-day-picker';
-import { useField, useFormikContext } from "formik";
+import { useField, useFormikContext } from 'formik';
 
 import { DATE_FORMAT, DB_DATE_FORMAT } from 'themes/config';
 

@@ -226,12 +226,12 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
         )
         || frameworks.first()
       );
-    const cycleTaxonomy = dataReady && taxonomies.get(`${CYCLE_TAXONOMY_ID}`)
+    const cycleTaxonomy = dataReady && taxonomies.get(`${CYCLE_TAXONOMY_ID}`);
     const hasCycles = dataReady
       && currentFramework
       && cycleTaxonomy
       && cycleTaxonomy.get('frameworkIds')
-      && cycleTaxonomy.get('frameworkIds').some((id) => qe(id, currentFramework.get('id')))
+      && cycleTaxonomy.get('frameworkIds').some((id) => qe(id, currentFramework.get('id')));
 
     const hasResponse = dataReady
       && currentFramework

@@ -95,6 +95,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       scrollToTop(this.scrollContainer.current);
     }
   }
+
   bindHandleSubmit = (submitForm) => {
     this.remoteSubmitForm = submitForm;
   };
@@ -108,7 +109,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       : Map())
     .set('associatedUser', userOptions(users, null));
 
-  handleRepeatChange = (repeat) => this.setState({ repeat: repeat });
+  handleRepeatChange = (repeat) => this.setState({ repeat });
 
   getHeaderMainFields = (existingReferences, intl) =>
     ([ // fieldGroups
@@ -174,7 +175,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     return groups;
   };
 
-  getBodyAsideFields = (users, intl) => 
+  getBodyAsideFields = (users, intl) =>
     ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.schedule),
@@ -194,7 +195,8 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
           getCheckboxField(
             intl.formatMessage,
             'repeat',
-            false),
+            false
+          ),
           getFrequencyField(
             intl.formatMessage,
             (formData) => !this.props.isRepeat(formData)

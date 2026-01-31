@@ -24,7 +24,7 @@ import {
 } from 'themes/config';
 import { getImportFields, getColumnAttribute } from 'utils/import';
 import { checkActionAttribute, checkAttribute } from 'utils/entities';
-import { lowerCase  } from 'utils/string';
+import { lowerCase } from 'utils/string';
 import qe from 'utils/quasi-equals';
 
 import {
@@ -219,7 +219,7 @@ function mapDispatchToProps(dispatch) {
       let invalidConnections = [];
       if (formData.get('import') !== null) {
         formData.getIn(['import', 'rows']).forEach((row, index) => {
-          let rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
+          const rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
           // make sure type id is set
           let rowClean = {
             attributes: rowCleanColumns
@@ -311,19 +311,16 @@ function mapDispatchToProps(dispatch) {
                                 connectionId = connection.get('id');
                               }
                             }
-                          } else {
-                            if (categories && relConfig.lookup.table === API.CATEGORIES) {
-                              if (categories.get(`${id}`)) {
-                                connectionId = id;
-                              }
-                            } else if (connections) {
-
-                              if (
-                                connections.get(relConfig.lookup.table)
+                          } else if (categories && relConfig.lookup.table === API.CATEGORIES) {
+                            if (categories.get(`${id}`)) {
+                              connectionId = id;
+                            }
+                          } else if (connections) {
+                            if (
+                              connections.get(relConfig.lookup.table)
                                 && connections.getIn([relConfig.lookup.table, `${id}`])
-                              ) {
-                                connectionId = id;
-                              }
+                            ) {
+                              connectionId = id;
                             }
                           }
                         }
@@ -347,16 +344,16 @@ function mapDispatchToProps(dispatch) {
                             relField === 'recommendation-reference'
                             || relField === 'recommendation-id'
                           ) {
-                              const create = { recommendation_id: connectionId };
-                              if (recommendationMeasures && recommendationMeasures.create) {
-                                recommendationMeasures.create = [
-                                  ...recommendationMeasures.create,
-                                  create,
-                                ];
-                              } else {
-                                recommendationMeasures = { create: [create] };
-                              }
+                            const create = { recommendation_id: connectionId };
+                            if (recommendationMeasures && recommendationMeasures.create) {
+                              recommendationMeasures.create = [
+                                ...recommendationMeasures.create,
+                                create,
+                              ];
+                            } else {
+                              recommendationMeasures = { create: [create] };
                             }
+                          }
 
                           // measureCategories by code or id
                           if (

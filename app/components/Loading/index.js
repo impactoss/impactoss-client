@@ -62,7 +62,7 @@ class Loading extends React.PureComponent { // eslint-disable-line react/prefer-
       clearInterval(this.loadInterval);
       this.loadInterval = false;
     }
-  }
+  };
 
   handleTimeout = () => {
     // Added timeout
@@ -73,7 +73,7 @@ class Loading extends React.PureComponent { // eslint-disable-line react/prefer-
           : 0,
       })
     );
-  }
+  };
 
   render() {
     return (

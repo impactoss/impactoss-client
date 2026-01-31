@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 
-const SubmitFailedHandler = ({ isValid, isValidating, isSubmitting, handleSubmitFail }) => {
+const SubmitFailedHandler = ({
+  isValid, isValidating, isSubmitting, handleSubmitFail
+}) => {
   useEffect(() => {
     if (!isValid && !isValidating && isSubmitting) {
       handleSubmitFail();

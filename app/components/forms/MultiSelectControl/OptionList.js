@@ -155,7 +155,7 @@ class OptionList extends React.PureComponent {
         show: prevState.show + SHOW_INCREMENT,
       })
     );
-  }
+  };
 
   render() {
     // do groups not slice

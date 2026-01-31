@@ -25,7 +25,7 @@ import {
 } from 'themes/config';
 import { getImportFields, getColumnAttribute } from 'utils/import';
 import { checkIndicatorAttribute, checkAttribute } from 'utils/entities';
-import { lowerCase  } from 'utils/string';
+import { lowerCase } from 'utils/string';
 import qe from 'utils/quasi-equals';
 
 import {
@@ -91,7 +91,7 @@ function IndicatorImport({
   // console.log('render', categories, connections)
   const fields = Object.keys(ENTITY_FIELDS.indicators.ATTRIBUTES).reduce((memo, key) => {
     const val = ENTITY_FIELDS.indicators.ATTRIBUTES[key];
-  if (!val.skipImport && checkIndicatorAttribute(key)) {
+    if (!val.skipImport && checkIndicatorAttribute(key)) {
       return [
         ...memo,
         {
@@ -213,11 +213,11 @@ function mapDispatchToProps(dispatch) {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     handleSubmit: (formValues, connections) => {
-      const formData = fromJS(formValues)
+      const formData = fromJS(formValues);
       let invalidConnections = [];
       if (formData.get('import') !== null) {
         formData.getIn(['import', 'rows']).forEach((row, index) => {
-          let rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
+          const rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
           // make sure type id is set
           let rowClean = {
             attributes: rowCleanColumns
@@ -316,7 +316,6 @@ function mapDispatchToProps(dispatch) {
                             //   }
                             // } else
                             if (connections) {
-
                               if (
                                 connections.get(relConfig.lookup.table)
                                 && connections.getIn([relConfig.lookup.table, `${id}`])
@@ -346,16 +345,16 @@ function mapDispatchToProps(dispatch) {
                             relField === 'recommendation-reference'
                             || relField === 'recommendation-id'
                           ) {
-                              const create = { recommendation_id: connectionId };
-                              if (recommendationIndicators && recommendationIndicators.create) {
-                                recommendationIndicators.create = [
-                                  ...recommendationIndicators.create,
-                                  create,
-                                ];
-                              } else {
-                                recommendationIndicators = { create: [create] };
-                              }
+                            const create = { recommendation_id: connectionId };
+                            if (recommendationIndicators && recommendationIndicators.create) {
+                              recommendationIndicators.create = [
+                                ...recommendationIndicators.create,
+                                create,
+                              ];
+                            } else {
+                              recommendationIndicators = { create: [create] };
                             }
+                          }
 
                           // measureCategories by code or id
                           // if (

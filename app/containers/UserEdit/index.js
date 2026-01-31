@@ -105,7 +105,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     this.remoteSubmitForm = submitForm;
   };
 
-  getInitialFormData = ({ taxonomies, roles, viewEntity }) => 
+  getInitialFormData = ({ taxonomies, roles, viewEntity }) =>
     Map({
       id: viewEntity.get('id'),
       attributes: viewEntity.get('attributes').mergeWith(
@@ -361,7 +361,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, taxonomies, roles, viewEntity) => {
-      const formData = fromJS(formValues)
+      const formData = fromJS(formValues);
       let saveData = formData
         .set(
           'userCategories',

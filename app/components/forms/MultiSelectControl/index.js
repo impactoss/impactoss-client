@@ -330,7 +330,7 @@ class MultiSelectControl extends React.Component {
   // TODO intl
   render() {
     let options = this.prepareOptions(this.props, this.state);
-    //console.log(options.toJS());
+    // console.log(options.toJS());
     const optionsChangedToChecked = options.filter((option) => option.get('changedToChecked'));
     const optionsChangedToUnchecked = options.filter((option) => option.get('changedToUnchecked'));
     const hasChanges = optionsChangedToChecked.size > 0 || optionsChangedToUnchecked.size > 0;

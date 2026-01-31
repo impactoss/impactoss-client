@@ -177,7 +177,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) => 
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) =>
     ([ // fieldGroup
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.taxonomies.plural),

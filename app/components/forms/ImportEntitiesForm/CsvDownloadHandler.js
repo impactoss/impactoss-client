@@ -5,7 +5,7 @@ import styled from 'styled-components';
 const CsvDownloadHandler = ({ children, ...props }) => {
   const { CSVDownloader, Type } = useCSVDownloader();
   return (
-    <CSVDownloader type={Type.Button} className="ioss-csv-downloader" {...props} >
+    <CSVDownloader type={Type.Button} className="ioss-csv-downloader" {...props}>
       {children}
     </CSVDownloader>
   );

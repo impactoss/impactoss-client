@@ -106,7 +106,9 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     this.remoteSubmitForm = submitForm;
   };
 
-  getInitialFormData = ({ taxonomies, measures, indicators, viewEntity }) =>
+  getInitialFormData = ({
+    taxonomies, measures, indicators, viewEntity
+  }) =>
     viewEntity
       ? Map({
         id: viewEntity.get('id'),
@@ -120,7 +122,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       })
       : Map();
 
-  getHeaderMainFields = (existingReferences, intl) => 
+  getHeaderMainFields = (existingReferences, intl) =>
     ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -424,7 +426,7 @@ function mapDispatchToProps(dispatch, props) {
       currentFramework,
       viewEntity,
     ) => {
-      const formData = fromJS(formValues)
+      const formData = fromJS(formValues);
       let saveData = formData
         .set(
           'recommendationCategories',

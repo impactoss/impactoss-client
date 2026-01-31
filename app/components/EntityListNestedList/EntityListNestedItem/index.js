@@ -40,7 +40,7 @@ export default class EntityListNestedItem extends React.PureComponent { // eslin
     config: PropTypes.object,
     onEntityClick: PropTypes.func,
     onExpand: PropTypes.func,
-  }
+  };
 
   render() {
     const {

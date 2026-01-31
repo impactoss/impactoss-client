@@ -1,10 +1,10 @@
 import React from 'react';
-import { useCSVReader } from "react-papaparse";
+import { useCSVReader } from 'react-papaparse';
 
 const CsvReaderHandler = ({ children, ...props }) => {
   const { CSVReader } = useCSVReader();
   return (
-    <CSVReader {...props} >
+    <CSVReader {...props}>
       {children}
     </CSVReader>
   );

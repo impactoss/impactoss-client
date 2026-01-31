@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { Field as FormikField, Form, Formik, ErrorMessage } from 'formik';
+import {
+  Field as FormikField, Form, Formik, ErrorMessage
+} from 'formik';
 import styled from 'styled-components';
 
 import { omit } from 'lodash/object';
@@ -46,6 +48,7 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
       />
     </ErrorWrapper>
   );
+
   renderLabel = (field) => (
     <Label htmlFor={field.id}>
       {`${field.label || startCase(field.id)}`}
@@ -53,7 +56,7 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
         && <Required>*</Required>
       }
     </Label>
-  )
+  );
 
   renderField = (field) => {
     const { id, ...props } = omit(field, nonControlProps);
@@ -63,7 +66,7 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
         {...props}
       />
     );
-  }
+  };
 
   renderBody = (fieldConfigs) => (
     <FormBody>
@@ -74,13 +77,14 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
               <FormikField
                 key={i}
                 name={fieldConfig.id}
-                validate={(value) => validateField(value, fieldConfig)}>
+                validate={(value) => validateField(value, fieldConfig)}
+              >
                 {({ field, meta }) => (
                   <Field>
                     {field.label !== false && this.renderLabel(fieldConfig)}
                     {this.renderField({ ...fieldConfig, ...field })}
                     {meta.touched && meta.error && this.renderError(field.name)}
-                  </Field> 
+                  </Field>
                 )}
               </FormikField>
             ))}

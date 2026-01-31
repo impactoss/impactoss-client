@@ -101,7 +101,7 @@ class ImportFileSelectControl extends React.PureComponent { // eslint-disable-li
             errors: prevState.errors.concat([{ error: 0 }]),
           })
         );
-      }*/
+      } */
     // });
   };
 

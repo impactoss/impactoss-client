@@ -14,7 +14,8 @@ const StyledInput = styled.input`
 class InputComponent extends React.Component {
   focus = () => {
     this.input.focus();
-  }
+  };
+
   render() {
     return (
       <StyledInput

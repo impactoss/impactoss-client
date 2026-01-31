@@ -24,7 +24,7 @@ import {
 } from 'themes/config';
 import { getImportFields, getColumnAttribute } from 'utils/import';
 import { checkRecommendationAttribute, checkAttribute } from 'utils/entities';
-import { lowerCase  } from 'utils/string';
+import { lowerCase } from 'utils/string';
 import qe from 'utils/quasi-equals';
 
 import {
@@ -156,7 +156,7 @@ function RecommendationImport({
           fieldModel="import"
           formData={FORM_INITIAL}
           handleSubmit={(formData) => {
-            console.log('handleSubmit', formData)
+            console.log('handleSubmit', formData);
             handleSubmit(formData, connections, categories);
           }}
           handleCancel={handleCancel}
@@ -215,10 +215,10 @@ function mapDispatchToProps(dispatch) {
     handleSubmit: (formValues, connections, categories) => {
       const formData = fromJS(formValues);
       let invalidConnections = [];
-      console.log(formValues)
+      console.log(formValues);
       if (formData.get('import') !== null) {
         formData.getIn(['import', 'rows']).forEach((row, index) => {
-          let rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
+          const rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
           // make sure type id is set
           let rowClean = {
             attributes: rowCleanColumns
@@ -310,19 +310,16 @@ function mapDispatchToProps(dispatch) {
                                 connectionId = connection.get('id');
                               }
                             }
-                          } else {
-                            if (categories && relConfig.lookup.table === API.CATEGORIES) {
-                              if (categories.get(`${id}`)) {
-                                connectionId = id;
-                              }
-                            } else if (connections) {
-
-                              if (
-                                connections.get(relConfig.lookup.table)
+                          } else if (categories && relConfig.lookup.table === API.CATEGORIES) {
+                            if (categories.get(`${id}`)) {
+                              connectionId = id;
+                            }
+                          } else if (connections) {
+                            if (
+                              connections.get(relConfig.lookup.table)
                                 && connections.getIn([relConfig.lookup.table, `${id}`])
-                              ) {
-                                connectionId = id;
-                              }
+                            ) {
+                              connectionId = id;
                             }
                           }
                         }
@@ -346,16 +343,16 @@ function mapDispatchToProps(dispatch) {
                             relField === 'action-reference'
                             || relField === 'action-id'
                           ) {
-                              const create = { measure_id: connectionId };
-                              if (recommendationMeasures && recommendationMeasures.create) {
-                                recommendationMeasures.create = [
-                                  ...recommendationMeasures.create,
-                                  create,
-                                ];
-                              } else {
-                                recommendationMeasures = { create: [create] };
-                              }
+                            const create = { measure_id: connectionId };
+                            if (recommendationMeasures && recommendationMeasures.create) {
+                              recommendationMeasures.create = [
+                                ...recommendationMeasures.create,
+                                create,
+                              ];
+                            } else {
+                              recommendationMeasures = { create: [create] };
                             }
+                          }
 
                           // recommendationCategories by code or id
                           if (

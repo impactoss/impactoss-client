@@ -12,7 +12,9 @@ import asArray from 'utils/as-array';
 import appMessage from 'utils/app-message';
 import { validateField } from 'utils/forms';
 
-import { ErrorMessage, Formik, Form, Field as FormikField } from 'formik';
+import {
+  ErrorMessage, Formik, Form, Field as FormikField
+} from 'formik';
 import { selectNewEntityModal } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -321,8 +323,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       {group.fields.map((field, i) => {
         if (!field) return null;
         if (field.controlType !== 'info') {
-          const isContextRequiredForField =
-            !!field.dynamicValidators
+          const isContextRequiredForField = !!field.dynamicValidators
             || !!field.modifyFieldAttributes
             || !!field.isFieldDisabled;
           const FieldComponentWrapper = isContextRequiredForField ? FieldWithContext : FormikField;
@@ -334,7 +335,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
               field={isContextRequiredForField ? field : null}
             >
               {({ field: formikField, form, meta }) => {
-                let fieldProps = this.getFieldProps(field, form, formikField);
+                const fieldProps = this.getFieldProps(field, form, formikField);
                 return (
                   <Field id={field.id} labelledGroup={!!field.label}>
                     {this.renderFormField(
@@ -437,7 +438,9 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             initialValues={formData}
             onSubmit={(values) => handleSubmit(values)}
           >
-            {({ submitForm, isValid, isValidating, isSubmitting }) => {
+            {({
+              submitForm, isValid, isValidating, isSubmitting
+            }) => {
               bindHandleSubmit && bindHandleSubmit(submitForm);
               return (
                 <StyledForm>

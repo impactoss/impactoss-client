@@ -186,7 +186,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) => 
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) =>
     ([ // fieldGroups
       { // fieldGroup
         fields: [

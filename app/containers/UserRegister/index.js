@@ -136,7 +136,7 @@ UserRegister.propTypes = {
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   queryMessages: selectQueryMessages(state),
-})
+});
 
 export function mapDispatchToProps(dispatch) {
   return {
