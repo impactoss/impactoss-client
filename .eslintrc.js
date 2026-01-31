@@ -26,7 +26,7 @@ module.exports = {
   rules: {
     'arrow-parens': ['error', 'always'],
     'arrow-body-style': [2, 'as-needed'],
-    camelcase: 0,
+    'camelcase': 0,
     'comma-dangle': [2, 'always-multiline'],
     'import/imports-first': 0,
     'import/newline-after-import': 0,
@@ -35,7 +35,7 @@ module.exports = {
     'import/no-named-as-default': 0,
     'import/no-unresolved': 2,
     'import/prefer-default-export': 0,
-    indent: [2, 2, { SwitchCase: 1 }],
+    'indent': [2, 2, { SwitchCase: 1 }],
     'jsx-a11y/aria-props': 2,
     'jsx-a11y/heading-has-content': 0,
     'jsx-a11y/label-has-for': 0,
@@ -62,6 +62,8 @@ module.exports = {
     'redux-saga/no-yield-in-race': 2,
     'redux-saga/yield-effects': 2,
     'require-yield': 0,
+    'implicit-arrow-linebreak': 0,
+    'quote-props': 0, // Allow quoted properties like "framework_id"
     'import/no-webpack-loader-syntax': 0,
   },
   settings: {
