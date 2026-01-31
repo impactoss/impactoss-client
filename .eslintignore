@@ -1,0 +1,11 @@
+# Build outputs
+build/
+
+# Dependencies
+node_modules/
+
+# Misc
+docs/
+internals/
+server/
+*.min.js
