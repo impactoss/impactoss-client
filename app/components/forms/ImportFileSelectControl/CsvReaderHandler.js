@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import { useCSVReader } from 'react-papaparse';
 
 const CsvReaderHandler = ({ children, ...props }) => {
@@ -9,4 +11,10 @@ const CsvReaderHandler = ({ children, ...props }) => {
     </CSVReader>
   );
 };
+
+CsvReaderHandler.propTypes = {
+  children: PropTypes.node,
+  isButton: PropTypes.bool,
+};
+
 export default CsvReaderHandler;

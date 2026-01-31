@@ -27,13 +27,15 @@ import { CONTENT_MODAL } from 'containers/App/constants';
 
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
+import CsvDownloadHandler from 'components/CsvDownloadHandler';
+
 import ButtonForm from 'components/buttons/ButtonForm';
 import ButtonSubmit from 'components/buttons/ButtonSubmit';
 import { filterEntitiesByKeywords } from 'utils/entities';
 import { isMinSize } from 'utils/responsive';
 
 import OptionsForEntityList from './OptionsForEntityList';
-import CsvDownloadHandler from './CsvDownloadHandler';
+
 
 import messages from './messages';
 import {

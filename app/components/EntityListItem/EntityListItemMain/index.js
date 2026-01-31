@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { injectIntl } from 'react-intl';
+import { injectIntl, intlShape } from 'react-intl';
 // import { isEqual } from 'lodash/lang';
 import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
@@ -329,7 +329,7 @@ EntityListItemMain.propTypes = {
   isManager: PropTypes.bool,
   isFocus: PropTypes.bool,
   skipTargetId: PropTypes.string,
-  intl: PropTypes.object.isRequired,
+  intl: intlShape.isRequired, // eslint-disable-line react/no-unused-prop-types
 };
 
 export default injectIntl(EntityListItemMain);

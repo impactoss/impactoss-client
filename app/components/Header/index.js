@@ -12,7 +12,6 @@ import { isMinSize } from 'utils/responsive';
 import {
   SHOW_HEADER_TITLE,
   SHOW_HEADER_PATTERN,
-  STICKY_HEADER_ON_HOME,
   SHOW_BRAND_ON_HOME,
   SHOW_HEADER_SHADOW_ON_HOME,
   TEXT_TRUNCATE,
@@ -508,7 +507,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             {!SHOW_BRAND_ON_HOME && isHome
               && (
                 <HomeNavWrap>
-                  {this.renderSecondary(navItemsAdmin, search, hasSettings, onShowSettings, size)}
+                  {this.renderSecondary(navItemsSecondary, search, hasSettings, onShowSettings, size)}
                 </HomeNavWrap>
               )
             }

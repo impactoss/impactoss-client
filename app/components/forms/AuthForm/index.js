@@ -131,6 +131,7 @@ AuthForm.propTypes = {
   labels: PropTypes.object,
   fields: PropTypes.array,
   sending: PropTypes.bool,
+  initialValues: PropTypes.object, // Map?
 };
 AuthForm.defaultProps = {
   sending: false,

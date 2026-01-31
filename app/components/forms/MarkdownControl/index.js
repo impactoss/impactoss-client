@@ -78,7 +78,7 @@ const ViewButton = styled((p) => (
   background: none;
   opacity: ${({ active }) => active ? 1 : 0.6};
   border-bottom: 3px solid;
-  border-bottom-color: ${({ active, theme }) => active ? palette('primary', 1) : 'transparent'};
+  border-bottom-color: ${({ active }) => active ? palette('primary', 1) : 'transparent'};
   &:hover {
     opacity: 0.8;
     border-bottom-color: ${({ active, theme }) => active ? theme.global.colors.aHover : 'transparent'};

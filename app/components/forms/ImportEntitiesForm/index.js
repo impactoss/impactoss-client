@@ -29,6 +29,7 @@ import Main from 'components/EntityView/Main';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 
+import CsvDownloadHandler from 'components/CsvDownloadHandler';
 import DocumentWrap from 'components/fields/DocumentWrap';
 import FieldGroupWrapper from 'components/fields/FieldGroupWrapper';
 
@@ -44,7 +45,6 @@ import FormFooter from '../FormFooter';
 import FormFooterButtons from '../FormFooterButtons';
 
 import messages from './messages';
-import CsvDownloadHandler from './CsvDownloadHandler';
 
 const StyledForm = styled(Form)`
   display: table;
@@ -101,14 +101,6 @@ const CsvDownload = styled.span`
   display: inline-block;
 `;
 
-const NoteLink = styled`
-  color: ${palette('primary', 1)};
-  font-weight: 700;
-  &:hover {
-    color: ${palette('primary', 0)};
-    text-decoration: underline;
-  }
-`;
 const RowErrors = styled.div`
   margin-top: 2em;
 `;
@@ -183,6 +175,7 @@ function ImportEntitiesForm({
                               <CsvDownloadHandler
                                 data={asArray(template.data)}
                                 filename={template.filename}
+                                className="ioss-csv-downloader"
                               >
                                 <FormattedMessage {...messages.templateHintDownloadLink} />
                               </CsvDownloadHandler>

@@ -62,13 +62,12 @@ import { FORM_INITIAL, DEPENDENCIES } from './constants';
 function ActionImport({
   dataReady,
   authReady,
-  loadEntitiesIfNeeded,
-  redirectIfNotPermitted,
+  onLoadEntitiesIfNeeded,
+  onRedirectIfNotPermitted,
   categories,
   connections,
   handleCancel,
   handleSubmit,
-  resetProgress,
   errors,
   success,
   progress,
@@ -77,12 +76,12 @@ function ActionImport({
   // reload entities if invalidated
   useEffect(() => {
     if (!dataReady) {
-      loadEntitiesIfNeeded();
+      onLoadEntitiesIfNeeded();
     }
   }, [dataReady]);
   useEffect(() => {
     if (authReady) {
-      redirectIfNotPermitted();
+      onRedirectIfNotPermitted();
     }
   }, [authReady]);
 
@@ -178,13 +177,12 @@ function ActionImport({
 }
 
 ActionImport.propTypes = {
-  loadEntitiesIfNeeded: PropTypes.func,
-  redirectIfNotPermitted: PropTypes.func,
+  onLoadEntitiesIfNeeded: PropTypes.func,
+  onRedirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
-  resetProgress: PropTypes.func.isRequired,
   progress: PropTypes.number,
   errors: PropTypes.object,
   success: PropTypes.object,
@@ -205,13 +203,13 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    loadEntitiesIfNeeded: () => {
+    onLoadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
     resetProgress: () => {
       dispatch(resetProgress());
     },
-    redirectIfNotPermitted: () => {
+    onRedirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     handleSubmit: (formValues, connections, categories) => {
@@ -286,7 +284,7 @@ function mapDispatchToProps(dispatch) {
                   relationship.values.forEach(
                     (relValue) => {
                       // console.log(relValue)
-                      const [id, value] = relValue.trim().split('|');
+                      const [id,] = relValue.trim().split('|');
                       if (relConfig) {
                         // check if connection id is valid
                         let connectionId;
@@ -420,10 +418,6 @@ function mapDispatchToProps(dispatch) {
     },
     handleCancel: () => {
       dispatch(updatePath(ROUTES.MEASURES));
-    },
-    handleReset: () => {
-      dispatch(resetProgress());
-      dispatch(resetForm());
     },
   };
 }
