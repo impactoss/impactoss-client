@@ -27,7 +27,7 @@ module.exports = {
     'arrow-parens': ['error', 'always'],
     'arrow-body-style': [2, 'as-needed'],
     'camelcase': 0,
-    'comma-dangle': [2, 'always-multiline'],
+    'comma-dangle': 0,
     'import/imports-first': 0,
     'import/newline-after-import': 0,
     'import/no-dynamic-require': 0,
@@ -63,7 +63,8 @@ module.exports = {
     'redux-saga/yield-effects': 2,
     'require-yield': 0,
     'implicit-arrow-linebreak': 0,
-    'quote-props': 0, // Allow quoted properties like "framework_id"
+    'quote-props': 0,
+    'react/jsx-indent': 0,
     'import/no-webpack-loader-syntax': 0,
   },
   settings: {
