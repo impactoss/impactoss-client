@@ -9,7 +9,7 @@ const Styled = styled.div`
   height: 50px;
   max-width: 230px;
 `;
-const StyledButton = styled(ButtonDefaultWithIcon)`
+const StyledButton = styled((p) => <ButtonDefaultWithIcon {...p} />)`
   &:focus-visible {
     outline-offset: 4px !important;
   }
