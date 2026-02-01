@@ -229,7 +229,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         fields: [
           renderUserControl(
             users,
-            intl.formatMessage(appMessages.attributes.manager_id.categories)
+            intl.formatMessage(appMessages.attributes.manager_id.categories),
           ),
         ],
       });
@@ -329,7 +329,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                   formData,
                   measures,
                   recommendationsByFw,
-                  taxonomy
+                  taxonomy,
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(taxonomyReference)}
@@ -346,7 +346,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                       measures,
                       onCreateOption,
                       FORM_INITIAL.getIn(['attributes', 'user_only']),
-                      intl
+                      intl,
                     ),
                     aside: this.getBodyAsideFields(users, isAdmin, taxonomy, intl),
                   },
@@ -429,7 +429,7 @@ function mapDispatchToProps(dispatch) {
               connectionAttribute: 'associatedMeasures',
               createConnectionKey: 'measure_id',
               createKey: 'category_id',
-            })
+            }),
           );
         }
         if (recommendationsByFw && taxonomy.getIn(['attributes', 'tags_recommendations'])) {
@@ -452,7 +452,7 @@ function mapDispatchToProps(dispatch) {
                   delete: [],
                   create: [],
                 }),
-              )
+              ),
           );
         }
       }

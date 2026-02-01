@@ -127,7 +127,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
       ['attributes', 'due_date_id'],
       indicator && indicator.get('dates')
         ? getDueDateDateOptions(indicator.get('dates'))[0].value
-        : '0'
+        : '0',
     ));
 
   getHeaderAsideFields = (canUserPublish, intl) =>
@@ -164,8 +164,8 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
             getDueDateDateOptions(
               indicator.get('dates'),
               intl.formatMessage,
-              intl.formatDate
-            )
+              intl.formatDate,
+            ),
           )],
       },
     ]);
@@ -259,7 +259,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                   this.props.handleSubmit(
                     formData,
                     indicatorReference,
-                    highestRole
+                    highestRole,
                   );
                 }}
                 handleSubmitFail={this.props.handleSubmitFail}
@@ -347,7 +347,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(save(
         saveData.toJS(),
         canUserSeeDraftContent(highestRole) ? ROUTES.PROGRESS_REPORTS : `${ROUTES.INDICATORS}/${indicatorReference}`,
-        !canUserSeeDraftContent(highestRole) // createAsGuest: do not append created id to redirect, do not create locally
+        !canUserSeeDraftContent(highestRole), // createAsGuest: do not append created id to redirect, do not create locally
       ));
     },
     handleCancel: (indicatorReference) => {

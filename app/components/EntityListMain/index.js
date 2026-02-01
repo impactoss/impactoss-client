@@ -83,7 +83,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     jumpToComponent(
       this.ScrollTarget.current,
       this.ScrollReference.current,
-      this.ScrollContainer.current
+      this.ScrollContainer.current,
     );
   };
 
@@ -191,8 +191,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
             intl.formatMessage(
               isPlural
                 ? appMessages.entities.taxonomies[groupSelectValue].plural
-                : appMessages.entities.taxonomies[groupSelectValue].single
-            )
+                : appMessages.entities.taxonomies[groupSelectValue].single,
+            ),
           ),
       });
     }

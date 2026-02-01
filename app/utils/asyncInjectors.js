@@ -16,7 +16,7 @@ export function injectAsyncReducer(store, isValid) {
 
     invariant(
       isString(name) && !isEmpty(name) && isFunction(asyncReducer),
-      '(app/utils...) injectAsyncReducer: Expected `asyncReducer` to be a reducer function'
+      '(app/utils...) injectAsyncReducer: Expected `asyncReducer` to be a reducer function',
     );
 
     if (Reflect.has(store.asyncReducers, name)) return;
@@ -35,12 +35,12 @@ export function injectAsyncSagas(store, isValid) {
 
     invariant(
       Array.isArray(sagas),
-      '(app/utils...) injectAsyncSagas: Expected `sagas` to be an array of generator functions'
+      '(app/utils...) injectAsyncSagas: Expected `sagas` to be an array of generator functions',
     );
 
     warning(
       !isEmpty(sagas),
-      '(app/utils...) injectAsyncSagas: Received an empty `sagas` array'
+      '(app/utils...) injectAsyncSagas: Received an empty `sagas` array',
     );
 
     sagas.map(store.runSaga);

@@ -13,7 +13,7 @@ import appMessage from 'utils/app-message';
 import { validateField } from 'utils/forms';
 
 import {
-  ErrorMessage, Formik, Form, Field as FormikField
+  ErrorMessage, Formik, Form, Field as FormikField,
 } from 'formik';
 import { selectNewEntityModal } from 'containers/App/selectors';
 
@@ -268,14 +268,14 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             field.formData,
             hasEntityNewModal,
             scrollContainer,
-            formikActions
+            formikActions,
           );
           break;
         case 'uploader':
           formField = this.renderUploader(
             field,
             field.formData,
-            formikActions
+            formikActions,
           );
           break;
         default:
@@ -343,7 +343,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                       false,
                       hasEntityNewModal,
                       scrollContainer,
-                      form
+                      form,
                     )}
                     {meta.touched && meta.error && (
                       <ErrorWrapper>
@@ -393,7 +393,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             <div key={i}>
               {this.renderGroup(fieldGroup, hasEntityNewModal, scrollContainer)}
             </div>
-          )
+          ),
         )
       }
     </Main>
@@ -412,7 +412,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             <div key={i}>
               {this.renderGroup(fieldGroup, hasEntityNewModal, scrollContainer)}
             </div>
-          )
+          ),
         )
       }
     </Aside>
@@ -439,7 +439,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             onSubmit={(values) => handleSubmit(values)}
           >
             {({
-              submitForm, isValid, isValidating, isSubmitting
+              submitForm, isValid, isValidating, isSubmitting,
             }) => {
               if (bindHandleSubmit) bindHandleSubmit(submitForm);
               return (

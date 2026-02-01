@@ -361,7 +361,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           {
             title: `${intl.formatMessage(messages.editFormTitlePrefix)} ${entitiesSelected.size} ${intl.formatMessage(messages.editFormTitlePostfix)}`,
           },
-          intl
+          intl,
         );
       }
     }

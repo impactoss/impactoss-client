@@ -144,7 +144,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
               title: intl.formatMessage(messages.addReport),
               onClick: this.props.handleNewReport,
             }
-            : null
+            : null,
         ),
       ],
     });
@@ -199,7 +199,7 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
         getManagerField(
           entity,
           appMessages.attributes.manager_id.indicators,
-          appMessages.attributes.manager_id.indicatorsEmpty
+          appMessages.attributes.manager_id.indicatorsEmpty,
         ),
       ],
     },

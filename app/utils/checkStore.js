@@ -17,6 +17,6 @@ export default function checkStore(store) {
   };
   invariant(
     conformsTo(store, shape),
-    '(app/utils...) redirects: Expected a valid redux store'
+    '(app/utils...) redirects: Expected a valid redux store',
   );
 }

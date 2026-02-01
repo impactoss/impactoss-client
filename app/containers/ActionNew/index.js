@@ -380,7 +380,7 @@ function mapDispatchToProps(dispatch) {
               create: updates.get('create').concat(formCategoryIds.map((id) => Map({
                 category_id: id,
               }))),
-            }), Map({ delete: List(), create: List() }))
+            }), Map({ delete: List(), create: List() })),
         );
       }
 
@@ -405,7 +405,7 @@ function mapDispatchToProps(dispatch) {
                 delete: [],
                 create: [],
               }),
-            )
+            ),
         );
       }
 

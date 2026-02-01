@@ -4,7 +4,7 @@ import { toLower } from 'lodash/string';
 
 // eslint-disable-next-line import/no-unresolved
 import {
-  isValid, format, parse, startOfToday, getYear, getMonth
+  isValid, format, parse, startOfToday, getYear, getMonth,
 } from 'date-fns';
 import validateDateFormat from 'components/forms/validators/validate-date-format';
 import { DayPicker } from 'react-day-picker';

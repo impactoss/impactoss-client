@@ -41,7 +41,7 @@ export const groupEntities = (
           subgroupSelectValue,
           contextIntl,
           frameworks,
-        )
+        ),
       )
       .delete('entities'))
   : makeEntityGroups(
@@ -122,7 +122,7 @@ export const makeTaxonomyGroups = (entities, taxonomy, contextIntl, frameworks) 
             messages.notapplicable,
             {
               taxonomy: lowerCase(getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl)),
-            }
+            },
           ),
           entities: List().push(entity),
           order: 'zzzzzzzz',
@@ -138,7 +138,7 @@ export const makeTaxonomyGroups = (entities, taxonomy, contextIntl, frameworks) 
             messages.without,
             {
               taxonomy: lowerCase(getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl)),
-            }
+            },
           ),
           entities: List().push(entity),
           order: 'xxxxxxxx',
@@ -149,7 +149,7 @@ export const makeTaxonomyGroups = (entities, taxonomy, contextIntl, frameworks) 
   }); // for each entities
   return groups.sortBy(
     (group) => group.get('order'),
-    (a, b) => getEntitySortComparator(a, b, 'asc')
+    (a, b) => getEntitySortComparator(a, b, 'asc'),
   ).toList();
 };
 

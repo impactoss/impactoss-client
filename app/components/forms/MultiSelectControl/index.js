@@ -179,7 +179,7 @@ class MultiSelectControl extends React.Component {
         queryTags: active
           ? prevState.queryTags.concat([tagOption.get('value')])
           : without(prevState.queryTags, tagOption.get('value')),
-      })
+      }),
     );
   };
 

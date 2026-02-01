@@ -184,7 +184,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
             taxonomies,
             measureConnections,
             onEntityClick,
-          )
+          ),
         ));
       } else if (entity.getIn(['taxonomy', 'attributes', 'tags_measures']) && measures) {
         // related actions
@@ -220,7 +220,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                 onEntityClick,
                 fwid,
                 hasResponse,
-              )
+              ),
             );
           });
         });
@@ -278,7 +278,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         fields: [getManagerField(
           entity,
           appMessages.attributes.manager_id.categories,
-          appMessages.attributes.manager_id.categoriesEmpty
+          appMessages.attributes.manager_id.categoriesEmpty,
         )],
       });
     }
@@ -287,7 +287,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
 
   /* eslint-disable react/destructuring-assignment */
   getTaxTitle = (id) => this.props.intl.formatMessage(
-    appMessages.entities.taxonomies[id].single
+    appMessages.entities.taxonomies[id].single,
   );
   /* eslint-ensable react/destructuring-assignment */
 

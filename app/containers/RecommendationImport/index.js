@@ -104,7 +104,7 @@ function RecommendationImport({
     return memo;
   }, []);
   const relationshipFields = Object.keys(
-    ENTITY_FIELDS.recommendations.RELATIONSHIPS_IMPORT
+    ENTITY_FIELDS.recommendations.RELATIONSHIPS_IMPORT,
   ).reduce(
     (memo, key) => {
       if (
@@ -232,7 +232,7 @@ function mapDispatchToProps(dispatch) {
                   if (validateDateFormat(val, DATE_FORMAT)) {
                     return format(
                       parse(val, DATE_FORMAT, new Date()),
-                      API_DATE_FORMAT
+                      API_DATE_FORMAT,
                     );
                   }
                   return '';
@@ -286,7 +286,7 @@ function mapDispatchToProps(dispatch) {
                   relationship.values.forEach(
                     (relValue) => {
                       // console.log(relValue)
-                      const [id,] = relValue.trim().split('|');
+                      const [id] = relValue.trim().split('|');
                       if (relConfig) {
                         // check if connection id is valid
                         let connectionId;
@@ -296,7 +296,7 @@ function mapDispatchToProps(dispatch) {
                             if (categories && relConfig.lookup.table === API.CATEGORIES) {
                               const category = categories.find(
                                 (entity) => entity.getIn(['attributes', relConfig.lookup.attribute])
-                                  && qe(entity.getIn(['attributes', relConfig.lookup.attribute]).trim(), id)
+                                  && qe(entity.getIn(['attributes', relConfig.lookup.attribute]).trim(), id),
                               );
                               if (category) {
                                 connectionId = category.get('id');
@@ -305,7 +305,7 @@ function mapDispatchToProps(dispatch) {
                               const connection = connections.get(relConfig.lookup.table)
                                 && connections.get(relConfig.lookup.table).find(
                                   (entity) => entity.getIn(['attributes', relConfig.lookup.attribute])
-                                    && qe(entity.getIn(['attributes', relConfig.lookup.attribute]).trim(), id)
+                                    && qe(entity.getIn(['attributes', relConfig.lookup.attribute]).trim(), id),
                                 );
                               if (connection) {
                                 connectionId = connection.get('id');
@@ -382,10 +382,10 @@ function mapDispatchToProps(dispatch) {
                           ];
                         }
                       } // relConfig
-                    }
+                    },
                   ); // forEach
                 }
-              }
+              },
             );
             rowClean = {
               ...rowClean,
@@ -411,7 +411,7 @@ function mapDispatchToProps(dispatch) {
                 invalidItem,
                 {
                   timestamp: `${Date.now()}-${Math.random().toString(36).slice(-8)}`,
-                }
+                },
               ),
             ));
           });

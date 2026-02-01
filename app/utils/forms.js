@@ -40,7 +40,7 @@ export const entityOption = (entity, defaultToId, hasTags) => Map({
 
 export const entityOptions = (entities, defaultToId = true, hasTags = true) => entities
   ? entities.toList().map(
-    (entity) => entityOption(entity, defaultToId, hasTags)
+    (entity) => entityOption(entity, defaultToId, hasTags),
   )
   : List();
 
@@ -57,8 +57,8 @@ export const userOption = (entity, activeUserId, searchAttributes) => Map({
 export const userOptions = (entities, activeUserId, searchAttributes) => entities
   ? entities.reduce(
     (options, entity) => options.push(
-      userOption(entity, activeUserId, searchAttributes)
-    ), List()
+      userOption(entity, activeUserId, searchAttributes),
+    ), List(),
   )
   : List();
 
@@ -82,7 +82,7 @@ export const taxonomyOptions = (taxonomies) => taxonomies
   ? sortEntities(taxonomies, 'asc', 'priority').reduce(
     (values, tax) => values.set(
       tax.get('id'),
-      entityOptions(tax.get('categories'), false, false)
+      entityOptions(tax.get('categories'), false, false),
     ),
     Map(),
   )
@@ -284,7 +284,7 @@ export const getCategoryUpdatesFromFormData = ({
           ? associatedIds.push(associatedId)
           : associatedIds,
         List(),
-      )
+      ),
     ),
     create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) => !associatedCategories.has(catId)
       ? payloads.push(Map({
@@ -327,7 +327,7 @@ export const getConnectionUpdatesFromFormData = ({
     (associatedIds, associatedId, id) => !formConnectionIds.includes(id)
       ? associatedIds.push(associatedId)
       : associatedIds,
-    List()
+    List(),
   );
   // also remove any other category associations an entity may have
   // if it cannot have multiple categories ()
@@ -345,7 +345,7 @@ export const getConnectionUpdatesFromFormData = ({
           (associationId) => {
             const otherId = connectionCategories.get(associationId);
             return taxonomyCategoryIds.includes(`${otherId}`);
-          }
+          },
         );
         return associationsToRemove
           ? memo.concat(associationsToRemove)

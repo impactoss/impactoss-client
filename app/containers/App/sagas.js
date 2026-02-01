@@ -255,7 +255,7 @@ export function* recoverSaga(payload) {
       {
         replace: true,
         query: { info: PARAMS.RECOVER_SUCCESS },
-      }
+      },
     ));
   } catch (err) {
     console.log('ERROR in recoverSaga');
@@ -311,7 +311,7 @@ export function* validateTokenSaga() {
           [KEYS.UID]: uid,
           [KEYS.CLIENT]: client,
           [KEYS.ACCESS_TOKEN]: accessToken,
-        }
+        },
       );
       if (!response.success) {
         yield call(clearAuthValues);
@@ -472,7 +472,7 @@ export function* saveMultipleEntitiesSaga({ path, data }) {
       { data: datum },
       updateClient, // update client for small batch jobs
       true, // multiple
-    )
+    ),
   ));
   if (!updateClient) {
     yield put(invalidateEntities(path));
@@ -514,7 +514,7 @@ export function* deleteMultipleEntitiesSaga({ path, data }) {
       { data: datum },
       updateClient, // do not update client
       true, // multiple
-    )
+    ),
   ));
   if (!updateClient) {
     yield put(invalidateEntities(path));
@@ -597,7 +597,7 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
           {
             query: { info: 'createdAsGuest', infotype: data.path },
             replace: true,
-          }
+          },
         ));
       } else {
         yield put(updatePath(
@@ -629,7 +629,7 @@ export function* newMultipleEntitiesSaga({ path, data }) {
       { data: datum },
       updateClient, // do not update client
       true, // multiple
-    )
+    ),
   ));
   if (!updateClient) {
     yield put(invalidateEntities(path));
@@ -842,7 +842,7 @@ export function* updatePathSaga({ path, args }) {
       ? asArray(query).filter((item) => item.remove || item.replace).map((item) => item.arg)
       : [];
     const queryKeep = location.get('query').filter(
-      (val, key) => KEEP_QUERY_ARGS.indexOf(key) > -1 && argsRemove.indexOf(key) === -1
+      (val, key) => KEEP_QUERY_ARGS.indexOf(key) > -1 && argsRemove.indexOf(key) === -1,
     ).toJS();
     queryNext = {
       ...queryNext,
@@ -868,7 +868,7 @@ export function* closeEntitySaga({ path }) {
   yield put(
     !isPreviousValid && previousPath && (previousPath !== currentPath)
       ? goBack()
-      : updatePath(path || '/')
+      : updatePath(path || '/'),
   );
 }
 

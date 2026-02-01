@@ -107,14 +107,14 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
   };
 
   getInitialFormData = ({
-    taxonomies, measures, indicators, viewEntity
+    taxonomies, measures, indicators, viewEntity,
   }) =>
     viewEntity
       ? Map({
         id: viewEntity.get('id'),
         attributes: viewEntity.get('attributes').mergeWith(
           (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-          FORM_INITIAL.get('attributes')
+          FORM_INITIAL.get('attributes'),
         ),
         associatedTaxonomies: taxonomyOptions(taxonomies),
         associatedMeasures: entityOptions(measures, true),
@@ -154,7 +154,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     indicators,
     onCreateOption,
     hasResponse,
-    intl
+    intl,
   ) => {
     const groups = [];
     groups.push({
@@ -228,7 +228,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     } = viewDomain.get('page').toJS();
     const frameworkId = viewEntity && viewEntity.getIn(['attributes', 'framework_id']);
     const type = intl.formatMessage(
-      appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single
+      appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single,
     );
 
     const currentFramework = dataReady && frameworks.find((fw) => qe(fw.get('id'), frameworkId));
@@ -325,7 +325,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                       existingReferences
                         ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
                         : null,
-                      intl
+                      intl,
                     ),
                     aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
@@ -337,13 +337,13 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                       hasIndicators && indicators,
                       onCreateOption,
                       hasResponse,
-                      intl
+                      intl,
                     ),
                     aside: this.getBodyAsideFields(
                       fwTaxonomies,
                       onCreateOption,
                       canUserAdministerCategories,
-                      intl
+                      intl,
                     ),
                   },
                 }}
@@ -434,7 +434,7 @@ function mapDispatchToProps(dispatch, props) {
             formData,
             taxonomies,
             createKey: 'recommendation_id',
-          })
+          }),
         )
         .set(
           'recommendationMeasures',
@@ -444,7 +444,7 @@ function mapDispatchToProps(dispatch, props) {
             connectionAttribute: 'associatedMeasures',
             createConnectionKey: 'measure_id',
             createKey: 'recommendation_id',
-          })
+          }),
         )
         .set(
           'recommendationIndicators',
@@ -454,7 +454,7 @@ function mapDispatchToProps(dispatch, props) {
             connectionAttribute: 'associatedIndicators',
             createConnectionKey: 'indicator_id',
             createKey: 'recommendation_id',
-          })
+          }),
         );
       // cleanup attributes for framework
       if (!currentFramework || !currentFramework.getIn(['attributes', 'has_response'])) {

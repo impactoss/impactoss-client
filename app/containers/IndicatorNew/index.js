@@ -195,11 +195,11 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
           getCheckboxField(
             intl.formatMessage,
             'repeat',
-            false
+            false,
           ),
           getFrequencyField(
             intl.formatMessage,
-            (formData) => !this.props.isRepeat(formData)
+            (formData) => !this.props.isRepeat(formData),
           ),
           getDateField({
             formatMessage: intl.formatMessage,
@@ -415,7 +415,7 @@ function mapDispatchToProps(dispatch) {
                 delete: [],
                 create: [],
               }),
-            )
+            ),
         );
       }
       // TODO: remove once have singleselect instead of multiselect

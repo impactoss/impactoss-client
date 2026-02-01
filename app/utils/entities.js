@@ -16,7 +16,7 @@ import { qe } from 'utils/quasi-equals';
 
 export const getSupportLevel = (entity) => find(
   SUPPORT_LEVELS,
-  (option) => option.value === (entity.getIn(['attributes', 'support_level']) || null)
+  (option) => option.value === (entity.getIn(['attributes', 'support_level']) || null),
 );
 
 // check if entity has nested connection by id
@@ -53,8 +53,8 @@ export const testEntityTaxonomyAssociation = (
         categories.getIn([
           catId.toString(),
           'attributes', 'taxonomy_id',
-        ])
-      )
+        ]),
+      ),
   );
 
 // check if entity has any nested connection by type
@@ -74,7 +74,7 @@ export const prepareEntitySearchTarget = (entity, fields, queryLength) => reduce
   (target, field) => queryLength > SEARCH.MIN_LENGTH || field === 'reference '
     ? `${target} ${cleanupSearchTarget(entity.getIn(['attributes', field]))}`
     : target,
-  entity.get('id')
+  entity.get('id'),
 );
 
 export const getConnectedCategories = (
@@ -87,8 +87,8 @@ export const getConnectedCategories = (
       category,
       path,
       connectionId,
-    )
-  )
+    ),
+  ),
 );
 
 
@@ -102,7 +102,7 @@ export const filterEntitiesWithoutAssociation = (
   (entity) => asList(query).every(
     (pathOrTax) => isNumber(pathOrTax)
       ? !testEntityTaxonomyAssociation(entity, categories, parseInt(pathOrTax, 10))
-      : !testEntityAssociation(entity, pathOrTax)
+      : !testEntityAssociation(entity, pathOrTax),
   ),
 );
 
@@ -117,8 +117,8 @@ export const filterEntitiesByCategories = (
       (categoryId) => testEntityCategoryAssociation(
         entity,
         parseInt(categoryId, 10),
-      )
-    )
+      ),
+    ),
   );
 
 // filter entities by association with one or more categories
@@ -142,10 +142,10 @@ export const filterEntitiesByConnectedCategories = (
         ) && testEntityCategoryAssociation(
           connection,
           pathValue[1],
-        )
+        ),
       );
     },
-  )
+  ),
 );
 
 // filter entities by by association with one or more entities of specific connection type
@@ -162,7 +162,7 @@ export const filterEntitiesByConnection = (
       return entity.get(path)
         && testEntityEntityAssociation(entity, path, pathValue[1]);
     },
-  )
+  ),
 );
 
 // query is object not string!
@@ -173,7 +173,7 @@ export const filterEntitiesByAttributes = (entities, query) => entities
       (value, attribute) => attribute === 'id'
         ? qe(entity.get('id'), value)
         : qe(entity.getIn(['attributes', attribute]), value),
-    )
+    ),
   );
 
 export const filterEntitiesByKeywords = (
@@ -189,8 +189,8 @@ export const filterEntitiesByKeywords = (
           entity,
           searchAttributes,
           query.length,
-        )
-      )
+        ),
+      ),
     );
   } catch (e) {
     return entities;
@@ -200,7 +200,7 @@ export const filterEntitiesByKeywords = (
 export const entitiesSetCategoryIds = (
   entities,
   associationsGrouped,
-  categories
+  categories,
 ) => entities && entities.map(
   (entity) => entity.set(
     'categories',
@@ -208,8 +208,8 @@ export const entitiesSetCategoryIds = (
       parseInt(entity.get('id'), 10),
       associationsGrouped,
       categories,
-    )
-  )
+    ),
+  ),
 );
 
 
@@ -220,7 +220,7 @@ const entitySetAssociated = (
 ) => {
   if (associations) {
     const entityAssociationKey = associations.findKey(
-      (association) => qe(association, entity.get('id'))
+      (association) => qe(association, entity.get('id')),
     );
     if (entityAssociationKey) {
       return entity.set('associated', entityAssociationKey);
@@ -234,7 +234,7 @@ export const entitiesSetAssociated = (
   associationId,
 ) => {
   const associations = associationsGrouped.get(
-    parseInt(associationId, 10)
+    parseInt(associationId, 10),
   );
   return entities && entities.map(
     (entity) => entitySetAssociated(
@@ -250,7 +250,7 @@ const entitySetAssociatedCategory = (
 ) => {
   if (entityCategorised.get('categories')) {
     const associationKey = entityCategorised.get('categories').findKey(
-      (id) => qe(id, categoryId)
+      (id) => qe(id, categoryId),
     );
     return entityCategorised.set('associated', associationKey);
   }
@@ -260,7 +260,7 @@ export const entitiesSetAssociatedCategory = (
   entitiesCategorised,
   categoryId,
 ) => entitiesCategorised && entitiesCategorised.map(
-  (entity) => entitySetAssociatedCategory(entity, categoryId)
+  (entity) => entitySetAssociatedCategory(entity, categoryId),
 );
 
 export const entitiesSetSingle = (
@@ -269,7 +269,7 @@ export const entitiesSetSingle = (
   key,
   relatedKey,
 ) => entities && entities.map(
-  (entity) => entitySetSingle(entity, related, key, relatedKey)
+  (entity) => entitySetSingle(entity, related, key, relatedKey),
 );
 
 export const entitySetSingle = (
@@ -281,8 +281,8 @@ export const entitySetSingle = (
   && entity.set(
     key,
     related.find(
-      (r) => qe(entity.getIn(['attributes', relatedKey]), r.get('id'))
-    )
+      (r) => qe(entity.getIn(['attributes', relatedKey]), r.get('id')),
+    ),
   );
 
 export const entitySetUser = (entity, users) => {
@@ -314,9 +314,9 @@ export const filterTaxonomies = (
       // only non-parents
       || !list.some(
         (other) => other.getIn(['attributes', tagsKey])
-          && qe(tax.get('id'), other.getIn(['attributes', 'parent_id']))
+          && qe(tax.get('id'), other.getIn(['attributes', 'parent_id'])),
       )
-    )
+    ),
 );
 
 export const prepareTaxonomiesIsAssociated = (
@@ -331,8 +331,8 @@ export const prepareTaxonomiesIsAssociated = (
   const filteredAssociations = associations.filter(
     (association) => qe(
       association.getIn(['attributes', associationKey]),
-      associationId
-    )
+      associationId,
+    ),
   );
   const filteredTaxonomies = taxonomies && filterTaxonomies(
     taxonomies,
@@ -341,31 +341,31 @@ export const prepareTaxonomiesIsAssociated = (
   ).map(
     (tax) => tax.set(
       'tags',
-      tax.getIn(['attributes', tagsKey])
+      tax.getIn(['attributes', tagsKey]),
       // set categories
-    )
+    ),
   );
   return filteredTaxonomies.map(
     (tax) => {
       const childTax = includeParents
         && taxonomies.find((potential) => qe(
           potential.getIn(['attributes', 'parent_id']),
-          tax.get('id')
+          tax.get('id'),
         ));
       return tax.set(
         'categories',
         categories.filter(
           (cat) => qe(
             cat.getIn(['attributes', 'taxonomy_id']),
-            tax.get('id')
-          )
+            tax.get('id'),
+          ),
         ).filter(
           (cat) => {
             const hasAssociations = filteredAssociations.some(
               (association) => qe(
                 association.getIn(['attributes', 'category_id']),
-                cat.get('id')
-              )
+                cat.get('id'),
+              ),
             );
             if (hasAssociations) {
               return true;
@@ -377,22 +377,22 @@ export const prepareTaxonomiesIsAssociated = (
               (childCat) => qe(
                 childCat.getIn(['attributes', 'taxonomy_id']),
                 childTax.get('id'),
-              )
+              ),
             ).filter(
               (childCat) => qe(
                 childCat.getIn(['attributes', 'parent_id']),
                 cat.get('id'),
-              )
+              ),
             ).some(
               (child) => filteredAssociations.find(
                 (association) => qe(
                   association.getIn(['attributes', 'category_id']),
-                  child.get('id')
-                )
-              )
+                  child.get('id'),
+                ),
+              ),
             ); // some
-          }
-        ) // filter
+          },
+        ), // filter
       ); // set
     },
   ); // map/return
@@ -401,10 +401,10 @@ export const prepareTaxonomiesIsAssociated = (
 export const getTaxCategories = (categories, taxonomy, tagsKey) => categories.filter(
   (cat) => qe(
     cat.getIn(['attributes', 'taxonomy_id']),
-    taxonomy.get('id')
+    taxonomy.get('id'),
   ) && (
     !cat.getIn(['attributes', 'user_only']) || tagsKey === 'tags_users'
-  )
+  ),
 );
 
 export const prepareTaxonomiesAssociated = (
@@ -421,13 +421,13 @@ export const prepareTaxonomiesAssociated = (
       const catsAssociated = entitiesSetAssociated(
         taxCategories,
         associationsGrouped,
-        associationId
+        associationId,
       );
       return tax.set(
         'tags',
         tax.getIn(['attributes', tagsKey]),
       ).set('categories', catsAssociated);
-    }
+    },
   );
 
 // TODO deal with conflicts
@@ -444,7 +444,7 @@ export const prepareTaxonomiesMultiple = (
       categories,
       tagsKey,
       includeParents,
-    )
+    ),
   ),
   Map(),
 );
@@ -460,9 +460,9 @@ export const prepareTaxonomies = (
       const taxCategories = getTaxCategories(categories, tax, tagsKey);
       return tax.set(
         'tags',
-        tax.getIn(['attributes', tagsKey])
+        tax.getIn(['attributes', tagsKey]),
       ).set('categories', taxCategories);
-    }
+    },
   );
 
 export const prepareCategory = (
@@ -476,7 +476,7 @@ export const prepareCategory = (
       taxonomies.find(
         (tax) => qe(
           category.getIn(['attributes', 'taxonomy_id']),
-          tax.get('id')
+          tax.get('id'),
         ),
       ),
     );
@@ -503,7 +503,7 @@ export const usersByMinimumRole = (
   userRoles,
   roleId,
 ) => users && users.filter(
-  (user) => hasUserMinimumRole(user, userRoles, roleId)
+  (user) => hasUserMinimumRole(user, userRoles, roleId),
 );
 
 export const usersByRole = (
@@ -518,11 +518,11 @@ export const usersByRole = (
         roleId,
       ) && qe(
         association.getIn(['attributes', 'user_id']),
-        user.get('id')
-      )
+        user.get('id'),
+      ),
     );
     return roles && roles.size > 0;
-  }
+  },
 );
 
 export const getEntityTitle = (entity, labels, contextIntl) => {
@@ -560,7 +560,7 @@ export const getCategoryShortTitle = (category) => truncateText(
       category.getIn(['attributes', 'title'])
       || category.getIn(['attributes', 'name'])
     ),
-  TEXT_TRUNCATE.ENTITY_TAG
+  TEXT_TRUNCATE.ENTITY_TAG,
 );
 
 export const getCategoryTitle = (cat) => cat.getIn(['attributes', 'reference'])
@@ -577,7 +577,7 @@ export const getEntityCategories = (
 ) => {
   // directly associated categories
   const categoryIds = associationsGrouped.get(
-    parseInt(entityId, 10)
+    parseInt(entityId, 10),
   );
 
   // include parent categories of associated categories when categories present
@@ -611,8 +611,8 @@ export const getTaxonomyCategories = (
   const taxCategories = categories.filter(
     (category) => qe(
       category.getIn(['attributes', 'taxonomy_id']),
-      taxonomy.get('id')
-    )
+      taxonomy.get('id'),
+    ),
   );
   return taxCategories.map(
     (category) => {
@@ -632,7 +632,7 @@ export const getTaxonomyCategories = (
               return memo;
             }
             return memo.merge(
-              groupedAssociations.get(parseInt(child.get('id'), 10))
+              groupedAssociations.get(parseInt(child.get('id'), 10)),
             );
           },
           categoryAssocations || Map(),
@@ -643,11 +643,11 @@ export const getTaxonomyCategories = (
           relationship.path,
           // consider reduce for combined filter and map
           categoryAssocations.map(
-            (association) => association.getIn(['attributes', relationship.key])
-          )
+            (association) => association.getIn(['attributes', relationship.key]),
+          ),
         )
         : category;
-    }
+    },
   );
 };
 

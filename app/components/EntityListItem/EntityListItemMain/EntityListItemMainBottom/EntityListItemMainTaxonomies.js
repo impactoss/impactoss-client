@@ -91,7 +91,7 @@ class EntityListItemMainTaxonomies extends React.PureComponent { // eslint-disab
 
   render() {
     const {
-      categories, taxonomies, onEntityClick, intl
+      categories, taxonomies, onEntityClick, intl,
     } = this.props;
     const smartTaxonomy = taxonomies && taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
     const entityTags = categories && this.getEntityTags(categories, taxonomies, onEntityClick);

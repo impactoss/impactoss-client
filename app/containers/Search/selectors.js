@@ -21,7 +21,7 @@ import { CONFIG } from './constants';
 
 export const selectPathQuery = createSelector(
   (state, locationQuery) => locationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('path')
+  (locationQuery) => locationQuery && locationQuery.get('path'),
 );
 
 // kicks off series of cascading selectors
@@ -48,7 +48,7 @@ export const selectEntitiesByQuery = createSelector(
             ? filterEntitiesByKeywords(
               categories,
               searchQuery,
-              group.get('categorySearch').valueSeq().toArray()
+              group.get('categorySearch').valueSeq().toArray(),
             )
             : categories;
           if (path === `taxonomies-${tax.get('id')}` || (!path && !active && filteredCategories.size > 0)) {
@@ -88,13 +88,13 @@ export const selectEntitiesByQuery = createSelector(
                       (entity) => qe(
                         entity.getIn(['attributes', 'framework_id']),
                         fw.get('id'),
-                      )
+                      ),
                     );
                   const filteredEntities = searchQuery
                     ? filterEntitiesByKeywords(
                       fwEntities,
                       searchQuery,
-                      target.get('search').valueSeq().toArray()
+                      target.get('search').valueSeq().toArray(),
                     )
                     : fwEntities;
                   const fwTargetPath = `${target.get('path')}_${fw.get('id')}`;
@@ -121,8 +121,8 @@ export const selectEntitiesByQuery = createSelector(
                           filteredEntities,
                           order || (sortOption ? sortOption.order : 'desc'),
                           sort || (sortOption ? sortOption.attribute : 'id'),
-                          sortOption ? sortOption.type : 'number'
-                        ))
+                          sortOption ? sortOption.type : 'number',
+                        )),
                     );
                   }
                   return innerMemo.push(fwTarget.set('results', filteredEntities));
@@ -133,7 +133,7 @@ export const selectEntitiesByQuery = createSelector(
                 ? filterEntitiesByKeywords(
                   targetEntties,
                   searchQuery,
-                  target.get('search').valueSeq().toArray()
+                  target.get('search').valueSeq().toArray(),
                 )
                 : allEntities.get(target.get('path'));
 
@@ -156,15 +156,15 @@ export const selectEntitiesByQuery = createSelector(
                       filteredEntities,
                       order || (sortOption ? sortOption.order : 'desc'),
                       sort || (sortOption ? sortOption.attribute : 'id'),
-                      sortOption ? sortOption.type : 'number'
-                    ))
+                      sortOption ? sortOption.type : 'number',
+                    )),
                 );
               }
               return memo.push(target.set('results', filteredEntities));
             },
             List(),
-          )
+          ),
       );
     });
-  }
+  },
 );

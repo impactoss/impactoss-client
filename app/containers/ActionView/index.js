@@ -186,8 +186,8 @@ export class ActionView extends React.PureComponent { // eslint-disable-line rea
     let taxonomiesFiltered = taxonomies.filter((tax) => !tax.getIn(['attributes', 'is_smart']));
     taxonomiesFiltered = taxonomiesFiltered.map(
       (tax) => tax.set('categories', tax.get('categories').filter(
-        (cat) => cat.get('associated')
-      ))
+        (cat) => cat.get('associated'),
+      )),
     );
     if (hasTaxonomyCategories(taxonomiesFiltered)) {
       fields.push({ // fieldGroup

@@ -32,7 +32,7 @@ const MarkdownHint = styled.div`
 `;
 
 const StyledTextareaMarkdown = styled(
-  React.forwardRef((p, ref) => <TextareaMarkdown ref={ref} {...p} />)
+  React.forwardRef((p, ref) => <TextareaMarkdown ref={ref} {...p} />),
 )`
   background-color: ${palette('background', 0)};
   width: 100%;

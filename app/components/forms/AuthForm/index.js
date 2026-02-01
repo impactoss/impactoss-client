@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import {
-  Field as FormikField, Form, Formik, ErrorMessage
+  Field as FormikField, Form, Formik, ErrorMessage,
 } from 'formik';
 import styled from 'styled-components';
 

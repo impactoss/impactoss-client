@@ -21,8 +21,8 @@ export const selectViewEntity = createSelector(
     'roles',
     userRoles
       .filter((association) => qe(association.getIn(['attributes', 'user_id']), entity.get('id')))
-      .map((association) => roles.find((role) => qe(role.get('id'), association.getIn(['attributes', 'role_id']))))
-  )
+      .map((association) => roles.find((role) => qe(role.get('id'), association.getIn(['attributes', 'role_id'])))),
+  ),
 );
 
 export const selectTaxonomies = createSelector(
@@ -30,5 +30,5 @@ export const selectTaxonomies = createSelector(
   (state) => selectTaxonomiesSorted(state),
   (state) => selectEntities(state, 'categories'),
   (state) => selectEntities(state, 'user_categories'),
-  (id, taxonomies, categories, associations) => prepareTaxonomiesIsAssociated(taxonomies, categories, associations, 'tags_users', 'user_id', id)
+  (id, taxonomies, categories, associations) => prepareTaxonomiesIsAssociated(taxonomies, categories, associations, 'tags_users', 'user_id', id),
 );

@@ -46,7 +46,7 @@ class FieldGroup extends React.PureComponent { // eslint-disable-line react/pref
                 field={Object.assign({}, field, { aside: this.props.aside })}
               />
             )
-            : null
+            : null,
         )}
       </FieldGroupWrapper>
     );

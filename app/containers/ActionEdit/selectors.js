@@ -25,7 +25,7 @@ export const selectDomain = (state) => state.get('measureEdit');
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'measures', id }),
   (state) => selectEntities(state, 'users'),
-  (entity, users) => entitySetUser(entity, users)
+  (entity, users) => entitySetUser(entity, users),
 );
 export const selectTaxonomies = createSelector(
   (state, id) => id,
@@ -44,7 +44,7 @@ export const selectTaxonomies = createSelector(
     'tags_measures',
     id,
     false,
-  )
+  ),
 );
 
 export const selectConnectedTaxonomies = createSelector(
@@ -55,7 +55,7 @@ export const selectConnectedTaxonomies = createSelector(
     categories,
     ['tags_recommendations'],
     false,
-  )
+  ),
 );
 
 export const selectRecommendationsByFw = createSelector(
@@ -70,19 +70,19 @@ export const selectRecommendationsByFw = createSelector(
           (fw) => qe(
             fw.get('id'),
             r.getIn(['attributes', 'framework_id']),
-          )
+          ),
         );
         return framework.getIn(['attributes', 'has_measures']);
-      }
+      },
     );
     return entitiesSetAssociated(
       filtered,
       associations,
       id,
     ).groupBy(
-      (r) => r.getIn(['attributes', 'framework_id']).toString()
+      (r) => r.getIn(['attributes', 'framework_id']).toString(),
     );
-  }
+  },
 );
 export const selectIndicators = createSelector(
   (state, id) => id,
@@ -92,5 +92,5 @@ export const selectIndicators = createSelector(
     indicators,
     associations,
     id,
-  )
+  ),
 );

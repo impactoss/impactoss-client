@@ -29,7 +29,7 @@ class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-l
       onEntityClick,
     } = this.props;
     const smartTaxonomy = taxonomies && taxonomies.find(
-      (tax) => tax.getIn(['attributes', 'is_smart'])
+      (tax) => tax.getIn(['attributes', 'is_smart']),
     );
     const hasUpper = connections && connections.length > 0;
     const hasLower = (categories && categories.size > 0) || smartTaxonomy;

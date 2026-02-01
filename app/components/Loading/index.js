@@ -71,7 +71,7 @@ class Loading extends React.PureComponent { // eslint-disable-line react/prefer-
         progress: prevState.progress < 100
           ? (prevState.progress + ANIMATION_STEP)
           : 0,
-      })
+      }),
     );
   };
 

@@ -56,7 +56,7 @@ const selectRecommendationsWithCategories = createSelector(
       );
     }
     return entities;
-  }
+  },
 );
 const selectRecommendationsWithMeasures = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
@@ -69,11 +69,11 @@ const selectRecommendationsWithMeasures = createSelector(
         (entity) => entity.set(
           'measures',
           associationsGrouped.get(parseInt(entity.get('id'), 10)),
-        )
+        ),
       );
     }
     return entities;
-  }
+  },
 );
 const selectRecommendationsWithIndicators = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
@@ -86,11 +86,11 @@ const selectRecommendationsWithIndicators = createSelector(
         (entity) => entity.set(
           'indicators',
           associationsGrouped.get(parseInt(entity.get('id'), 10)),
-        )
+        ),
       );
     }
     return entities;
-  }
+  },
 );
 const selectRecommendationsByFw = createSelector(
   selectRecommendationsWithIndicators,
@@ -104,11 +104,11 @@ const selectRecommendationsByFw = createSelector(
         (entity) => qe(
           entity.getIn(['attributes', 'framework_id']),
           listQuery,
-        )
+        ),
       );
     }
     return entities;
-  }
+  },
 );
 const selectRecommendationsWithout = createSelector(
   selectRecommendationsByFw,
@@ -116,21 +116,21 @@ const selectRecommendationsWithout = createSelector(
   selectWithoutQuery,
   (entities, categories, query) => query
     ? filterEntitiesWithoutAssociation(entities, categories, query)
-    : entities
+    : entities,
 );
 const selectRecommendationsByConnections = createSelector(
   selectRecommendationsWithout,
   selectConnectionQuery,
   (entities, query) => query
     ? filterEntitiesByConnection(entities, query)
-    : entities
+    : entities,
 );
 const selectRecommendationsByCategories = createSelector(
   selectRecommendationsByConnections,
   selectCategoryQuery,
   (entities, query) => query
     ? filterEntitiesByCategories(entities, query)
-    : entities
+    : entities,
 );
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
@@ -149,9 +149,9 @@ export const selectRecommendations = createSelector(
       entities,
       order || (sortOption ? sortOption.order : 'desc'),
       sort || (sortOption ? sortOption.attribute : 'id'),
-      sortOption ? sortOption.type : 'string'
+      sortOption ? sortOption.type : 'string',
     );
-  }
+  },
 );
 
 export const selectConnectedTaxonomies = createSelector(
@@ -161,12 +161,12 @@ export const selectConnectedTaxonomies = createSelector(
     taxonomies,
     categories,
     ['tags_measures'],
-  )
+  ),
 );
 
 const selectConnectionsIndicators = createSelector(
   selectFWIndicators,
-  (indicators) => Map().set('indicators', indicators)
+  (indicators) => Map().set('indicators', indicators),
 );
 
 export const selectConnections = createSelector(
@@ -184,9 +184,9 @@ export const selectConnections = createSelector(
           entitiesSetCategoryIds(
             measures,
             associationsGrouped,
-          )
+          ),
         );
     }
     return connections;
-  }
+  },
 );

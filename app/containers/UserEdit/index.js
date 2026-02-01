@@ -110,7 +110,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       id: viewEntity.get('id'),
       attributes: viewEntity.get('attributes').mergeWith(
         (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-        FORM_INITIAL.get('attributes')
+        FORM_INITIAL.get('attributes'),
       ),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedRole: getHighestUserRoleId(roles),
@@ -369,7 +369,7 @@ function mapDispatchToProps(dispatch) {
             formData,
             taxonomies,
             createKey: 'user_id',
-          })
+          }),
         );
 
       // roles

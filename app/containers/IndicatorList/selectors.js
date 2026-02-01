@@ -50,11 +50,11 @@ export const selectConnectionsMeasures = createSelector(
         entitiesSetCategoryIds(
           measures,
           associationsGrouped,
-        )
+        ),
       );
     }
     return Map();
-  }
+  },
 );
 export const selectConnections = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
@@ -80,11 +80,11 @@ export const selectConnections = createSelector(
             recommendations,
             associationsGrouped,
             categories,
-          )
+          ),
         );
     }
     return connections;
-  }
+  },
 );
 
 export const selectConnectedTaxonomies = createSelector(
@@ -108,7 +108,7 @@ export const selectConnectedTaxonomies = createSelector(
   ) => {
     if (!ready) return Map();
     const indicatorFrameworks = frameworks.filter(
-      (fw) => fw.getIn(['attributes', 'has_indicators'])
+      (fw) => fw.getIn(['attributes', 'has_indicators']),
     );
     const relationships = [
       {
@@ -138,13 +138,13 @@ export const selectConnectedTaxonomies = createSelector(
               (fwt) => indicatorFrameworks.some(
                 (fw) => qe(
                   fwt.getIn(['attributes', 'framework_id']),
-                  fw.get('id')
+                  fw.get('id'),
                 ),
               ) && qe(
                 fwt.getIn(['attributes', 'taxonomy_id']),
-                taxonomy.get('id')
-              )
-            )
+                taxonomy.get('id'),
+              ),
+            ),
           );
         }
         if (
@@ -161,9 +161,9 @@ export const selectConnectedTaxonomies = createSelector(
             && connections.getIn([
               relationship.path,
               association.getIn(['attributes', relationship.key]).toString(),
-            ])
+            ]),
         ).groupBy(
-          (association) => association.getIn(['attributes', 'category_id'])
+          (association) => association.getIn(['attributes', 'category_id']),
         );
         return connectedTaxonomies.merge(
           filtered.map(
@@ -174,14 +174,14 @@ export const selectConnectedTaxonomies = createSelector(
                 categories,
                 relationship,
                 groupedAssociations,
-              )
-            )
-          )
+              ),
+            ),
+          ),
         );
       },
       Map(),
     );
-  }
+  },
 );
 
 const selectIndicatorsNestedQ = (state, locationQuery) =>
@@ -206,14 +206,14 @@ const selectIndicatorsNestedWithRecs = createSelector(
             (recId) => connections.getIn([
               'recommendations',
               recId.toString(),
-            ])
+            ]),
           ).groupBy(
             (recId) => connections.getIn([
               'recommendations',
               recId.toString(),
               'attributes',
               'framework_id',
-            ])
+            ]),
           );
           // currently requires both for filtering & display
           return entity.set(
@@ -223,11 +223,11 @@ const selectIndicatorsNestedWithRecs = createSelector(
             'recommendationsByFw',
             entityRecsByFw,
           );
-        }
+        },
       );
     }
     return entities;
-  }
+  },
 );
 
 
@@ -242,11 +242,11 @@ const selectIndicatorsNestedWithMeasures = createSelector(
         (entity) => entity.set(
           'measures',
           associationsGrouped.get(parseInt(entity.get('id'), 10)),
-        )
+        ),
       );
     }
     return entities;
-  }
+  },
 );
 const selectIndicatorsNested = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
@@ -259,7 +259,7 @@ const selectIndicatorsNested = createSelector(
     entities,
     progressReports,
     dueDates,
-    users
+    users,
   ) => {
     if (ready) {
       return entities.map(
@@ -270,8 +270,8 @@ const selectIndicatorsNested = createSelector(
             (report) => qe(
               entity.get('id'),
               report.getIn(['attributes', 'indicator_id']),
-            )
-          )
+            ),
+          ),
           // nest dates without report
         ).set(
           'dates',
@@ -285,22 +285,22 @@ const selectIndicatorsNested = createSelector(
                 return !dateReports || dateReports.size === 0;
               }
               return false;
-            }
-          )
+            },
+          ),
         ).set(
           'manager',
           users.find(
             (user) => entity.getIn(['attributes', 'manager_id'])
               && qe(
                 user.get('id'),
-                entity.getIn(['attributes', 'manager_id'])
-              )
-          )
-        )
+                entity.getIn(['attributes', 'manager_id']),
+              ),
+          ),
+        ),
       );
     }
     return entities;
-  }
+  },
 );
 const selectIndicatorsWithout = createSelector(
   selectIndicatorsNested,
@@ -308,21 +308,21 @@ const selectIndicatorsWithout = createSelector(
   selectWithoutQuery,
   (entities, categories, query) => query
     ? filterEntitiesWithoutAssociation(entities, categories, query)
-    : entities
+    : entities,
 );
 const selectIndicatorsByConnections = createSelector(
   selectIndicatorsWithout,
   selectConnectionQuery,
   (entities, query) => query
     ? filterEntitiesByConnection(entities, query)
-    : entities
+    : entities,
 );
 const selectIndicatorsByCategories = createSelector(
   selectIndicatorsByConnections,
   selectCategoryQuery,
   (entities, query) => query
     ? filterEntitiesByCategories(entities, query)
-    : entities
+    : entities,
 );
 const selectIndicatorsByConnectedCategories = createSelector(
   selectIndicatorsByCategories,
@@ -330,7 +330,7 @@ const selectIndicatorsByConnectedCategories = createSelector(
   selectConnectedCategoryQuery,
   (entities, connections, query) => query
     ? filterEntitiesByConnectedCategories(entities, connections, query)
-    : entities
+    : entities,
 );
 const selectIndicatorsExpandables = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
@@ -345,14 +345,14 @@ const selectIndicatorsExpandables = createSelector(
         const dueDatesForIndicator = dueDates.filter(
           (date) => qe(
             entity.get('id'),
-            date.getIn(['attributes', 'indicator_id'])
-          )
+            date.getIn(['attributes', 'indicator_id']),
+          ),
         );
         const reportsForIndicator = reports.filter(
           (report) => qe(
             entity.get('id'),
-            report.getIn(['attributes', 'indicator_id'])
-          )
+            report.getIn(['attributes', 'indicator_id']),
+          ),
         );
         if (expandNo <= 0) {
           // insert expandables:
@@ -360,7 +360,7 @@ const selectIndicatorsExpandables = createSelector(
           // - reports (incl due_dates)
           return entity.set(
             'expandable',
-            'reports'
+            'reports',
           ).set(
             'reports',
             reportsForIndicator,
@@ -369,26 +369,26 @@ const selectIndicatorsExpandables = createSelector(
             Map().set(
               'overdue',
               dueDatesForIndicator.filter(
-                (date) => date.getIn(['attributes', 'overdue'])
-              ).size
+                (date) => date.getIn(['attributes', 'overdue']),
+              ).size,
             ).set(
               'due',
               dueDatesForIndicator.filter(
-                (date) => date.getIn(['attributes', 'due'])
-              ).size
-            )
+                (date) => date.getIn(['attributes', 'due']),
+              ).size,
+            ),
           );
         }
         // insert expanded indicators with expandable reports (incl due_dates)
         const dueDatesScheduled = dueDatesForIndicator.filter(
-          (date) => !date.getIn(['attributes', 'has_progress_report'])
+          (date) => !date.getIn(['attributes', 'has_progress_report']),
         );
         return entity.set(
           'expanded',
           'reports',
         ).set(
           'reports',
-          entitiesSetSingle(reportsForIndicator, dueDates, 'date', 'due_date_id')
+          entitiesSetSingle(reportsForIndicator, dueDates, 'date', 'due_date_id'),
         ).set(
           'dates',
           // store upcoming scheduled indicator
@@ -399,11 +399,11 @@ const selectIndicatorsExpandables = createSelector(
               'asc',
               'due_date',
               'date',
-            ).first()
-          )
+            ).first(),
+          ),
         );
-      }
-    )
+      },
+    ),
 );
 // kicks off series of cascading selectors
 // 1. selectEntitiesWhere filters by attribute
@@ -423,7 +423,7 @@ export const selectIndicators = createSelector(
       entities,
       order || (sortOption ? sortOption.order : 'desc'),
       sort || (sortOption ? sortOption.attribute : 'id'),
-      sortOption ? sortOption.type : 'string'
+      sortOption ? sortOption.type : 'string',
     );
-  }
+  },
 );

@@ -115,7 +115,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     pages,
     'asc',
     'order',
-    'number'
+    'number',
   )
     .filter((page) => FOOTER.INTERNAL_LINKS.indexOf(parseInt(page.get('id'), 10)) < 0)
     .map((page) => ({
@@ -400,7 +400,7 @@ export function mapDispatchToProps(dispatch) {
           arg: 'fw',
           value: framework,
           replace: true,
-        }
+        },
       ));
     },
     onInitializeSettings: ({

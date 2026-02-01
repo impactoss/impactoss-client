@@ -36,7 +36,7 @@ export function Accordion({
             <div>
               <StyledButton
                 onClick={() => onActive(
-                  getActives({ activePanels, panelId: option.id, single })
+                  getActives({ activePanels, panelId: option.id, single }),
                 )}
               >
                 <AccordionHeader

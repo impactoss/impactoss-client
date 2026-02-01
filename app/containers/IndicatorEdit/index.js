@@ -122,7 +122,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
   };
 
   getInitialFormData = ({
-    measures, viewEntity, users, recommendationsByFw
+    measures, viewEntity, users, recommendationsByFw,
   }) => {
     let attributes = viewEntity.get('attributes');
     if (!attributes.get('reference')) {
@@ -133,7 +133,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         id: viewEntity.get('id'),
         attributes: attributes.mergeWith(
           (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-          FORM_INITIAL.get('attributes')
+          FORM_INITIAL.get('attributes'),
         ),
         associatedMeasures: entityOptions(measures, true),
         associatedRecommendationsByFw: recommendationsByFw
@@ -231,11 +231,11 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           getCheckboxField(
             intl.formatMessage,
             'repeat',
-            repeat
+            repeat,
           ),
           getFrequencyField(
             intl.formatMessage,
-            (formData) => !this.props.isRepeat(formData)
+            (formData) => !this.props.isRepeat(formData),
           ),
           getDateField({
             formatMessage: intl.formatMessage,
@@ -356,7 +356,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                       existingReferences
                         ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
                         : null,
-                      intl
+                      intl,
                     ),
                     aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
@@ -460,7 +460,7 @@ function mapDispatchToProps(dispatch, props) {
             connectionAttribute: 'associatedMeasures',
             createConnectionKey: 'measure_id',
             createKey: 'indicator_id',
-          })
+          }),
         );
       saveData = saveData.set(
         'recommendationIndicators',
@@ -484,7 +484,7 @@ function mapDispatchToProps(dispatch, props) {
               delete: [],
               create: [],
             }),
-          )
+          ),
       );
 
       // TODO: remove once have singleselect instead of multiselect

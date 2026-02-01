@@ -132,7 +132,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
                     messages.selectLabel,
                     {
                       entityTitle: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
-                    }
+                    },
                   )}
                 />
               )}

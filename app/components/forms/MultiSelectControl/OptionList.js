@@ -153,7 +153,7 @@ class OptionList extends React.PureComponent {
     this.setState(
       (prevState) => ({
         show: prevState.show + SHOW_INCREMENT,
-      })
+      }),
     );
   };
 

@@ -61,7 +61,7 @@ class EntityListSidebarGroupLabel extends React.PureComponent { // eslint-disabl
       <Styled
         onClick={onToggle}
         title={intl.formatMessage(
-          expanded ? messages.groupExpand.hide : messages.groupExpand.show
+          expanded ? messages.groupExpand.hide : messages.groupExpand.show,
         )}
       >
         <GroupLabel>{label}</GroupLabel>

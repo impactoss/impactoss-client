@@ -44,12 +44,12 @@ export const getBookmarkForLocation = (location, bookmarks) => {
     (bookmark) => {
       const queryBM = bookmark.getIn(['attributes', 'view', 'query']);
       return queryCheck.every(
-        (valueCheck, key) => checkValues(valueCheck, queryBM.get(key))
+        (valueCheck, key) => checkValues(valueCheck, queryBM.get(key)),
       )
         && queryBM.every(
-          (valueCheck, key) => checkValues(valueCheck, queryCheck.get(key))
+          (valueCheck, key) => checkValues(valueCheck, queryCheck.get(key)),
         );
-    }
+    },
   );
 };
 

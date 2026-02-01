@@ -72,9 +72,9 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       let recLabel;
       if (isList && !fwSet) {
         recLabel = `${intl.formatMessage(
-          appMessages.entities.recommendations.plural
+          appMessages.entities.recommendations.plural,
         )} (${intl.formatMessage(
-          appMessages.frameworks.all
+          appMessages.frameworks.all,
         )})`;
       } else if (fwSet) {
         recLabel = intl.formatMessage(appMessages.entities[`recommendations_${frameworkId}`].plural);
@@ -139,9 +139,9 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
           appMessages.labels.groupedByTaxonomy,
           {
             tax: intl.formatMessage(
-              appMessages.entities.taxonomies[taxonomy.getIn(['parent', 'id'])].single
+              appMessages.entities.taxonomies[taxonomy.getIn(['parent', 'id'])].single,
             ),
-          }
+          },
         ),
         width: (userOnly || headerAttributes.length === 0) ? 100 : TITLE_COL_RATIO * 100,
         active: titleColumnActive,
@@ -274,7 +274,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
           width: ((1 - TITLE_COL_RATIO) / countAttributes.length) * 100,
           maxCount: this.getCategoryMaxCount(categoryGroups, attribute),
           attribute,
-        }))
+        })),
       );
   };
 

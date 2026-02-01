@@ -21,7 +21,7 @@ import VerticalDiagramButton from './VerticalDiagramButton';
 import VerticalDiagramSVG from './VerticalDiagramSVG';
 
 const Diagram = styled(
-  React.forwardRef((p, ref) => <div ref={ref} {...p} />)
+  React.forwardRef((p, ref) => <div ref={ref} {...p} />),
 )`
   position: relative;
   width: 100%;
@@ -178,7 +178,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
                       />
                     </DiagramButtonWrap>
                   );
-                }
+                },
               )}
             </DiagramSectionVerticalCenter>
           </DiagramSectionVertical>

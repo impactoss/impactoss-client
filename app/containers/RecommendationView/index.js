@@ -151,7 +151,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
           'support_level',
           SUPPORT_LEVELS,
           appMessages.attributes.support_level,
-          0 // defaultValue
+          0, // defaultValue
         ),
         getMarkdownField(entity, 'response', true),
       ],
@@ -216,13 +216,13 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
 
     const frameworkId = viewEntity && viewEntity.getIn(['attributes', 'framework_id']);
     const type = intl.formatMessage(
-      appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single
+      appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single,
     );
 
     const currentFramework = dataReady
       && (
         frameworks.find(
-          (fw) => qe(fw.get('id'), frameworkId)
+          (fw) => qe(fw.get('id'), frameworkId),
         )
         || frameworks.first()
       );

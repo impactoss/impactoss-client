@@ -89,7 +89,7 @@ const render = (messages) => {
           </Grommet>
         </StyleSheetManager>
       </LanguageProvider>
-    </Provider>
+    </Provider>,
   );
 };
 

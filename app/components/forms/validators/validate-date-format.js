@@ -15,7 +15,7 @@ export default function validateDateFormat(val, dateFormat = DB_DATE_FORMAT) {
           val,
           dateFormat,
           new Date(),
-        )
+        ),
       )
     );
 }

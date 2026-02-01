@@ -31,5 +31,5 @@ export const selectViewEntity = createSelector(
       key: 'date',
       relatedKey: 'due_date_id',
     },
-  ])
+  ]),
 );

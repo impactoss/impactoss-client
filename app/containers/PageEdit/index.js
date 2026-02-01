@@ -100,7 +100,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
         id: viewEntity.get('id'),
         attributes: viewEntity.get('attributes').mergeWith(
           (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-          FORM_INITIAL.get('attributes')
+          FORM_INITIAL.get('attributes'),
         ),
       })
       : Map();

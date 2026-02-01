@@ -128,9 +128,9 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
         messages[path].pageTitle,
         {
           type: intl.formatMessage(
-            appMessages.entities[fwSpecified ? `${path}_${currentFrameworkId}` : path].single
+            appMessages.entities[fwSpecified ? `${path}_${currentFrameworkId}` : path].single,
           ),
-        }
+        },
       );
       icon = fwSpecified ? `${path}_${currentFrameworkId}` : path;
     } else {
@@ -191,7 +191,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             bindHandleSubmit={this.bindHandleSubmit}
             handleSubmit={(formData) => this.props.handleSubmit(
               formData,
-              attributes
+              attributes,
             )}
             handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}

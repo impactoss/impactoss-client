@@ -31,10 +31,10 @@ class ConnectionGroupsField extends React.PureComponent { // eslint-disable-line
         type: intl.formatMessage(
           size === 1
             ? appMessages.entities[field.entityType].single
-            : appMessages.entities[field.entityType].plural
+            : appMessages.entities[field.entityType].plural,
         ),
         byType: intl.formatMessage(field.groupedBy),
-      }
+      },
     );
 
     return (

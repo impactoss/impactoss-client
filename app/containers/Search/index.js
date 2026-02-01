@@ -131,11 +131,11 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
   getTargetTitle = (target, isSingle, intl) => {
     if (startsWith(target.get('path'), 'taxonomies')) {
       return intl.formatMessage(
-        appMessages.entities.taxonomies[target.get('taxId')][isSingle ? 'single' : 'plural']
+        appMessages.entities.taxonomies[target.get('taxId')][isSingle ? 'single' : 'plural'],
       );
     }
     return intl.formatMessage(
-      appMessages.entities[target.get('path')][isSingle ? 'single' : 'plural']
+      appMessages.entities[target.get('path')][isSingle ? 'single' : 'plural'],
     );
   };
 
@@ -165,7 +165,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
           : memo2,
         memo,
       ),
-      0
+      0,
     );
     const countTargets = dataReady && hasQuery && entities && entities.reduce(
       (memo, group) => group.get('targets').reduce(
@@ -185,7 +185,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
     const hasResults = hasEntry
       && entities.reduce(
         (memo, group) => group.get('targets').find(
-          (target) => target.get('results') && target.get('results').size > 0
+          (target) => target.get('results') && target.get('results').size > 0,
         ) || memo,
         false,
       );
@@ -308,7 +308,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                         {entities.map(
                           (group, id) => {
                             const hasGroupResults = group.get('targets').some(
-                              (target) => target.get('results') && target.get('results').size > 0
+                              (target) => target.get('results') && target.get('results').size > 0,
                             );
                             if (hasGroupResults) {
                               return (
@@ -376,14 +376,14 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                           );
                                         }
                                         return null;
-                                      }
+                                      },
                                     )}
                                   </Box>
                                 </Box>
                               );
                             }
                             return null;
-                          }
+                          },
                         )}
                       </Box>
                     )}

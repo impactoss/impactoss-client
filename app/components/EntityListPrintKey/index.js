@@ -65,7 +65,7 @@ export class EntityListPrintKey extends React.Component { // eslint-disable-line
     const hasSome = config.taxonomies
       && taxonomies
       && taxonomies.some(
-        (tax) => tax.get('categories') && tax.get('categories').size > 0
+        (tax) => tax.get('categories') && tax.get('categories').size > 0,
       );
     if (!hasSome) {
       return null;
@@ -113,7 +113,7 @@ export class EntityListPrintKey extends React.Component { // eslint-disable-line
               );
             }
             return null;
-          }
+          },
         )}
       </Styled>
     );

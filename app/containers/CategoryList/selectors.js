@@ -33,19 +33,19 @@ export const selectTaxonomy = createSelector(
       taxonomies.filter(
         (tax) => qe(
           id,
-          tax.getIn(['attributes', 'parent_id'])
-        )
-      )
+          tax.getIn(['attributes', 'parent_id']),
+        ),
+      ),
     ).set(
       'parent',
       taxonomies.find(
         (tax) => qe(
           taxonomy.getIn(['attributes', 'parent_id']),
-          tax.get('id')
-        )
-      )
+          tax.get('id'),
+        ),
+      ),
     );
-  }
+  },
 );
 
 const selectMeasures = createSelector(
@@ -62,8 +62,8 @@ const selectMeasures = createSelector(
       ).set(
         'recommendation_ids',
         measureRecommendations.get(parseInt(id, 10)) || Map(),
-      )
-    )
+      ),
+    ),
 );
 
 const selectRecommendations = createSelector(
@@ -73,8 +73,8 @@ const selectRecommendations = createSelector(
     (entity, id) => entity.set(
       'category_ids',
       recCategories.get(parseInt(id, 10)) || Map(),
-    )
-  )
+    ),
+  ),
 );
 
 const filterAssociatedEntities = (
@@ -83,8 +83,8 @@ const filterAssociatedEntities = (
   associations,
 ) => entities.filter(
   (entity) => associations.find(
-    (association, id) => entity.get(key).includes(parseInt(id, 10))
-  )
+    (association, id) => entity.get(key).includes(parseInt(id, 10)),
+  ),
 );
 
 // all entities that are tagged with a child category of current category
@@ -96,11 +96,11 @@ const filterChildConnections = (
   (entity) => categories.filter(
     (cat) => qe(
       categoryId,
-      cat.getIn(['attributes', 'parent_id'])
-    )
+      cat.getIn(['attributes', 'parent_id']),
+    ),
   ).some(
-    (cat) => entity.get('category_ids').includes(parseInt(cat.get('id'), 10))
-  )
+    (cat) => entity.get('category_ids').includes(parseInt(cat.get('id'), 10)),
+  ),
 );
 
 const getCategoryCounts = (
@@ -116,7 +116,7 @@ const getCategoryCounts = (
     const tagsMeasures = taxonomy.getIn(['attributes', 'tags_measures']);
     const childCatsTagMeasures = taxonomy.get('children')
       && taxonomy.get('children').some(
-        (childTax) => childTax.getIn(['attributes', 'tags_measures'])
+        (childTax) => childTax.getIn(['attributes', 'tags_measures']),
       );
     if (tagsMeasures || childCatsTagMeasures) {
       let associatedMeasures;
@@ -125,17 +125,17 @@ const getCategoryCounts = (
         associatedMeasures = filterChildConnections(
           measures,
           categories,
-          categoryId
+          categoryId,
         );
       } else if (tagsMeasures) {
         associatedMeasures = measures.filter(
-          (entity) => entity.get('category_ids').includes(parseInt(categoryId, 10))
+          (entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)),
         );
       }
       category = category.set('measuresCount', associatedMeasures.size);
       // get all public associated measures
       const associatedMeasuresPublic = associatedMeasures.filter(
-        (measure) => !measure.getIn(['attributes', 'draft'])
+        (measure) => !measure.getIn(['attributes', 'draft']),
       );
       category = category.set(
         'measuresPublicCount',
@@ -152,7 +152,7 @@ const getCategoryCounts = (
     const tagsRecs = taxonomy.getIn(['attributes', 'tags_recommendations']);
     const childCatsTagRecs = taxonomy.get('children')
       && taxonomy.get('children').some(
-        (childTax) => childTax.getIn(['attributes', 'tags_recommendations'])
+        (childTax) => childTax.getIn(['attributes', 'tags_recommendations']),
       );
     if (tagsRecs || childCatsTagRecs) {
       let associatedRecs;
@@ -166,30 +166,30 @@ const getCategoryCounts = (
         // directly tagged recommendations
       } else if (tagsRecs) {
         associatedRecs = recommendations.filter(
-          (entity) => entity.get('category_ids').includes(parseInt(categoryId, 10))
+          (entity) => entity.get('category_ids').includes(parseInt(categoryId, 10)),
         );
       }
       const associatedRecsPublic = associatedRecs.filter(
-        (rec) => !rec.getIn(['attributes', 'draft'])
+        (rec) => !rec.getIn(['attributes', 'draft']),
       );
       // all frameworks
       category = category.set('recommendationsCount', associatedRecs.size);
       category = category.set(
         'recommendationsPublicCount',
-        associatedRecsPublic ? associatedRecsPublic.size : 0
+        associatedRecsPublic ? associatedRecsPublic.size : 0,
       );
       // by framework
       category = category.set(
         'recommendationsCountByFW',
         associatedRecs.groupBy(
-          (rec) => rec.getIn(['attributes', 'framework_id'])
+          (rec) => rec.getIn(['attributes', 'framework_id']),
         ).map((group) => group.size),
       );
       category = category.set(
         'recommendationsPublicCountByFW',
         associatedRecsPublic
           ? associatedRecsPublic.groupBy(
-            (rec) => rec.getIn(['attributes', 'framework_id'])
+            (rec) => rec.getIn(['attributes', 'framework_id']),
           ).map((group) => group.size)
           : 0,
       );
@@ -197,7 +197,7 @@ const getCategoryCounts = (
       // for sorting
       category = category.set(
         'recommendations',
-        associatedRecsPublic ? associatedRecsPublic.size : 0
+        associatedRecsPublic ? associatedRecsPublic.size : 0,
       );
 
       // measures connected via recommendation
@@ -209,26 +209,26 @@ const getCategoryCounts = (
         );
         category = category.set(
           'measuresCount',
-          connectedMeasures ? connectedMeasures.size : 0
+          connectedMeasures ? connectedMeasures.size : 0,
         );
         const connectedMeasuresPublic = connectedMeasures.filter(
-          (measure) => !measure.getIn(['attributes', 'draft'])
+          (measure) => !measure.getIn(['attributes', 'draft']),
         );
         category = category.set(
           'measuresPublicCount',
-          connectedMeasuresPublic ? connectedMeasuresPublic.size : 0
+          connectedMeasuresPublic ? connectedMeasuresPublic.size : 0,
         );
         // for sorting
         category = category.set(
           'measures',
-          connectedMeasuresPublic ? connectedMeasuresPublic.size : 0
+          connectedMeasuresPublic ? connectedMeasuresPublic.size : 0,
         );
         // by framework
         category = category.set(
           'measuresPublicCountByFw',
           associatedRecsPublic
             ? associatedRecsPublic.groupBy(
-              (rec) => rec.getIn(['attributes', 'framework_id'])
+              (rec) => rec.getIn(['attributes', 'framework_id']),
             ).map((group) => {
               const connectedMeasuresForGroup = filterAssociatedEntities(
                 measures,
@@ -236,7 +236,7 @@ const getCategoryCounts = (
                 group,
               );
               const connectedMeasuresPublicForGroup = connectedMeasuresForGroup.filter(
-                (measure) => !measure.getIn(['attributes', 'draft'])
+                (measure) => !measure.getIn(['attributes', 'draft']),
               );
               return connectedMeasuresPublicForGroup
                 ? connectedMeasuresPublicForGroup.size
@@ -247,7 +247,7 @@ const getCategoryCounts = (
       }
     }
     return category;
-  }
+  },
 );
 
 const selectCategoryCountGroups = createSelector(
@@ -261,14 +261,14 @@ const selectCategoryCountGroups = createSelector(
       const taxonomyCategories = taxonomy && categories && categories.filter(
         (cat) => qe(
           cat.getIn(['attributes', 'taxonomy_id']),
-          taxonomy.get('id')
+          taxonomy.get('id'),
         ) && (
           CURRENT_TAXONOMY_IDS.indexOf(parseInt(taxonomy.get('id'), 10)) === -1
           || settingsFromQuery.loadNonCurrent
           || !!cat.getIn(['attributes', 'is_current'])
         ) && (
           settingsFromQuery.loadArchived || !cat.getIn(['attributes', 'is_archive'])
-        )
+        ),
       );
       if (taxonomyCategories) {
         if (!taxonomy.get('parent')) {
@@ -282,7 +282,7 @@ const selectCategoryCountGroups = createSelector(
           return catCounts
             ? Map().set(
               taxonomy.get('id'),
-              taxonomy.set('categories', catCounts)
+              taxonomy.set('categories', catCounts),
             )
             : Map();
         }
@@ -290,16 +290,16 @@ const selectCategoryCountGroups = createSelector(
           const taxParentCategories = categories.filter(
             (cat) => qe(
               cat.getIn(['attributes', 'taxonomy_id']),
-              taxonomy.get('parent').get('id')
-            )
+              taxonomy.get('parent').get('id'),
+            ),
           );
           return taxParentCategories.map(
             (parentCat) => {
               const taxChildCategories = taxonomyCategories.filter(
                 (cat) => qe(
                   cat.getIn(['attributes', 'parent_id']),
-                  parentCat.get('id')
-                )
+                  parentCat.get('id'),
+                ),
               );
               const catCounts = getCategoryCounts(
                 taxChildCategories,
@@ -309,14 +309,14 @@ const selectCategoryCountGroups = createSelector(
                 categories,
               );
               return parentCat.set('categories', catCounts);
-            }
+            },
           );
         }
       }
       return Map();
     }
     return null;
-  }
+  },
 );
 
 const mapCategoryGroups = (
@@ -331,7 +331,7 @@ const mapCategoryGroups = (
       const filteredCategories = group.get('categories').filter(
         (cat) => userOnly
           ? cat.getIn(['attributes', 'user_only'])
-          : !cat.getIn(['attributes', 'user_only'])
+          : !cat.getIn(['attributes', 'user_only']),
       );
       return group.set(
         'measures',
@@ -359,7 +359,7 @@ const mapCategoryGroups = (
           'bool',
         ),
       );
-    }
+    },
   );
 
   return sortEntities(
@@ -378,9 +378,9 @@ export const selectCategoryGroups = createSelector(
     ? mapCategoryGroups(
       categoryGroups,
       sort,
-      order
+      order,
     )
-    : Map()
+    : Map(),
 );
 
 export const selectUserOnlyCategoryGroups = createSelector(
@@ -394,5 +394,5 @@ export const selectUserOnlyCategoryGroups = createSelector(
       order,
       true, // userOnly
     )
-    : Map()
+    : Map(),
 );

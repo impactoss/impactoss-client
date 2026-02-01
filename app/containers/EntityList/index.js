@@ -187,7 +187,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             });
           }
           return action;
-        }
+        },
       );
     }
     return (
@@ -250,7 +250,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onPageSelect={this.props.onPageSelect}
           onPageItemsSelect={this.props.onPageItemsSelect}
           onEntityClick={(id, path) => this.props.onEntityClick(
-            id, path, viewDomain.get('errors')
+            id, path, viewDomain.get('errors'),
           )}
           onSortBy={this.props.onSortBy}
           onSortOrder={this.props.onSortOrder}
@@ -539,7 +539,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(resetProgress());
 
       const entities = props.entities.filter(
-        (entity) => entityIdsSelected.includes(entity.get('id'))
+        (entity) => entityIdsSelected.includes(entity.get('id')),
       );
 
       // figure out changes
@@ -571,13 +571,13 @@ function mapDispatchToProps(dispatch, props) {
           dispatch(saveMultiple(
             props.config.serverPath,
             entities.filter(
-              (entity) => entity.getIn(['attributes', activeEditOption.optionId]) !== newValue
+              (entity) => entity.getIn(['attributes', activeEditOption.optionId]) !== newValue,
             ).map(
               (entity) => Map()
                 .set('path', props.config.serverPath)
                 .set('entity', entity.setIn(['attributes', activeEditOption.optionId], newValue))
-                .set('saveRef', entity.get('id'))
-            ).toJS()
+                .set('saveRef', entity.get('id')),
+            ).toJS(),
           ));
         }
         // connections
@@ -596,7 +596,7 @@ function mapDispatchToProps(dispatch, props) {
                 }
               });
             }
-          }
+          },
         );
         const updates = entities.reduce(
           (memo, entity) => {
@@ -619,7 +619,7 @@ function mapDispatchToProps(dispatch, props) {
               // exclude existing relations from the changeSet
               entityCreates = !!existingAssignments && existingAssignments.size > 0
                 ? creates.filter(
-                  (id) => !existingAssignments.includes(parseInt(id, 10))
+                  (id) => !existingAssignments.includes(parseInt(id, 10)),
                 )
                 : creates;
               entityCreates = entityCreates.map(
@@ -632,7 +632,7 @@ function mapDispatchToProps(dispatch, props) {
                     },
                   },
                   saveRef: entity.get('id'),
-                })
+                }),
               );
             }
             // delete connections
@@ -642,13 +642,13 @@ function mapDispatchToProps(dispatch, props) {
               && existingAssignments.size > 0
             ) {
               entityDeletes = existingAssignments.filter(
-                (assigned) => deletes.includes(assigned.toString())
+                (assigned) => deletes.includes(assigned.toString()),
               ).map(
                 (assigned, id) => fromJS({
                   path: activeEditOption.path,
                   id,
                   saveRef: entity.get('id'),
-                })
+                }),
               ).toList();
             }
             return memo

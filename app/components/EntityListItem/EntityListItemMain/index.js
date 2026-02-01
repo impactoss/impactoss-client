@@ -120,7 +120,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             entitiesByFramework.forEach((fwentities, fwid) => {
               if (fwentities.size > 0) {
                 const connectedEntities = fwentities.map(
-                  (connectionId) => connections.getIn([option.path, connectionId.toString()])
+                  (connectionId) => connections.getIn([option.path, connectionId.toString()]),
                 );
                 const path = `${option.path}_${fwid}`;
                 memoX = memoX.concat([{
@@ -129,7 +129,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
                       && intl.formatMessage(
                         size === 1
                           ? appMessages.entities[path].single
-                          : appMessages.entities[path].plural
+                          : appMessages.entities[path].plural,
                       ),
                     style: option.path,
                     path: option.clientPath || option.path,
@@ -143,12 +143,12 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
           const connectedEntities = entity
             .get(option.path)
             .map(
-              (connectionId) => connections.getIn([option.path, connectionId.toString()])
+              (connectionId) => connections.getIn([option.path, connectionId.toString()]),
             );
           memoX = memoX.concat([{
             option: {
               label: (size) => intl && intl.formatMessage(
-                size === 1 ? appMessages.entities[option.path].single : appMessages.entities[option.path].plural
+                size === 1 ? appMessages.entities[option.path].single : appMessages.entities[option.path].plural,
               ),
               style: option.path,
               path: option.clientPath || option.path,
@@ -189,7 +189,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     const progressCategory = progressTaxonomy
       && categoryIds
       && progressTaxonomy.get('categories').find(
-        (cat) => categoryIds.includes(parseInt(cat.get('id'), 10))
+        (cat) => categoryIds.includes(parseInt(cat.get('id'), 10)),
       );
     return progressCategory && progressCategory.toJS();
   };
@@ -200,10 +200,10 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       ? categoryIds.filter(
         (cat) => {
           const progressCategoryIds = progressTaxonomy.get('categories').map(
-            (pCat) => parseInt(pCat.get('id'), 10)
+            (pCat) => parseInt(pCat.get('id'), 10),
           );
           return !progressCategoryIds || !progressCategoryIds.includes(parseInt(cat, 10));
-        }
+        },
       )
       : categoryIds;
   };

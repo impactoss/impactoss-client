@@ -6,8 +6,8 @@ export function updateAssociationsRequest(path, associations) {
   if (associations.create) {
     requests = requests.concat(
       associations.create.map(
-        (payload) => newEntityRequest(path, payload)
-      )
+        (payload) => newEntityRequest(path, payload),
+      ),
     );
   }
 
@@ -15,8 +15,8 @@ export function updateAssociationsRequest(path, associations) {
   if (associations.delete) {
     requests = requests.concat(
       associations.delete.map(
-        (associationId) => deleteEntityRequest(path, associationId)
-      )
+        (associationId) => deleteEntityRequest(path, associationId),
+      ),
     );
   }
 

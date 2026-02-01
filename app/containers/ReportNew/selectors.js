@@ -20,12 +20,12 @@ export const selectIndicator = createSelector(
       dates.filter(
         (date) => qe(
           date.getIn(['attributes', 'indicator_id']),
-          indicator.get('id')
-        )
+          indicator.get('id'),
+        ),
       ),
       'asc',
       'due_date',
-      'date'
+      'date',
     ),
-  )
+  ),
 );

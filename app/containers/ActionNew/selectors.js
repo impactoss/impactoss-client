@@ -20,7 +20,7 @@ export const selectConnectedTaxonomies = createSelector(
     categories,
     ['tags_recommendations'],
     false,
-  )
+  ),
 );
 
 export const selectRecommendationsByFw = createSelector(
@@ -38,12 +38,12 @@ export const selectRecommendationsByFw = createSelector(
           (fw) => qe(
             fw.get('id'),
             r.getIn(['attributes', 'framework_id']),
-          )
+          ),
         );
         return framework.getIn(['attributes', 'has_measures']);
-      }
+      },
     ).groupBy(
-      (r) => r.getIn(['attributes', 'framework_id']).toString()
+      (r) => r.getIn(['attributes', 'framework_id']).toString(),
     );
-  }
+  },
 );

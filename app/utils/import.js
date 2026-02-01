@@ -22,7 +22,7 @@ export const getImportFields = (shape, formatMessage) => {
   if (shape.fields) {
     const fields = filter(
       shape.fields,
-      (field) => field.import === true && !field.disabled
+      (field) => field.import === true && !field.disabled,
     );
     values = reduce(
       fields,

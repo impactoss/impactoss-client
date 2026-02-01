@@ -143,7 +143,7 @@ export function EntityListDownload({
           fieldAttributes: fields && fields.ATTRIBUTES,
           hasUserRole,
           intl,
-        })
+        }),
       );
     }
     if (hasTaxonomies && taxonomies) {
@@ -156,7 +156,7 @@ export function EntityListDownload({
             active: false,
             column: snakeCase(label),
           });
-        }).toJS()
+        }).toJS(),
       );
     }
     if (hasConnections && connections && config.connections && config.connections.options) {
@@ -201,7 +201,7 @@ export function EntityListDownload({
             };
           },
           {},
-        )
+        ),
       );
     }
   }, [

@@ -199,7 +199,7 @@ const VerticalDiagramSVG = ({ frameworks, itemRefs }) => (
                         'right',
                         fwId,
                       ),
-                      'left'
+                      'left',
                     )
                   }
                 />
@@ -228,7 +228,7 @@ const VerticalDiagramSVG = ({ frameworks, itemRefs }) => (
                   r={0}
                   points={
                     getConnectionPathArrow(
-                      connectRecommendationsMeasures(itemRefs, fwId)
+                      connectRecommendationsMeasures(itemRefs, fwId),
                     )
                   }
                 />
@@ -245,7 +245,7 @@ const VerticalDiagramSVG = ({ frameworks, itemRefs }) => (
             r={0}
             points={
               getConnectionPathArrow(
-                connectMeasuresIndicators(itemRefs)
+                connectMeasuresIndicators(itemRefs),
               )
             }
           />

@@ -36,15 +36,15 @@ export const getOptionSortRecentlyCreatedValueMapper = (option) => {
 export const sortOptions = (options) => options
   .sortBy(
     (option) => getOptionSortValueMapper(option),
-    (a, b) => getEntitySortComparator(a, b, 'asc')
+    (a, b) => getEntitySortComparator(a, b, 'asc'),
   )
   .sortBy(
     (option) => getOptionSortRecentlyCreatedValueMapper(option),
-    (a, b) => getEntitySortComparator(a, b, 'asc')
+    (a, b) => getEntitySortComparator(a, b, 'asc'),
   )
   .sortBy(
     (option) => getOptionSortCheckedValueMapper(option),
-    (a, b) => getEntitySortComparator(a, b, 'asc')
+    (a, b) => getEntitySortComparator(a, b, 'asc'),
   );
 
 export const prepareOptionSearchTarget = (option, fields, queryLength) => reduce(
@@ -59,7 +59,7 @@ export const prepareOptionSearchTarget = (option, fields, queryLength) => reduce
       return target;
     }
     return target;
-  }, ''
+  }, '',
 );
 
 // compare to utils/entities.js filterEntitiesByKeywords
@@ -72,7 +72,7 @@ export const filterOptionsByKeywords = (options, query) => { // filter checkboxe
         (option.get('searchAttributes') && option.get('searchAttributes').size > 0)
           ? option.get('searchAttributes').toArray()
           : ['id', 'reference', 'label', 'search'],
-        query.length
+        query.length,
       )));
     } catch (e) {
       // nothing
@@ -85,7 +85,7 @@ export const filterOptionsByKeywords = (options, query) => { // filter checkboxe
 export const filterOptionsByTags = (options, queryTags) => options.filter(
   (option) => asArray(queryTags).every(
     (tag) => testEntityEntityAssociation(option, 'tags', parseInt(tag, 10)),
-  )
+  ),
 );
 
 export const getChangedOptions = (options) => options.filter((o) => o.get('hasChanged'));

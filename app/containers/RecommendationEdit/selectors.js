@@ -23,7 +23,7 @@ export const selectDomain = (state) => state.get('recommendationEdit');
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'recommendations', id }),
   (state) => selectEntities(state, 'users'),
-  (entity, users) => entitySetUser(entity, users)
+  (entity, users) => entitySetUser(entity, users),
 );
 
 export const selectTaxonomies = createSelector(
@@ -43,7 +43,7 @@ export const selectTaxonomies = createSelector(
     'tags_recommendations',
     id,
     false, //  do not include parent taxonomies
-  )
+  ),
 );
 
 export const selectConnectedTaxonomies = createSelector(
@@ -54,7 +54,7 @@ export const selectConnectedTaxonomies = createSelector(
     categories,
     ['tags_measures'],
     false,
-  )
+  ),
 );
 
 export const selectMeasures = createSelector(
@@ -65,7 +65,7 @@ export const selectMeasures = createSelector(
     entities,
     associations,
     id,
-  )
+  ),
 );
 export const selectIndicators = createSelector(
   (state, id) => id,
@@ -75,5 +75,5 @@ export const selectIndicators = createSelector(
     entities,
     associations,
     id,
-  )
+  ),
 );

@@ -222,7 +222,7 @@ function ImportEntitiesForm({
                                               <Text size="xsmall">{template.data[d]}</Text>
                                             </TableCell>
                                           </TableRow>
-                                        )
+                                        ),
                                       )}
                                     </TableBody>
                                   </Table>

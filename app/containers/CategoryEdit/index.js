@@ -117,14 +117,14 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
   };
 
   getInitialFormData = ({
-    viewEntity, users, measures, recommendationsByFw, parentOptions
+    viewEntity, users, measures, recommendationsByFw, parentOptions,
   }) =>
     viewEntity
       ? Map({
         id: viewEntity.get('id'),
         attributes: viewEntity.get('attributes').mergeWith(
           (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-          FORM_INITIAL.get('attributes')
+          FORM_INITIAL.get('attributes'),
         ),
         associatedMeasures: measures && entityOptions(measures, true),
         associatedRecommendationsByFw: recommendationsByFw
@@ -239,7 +239,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           renderUserControl(
             users,
             intl.formatMessage(appMessages.attributes.manager_id.categories),
-            entity.getIn(['attributes', 'manager_id'])
+            entity.getIn(['attributes', 'manager_id']),
           ),
         ],
       });
@@ -482,7 +482,7 @@ function mapDispatchToProps(dispatch, props) {
             allowMultiple: taxonomy.getIn(['attributes', 'allow_multiple']),
             taxonomyCategoryIds: taxonomy.get('categories')
               && taxonomy.get('categories').keySeq(),
-          })
+          }),
         );
       }
       if (recommendationsByFw && taxonomy.getIn(['attributes', 'tags_recommendations'])) {
@@ -511,7 +511,7 @@ function mapDispatchToProps(dispatch, props) {
                 delete: [],
                 create: [],
               }),
-            )
+            ),
         );
       }
 
