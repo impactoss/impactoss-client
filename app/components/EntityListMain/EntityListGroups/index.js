@@ -159,7 +159,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       } else {
         pageSize = Math.min(
           (locationQuery.get('items') && parseInt(locationQuery.get('items'), 10)),
-          PAGE_SIZE_MAX
+          PAGE_SIZE_MAX,
         );
       }
     } else {
@@ -179,7 +179,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
         pager = getPager(
           entityGroupsCount,
           locationQuery.get('page') && parseInt(locationQuery.get('page'), 10),
-          pageSize
+          pageSize,
         );
         // pick only entities within oage range while preserving hierarchical groups shape
         entityGroupsPaged = pageEntityGroups(entityGroups, pager, intl ? intl.formatMessage : null);
@@ -197,7 +197,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
       pager = getPager(
         entities.size,
         locationQuery.get('page') && parseInt(locationQuery.get('page'), 10),
-        pageSize
+        pageSize,
       );
       const entitiesOnPage = entities.slice(pager.startIndex, pager.endIndex + 1);
       entityGroupsPaged = List().push(Map({ entities: entitiesOnPage }));
@@ -325,7 +325,7 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                             skipGroupTargetId={skipGroupTargetId}
                           />
                         </ListEntitiesSubGroup>
-                      )
+                      ),
                     )}
                     {entityGroup.get('entities') && !entityGroup.get('entityGroups') && (
                       <EntityListItems

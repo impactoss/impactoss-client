@@ -50,7 +50,7 @@ export default class EntityListItemMainConnections extends React.PureComponent {
         {
           this.props.connections.map((connection, i) => {
             const draftEntities = connection.entities.filter(
-              (entity) => entity && entity.getIn(['attributes', 'draft'])
+              (entity) => entity && entity.getIn(['attributes', 'draft']),
             );
             const entitiesTotal = connection.entities ? connection.entities.size : 0;
             return (

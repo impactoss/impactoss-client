@@ -22,24 +22,24 @@ export const selectViewEntity = createSelector(
       let indicatorAssociated = indicators.find(
         (indicator) => qe(
           entity.getIn(['attributes', 'indicator_id']),
-          indicator.get('id')
-        )
+          indicator.get('id'),
+        ),
       );
       // reports should alwasy have an indicator but checking here just in case (eg report is )
       const indicatorDates = indicatorAssociated && dates.filter(
         (date) => qe(
           date.getIn(['attributes', 'indicator_id']),
-          indicatorAssociated.get('id')
-        )
+          indicatorAssociated.get('id'),
+        ),
       );
       indicatorAssociated = indicatorDates
         && indicatorAssociated
         && indicatorAssociated.set(
           'dates',
-          sortEntities(indicatorDates, 'asc', 'due_date', 'date')
+          sortEntities(indicatorDates, 'asc', 'due_date', 'date'),
         );
       return entitySetUser(entity.set('indicator', indicatorAssociated), users);
     }
     return entity;
-  }
+  },
 );

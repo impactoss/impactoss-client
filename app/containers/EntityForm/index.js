@@ -5,14 +5,16 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import { fromJS, List } from 'immutable';
+import { fromJS } from 'immutable';
 import { omit } from 'lodash/object';
 
 import asArray from 'utils/as-array';
 import appMessage from 'utils/app-message';
 import { validateField } from 'utils/forms';
 
-import { ErrorMessage, Formik, Form, Field as FormikField } from 'formik';
+import {
+  ErrorMessage, Formik, Form, Field as FormikField,
+} from 'formik';
 import { selectNewEntityModal } from 'containers/App/selectors';
 
 import appMessages from 'containers/App/messages';
@@ -162,7 +164,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     let fieldProps;
     if (field.controlType === 'multiselect') {
       const values = fromJS(form.values);
-      const formData = fromJS(this.props.formData);
+      // const formData = fromJS(this.props.formData);
       fieldProps = {
         ...field,
         formData: values,
@@ -266,14 +268,14 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             field.formData,
             hasEntityNewModal,
             scrollContainer,
-            formikActions
+            formikActions,
           );
           break;
         case 'uploader':
           formField = this.renderUploader(
             field,
             field.formData,
-            formikActions
+            formikActions,
           );
           break;
         default:
@@ -321,8 +323,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       {group.fields.map((field, i) => {
         if (!field) return null;
         if (field.controlType !== 'info') {
-          const isContextRequiredForField =
-            !!field.dynamicValidators
+          const isContextRequiredForField = !!field.dynamicValidators
             || !!field.modifyFieldAttributes
             || !!field.isFieldDisabled;
           const FieldComponentWrapper = isContextRequiredForField ? FieldWithContext : FormikField;
@@ -334,7 +335,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
               field={isContextRequiredForField ? field : null}
             >
               {({ field: formikField, form, meta }) => {
-                let fieldProps = this.getFieldProps(field, form, formikField);
+                const fieldProps = this.getFieldProps(field, form, formikField);
                 return (
                   <Field id={field.id} labelledGroup={!!field.label}>
                     {this.renderFormField(
@@ -342,7 +343,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                       false,
                       hasEntityNewModal,
                       scrollContainer,
-                      form
+                      form,
                     )}
                     {meta.touched && meta.error && (
                       <ErrorWrapper>
@@ -392,7 +393,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             <div key={i}>
               {this.renderGroup(fieldGroup, hasEntityNewModal, scrollContainer)}
             </div>
-          )
+          ),
         )
       }
     </Main>
@@ -411,7 +412,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             <div key={i}>
               {this.renderGroup(fieldGroup, hasEntityNewModal, scrollContainer)}
             </div>
-          )
+          ),
         )
       }
     </Aside>
@@ -437,8 +438,10 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             initialValues={formData}
             onSubmit={(values) => handleSubmit(values)}
           >
-            {({ submitForm, isValid, isValidating, isSubmitting }) => {
-              bindHandleSubmit && bindHandleSubmit(submitForm);
+            {({
+              submitForm, isValid, isValidating, isSubmitting,
+            }) => {
+              if (bindHandleSubmit) bindHandleSubmit(submitForm);
               return (
                 <StyledForm>
                   <SubmitFailedHandler

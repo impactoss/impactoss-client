@@ -24,9 +24,9 @@ import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
 import { ROUTES } from 'containers/App/constants';
+import { updatePath } from 'containers/App/actions';
 import { FORM_INITIAL } from './constants';
 
-import { updatePath } from 'containers/App/actions';
 
 import messages from './messages';
 

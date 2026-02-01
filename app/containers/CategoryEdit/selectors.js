@@ -26,7 +26,7 @@ export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
   (state) => selectEntities(state, 'users'),
   (state) => selectFWTaxonomiesSorted(state),
-  (entity, users, taxonomies) => prepareCategory(entity, users, taxonomies)
+  (entity, users, taxonomies) => prepareCategory(entity, users, taxonomies),
 );
 
 export const selectParentOptions = createSelector(
@@ -38,8 +38,8 @@ export const selectParentOptions = createSelector(
       const taxonomy = taxonomies.find(
         (tax) => qe(
           entity.getIn(['attributes', 'taxonomy_id']),
-          tax.get('id')
-        )
+          tax.get('id'),
+        ),
       );
       const taxonomyParentId = taxonomy
         && taxonomy.getIn(['attributes', 'parent_id']);
@@ -55,12 +55,12 @@ export const selectParentOptions = createSelector(
             return otherTaxonomy
               ? qe(taxonomyParentId, otherTaxonomy.get('id'))
               : null;
-          }
+          },
         )
         : null;
     }
     return null;
-  }
+  },
 );
 
 export const selectParentTaxonomy = createSelector(
@@ -84,7 +84,7 @@ export const selectParentTaxonomy = createSelector(
       );
     }
     return null;
-  }
+  },
 );
 const selectIsParentTaxonomy = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
@@ -107,7 +107,7 @@ const selectIsParentTaxonomy = createSelector(
       );
     }
     return false;
-  }
+  },
 );
 
 
@@ -118,7 +118,7 @@ export const selectUsers = createSelector(
     entities,
     associations,
     CATEGORY_MANAGER_MIN_ROLE,
-  )
+  ),
 );
 
 export const selectMeasures = createSelector(
@@ -131,7 +131,7 @@ export const selectMeasures = createSelector(
       entities,
       id,
     );
-  }
+  },
 );
 
 export const selectRecommendationsByFw = createSelector(
@@ -156,16 +156,16 @@ export const selectRecommendationsByFw = createSelector(
     );
     const filtered = entities.filter(
       (r) => frameworkIds.find(
-        (fwid) => qe(fwid, r.getIn(['attributes', 'framework_id']))
-      )
+        (fwid) => qe(fwid, r.getIn(['attributes', 'framework_id'])),
+      ),
     );
     return entitiesSetAssociatedCategory(
       filtered,
       id,
     ).groupBy(
-      (r) => r.getIn(['attributes', 'framework_id']).toString()
+      (r) => r.getIn(['attributes', 'framework_id']).toString(),
     );
-  }
+  },
 );
 
 export const selectConnectedTaxonomies = createSelector(
@@ -174,6 +174,6 @@ export const selectConnectedTaxonomies = createSelector(
   (taxonomies, categories) => prepareTaxonomiesMultiple(
     taxonomies,
     categories,
-    ['tags_measures', 'tags_recommendations']
-  )
+    ['tags_measures', 'tags_recommendations'],
+  ),
 );

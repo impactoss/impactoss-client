@@ -14,15 +14,15 @@ import { Map, fromJS } from 'immutable';
 
 import {
   taxonomyOptions,
-  entityOptions,
+  // entityOptions,
   // renderMeasureControl,
   // renderIndicatorControl,
   renderTaxonomyControl,
   getCategoryUpdatesFromFormData,
-  getConnectionUpdatesFromFormData,
+  // getConnectionUpdatesFromFormData,
   getTitleFormField,
   getReferenceFormField,
-  getSupportField,
+  // getSupportField,
   getStatusField,
   getArchiveField,
   getMarkdownFormField,
@@ -36,7 +36,7 @@ import { qe } from 'utils/quasi-equals';
 import { lowerCase } from 'utils/string';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
-import { USER_ROLES, FEATURES } from 'themes/config';
+import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -71,7 +71,7 @@ import {
   selectTaxonomies,
   // selectMeasures,
   // selectIndicators,
-  selectConnectedTaxonomies,
+  // selectConnectedTaxonomies,
 } from './selectors';
 
 import messages from './messages';
@@ -112,7 +112,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
         id: viewEntity.get('id'),
         attributes: viewEntity.get('attributes').mergeWith(
           (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-          FORM_INITIAL.get('attributes')
+          FORM_INITIAL.get('attributes'),
         ),
         associatedTaxonomies: taxonomyOptions(taxonomies),
         // associatedMeasures: entityOptions(measures, true),
@@ -146,13 +146,13 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     ]);
 
   getBodyMainFields = (
-    connectedTaxonomies,
+    // connectedTaxonomies,
     entity,
     // measures,
     // indicators,
     onCreateOption,
     hasResponse,
-    intl
+    intl,
   ) => {
     const groups = [];
     groups.push({
@@ -210,7 +210,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
       viewEntity,
       dataReady,
       viewDomain,
-      connectedTaxonomies,
+      // connectedTaxonomies,
       taxonomies,
       // measures,
       // indicators,
@@ -226,13 +226,13 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     } = viewDomain.get('page').toJS();
     const frameworkId = viewEntity && viewEntity.getIn(['attributes', 'framework_id']);
     const type = intl.formatMessage(
-      appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single
+      appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single,
     );
 
     const currentFramework = dataReady && frameworks.find((fw) => qe(fw.get('id'), frameworkId));
     const hasResponse = dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_response']);
-    const hasMeasures = FEATURES.measures && dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_measures']);
-    const hasIndicators = FEATURES.measures && dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_indicators']);
+    // const hasMeasures = FEATURES.measures && dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_measures']);
+    // const hasIndicators = FEATURES.measures && dataReady && currentFramework && currentFramework.getIn(['attributes', 'has_indicators']);
     const fwTaxonomies = taxonomies && taxonomies.filter((tax) => tax.get('frameworkIds').find((id) => qe(id, frameworkId))
       || qe(frameworkId, tax.getIn(['attributes', 'framework_id'])));
 
@@ -323,25 +323,25 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                       existingReferences
                         ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
                         : null,
-                      intl
+                      intl,
                     ),
                     aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
                   body: {
                     main: this.getBodyMainFields(
-                      connectedTaxonomies,
+                      // connectedTaxonomies,
                       viewEntity,
                       // hasMeasures && measures,
                       // hasIndicators && indicators,
                       onCreateOption,
                       hasResponse,
-                      intl
+                      intl,
                     ),
                     aside: this.getBodyAsideFields(
                       fwTaxonomies,
                       onCreateOption,
                       canUserAdministerCategories,
-                      intl
+                      intl,
                     ),
                   },
                 }}
@@ -424,7 +424,7 @@ function mapDispatchToProps(dispatch, props) {
       currentFramework,
       viewEntity,
     ) => {
-      const formData = fromJS(formValues)
+      const formData = fromJS(formValues);
       let saveData = formData
         .set(
           'recommendationCategories',
@@ -432,7 +432,7 @@ function mapDispatchToProps(dispatch, props) {
             formData,
             taxonomies,
             createKey: 'recommendation_id',
-          })
+          }),
         // )
         // .set(
         //   'recommendationMeasures',

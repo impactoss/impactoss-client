@@ -24,7 +24,7 @@ export const selectUsers = createSelector(
     entities,
     associations,
     CONTRIBUTOR_MIN_ROLE_ASSIGNED,
-  )
+  ),
 );
 
 export const selectConnectedTaxonomies = createSelector(
@@ -33,8 +33,8 @@ export const selectConnectedTaxonomies = createSelector(
   (taxonomies, categories) => prepareTaxonomiesMultiple(
     taxonomies,
     categories,
-    ['tags_measures', 'tags_recommendations']
-  )
+    ['tags_measures', 'tags_recommendations'],
+  ),
 );
 
 export const selectRecommendationsByFw = createSelector(
@@ -52,12 +52,12 @@ export const selectRecommendationsByFw = createSelector(
           (fw) => qe(
             fw.get('id'),
             r.getIn(['attributes', 'framework_id']),
-          )
+          ),
         );
         return framework.getIn(['attributes', 'has_indicators']);
-      }
+      },
     ).groupBy(
-      (r) => r.getIn(['attributes', 'framework_id']).toString()
+      (r) => r.getIn(['attributes', 'framework_id']).toString(),
     );
-  }
+  },
 );

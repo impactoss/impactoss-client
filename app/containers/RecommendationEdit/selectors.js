@@ -12,10 +12,10 @@ import {
 } from 'containers/App/selectors';
 
 import {
-  entitiesSetAssociated,
+  // entitiesSetAssociated,
   entitySetUser,
   prepareTaxonomiesAssociated,
-  prepareTaxonomiesMultiple,
+  // prepareTaxonomiesMultiple,
 } from 'utils/entities';
 
 export const selectDomain = (state) => state.get('recommendationEdit');
@@ -23,7 +23,7 @@ export const selectDomain = (state) => state.get('recommendationEdit');
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'recommendations', id }),
   (state) => selectEntities(state, 'users'),
-  (entity, users) => entitySetUser(entity, users)
+  (entity, users) => entitySetUser(entity, users),
 );
 
 export const selectTaxonomies = createSelector(
@@ -43,7 +43,7 @@ export const selectTaxonomies = createSelector(
     'tags_recommendations',
     id,
     false, //  do not include parent taxonomies
-  )
+  ),
 );
 
 // export const selectConnectedTaxonomies = createSelector(

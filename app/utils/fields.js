@@ -287,7 +287,7 @@ export const getTaxonomyFields = (taxonomies) => taxonomies
       entityType: 'taxonomies',
       id: taxonomy.get('id'),
       values: mapCategoryOptions(taxonomy.get('categories'), taxonomy.get('id')),
-    })
+    }),
   ).valueSeq().toArray();
 
 export const getSmartTaxonomyField = (taxonomy) => ({

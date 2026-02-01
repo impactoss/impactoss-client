@@ -30,7 +30,7 @@ export const makeCategoriesForTaxonomy = (
     const parent = parentId && taxonomies.get(parentId);
     if (parent) {
       categories.groups = parent.get(
-        'categories'
+        'categories',
       ).map(
         (cat) => getEntityTitle(cat),
       ).toJS();
@@ -46,7 +46,7 @@ export const makeCategoriesForTaxonomy = (
         // add categories from entities if present
         const present = entities.some(
           (entity) => entity.get('categories')
-            && testEntityCategoryAssociation(entity, catId)
+            && testEntityCategoryAssociation(entity, catId),
         );
         if (present) {
           categories.items.push({
@@ -61,7 +61,7 @@ export const makeCategoriesForTaxonomy = (
             checked: optionChecked(locationQuery.get(config.query), catId),
           });
         }
-      }
+      },
     );
   }
   return categories;

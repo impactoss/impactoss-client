@@ -26,7 +26,7 @@ const Status = styled(Label)`
 class ItemStatus extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const {
-     
+
       draft, // deprecated
       top,
       float,

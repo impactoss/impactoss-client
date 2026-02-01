@@ -16,5 +16,5 @@ export const selectConnectedTaxonomies = createSelector(
     categories,
     ['tags_measures'],
     false,
-  )
+  ),
 );

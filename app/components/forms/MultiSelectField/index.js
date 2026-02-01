@@ -168,7 +168,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
         multiselectOpen: prevState.multiselectOpen !== field.id
           ? field.id
           : null,
-      })
+      }),
     );
   };
 
@@ -181,7 +181,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
   onMultiSelectItemRemove = (option) => this.props.handleUpdate && this.props.handleUpdate(
     this.props.fieldData.map((d) => option.get('value') === d.get('value')
       ? d.set('checked', false)
-      : d)
+      : d),
   );
 
   getMultiSelectActiveOptions = (field, fieldData) => {
@@ -205,7 +205,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
 
   sortOptions = (options) => options.sortBy(
     (option) => this.getOptionSortValueMapper(option),
-    (a, b) => getEntitySortComparator(a, b, 'asc')
+    (a, b) => getEntitySortComparator(a, b, 'asc'),
   );
 
   renderMultiselectActiveOption = (option, field, i) => (

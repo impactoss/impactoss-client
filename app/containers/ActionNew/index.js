@@ -186,7 +186,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
     return groups;
   };
 
-  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) => 
+  getBodyAsideFields = (taxonomies, onCreateOption, canCreateCategories, intl) =>
     ([ // fieldGroups
       { // fieldGroup
         fields: [
@@ -380,7 +380,7 @@ function mapDispatchToProps(dispatch) {
               create: updates.get('create').concat(formCategoryIds.map((id) => Map({
                 category_id: id,
               }))),
-            }), Map({ delete: List(), create: List() }))
+            }), Map({ delete: List(), create: List() })),
         );
       }
 
@@ -405,7 +405,7 @@ function mapDispatchToProps(dispatch) {
                 delete: [],
                 create: [],
               }),
-            )
+            ),
         );
       }
 

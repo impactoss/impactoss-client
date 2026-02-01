@@ -93,7 +93,7 @@ function entityListReducer(state = initialState, action) {
       return action.data
         ? state.setIn(
           ['errors', action.data.timestamp],
-          { data: action.data, error: checkResponseError(action.error) }
+          { data: action.data, error: checkResponseError(action.error) },
         )
         : state;
     case DISMISS_ERROR:

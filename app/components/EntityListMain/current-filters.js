@@ -61,7 +61,7 @@ export const currentFilters = (
       config.frameworks,
       frameworks,
       locationQuery,
-      onTagClick
+      onTagClick,
     ));
   }
   if (config.taxonomies && taxonomies) {
@@ -70,7 +70,7 @@ export const currentFilters = (
       taxonomies,
       locationQuery,
       onTagClick,
-      withoutLabel
+      withoutLabel,
     ));
   }
   if (config.connectedTaxonomies && taxonomies) {
@@ -78,7 +78,7 @@ export const currentFilters = (
       config.connectedTaxonomies,
       taxonomies,
       locationQuery,
-      onTagClick
+      onTagClick,
     ));
   }
   if (config.connections && connections) {
@@ -87,7 +87,7 @@ export const currentFilters = (
       connections,
       locationQuery,
       onTagClick,
-      withoutLabel
+      withoutLabel,
     ));
   }
   if (config.attributes) {
@@ -96,7 +96,7 @@ export const currentFilters = (
       config.attributes.options,
       locationQuery,
       onTagClick,
-      withoutLabel
+      withoutLabel,
     ));
   }
   return filterTags;
@@ -120,7 +120,7 @@ const getCurrentTaxonomyFilters = (
   taxonomies,
   locationQuery,
   onClick,
-  withoutLabel
+  withoutLabel,
 ) => {
   const tags = [];
   if (locationQuery.get(taxonomyFilters.query)) {
@@ -151,7 +151,7 @@ const getCurrentTaxonomyFilters = (
             });
           }
         });
-      }
+      },
     );
   }
   if (locationQuery.get('without')) {
@@ -216,7 +216,7 @@ const getCurrentConnectedTaxonomyFilters = (
   taxonomyFilters,
   taxonomies,
   locationQuery,
-  onClick
+  onClick,
 ) => {
   const tags = [];
   if (locationQuery.get(taxonomyFilters.query)) {
@@ -258,7 +258,7 @@ const getCurrentConnectionFilters = (
   connections,
   locationQuery,
   onClick,
-  withoutLabel
+  withoutLabel,
 ) => {
   const tags = [];
   forEach(connectionFilters.options, (option) => {

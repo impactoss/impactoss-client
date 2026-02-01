@@ -83,7 +83,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     jumpToComponent(
       this.ScrollTarget.current,
       this.ScrollReference.current,
-      this.ScrollContainer.current
+      this.ScrollContainer.current,
     );
   };
 
@@ -128,7 +128,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
         /* eslint-disable prefer-destructuring */
         groupSelectValue = config.taxonomies.defaultGroupsByFramework[frameworks.first().get('id')][1];
         /* eslint-enable prefer-destructuring */
-      } else if (currentFWid !== 'all'){
+      } else if (currentFWid !== 'all') {
         groupSelectValue = getGroupValue(
           taxonomies,
           config.taxonomies.defaultGroupAttribute,
@@ -191,8 +191,8 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
             intl.formatMessage(
               isPlural
                 ? appMessages.entities.taxonomies[groupSelectValue].plural
-                : appMessages.entities.taxonomies[groupSelectValue].single
-            )
+                : appMessages.entities.taxonomies[groupSelectValue].single,
+            ),
           ),
       });
     }

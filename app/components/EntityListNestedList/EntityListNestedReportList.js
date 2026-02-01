@@ -62,7 +62,7 @@ class EntityListNestedReportList extends React.PureComponent { // eslint-disable
           reports
             .sortBy(
               (report) => report.get('date') ? report.getIn(['date', 'attributes', 'due_date']) : report.getIn(['attributes', 'updated_at']),
-              (a, b) => new Date(a) < new Date(b)
+              (a, b) => new Date(a) < new Date(b),
             )
             .map((report, i) => this.state.showAll || i < REPORT_MAX
               ? (

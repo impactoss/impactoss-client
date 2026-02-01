@@ -11,7 +11,7 @@ import {
   USER_ROLES,
   PAGE_ADMIN_MIN_ROLE,
   USER_ADMIN_MIN_ROLE,
-  CONTRIBUTOR_MIN_ROLE_ASSIGNED,
+  // CONTRIBUTOR_MIN_ROLE_ASSIGNED,
 } from 'themes/config';
 
 const errorLoading = (err) => {

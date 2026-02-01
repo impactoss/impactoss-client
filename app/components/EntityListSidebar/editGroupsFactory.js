@@ -75,8 +75,8 @@ export const makeEditGroups = ({
               (otherTax) => qe(
                 tax.get('id'),
                 otherTax.getIn(['attributes', 'parent_id']),
-              )
-            )
+              ),
+            ),
           )
           .reduce(
             (memo, taxonomy) => taxonomy.get('tags')

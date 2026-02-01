@@ -92,7 +92,7 @@ function appReducer(state = initialState, payload) {
     case UPDATE_ENTITIES:
       return payload.entities.reduce((stateUpdated, entity) => stateUpdated.setIn(
         ['entities', payload.path, entity.data.id, 'attributes'],
-        fromJS(entity.data.attributes)
+        fromJS(entity.data.attributes),
       ),
       state);
     case UPDATE_CONNECTIONS:
@@ -101,7 +101,7 @@ function appReducer(state = initialState, payload) {
           ? stateUpdated.deleteIn(['entities', payload.path, connection.id && connection.id.toString()])
           : stateUpdated.setIn(
             ['entities', payload.path, connection.data.id && connection.data.id.toString()],
-            fromJS(connection.data)
+            fromJS(connection.data),
           ),
         state,
       );

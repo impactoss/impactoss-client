@@ -17,7 +17,7 @@ import {
   renderTaxonomyControl,
   getTitleFormField,
   getReferenceFormField,
-  getSupportField,
+  // getSupportField,
   getStatusField,
   getMarkdownFormField,
   renderIndicatorControl,
@@ -104,7 +104,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       ['attributes', 'framework_id'],
       (frameworkId && frameworkId !== 'all')
         ? frameworkId
-        : DEFAULT_FRAMEWORK
+        : DEFAULT_FRAMEWORK,
     ));
 
   getHeaderMainFields = (frameworkId, frameworks, existingReferences, intl) => {
@@ -209,7 +209,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
     const fwSpecified = (frameworkId && frameworkId !== 'all');
 
     const type = intl.formatMessage(
-      appMessages.entities[fwSpecified ? `recommendations_${frameworkId}` : 'recommendations'].single
+      appMessages.entities[fwSpecified ? `recommendations_${frameworkId}` : 'recommendations'].single,
     );
 
     const currentFrameworkId = fwSpecified

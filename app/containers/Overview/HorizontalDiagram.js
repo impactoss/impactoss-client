@@ -322,7 +322,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
   }
 
   getTaxonomiesByTagging = (taxonomies, tags) => taxonomies.filter(
-    (tax) => tax.getIn(['attributes', tags])
+    (tax) => tax.getIn(['attributes', tags]),
   );
 
   getConnectionPoint = (node, nodeReference, side = 'right') => {
@@ -406,7 +406,7 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
       vertical,
       this.getConnectionPoint(this.state.buttonRecs, this.state.diagram, vertical ? 'bottom' : 'right'),
       this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, vertical ? 'top' : 'left'),
-      vertical ? 0.6 : 0.2
+      vertical ? 0.6 : 0.2,
     )
     : this.getConnectionPath(
       vertical,
@@ -418,21 +418,21 @@ export class HorizontalDiagram extends React.PureComponent { // eslint-disable-l
     vertical,
     this.getConnectionPoint(this.state.buttonSdgtargets, this.state.diagram, vertical ? 'bottom' : 'right'),
     this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, vertical ? 'top' : 'left'),
-    vertical ? 0.6 : 0.2
+    vertical ? 0.6 : 0.2,
   );
 
   connectMeasuresIndicators = (vertical = false) => this.getConnectionPath(
     vertical,
     this.getConnectionPoint(this.state.buttonMeasures, this.state.diagram, vertical ? 'bottom' : 'right'),
     this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, vertical ? 'top' : 'left'),
-    vertical ? 0.6 : 0.2
+    vertical ? 0.6 : 0.2,
   );
 
   connectSdgtargetsIndicators = (vertical = false) => this.getCurvedConnectionPath(
     vertical,
     this.getConnectionPoint(this.state.buttonSdgtargets, this.state.diagram, vertical ? 'bottom' : 'right'),
     this.getConnectionPoint(this.state.buttonIndicators, this.state.diagram, vertical ? 'top' : 'left'),
-    0.9
+    0.9,
   );
 
   resize = () => {

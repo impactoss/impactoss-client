@@ -70,7 +70,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         getDefaultTaxonomy(
           this.props.taxonomies,
           this.props.frameworkId,
-        ).get('id')
+        ).get('id'),
       );
     }
   }
@@ -86,7 +86,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         getDefaultTaxonomy(
           nextProps.taxonomies,
           nextProps.frameworkId,
-        ).get('id')
+        ).get('id'),
       );
     }
   }
@@ -97,7 +97,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
   getTaxDescription = (id) => this.props.intl.formatMessage(appMessages.entities.taxonomies[id].description);
 
   getTaxButtonTitle = (id) => this.props.intl.formatMessage(
-    appMessages.entities.taxonomies[id].shortSingle || appMessages.entities.taxonomies[id].single
+    appMessages.entities.taxonomies[id].shortSingle || appMessages.entities.taxonomies[id].single,
   );
   /* eslint-enable react/destructuring-assignment */
 

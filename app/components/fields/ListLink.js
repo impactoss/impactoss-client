@@ -7,7 +7,7 @@ const ListLink = styled(
   // eslint-disable-line no-unused-vars
   ({
     paletteName, pIndex, paletteHover, pIndexHover, ...props
-  }) => <Link {...props} /> // eslint-disable-line jsx-a11y/anchor-has-content
+  }) => <Link {...props} />, // eslint-disable-line jsx-a11y/anchor-has-content
 )`
   color: ${({ paletteName, pIndex }) => palette(paletteName || 'mainListItem', pIndex || 0)};
   display: block;

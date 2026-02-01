@@ -70,7 +70,7 @@ class Group extends React.PureComponent { // eslint-disable-line react/prefer-st
               onClick={() => this.setState(
                 (prevState) => (
                   { showAllConnections: !prevState.showAllConnections }
-                )
+                ),
               )}
             >
               { this.state.showAllConnections

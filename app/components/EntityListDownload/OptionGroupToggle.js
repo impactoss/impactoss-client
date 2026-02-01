@@ -44,7 +44,7 @@ export function OptionGroupToggle({
         expanded={expanded}
         onClick={onToggle}
         title={intl.formatMessage(
-          expanded ? messages.groupHide : messages.groupShow
+          expanded ? messages.groupHide : messages.groupShow,
         )}
       >
         <Box direction="row" justify="between" align="center">

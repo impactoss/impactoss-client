@@ -53,12 +53,12 @@ const FormWrapper = styled.div`
 
 class EntityListForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
   getInitialFormData = (options, fieldName) => {
-    let formData = INITIAL_FORM;
+    const formData = INITIAL_FORM;
     if (options) {
       formData[fieldName] = Object.values(options);
     }
     return formData;
-  }
+  };
 
   render() {
     const {
@@ -91,7 +91,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
             initialValues={this.getInitialFormData(formOptions.options, fieldName)}
             onSubmit={(values) => onSubmit(fromJS(values))}
           >
-            {() =>
+            {() => (
               <Form>
                 <Field name={fieldName}>
                   {({ form }) => (
@@ -121,7 +121,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
                   }
                 </Field>
               </Form>
-            }
+            )}
           </Formik>
         </FormWrapper>
       </Styled>

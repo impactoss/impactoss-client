@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { injectIntl } from 'react-intl';
+import { injectIntl, intlShape } from 'react-intl';
 // import { isEqual } from 'lodash/lang';
 import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
@@ -17,7 +17,7 @@ import EntityListItemMainTop from './EntityListItemMainTop';
 import EntityListItemMainTitle from './EntityListItemMainTitle';
 import EntityListItemMainBottom from './EntityListItemMainBottom';
 
-const Styled = styled(Component)`
+const Styled = styled((p) => <Component {...p} />)`
   position: relative;
   padding-left: 0;
   box-shadow: ${({ isConnection }) => isConnection ? '0px 0px 6px 0px rgba(0,0,0,0.2)' : 'none'};
@@ -33,7 +33,7 @@ const Styled = styled(Component)`
     padding-right: 0;
   }
 `;
-const Wrapper = styled(Component)`
+const Wrapper = styled((p) => <Component {...p} />)`
   position: relative;
   padding-right: 6px;
   padding-top: 4px;
@@ -120,7 +120,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             entitiesByFramework.forEach((fwentities, fwid) => {
               if (fwentities.size > 0) {
                 const connectedEntities = fwentities.map(
-                  (connectionId) => connections.getIn([option.path, connectionId.toString()])
+                  (connectionId) => connections.getIn([option.path, connectionId.toString()]),
                 );
                 const path = `${option.path}_${fwid}`;
                 memoX = memoX.concat([{
@@ -129,7 +129,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
                       && intl.formatMessage(
                         size === 1
                           ? appMessages.entities[path].single
-                          : appMessages.entities[path].plural
+                          : appMessages.entities[path].plural,
                       ),
                     style: option.path,
                     path: option.clientPath || option.path,
@@ -143,12 +143,12 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
           const connectedEntities = entity
             .get(option.path)
             .map(
-              (connectionId) => connections.getIn([option.path, connectionId.toString()])
+              (connectionId) => connections.getIn([option.path, connectionId.toString()]),
             );
           memoX = memoX.concat([{
             option: {
               label: (size) => intl && intl.formatMessage(
-                size === 1 ? appMessages.entities[option.path].single : appMessages.entities[option.path].plural
+                size === 1 ? appMessages.entities[option.path].single : appMessages.entities[option.path].plural,
               ),
               style: option.path,
               path: option.clientPath || option.path,
@@ -189,7 +189,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
     const progressCategory = progressTaxonomy
       && categoryIds
       && progressTaxonomy.get('categories').find(
-        (cat) => categoryIds.includes(parseInt(cat.get('id'), 10))
+        (cat) => categoryIds.includes(parseInt(cat.get('id'), 10)),
       );
     return progressCategory && progressCategory.toJS();
   };
@@ -200,10 +200,10 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       ? categoryIds.filter(
         (cat) => {
           const progressCategoryIds = progressTaxonomy.get('categories').map(
-            (pCat) => parseInt(pCat.get('id'), 10)
+            (pCat) => parseInt(pCat.get('id'), 10),
           );
           return !progressCategoryIds || !progressCategoryIds.includes(parseInt(cat, 10));
-        }
+        },
       )
       : categoryIds;
   };
@@ -224,7 +224,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       path = nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath;
     }
     let supportLevel;
-    console.log(entity.getIn(['attributes', 'support_level']))
+    console.log(entity.getIn(['attributes', 'support_level']));
     if (
       typeof entity.getIn(['attributes', 'support_level']) !== 'undefined'
       && entity.getIn(['attributes', 'support_level']) !== 'null'
@@ -330,7 +330,7 @@ EntityListItemMain.propTypes = {
   isManager: PropTypes.bool,
   isFocus: PropTypes.bool,
   skipTargetId: PropTypes.string,
-  intl: PropTypes.object.isRequired,
+  intl: intlShape.isRequired, // eslint-disable-line react/no-unused-prop-types
 };
 
 export default injectIntl(EntityListItemMain);

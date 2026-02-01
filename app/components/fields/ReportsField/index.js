@@ -85,7 +85,7 @@ class ReportsField extends React.PureComponent { // eslint-disable-line react/pr
                   onClick={() => this.setState(
                     (prevState) => (
                       { showAllReports: !prevState.showAllReports }
-                    )
+                    ),
                   )}
                 >
                   { this.state.showAllReports

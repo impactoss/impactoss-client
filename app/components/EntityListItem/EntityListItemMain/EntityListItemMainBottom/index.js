@@ -8,7 +8,7 @@ import Component from 'components/styled/Component';
 import EntityListItemMainConnections from './EntityListItemMainConnections';
 import EntityListItemMainTaxonomies from './EntityListItemMainTaxonomies';
 
-const Styled = styled(Component)`
+const Styled = styled((p) => <Component {...p} />)`
   margin-bottom: -5px;
   display: none;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
@@ -29,7 +29,7 @@ class EntityListItemMainBottom extends React.PureComponent { // eslint-disable-l
       onEntityClick,
     } = this.props;
     const smartTaxonomy = taxonomies && taxonomies.find(
-      (tax) => tax.getIn(['attributes', 'is_smart'])
+      (tax) => tax.getIn(['attributes', 'is_smart']),
     );
     const hasUpper = connections && connections.length > 0;
     const hasLower = (categories && categories.size > 0) || smartTaxonomy;

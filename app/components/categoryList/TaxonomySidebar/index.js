@@ -156,7 +156,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
                             {... appMessages.taxonomyGroups.objectives}
                             values={{
                               type: intl.formatMessage(
-                                appMessages.entities[`recommendations_${group.frameworkId}`].pluralLong
+                                appMessages.entities[`recommendations_${group.frameworkId}`].pluralLong,
                               ),
                             }}
                           />
@@ -185,7 +185,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
                                       onTaxonomyClick={this.onHideSidebar}
                                       onTaxonomyOver={onTaxonomyOver}
                                     />
-                                  )
+                                  ),
                                 )}
                             </div>
                           </div>

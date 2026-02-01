@@ -73,7 +73,7 @@ const render = (messages) => {
         <StyleSheetManager
           enableVendorPrefixes
           shouldForwardProp={(propName, target) => {
-            if (typeof target === "string") {
+            if (typeof target === 'string') {
               // For HTML elements, forward the prop if it is a valid HTML attribute
               return isPropValid(propName);
             }
@@ -89,7 +89,7 @@ const render = (messages) => {
           </Grommet>
         </StyleSheetManager>
       </LanguageProvider>
-    </Provider>
+    </Provider>,
   );
 };
 
@@ -129,4 +129,4 @@ if (process.env.NODE_ENV === 'production') {
       runtime.applyUpdate();
     },
   });
-}*/
+} */

@@ -82,7 +82,7 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
           to={`${ROUTES.CATEGORIES}/${group.get('id')}`}
           title={intl.formatMessage(
             messages.groupHeaderTitle,
-            { label: group.get('label'), type: groupTypeTitle }
+            { label: group.get('label'), type: groupTypeTitle },
           )}
         >
           <ScreenReaderHide>
@@ -98,7 +98,7 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
             to={`${ROUTES.CATEGORIES}/${group.get('id')}`}
             title={intl.formatMessage(
               messages.subgroupHeaderTitle,
-              { label: group.get('label'), type: groupTypeTitle }
+              { label: group.get('label'), type: groupTypeTitle },
             )}
           >
             <ScreenReaderHide>

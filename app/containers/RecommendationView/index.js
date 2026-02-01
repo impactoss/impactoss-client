@@ -32,9 +32,9 @@ import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import {
   IS_CURRENT_STATUSES,
   IS_ARCHIVE_STATUSES,
-  SUPPORT_LEVELS,
+  // SUPPORT_LEVELS,
   CYCLE_TAXONOMY_ID,
-  FEATURES,
+  // FEATURES,
 } from 'themes/config';
 
 import Loading from 'components/Loading';
@@ -135,8 +135,8 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
     // measureConnections,
     // indicators,
     // indicatorConnections,
-    onEntityClick,
-    hasResponse,
+    // onEntityClick,
+    // hasResponse,
   ) => {
     const fields = [];
     // own attributes
@@ -217,32 +217,32 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
 
     const frameworkId = viewEntity && viewEntity.getIn(['attributes', 'framework_id']);
     const type = intl.formatMessage(
-      appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single
+      appMessages.entities[frameworkId ? `recommendations_${frameworkId}` : 'recommendations'].single,
     );
 
     const currentFramework = dataReady
       && (
         frameworks.find(
-          (fw) => qe(fw.get('id'), frameworkId)
+          (fw) => qe(fw.get('id'), frameworkId),
         )
         || frameworks.first()
       );
-    const cycleTaxonomy = dataReady && taxonomies.get(`${CYCLE_TAXONOMY_ID}`)
+    const cycleTaxonomy = dataReady && taxonomies.get(`${CYCLE_TAXONOMY_ID}`);
     const hasCycles = dataReady
       && currentFramework
       && cycleTaxonomy
       && cycleTaxonomy.get('frameworkIds')
-      && cycleTaxonomy.get('frameworkIds').some((id) => qe(id, currentFramework.get('id')))
+      && cycleTaxonomy.get('frameworkIds').some((id) => qe(id, currentFramework.get('id')));
 
     const hasResponse = dataReady
       && currentFramework
       && currentFramework.getIn(['attributes', 'has_response']);
-    const hasMeasures = dataReady
-      && currentFramework
-      && currentFramework.getIn(['attributes', 'has_measures']);
-    const hasIndicators = dataReady
-      && currentFramework
-      && currentFramework.getIn(['attributes', 'has_indicators']);
+    // const hasMeasures = dataReady
+    //   && currentFramework
+    //   && currentFramework.getIn(['attributes', 'has_measures']);
+    // const hasIndicators = dataReady
+    //   && currentFramework
+    //   && currentFramework.getIn(['attributes', 'has_indicators']);
     let buttons = [];
     if (dataReady) {
       buttons.push({

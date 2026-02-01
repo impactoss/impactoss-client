@@ -30,7 +30,7 @@ const Styled = styled.span`
     width: ${(props) => props.expanded ? COLUMN_WIDTHS.HALF * 100 : 100}%;
   }
 `;
-const Item = styled(Component)`
+const Item = styled((p) => <Component {...p} />)`
   display: table;
   width: 100%;
   color: ${palette('mainListItem', 0)};
@@ -40,7 +40,7 @@ const Item = styled(Component)`
   border-right: ${(props) => props.error ? '1px solid' : 0};
   border-color: ${palette('error', 0)};
 `;
-const MainWrapper = styled(Component)`
+const MainWrapper = styled((p) => <Component {...p} />)`
   width:100%;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     display: table-cell;
@@ -54,7 +54,7 @@ const MainWrapper = styled(Component)`
     width: ${(props) => props.expandable ? COLUMN_WIDTHS.MAIN * 100 : 100}%;
   }
 `;
-const MainInnerWrapper = styled(Component)`
+const MainInnerWrapper = styled((p) => <Component {...p} />)`
   display: table;
   width: 100%;
 `;
@@ -132,7 +132,7 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
                     messages.selectLabel,
                     {
                       entityTitle: entity.getIn(['attributes', 'name']) || entity.getIn(['attributes', 'title']),
-                    }
+                    },
                   )}
                 />
               )}

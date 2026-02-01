@@ -24,7 +24,7 @@ import {
 } from 'themes/config';
 import { getImportFields, getColumnAttribute } from 'utils/import';
 import { checkActionAttribute, checkAttribute } from 'utils/entities';
-import { lowerCase  } from 'utils/string';
+import { lowerCase } from 'utils/string';
 import qe from 'utils/quasi-equals';
 
 import {
@@ -62,13 +62,13 @@ import { FORM_INITIAL, DEPENDENCIES } from './constants';
 function ActionImport({
   dataReady,
   authReady,
-  loadEntitiesIfNeeded,
-  redirectIfNotPermitted,
+  onLoadEntitiesIfNeeded,
+  onRedirectIfNotPermitted,
+  onResetProgress,
   categories,
   connections,
   handleCancel,
   handleSubmit,
-  resetProgress,
   errors,
   success,
   progress,
@@ -77,12 +77,12 @@ function ActionImport({
   // reload entities if invalidated
   useEffect(() => {
     if (!dataReady) {
-      loadEntitiesIfNeeded();
+      onLoadEntitiesIfNeeded();
     }
   }, [dataReady]);
   useEffect(() => {
     if (authReady) {
-      redirectIfNotPermitted();
+      onRedirectIfNotPermitted();
     }
   }, [authReady]);
 
@@ -106,7 +106,7 @@ function ActionImport({
     return memo;
   }, []);
   const relationshipFields = Object.keys(
-    ENTITY_FIELDS.measures.RELATIONSHIPS_IMPORT
+    ENTITY_FIELDS.measures.RELATIONSHIPS_IMPORT,
   ).reduce(
     (memo, key) => {
       if (
@@ -163,7 +163,7 @@ function ActionImport({
             handleSubmit(formData, connections, categories);
           }}
           handleCancel={handleCancel}
-          resetProgress={resetProgress}
+          resetProgress={onResetProgress}
           errors={errors}
           success={success}
           progress={progress}
@@ -178,13 +178,13 @@ function ActionImport({
 }
 
 ActionImport.propTypes = {
-  loadEntitiesIfNeeded: PropTypes.func,
-  redirectIfNotPermitted: PropTypes.func,
+  onLoadEntitiesIfNeeded: PropTypes.func,
+  onRedirectIfNotPermitted: PropTypes.func,
+  onResetProgress: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
-  resetProgress: PropTypes.func.isRequired,
   progress: PropTypes.number,
   errors: PropTypes.object,
   success: PropTypes.object,
@@ -205,13 +205,13 @@ const mapStateToProps = (state) => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    loadEntitiesIfNeeded: () => {
+    onLoadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
-    resetProgress: () => {
+    onResetProgress: () => {
       dispatch(resetProgress());
     },
-    redirectIfNotPermitted: () => {
+    onRedirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
     handleSubmit: (formValues, connections, categories) => {
@@ -219,7 +219,7 @@ function mapDispatchToProps(dispatch) {
       let invalidConnections = [];
       if (formData.get('import') !== null) {
         formData.getIn(['import', 'rows']).forEach((row, index) => {
-          let rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
+          const rowCleanColumns = row.mapKeys((k) => getColumnAttribute(k));
           // make sure type id is set
           let rowClean = {
             attributes: rowCleanColumns
@@ -232,7 +232,7 @@ function mapDispatchToProps(dispatch) {
                   if (validateDateFormat(val, DATE_FORMAT)) {
                     return format(
                       parse(val, DATE_FORMAT, new Date()),
-                      API_DATE_FORMAT
+                      API_DATE_FORMAT,
                     );
                   }
                   return '';
@@ -286,7 +286,7 @@ function mapDispatchToProps(dispatch) {
                   relationship.values.forEach(
                     (relValue) => {
                       // console.log(relValue)
-                      const [id, value] = relValue.trim().split('|');
+                      const [id] = relValue.trim().split('|');
                       if (relConfig) {
                         // check if connection id is valid
                         let connectionId;
@@ -296,7 +296,7 @@ function mapDispatchToProps(dispatch) {
                             if (categories && relConfig.lookup.table === API.CATEGORIES) {
                               const category = categories.find(
                                 (entity) => entity.getIn(['attributes', relConfig.lookup.attribute])
-                                  && qe(entity.getIn(['attributes', relConfig.lookup.attribute]).trim(), id)
+                                  && qe(entity.getIn(['attributes', relConfig.lookup.attribute]).trim(), id),
                               );
                               if (category) {
                                 connectionId = category.get('id');
@@ -305,25 +305,22 @@ function mapDispatchToProps(dispatch) {
                               const connection = connections.get(relConfig.lookup.table)
                                 && connections.get(relConfig.lookup.table).find(
                                   (entity) => entity.getIn(['attributes', relConfig.lookup.attribute])
-                                    && qe(entity.getIn(['attributes', relConfig.lookup.attribute]).trim(), id)
+                                    && qe(entity.getIn(['attributes', relConfig.lookup.attribute]).trim(), id),
                                 );
                               if (connection) {
                                 connectionId = connection.get('id');
                               }
                             }
-                          } else {
-                            if (categories && relConfig.lookup.table === API.CATEGORIES) {
-                              if (categories.get(`${id}`)) {
-                                connectionId = id;
-                              }
-                            } else if (connections) {
-
-                              if (
-                                connections.get(relConfig.lookup.table)
+                          } else if (categories && relConfig.lookup.table === API.CATEGORIES) {
+                            if (categories.get(`${id}`)) {
+                              connectionId = id;
+                            }
+                          } else if (connections) {
+                            if (
+                              connections.get(relConfig.lookup.table)
                                 && connections.getIn([relConfig.lookup.table, `${id}`])
-                              ) {
-                                connectionId = id;
-                              }
+                            ) {
+                              connectionId = id;
                             }
                           }
                         }
@@ -347,16 +344,16 @@ function mapDispatchToProps(dispatch) {
                             relField === 'recommendation-reference'
                             || relField === 'recommendation-id'
                           ) {
-                              const create = { recommendation_id: connectionId };
-                              if (recommendationMeasures && recommendationMeasures.create) {
-                                recommendationMeasures.create = [
-                                  ...recommendationMeasures.create,
-                                  create,
-                                ];
-                              } else {
-                                recommendationMeasures = { create: [create] };
-                              }
+                            const create = { recommendation_id: connectionId };
+                            if (recommendationMeasures && recommendationMeasures.create) {
+                              recommendationMeasures.create = [
+                                ...recommendationMeasures.create,
+                                create,
+                              ];
+                            } else {
+                              recommendationMeasures = { create: [create] };
                             }
+                          }
 
                           // measureCategories by code or id
                           if (
@@ -385,10 +382,10 @@ function mapDispatchToProps(dispatch) {
                           ];
                         }
                       } // relConfig
-                    }
+                    },
                   ); // forEach
                 }
-              }
+              },
             );
             rowClean = {
               ...rowClean,
@@ -414,7 +411,7 @@ function mapDispatchToProps(dispatch) {
                 invalidItem,
                 {
                   timestamp: `${Date.now()}-${Math.random().toString(36).slice(-8)}`,
-                }
+                },
               ),
             ));
           });
@@ -423,10 +420,6 @@ function mapDispatchToProps(dispatch) {
     },
     handleCancel: () => {
       dispatch(updatePath(ROUTES.MEASURES));
-    },
-    handleReset: () => {
-      dispatch(resetProgress());
-      dispatch(resetForm());
     },
   };
 }

@@ -7,7 +7,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { palette } from 'styled-theme';
 
 import EntityListSidebarGroupLabel from './EntityListSidebarGroupLabel';
 import EntityListSidebarOption from './EntityListSidebarOption';

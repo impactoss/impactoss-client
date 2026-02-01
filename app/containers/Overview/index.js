@@ -271,7 +271,7 @@ function mapDispatchToProps(dispatch) {
         path,
         {
           query,
-        }
+        },
       ));
     },
     onTaxonomyLink: (path) => {

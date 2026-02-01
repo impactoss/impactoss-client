@@ -6,27 +6,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, injectIntl } from 'react-intl';
-import { PathLine } from 'react-svg-pathline';
 import { palette } from 'styled-theme';
 
 import styled, { withTheme } from 'styled-components';
 
 import { ROUTES } from 'containers/App/constants';
 
-// components
-import Button from 'components/buttons/Button';
-import Icon from 'components/Icon';
-
 import isNumber from 'utils/is-number';
 
 // relative
 import appMessages from 'containers/App/messages';
-import messages from './messages';
+// import messages from './messages';
 import VerticalDiagramButton from './VerticalDiagramButton';
-import VerticalDiagramSVG  from './VerticalDiagramSVG';
+import VerticalDiagramSVG from './VerticalDiagramSVG';
 
 const Diagram = styled(
-  React.forwardRef((p, ref) => <div ref={ref} {...p} />)
+  React.forwardRef((p, ref) => <div ref={ref} {...p} />),
 )`
   position: relative;
   width: 100%;
@@ -75,78 +70,6 @@ const DiagramButtonWrap = styled.div`
   }
 `;
 
-const DiagramButton = styled((p) => <Button {...p} />)`
-  background-color: ${(props) => palette(props.paletteDefault, 0)};
-  color: white;
-  padding: ${({ draft }) => draft ? '0.4em 0.5em 0.75em' : '0.6em 0.5em'};
-  box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.2);
-  font-size: 0.7em;
-  border-radius: 15px;
-  max-width: ${({ multiple }) => multiple ? '70px' : 'none'};
-  min-width: none;
-  &:hover {
-    background-color: ${(props) => palette(props.paletteHover, 0)};
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    font-size: 1em;
-    padding: ${({ draft }) => draft ? '0.4em 0.5em 0.4em' : '0.6em 0.5em'};
-    max-width: ${({ multiple }) => multiple ? '100px' : 'none'};
-    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
-    font-size: 1.1em;
-    min-width: ${({ multiple }) => multiple ? 'none' : '180px'};
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    font-weight: bold;
-    max-width: none;
-    padding: ${({ draft }) => draft ? '0.6em 1em 0.2em' : '0.8em 1em'};
-  }
-  @media print {
-    font-size: ${(props) => props.theme.sizes.print.default};
-    box-shadow: none;
-    border: 1px solid ${palette('light', 3)};
-    min-width: none;
-    width: 130px;
-    height: 90px;
-  }
-`;
-const DiagramButtonIcon = styled.div`
-  padding-bottom: 5px;
-`;
-
-const DraftEntities = styled.div`
-  display: none;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    display: block;
-    font-size: 0.8em;
-    font-weight: normal;
-  }
-  @media print {
-    font-size: ${(props) => props.theme.sizes.print.smaller};
-  }
-`;
-
-const DiagramSvg = styled.svg``;
-const DiagramSvgWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  @media print {
-    display: none;
-  }
-`;
-
-const PathLineCustom = styled(PathLine)`
-  stroke: ${palette('dark', 2)};
-  stroke-width: 0.5px;
-  fill: none;
-`;
-const PathLineArrow = styled(PathLine)`
-  fill: ${palette('dark', 2)};
-`;
 const SectionLabel = styled.div`
   color: ${palette('text', 1)};
   font-size: ${(props) => props.theme.sizes.text.small};
@@ -187,7 +110,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
 
   resize = () => {
     // reset
-    this.itemRefs={};
+    this.itemRefs = {};
     this.setState((prev) => ({ diagramVersion: (prev.diagramVersion || 0) + 1 }));
   };
 
@@ -197,7 +120,6 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
       // Force update to re-render DiagramSVG and cause effect to re-run
       this.setState((prev) => ({ diagramVersion: (prev.diagramVersion || 0) + 1 }));
     }
-
   };
 
   render() {
@@ -256,7 +178,7 @@ export class VerticalDiagram extends React.PureComponent { // eslint-disable-lin
                       />
                     </DiagramButtonWrap>
                   );
-                }
+                },
               )}
             </DiagramSectionVerticalCenter>
           </DiagramSectionVertical>

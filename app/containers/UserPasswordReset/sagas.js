@@ -39,7 +39,7 @@ export function* reset({ data }) {
         [KEYS.ACCESS_TOKEN]: query.get('token'),
         [KEYS.UID]: query.get('uid'),
         [KEYS.EXPIRY]: query.get('expiry'),
-      }
+      },
     );
     yield put(passwordResetSuccess());
     yield put(updatePath(ROUTES.LOGIN));

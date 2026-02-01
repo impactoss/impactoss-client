@@ -27,7 +27,9 @@ const Input = styled.input`
 `;
 export class RadioControl extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { options, hints, onChange, name, value } = this.props;
+    const {
+      options, hints, onChange, name, value,
+    } = this.props;
     return (
       <StyledWrapper>
         {
@@ -35,7 +37,7 @@ export class RadioControl extends React.PureComponent { // eslint-disable-line r
             <Option key={i}>
               <Label highlight={option.highlight}>
                 <Input
-                  type='radio'
+                  type="radio"
                   name={name}
                   value={option.value}
                   checked={option.value === value}
