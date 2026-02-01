@@ -61,12 +61,11 @@ export const getTitleTextField = (entity, isManager, attribute = 'title', label)
 export const getStatusField = (entity, attribute = 'draft', options, label, defaultValue = true) => ({
   controlType: 'info',
   type: 'status',
-  value:
-    entity &&
-    entity.getIn(['attributes', attribute]) !== null &&
-    typeof entity.getIn(['attributes', attribute]) !== 'undefined'
-      ? entity.getIn(['attributes', attribute])
-      : defaultValue,
+  value: entity
+    && entity.getIn(['attributes', attribute]) !== null
+    && typeof entity.getIn(['attributes', attribute]) !== 'undefined'
+    ? entity.getIn(['attributes', attribute])
+    : defaultValue,
   options,
   label,
 });
@@ -178,16 +177,21 @@ export const getMetaField = (entity, includeRelationshipUpdatedAt = true) => {
 };
 
 export const getMarkdownField = (entity, attribute, hasLabel = true, label) =>
-  !!entity.getIn(['attributes', attribute]) &&
-  entity.getIn(['attributes', attribute]).trim().length > 0 && {
+  !!entity.getIn(['attributes', attribute])
+  && entity.getIn(['attributes', attribute]).trim().length > 0 && {
     type: 'markdown',
     value: entity.getIn(['attributes', attribute]),
     label: hasLabel && appMessages.attributes[label || attribute],
   };
 
 export const getDateField = (entity, attribute, showEmpty, emptyMessage) =>
-  (showEmpty ||
-    (!!entity.getIn(['attributes', attribute]) && entity.getIn(['attributes', attribute]).trim().length > 0)) && {
+  (
+    showEmpty
+    || (
+      !!entity.getIn(['attributes', attribute])
+      && entity.getIn(['attributes', attribute]).trim().length > 0
+    )
+  ) && {
     type: 'date',
     value: !!entity.getIn(['attributes', attribute]) && entity.getIn(['attributes', attribute]),
     label: appMessages.attributes[attribute],
@@ -203,8 +207,8 @@ export const getDateRelatedField = (value, attribute, showEmpty, emptyMessage) =
   };
 
 export const getTextField = (entity, attribute) =>
-  !!entity.getIn(['attributes', attribute]) &&
-  entity.getIn(['attributes', attribute]).trim().length > 0 && {
+  !!entity.getIn(['attributes', attribute])
+  && entity.getIn(['attributes', attribute]).trim().length > 0 && {
     type: 'text',
     value: entity.getIn(['attributes', attribute]),
     label: appMessages.attributes[attribute],
@@ -213,46 +217,46 @@ export const getTextField = (entity, attribute) =>
 const mapCategoryOptions = (categories, taxId) =>
   categories
     ? sortCategories(categories, taxId)
-        .map((cat) => ({
-          label: cat.getIn(['attributes', 'title']),
-          reference: cat.getIn(['attributes', 'reference']) || null,
-          draft: cat.getIn(['attributes', 'draft']) || null,
-          linkTo: `${ROUTES.CATEGORIES}/${cat.get('id')}`,
-        }))
-        .valueSeq()
-        .toArray()
+      .map((cat) => ({
+        label: cat.getIn(['attributes', 'title']),
+        reference: cat.getIn(['attributes', 'reference']) || null,
+        draft: cat.getIn(['attributes', 'draft']) || null,
+        linkTo: `${ROUTES.CATEGORIES}/${cat.get('id')}`,
+      }))
+      .valueSeq()
+      .toArray()
     : [];
 
 const mapSmartCategoryOptions = (categories) =>
   categories
     ? sortEntities(categories, 'asc', 'referenceThenTitle')
-        .map((cat) => ({
-          label: cat.getIn(['attributes', 'title']),
-          isSmart: !!cat.get('associated'),
-          reference: cat.getIn(['attributes', 'reference']) || null,
-          draft: cat.getIn(['attributes', 'draft']) || null,
-          linkTo: `${ROUTES.CATEGORIES}/${cat.get('id')}`,
-        }))
-        .valueSeq()
-        .toArray()
+      .map((cat) => ({
+        label: cat.getIn(['attributes', 'title']),
+        isSmart: !!cat.get('associated'),
+        reference: cat.getIn(['attributes', 'reference']) || null,
+        draft: cat.getIn(['attributes', 'draft']) || null,
+        linkTo: `${ROUTES.CATEGORIES}/${cat.get('id')}`,
+      }))
+      .valueSeq()
+      .toArray()
     : [];
 
 const mapReports = (reports) =>
   reports
     ? reports
-        .map((report) => ({
-          label: report.getIn(['attributes', 'title']),
-          dueDate: report.get('due_date') ? report.getIn(['due_date', 'attributes', 'due_date']) : null,
-          updatedAt: report.getIn(['attributes', 'updated_at']),
-          createdAt: report.getIn(['attributes', 'created_at']),
-          draft: report.getIn(['attributes', 'draft']),
-          is_archive: report.getIn(['attributes', 'is_archive']),
-          is_current: report.getIn(['attributes', 'is_current']),
-          linkTo: `${ROUTES.PROGRESS_REPORTS}/${report.get('id')}`,
-          updatedBy: report.get('user') && report.getIn(['user', 'attributes']).toJS(),
-        }))
-        .valueSeq()
-        .toArray()
+      .map((report) => ({
+        label: report.getIn(['attributes', 'title']),
+        dueDate: report.get('due_date') ? report.getIn(['due_date', 'attributes', 'due_date']) : null,
+        updatedAt: report.getIn(['attributes', 'updated_at']),
+        createdAt: report.getIn(['attributes', 'created_at']),
+        draft: report.getIn(['attributes', 'draft']),
+        is_archive: report.getIn(['attributes', 'is_archive']),
+        is_current: report.getIn(['attributes', 'is_current']),
+        linkTo: `${ROUTES.PROGRESS_REPORTS}/${report.get('id')}`,
+        updatedBy: report.get('user') && report.getIn(['user', 'attributes']).toJS(),
+      }))
+      .valueSeq()
+      .toArray()
     : [];
 
 export const getReportsField = (reports, button) => ({
@@ -265,13 +269,13 @@ export const getReportsField = (reports, button) => ({
 const mapDates = (dates) =>
   dates
     ? dates
-        .map((date) => ({
-          date: date.getIn(['attributes', 'due_date']),
-          due: date.getIn(['attributes', 'due']),
-          overdue: date.getIn(['attributes', 'overdue']),
-        }))
-        .valueSeq()
-        .toArray()
+      .map((date) => ({
+        date: date.getIn(['attributes', 'due_date']),
+        due: date.getIn(['attributes', 'due']),
+        overdue: date.getIn(['attributes', 'overdue']),
+      }))
+      .valueSeq()
+      .toArray()
     : [];
 
 export const getScheduleField = (dates) => ({
@@ -281,17 +285,15 @@ export const getScheduleField = (dates) => ({
 });
 
 export const getTaxonomyFields = (taxonomies) =>
-  taxonomies &&
-  sortEntities(taxonomies, 'asc', 'priority')
+  taxonomies
+  && sortEntities(taxonomies, 'asc', 'priority')
     .map((taxonomy) => ({
       type: 'taxonomy',
       label: appMessages.entities.taxonomies[taxonomy.get('id')].plural,
       entityType: 'taxonomies',
       id: taxonomy.get('id'),
       values: mapCategoryOptions(taxonomy.get('categories'), taxonomy.get('id')),
-    }))
-    .valueSeq()
-    .toArray();
+    })).valueSeq().toArray();
 
 export const getSmartTaxonomyField = (taxonomy) => ({
   type: 'smartTaxonomy',
@@ -303,16 +305,16 @@ export const getSmartTaxonomyField = (taxonomy) => ({
 export const hasTaxonomyCategories = (taxonomies) =>
   taxonomies
     ? taxonomies.reduce(
-        (memo, taxonomy) => memo || (taxonomy.get('categories') && taxonomy.get('categories').size > 0),
-        false,
-      )
+      (memo, taxonomy) => memo || (taxonomy.get('categories') && taxonomy.get('categories').size > 0),
+      false,
+    )
     : false;
 
 const getCategoryShortTitle = (category) => {
-  const title =
-    category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
-      ? category.getIn(['attributes', 'short_title'])
-      : category.getIn(['attributes', 'title']);
+  const title = category.getIn(['attributes', 'short_title'])
+    && category.getIn(['attributes', 'short_title']).trim().length > 0
+    ? category.getIn(['attributes', 'short_title'])
+    : category.getIn(['attributes', 'title']);
   return truncateText(title, TEXT_TRUNCATE.ENTITY_TAG);
 };
 

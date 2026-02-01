@@ -11,7 +11,12 @@ import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import styled from 'styled-components';
 
-import { getNameField, getEmailFormField, getPasswordField, getPasswordConfirmationField } from 'utils/forms';
+import {
+  getNameField,
+  getEmailFormField,
+  getPasswordField,
+  getPasswordConfirmationField,
+} from 'utils/forms';
 
 import Icon from 'components/Icon';
 import Messages from 'components/Messages';
@@ -23,7 +28,12 @@ import OtpForm from 'components/forms/OtpForm';
 import A from 'components/styled/A';
 
 import { selectQueryMessages, selectOtpRequired, selectTempToken } from 'containers/App/selectors';
-import { updatePath, dismissQueryMessages, verifyOtp, resendOtp } from 'containers/App/actions';
+import {
+  updatePath,
+  dismissQueryMessages,
+  verifyOtp,
+  resendOtp,
+} from 'containers/App/actions';
 
 import { ROUTES } from 'containers/App/constants';
 import { IS_PROD, SERVER } from 'themes/config';
@@ -41,7 +51,15 @@ const BottomLinks = styled.div`
 export class UserRegister extends React.PureComponent {
   // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { intl, handleCancel, handleSubmit, handleOtpSubmit, handleOtpResend, otpRequired, tempToken } = this.props;
+    const {
+      intl,
+      handleCancel,
+      handleSubmit,
+      handleOtpSubmit,
+      handleOtpResend,
+      otpRequired,
+      tempToken,
+    } = this.props;
     const { registerError, registerSending } = this.props.viewDomain.get('page').toJS();
 
     return (

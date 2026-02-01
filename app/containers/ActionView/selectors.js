@@ -33,7 +33,7 @@ import { DEPENDENCIES } from './constants';
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'measures', id }),
   (state) => selectEntities(state, 'users'),
-  (entity, users) => entitySetUser(entity, users)
+  (entity, users) => entitySetUser(entity, users),
 );
 
 // TODO optimise use selectMeasureCategoriesByMeasure
@@ -48,15 +48,15 @@ export const selectTaxonomies = createSelector(
     associations,
     'tags_measures',
     id,
-  )
+  ),
 );
 
 const selectRecommendationAssociations = createSelector(
   (state, id) => id,
   selectRecommendationMeasuresByMeasure,
   (measureId, associations) => associations.get(
-    parseInt(measureId, 10)
-  )
+    parseInt(measureId, 10),
+  ),
 );
 const selectRecommendationsAssociated = createSelector(
   selectRecommendationAssociations,
@@ -70,7 +70,7 @@ const selectRecommendationsAssociated = createSelector(
           : memo;
       },
       Map(),
-    )
+    ),
 );
 
 // all connected recommendations
@@ -100,10 +100,10 @@ export const selectRecommendations = createSelector(
       && recommendations.filter(
         (rec) => {
           const currentFramework = frameworks.find(
-            (fw) => qe(fw.get('id'), rec.getIn(['attributes', 'framework_id']))
+            (fw) => qe(fw.get('id'), rec.getIn(['attributes', 'framework_id'])),
           );
           return currentFramework.getIn(['attributes', 'has_measures']);
-        }
+        },
       ).map(
         (rec) => rec.set(
           'categories',
@@ -111,26 +111,26 @@ export const selectRecommendations = createSelector(
             rec.get('id'),
             recommendationCategories,
             categories,
-          )
+          ),
         ).set(
           'measures',
-          recommendationMeasures.get(parseInt(rec.get('id'), 10))
+          recommendationMeasures.get(parseInt(rec.get('id'), 10)),
         ).set(
           'indicators',
-          recommendationIndicators.get(parseInt(rec.get('id'), 10))
-        )
+          recommendationIndicators.get(parseInt(rec.get('id'), 10)),
+        ),
       ).groupBy(
-        (r) => r.getIn(['attributes', 'framework_id'])
+        (r) => r.getIn(['attributes', 'framework_id']),
       );
-  }
+  },
 );
 
 const selectIndicatorAssociations = createSelector(
   (state, id) => id,
   selectMeasureIndicatorsByMeasure,
   (measureId, associations) => associations.get(
-    parseInt(measureId, 10)
-  )
+    parseInt(measureId, 10),
+  ),
 );
 const selectIndicatorsAssociated = createSelector(
   selectIndicatorAssociations,
@@ -144,7 +144,7 @@ const selectIndicatorsAssociated = createSelector(
           : memo;
       },
       Map(),
-    )
+    ),
 );
 
 // selectIndicators,
@@ -171,28 +171,28 @@ export const selectIndicators = createSelector(
             (recId) => connections.getIn([
               'recommendations',
               recId.toString(),
-            ])
+            ]),
           ).groupBy(
             (recId) => connections.getIn([
               'recommendations',
               recId.toString(),
               'attributes',
               'framework_id',
-            ]).toString()
+            ]).toString(),
           );
         return indicator.set(
           'measures',
-          indicatorMeasures.get(parseInt(indicator.get('id'), 10))
+          indicatorMeasures.get(parseInt(indicator.get('id'), 10)),
           // currently needs both
         ).set(
           'recommendations',
-          entityRecs
+          entityRecs,
         // nest connected recommendation ids byfw
         ).set(
           'recommendationsByFw',
           entityRecsByFw,
         );
-      }
+      },
     );
-  }
+  },
 );

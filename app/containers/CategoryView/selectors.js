@@ -6,19 +6,19 @@ import {
   selectEntity,
   selectEntities,
   selectRecommendationConnections,
-  selectMeasureConnections,
+  // selectMeasureConnections,
   selectTaxonomiesSorted,
   selectTaxonomies,
   selectFWRecommendations,
-  selectFWMeasures,
+  // selectFWMeasures,
   selectRecommendationCategoriesByCategory,
-  selectMeasureCategoriesByCategory,
-  selectRecommendationMeasuresByMeasure,
-  selectMeasureCategoriesByMeasure,
-  selectMeasureIndicatorsByMeasure,
-  selectRecommendationMeasuresByRecommendation,
+  // selectMeasureCategoriesByCategory,
+  // selectRecommendationMeasuresByMeasure,
+  // selectMeasureCategoriesByMeasure,
+  // selectMeasureIndicatorsByMeasure,
+  // selectRecommendationMeasuresByRecommendation,
   selectRecommendationCategoriesByRecommendation,
-  selectRecommendationIndicatorsByRecommendation,
+  // selectRecommendationIndicatorsByRecommendation,
   selectFrameworks,
   selectSettingsFromQuery,
 } from 'containers/App/selectors';
@@ -42,7 +42,7 @@ export const selectTaxonomy = createSelector(
   selectTaxonomiesSorted,
   (category, taxonomies) => category
     && taxonomies
-    && taxonomies.get(category.getIn(['attributes', 'taxonomy_id']).toString())
+    && taxonomies.get(category.getIn(['attributes', 'taxonomy_id']).toString()),
 );
 
 export const selectViewEntity = createSelector(
@@ -74,7 +74,7 @@ export const selectViewEntity = createSelector(
           relatedKey: 'parent_id',
         },
       ],
-    )
+    ),
 );
 
 export const selectParentTaxonomy = createSelector(
@@ -86,17 +86,17 @@ export const selectParentTaxonomy = createSelector(
         (tax) => qe(
           entity.getIn(['attributes', 'taxonomy_id']),
           tax.get('id'),
-        )
+        ),
       );
       return taxonomies.find(
         (tax) => qe(
           taxonomy.getIn(['attributes', 'parent_id']),
-          tax.get('id')
-        )
+          tax.get('id'),
+        ),
       );
     }
     return null;
-  }
+  },
 );
 export const selectChildTaxonomies = createSelector(
   selectCategory,
@@ -108,14 +108,14 @@ export const selectChildTaxonomies = createSelector(
       const taxonomy = taxonomies.find(
         (tax) => qe(
           entity.getIn(['attributes', 'taxonomy_id']),
-          tax.get('id')
+          tax.get('id'),
         ),
       );
       return taxonomies.filter(
         (tax) => qe(
           tax.getIn(['attributes', 'parent_id']),
-          taxonomy.get('id')
-        )
+          taxonomy.get('id'),
+        ),
       ).map(
         (tax) => tax.set(
           'categories',
@@ -123,38 +123,38 @@ export const selectChildTaxonomies = createSelector(
             categories.filter(
               (cat) => qe(
                 cat.getIn(['attributes', 'parent_id']),
-                entity.get('id')
+                entity.get('id'),
               ) && qe(
                 cat.getIn(['attributes', 'taxonomy_id']),
-                tax.get('id')
+                tax.get('id'),
               ) && (
                 CURRENT_TAXONOMY_IDS.indexOf(parseInt(tax.get('id'), 10)) === -1
                 || settingsFromQuery.loadNonCurrent
                 || !!cat.getIn(['attributes', 'is_current'])
               ) && (
                 settingsFromQuery.loadArchived || !cat.getIn(['attributes', 'is_archive'])
-              )
+              ),
             ),
             tax.get('id'),
-          )
-        )
+          ),
+        ),
       );
     }
     return null;
-  }
+  },
 );
 
 const selectTagsRecommendations = createSelector(
   selectTaxonomy,
-  (taxonomy) => taxonomy && taxonomy.getIn(['attributes', 'tags_recommendations'])
+  (taxonomy) => taxonomy && taxonomy.getIn(['attributes', 'tags_recommendations']),
 );
 
 const selectRecommendationAssociations = createSelector(
   (state, id) => id,
   selectRecommendationCategoriesByCategory,
   (catId, associations) => associations.get(
-    parseInt(catId, 10)
-  )
+    parseInt(catId, 10),
+  ),
 );
 const selectRecommendationsAssociated = createSelector(
   selectTagsRecommendations,
@@ -199,10 +199,10 @@ export const selectRecommendations = createSelector(
       && recommendations.filter(
         (rec) => {
           const currentFramework = frameworks.find(
-            (fw) => qe(fw.get('id'), rec && rec.getIn(['attributes', 'framework_id']))
+            (fw) => qe(fw.get('id'), rec && rec.getIn(['attributes', 'framework_id'])),
           );
           return currentFramework; // && currentFramework.getIn(['attributes', 'has_measures']);
-        }
+        },
       ).map(
         (rec) => rec && rec.set(
           'categories',
@@ -210,18 +210,18 @@ export const selectRecommendations = createSelector(
             rec.get('id'),
             recommendationCategories,
             categories,
-          )
+          ),
         // ).set(
         //   'measures',
         //   recommendationMeasures.get(parseInt(rec.get('id'), 10))
         // ).set(
         //   'indicators',
         //   recommendationIndicators.get(parseInt(rec.get('id'), 10))
-        )
+        ),
       ).groupBy(
-        (r) => r.getIn(['attributes', 'framework_id'])
+        (r) => r.getIn(['attributes', 'framework_id']),
       );
-  }
+  },
 );
 
 const selectChildrenTagRecommendations = createSelector(
@@ -229,7 +229,7 @@ const selectChildrenTagRecommendations = createSelector(
   (taxonomies) => taxonomies
     && taxonomies.some(
       (tax) => tax.getIn(['attributes', 'tags_recommendations']),
-    )
+    ),
 );
 
 const selectChildRecommendationsAssociated = createSelector(
@@ -244,25 +244,25 @@ const selectChildRecommendationsAssociated = createSelector(
         tax.get('categories').map(
           (cat) => {
             const recIds = associations.get(
-              parseInt(cat.get('id'), 10)
+              parseInt(cat.get('id'), 10),
             );
             return cat.set(
               'recommendations',
               recIds
                 ? sortEntities(
                   recIds.map(
-                    (id) => recommendations.get(id.toString())
+                    (id) => recommendations.get(id.toString()),
                   ),
                   'asc',
                   'reference',
                 )
                 : Map(),
             );
-          }
-        )
-      )
+          },
+        ),
+      ),
     )
-    : null
+    : null,
 );
 
 // all connected recommendations
@@ -291,20 +291,20 @@ export const selectChildRecommendations = createSelector(
                 rec.get('id'),
                 recCategories,
                 categories,
-              )
+              ),
             // ).set(
             //   'measures',
-            //   recMeasures.get(parseInt(rec.get('id'), 10))
-            )
-          )
-        )
-      )
-    )
+            //   recMeasures.get(parseInt(rec.get('id'), 10)),
+            ),
+          ),
+        ),
+      ),
+    ),
   ).groupBy(
-    (r) => r.getIn(['attributes', 'framework_id'])
-  )
+    (r) => r.getIn(['attributes', 'framework_id']),
+  ),
 );
-// 
+//
 // const selectTagsMeasures = createSelector(
 //   selectTaxonomy,
 //   (taxonomy) => taxonomy && taxonomy.getIn(['attributes', 'tags_measures'])
@@ -487,8 +487,8 @@ export const selectTaxonomiesWithCategories = createSelector(
     categories.filter(
       (cat) => qe(
         cat.getIn(['attributes', 'taxonomy_id']),
-        tax.get('id')
-      )
-    )
-  ))
+        tax.get('id'),
+      ),
+    ),
+  )),
 );

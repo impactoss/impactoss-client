@@ -128,7 +128,7 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
               result = getEntitySortComparator(
                 wordA.slice(intAlength + (wordA.slice(intAlength, intAlength + 1) === '.' ? 1 : 0)),
                 wordB.slice(intBlength + (wordB.slice(intBlength, intBlength + 1) === '.' ? 1 : 0)),
-                'asc'
+                'asc',
               );
             }
           } else {
@@ -147,7 +147,7 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
 export const sortEntities = (entities, sortOrder, sortBy, type, asList = true) => {
   const sorted = entities && entities.sortBy(
     (entity) => getEntitySortValueMapper(entity, sortBy || 'id'),
-    (a, b) => getEntitySortComparator(a, b, sortOrder || 'asc', type)
+    (a, b) => getEntitySortComparator(a, b, sortOrder || 'asc', type),
   );
   return asList ? sorted.toList() : sorted;
 };

@@ -13,7 +13,7 @@ import { CONFIG } from './constants';
 
 export const selectTypeQuery = createSelector(
   selectLocationQuery,
-  (locationQuery) => locationQuery && locationQuery.get('type')
+  (locationQuery) => locationQuery && locationQuery.get('type'),
 );
 
 // kicks off series of cascading selectors
@@ -34,7 +34,7 @@ export const selectBookmarks = createSelector(
       entities,
       order || (sortOption ? sortOption.order : 'desc'),
       sort || (sortOption ? sortOption.attribute : 'id'),
-      sortOption ? sortOption.type : 'number'
+      sortOption ? sortOption.type : 'number',
     );
-  }
+  },
 );

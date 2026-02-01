@@ -44,7 +44,7 @@ import {
   CATEGORY_ADMIN_MIN_ROLE,
   IS_CURRENT_STATUSES,
   IS_ARCHIVE_STATUSES,
-  CYCLE_TAXONOMY_ID,
+  CURRENT_TAXONOMY_IDS,
 } from 'themes/config';
 
 import Loading from 'components/Loading';
@@ -119,7 +119,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       fields: [
         isManager && getStatusField(entity),
         !entity.getIn(['attributes', 'draft'])
-        && qe(entity.getIn(['taxonomy', 'id']), CYCLE_TAXONOMY_ID)
+        && CURRENT_TAXONOMY_IDS.indexOf(entity.getIn(['attributes', 'taxonomy_id'])) > -1
         && getStatusField(
           entity,
           'is_current',
@@ -220,7 +220,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                 onEntityClick,
                 fwid,
                 hasResponse,
-              )
+              ),
             );
           });
         });
@@ -278,7 +278,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         fields: [getManagerField(
           entity,
           appMessages.attributes.manager_id.categories,
-          appMessages.attributes.manager_id.categoriesEmpty
+          appMessages.attributes.manager_id.categoriesEmpty,
         )],
       });
     }
@@ -287,7 +287,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
 
   /* eslint-disable react/destructuring-assignment */
   getTaxTitle = (id) => this.props.intl.formatMessage(
-    appMessages.entities.taxonomies[id].single
+    appMessages.entities.taxonomies[id].single,
   );
   /* eslint-ensable react/destructuring-assignment */
 

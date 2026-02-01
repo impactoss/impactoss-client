@@ -108,7 +108,8 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     this.remoteSubmitForm = submitForm;
   };
 
-  getInitialFormData = ({ users, measures, recommendationsByFw, parentOptions,
+  getInitialFormData = ({
+    users, measures, recommendationsByFw, parentOptions,
   }) => FORM_INITIAL
     .set('associatedMeasures', measures && entityOptions(measures, true))
     .set('associatedCategory', parentOptions && parentCategoryOptions(parentOptions, null))
@@ -228,7 +229,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         fields: [
           renderUserControl(
             users,
-            intl.formatMessage(appMessages.attributes.manager_id.categories)
+            intl.formatMessage(appMessages.attributes.manager_id.categories),
           ),
         ],
       });
@@ -264,7 +265,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
     }
-console.log('recommendationsByFw', recommendationsByFw && recommendationsByFw.toJS())
+    console.log('recommendationsByFw', recommendationsByFw && recommendationsByFw.toJS());
     return (
       <div>
         <HelmetCanonical
@@ -328,7 +329,7 @@ console.log('recommendationsByFw', recommendationsByFw && recommendationsByFw.to
                   formData,
                   measures,
                   recommendationsByFw,
-                  taxonomy
+                  taxonomy,
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(taxonomyReference)}
@@ -345,7 +346,7 @@ console.log('recommendationsByFw', recommendationsByFw && recommendationsByFw.to
                       measures,
                       onCreateOption,
                       FORM_INITIAL.getIn(['attributes', 'user_only']),
-                      intl
+                      intl,
                     ),
                     aside: this.getBodyAsideFields(users, isAdmin, taxonomy, intl),
                   },
@@ -428,7 +429,7 @@ function mapDispatchToProps(dispatch) {
               connectionAttribute: 'associatedMeasures',
               createConnectionKey: 'measure_id',
               createKey: 'category_id',
-            })
+            }),
           );
         }
         if (recommendationsByFw && taxonomy.getIn(['attributes', 'tags_recommendations'])) {
@@ -451,7 +452,7 @@ function mapDispatchToProps(dispatch) {
                   delete: [],
                   create: [],
                 }),
-              )
+              ),
           );
         }
       }

@@ -329,7 +329,6 @@ theme.palette = {
   asideListItemHover: [dark[1], '#fff', light[0], dark[2], light[0]],
 
 
-
   // asideHeader: [#color, '#bg',]
   asideListGroup: [dark[2], light[1]],
   asideListGroupHover: [dark[3], light[0]],

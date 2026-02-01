@@ -33,18 +33,18 @@ export const selectParentOptions = createSelector(
             const otherTaxonomy = taxonomies.find(
               (tax) => qe(
                 otherCategory.getIn(['attributes', 'taxonomy_id']),
-                tax.get('id')
-              )
+                tax.get('id'),
+              ),
             );
             return otherTaxonomy
               ? qe(taxonomyParentId, otherTaxonomy.get('id'))
               : null;
-          }
+          },
         )
         : null;
     }
     return null;
-  }
+  },
 );
 
 export const selectParentTaxonomy = createSelector(
@@ -55,12 +55,12 @@ export const selectParentTaxonomy = createSelector(
       return taxonomies.find(
         (tax) => qe(
           taxonomy.getIn(['attributes', 'parent_id']),
-          tax.get('id')
-        )
+          tax.get('id'),
+        ),
       );
     }
     return null;
-  }
+  },
 );
 
 
@@ -72,7 +72,7 @@ export const selectUsers = createSelector(
     entities,
     associations,
     USER_ROLES.MANAGER.value,
-  )
+  ),
 );
 
 export const selectConnectedTaxonomies = createSelector(
@@ -82,7 +82,7 @@ export const selectConnectedTaxonomies = createSelector(
     taxonomies,
     categories,
     ['tags_measures', 'tags_recommendations'],
-  )
+  ),
 );
 const selectIsParentTaxonomy = createSelector(
   (state, id) => selectEntity(state, { path: 'taxonomies', id }),
@@ -98,7 +98,7 @@ const selectIsParentTaxonomy = createSelector(
       );
     }
     return false;
-  }
+  },
 );
 
 export const selectRecommendationsByFw = createSelector(
@@ -114,7 +114,7 @@ export const selectRecommendationsByFw = createSelector(
     const frameworkIds = fwTaxonomies.reduce(
       (memo, fwt) => qe(
         id,
-        fwt.getIn(['attributes', 'taxonomy_id'])
+        fwt.getIn(['attributes', 'taxonomy_id']),
       )
         ? memo.push(fwt.getIn(['attributes', 'framework_id']))
         : memo,
@@ -124,13 +124,13 @@ export const selectRecommendationsByFw = createSelector(
       (r) => frameworkIds.find(
         (fwid) => qe(
           fwid,
-          r.getIn(['attributes', 'framework_id'])
-        )
-      )
+          r.getIn(['attributes', 'framework_id']),
+        ),
+      ),
     ).groupBy(
-      (r) => r.getIn(['attributes', 'framework_id']).toString()
+      (r) => r.getIn(['attributes', 'framework_id']).toString(),
     );
-  }
+  },
 );
 
 export const selectMeasures = createSelector(
@@ -138,5 +138,5 @@ export const selectMeasures = createSelector(
   selectIsParentTaxonomy,
   (entities, isParent) => isParent
     ? null
-    : entities
+    : entities,
 );

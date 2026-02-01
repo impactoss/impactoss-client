@@ -90,12 +90,12 @@ class TagFilters extends React.PureComponent {
         active: prevState.active === groupId
           ? null
           : groupId,
-      })
+      }),
     );
   };
 
   prepareOptions = (options, queryTags) => sortOptions(
-    fromJS(options).map((option) => option.withMutations((o) => o.set('checked', queryTags.includes(option.get('value')))))
+    fromJS(options).map((option) => option.withMutations((o) => o.set('checked', queryTags.includes(option.get('value'))))),
   );
 
   render() {

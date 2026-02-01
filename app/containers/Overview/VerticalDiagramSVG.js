@@ -32,24 +32,13 @@ const PathLineCustom = styled(PathLine)`
 const PathLineArrow = styled(PathLine)`
   fill: ${palette('dark', 2)};
 `;
-const SectionLabel = styled.div`
-  color: ${palette('text', 1)};
-  font-size: ${(props) => props.theme.sizes.text.small};
-  margin-top: 5px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  @media print {
-    font-size: ${(props) => props.theme.sizes.print.small};
-  }
-`;
 
 const roundRect = (rect) => ({
   right: Math.floor(rect.right),
   left: Math.floor(rect.left),
   top: Math.floor(rect.top),
   bottom: Math.floor(rect.bottom),
-})
+});
 
 const getConnectionPoint = (node, nodeReference, side = 'bottom') => {
   const boundingRect = roundRect(node.getBoundingClientRect());
@@ -104,7 +93,7 @@ const getCurvedConnectionPath = (
   }
   if (Math.abs(start.x - end.x) < RADIUS * 2) {
     return getConnectionPath(
-      {...start, x: end.x},
+      { ...start, x: end.x },
       end,
     );
   }
@@ -167,17 +156,16 @@ const connectMeasuresIndicators = (itemRefs) => getConnectionPath(
   getConnectionPoint(itemRefs.buttonIndicators, itemRefs.diagram, 'top'),
 );
 
-const VerticalDiagramSVG = ({ frameworks, itemRefs, version }) => {
-  return (
-    <DiagramSvgWrapper>
-      {itemRefs.diagram && (
-        <DiagramSvg
-          width={itemRefs.diagram.getBoundingClientRect().width}
-          height={itemRefs.diagram.getBoundingClientRect().height}
-        >
-          {frameworks && frameworks.valueSeq().map((fw) => {
-            const fwId = fw.get('id');
-            return fw.getIn(['attributes', 'has_indicators'])
+const VerticalDiagramSVG = ({ frameworks, itemRefs }) => (
+  <DiagramSvgWrapper>
+    {itemRefs.diagram && (
+      <DiagramSvg
+        width={itemRefs.diagram.getBoundingClientRect().width}
+        height={itemRefs.diagram.getBoundingClientRect().height}
+      >
+        {frameworks && frameworks.valueSeq().map((fw) => {
+          const fwId = fw.get('id');
+          return fw.getIn(['attributes', 'has_indicators'])
               && itemRefs[`buttonRecs_${fwId}`]
               && itemRefs.buttonIndicators
               && (
@@ -193,10 +181,10 @@ const VerticalDiagramSVG = ({ frameworks, itemRefs, version }) => {
                   )}
                 />
               );
-          })}
-          {frameworks && frameworks.valueSeq().map((fw) => {
-            const fwId = fw.get('id');
-            return fw.getIn(['attributes', 'has_indicators'])
+        })}
+        {frameworks && frameworks.valueSeq().map((fw) => {
+          const fwId = fw.get('id');
+          return fw.getIn(['attributes', 'has_indicators'])
               && itemRefs[`buttonRecs_${fwId}`]
               && itemRefs.buttonIndicators
               && frameworks.size === 1
@@ -211,15 +199,15 @@ const VerticalDiagramSVG = ({ frameworks, itemRefs, version }) => {
                         'right',
                         fwId,
                       ),
-                      'left'
+                      'left',
                     )
                   }
                 />
               );
-          })}
-          {frameworks && frameworks.valueSeq().map((fw) => {
-            const fwId = fw.get('id');
-            return itemRefs[`buttonRecs_${fwId}`]
+        })}
+        {frameworks && frameworks.valueSeq().map((fw) => {
+          const fwId = fw.get('id');
+          return itemRefs[`buttonRecs_${fwId}`]
               && itemRefs.buttonMeasures
               && (
                 <PathLineCustom
@@ -228,10 +216,10 @@ const VerticalDiagramSVG = ({ frameworks, itemRefs, version }) => {
                   points={connectRecommendationsMeasures(itemRefs, fwId)}
                 />
               );
-          })}
-          {frameworks && frameworks.valueSeq().map((fw) => {
-            const fwId = fw.get('id');
-            return fw.getIn(['attributes', 'has_measures'])
+        })}
+        {frameworks && frameworks.valueSeq().map((fw) => {
+          const fwId = fw.get('id');
+          return fw.getIn(['attributes', 'has_measures'])
               && itemRefs[`buttonRecs_${fwId}`]
               && itemRefs.buttonMeasures
               && (
@@ -240,38 +228,36 @@ const VerticalDiagramSVG = ({ frameworks, itemRefs, version }) => {
                   r={0}
                   points={
                     getConnectionPathArrow(
-                      connectRecommendationsMeasures(itemRefs, fwId)
+                      connectRecommendationsMeasures(itemRefs, fwId),
                     )
                   }
                 />
               );
-          })}
-          { itemRefs.buttonIndicators && itemRefs.buttonMeasures && (
-            <PathLineCustom
-              r={0}
-              points={connectMeasuresIndicators(itemRefs)}
-            />
-          )}
-          { itemRefs.buttonIndicators && itemRefs.buttonMeasures && (
-            <PathLineArrow
-              r={0}
-              points={
-                getConnectionPathArrow(
-                  connectMeasuresIndicators(itemRefs)
-                )
-              }
-            />
-          )}
-        </DiagramSvg>
-      )}
-    </DiagramSvgWrapper>
-  );
-};
+        })}
+        { itemRefs.buttonIndicators && itemRefs.buttonMeasures && (
+          <PathLineCustom
+            r={0}
+            points={connectMeasuresIndicators(itemRefs)}
+          />
+        )}
+        { itemRefs.buttonIndicators && itemRefs.buttonMeasures && (
+          <PathLineArrow
+            r={0}
+            points={
+              getConnectionPathArrow(
+                connectMeasuresIndicators(itemRefs),
+              )
+            }
+          />
+        )}
+      </DiagramSvg>
+    )}
+  </DiagramSvgWrapper>
+);
 
 VerticalDiagramSVG.propTypes = {
   frameworks: PropTypes.object,
   itemRefs: PropTypes.object,
-  version: PropTypes.number,
 };
 
 export default VerticalDiagramSVG;

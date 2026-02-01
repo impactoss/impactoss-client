@@ -10,7 +10,7 @@ export default class ControlLink extends React.PureComponent { // eslint-disable
     text: PropTypes.string,
     path: PropTypes.string,
     onClick: PropTypes.func.isRequired,
-  }
+  };
 
   render() {
     return (

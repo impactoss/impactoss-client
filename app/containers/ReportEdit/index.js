@@ -131,7 +131,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         id: viewEntity.get('id'),
         attributes: attributes.mergeWith(
           (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-          FORM_INITIAL.get('attributes')
+          FORM_INITIAL.get('attributes'),
         ),
       })
       : Map();
@@ -160,7 +160,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
               'is_archive',
               IS_ARCHIVE_STATUSES,
               appMessages.attributes.is_archive,
-              false
+              false,
             ),
           getMetaField(entity),
         ],
@@ -280,7 +280,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                 bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
-                  viewEntity
+                  viewEntity,
                 )}
                 handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
@@ -320,17 +320,19 @@ ReportEdit.propTypes = {
   onRedirectIfNotPermitted: PropTypes.func,
   onRedirectNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
+  handleSubmitFail: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   highestRole: PropTypes.number,
   params: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   intl: PropTypes.object.isRequired,
-  // userId: PropTypes.string, // used in nextProps
+  userId: PropTypes.string,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -365,7 +367,7 @@ function mapDispatchToProps(dispatch, props) {
       dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, viewEntity) => {
-      const formData = fromJS(formValues)
+      const formData = fromJS(formValues);
       let saveData = formData;
       const previousDateAssigned = viewEntity.getIn(['attributes', 'due_date_id']);
       const dateAssigned = formData.getIn(['attributes', 'due_date_id']);
@@ -373,7 +375,7 @@ function mapDispatchToProps(dispatch, props) {
         ['attributes', 'due_date_id'],
         dateAssigned === '0' || dateAssigned === 0
           ? null
-          : parseInt(dateAssigned, 10)
+          : parseInt(dateAssigned, 10),
       );
       // check if attributes have changed
       if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
@@ -383,7 +385,7 @@ function mapDispatchToProps(dispatch, props) {
         saveData.toJS(),
         previousDateAssigned && previousDateAssigned !== dateAssigned
           ? previousDateAssigned
-          : null
+          : null,
       ));
     },
     handleCancel: (reference) => {

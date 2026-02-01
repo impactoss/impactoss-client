@@ -89,7 +89,6 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
 
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
-
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -110,7 +109,9 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     this.remoteSubmitForm = submitForm;
   };
 
-  getInitialFormData = ({ viewEntity, taxonomies, recommendationsByFw, indicators }) => {
+  getInitialFormData = ({
+    viewEntity, taxonomies, recommendationsByFw, indicators,
+  }) => {
     let attributes = viewEntity.get('attributes');
     if (!attributes.get('reference') || attributes.get('reference') === '') {
       attributes = attributes.set('reference', viewEntity.get('id'));
@@ -121,7 +122,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
         id: viewEntity.get('id'),
         attributes: attributes.mergeWith(
           (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-          FORM_INITIAL.get('attributes')
+          FORM_INITIAL.get('attributes'),
         ),
         associatedTaxonomies: taxonomyOptions(taxonomies),
         associatedRecommendationsByFw: recommendationsByFw
@@ -340,7 +341,7 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                       existingReferences
                         ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
                         : null,
-                      intl
+                      intl,
                     ),
                     aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
@@ -438,7 +439,7 @@ function mapDispatchToProps(dispatch, props) {
             formData,
             taxonomies,
             createKey: 'measure_id',
-          })
+          }),
         )
         .set(
           'measureIndicators',
@@ -448,7 +449,7 @@ function mapDispatchToProps(dispatch, props) {
             connectionAttribute: 'associatedIndicators',
             createConnectionKey: 'indicator_id',
             createKey: 'measure_id',
-          })
+          }),
         );
       saveData = saveData.set(
         'recommendationMeasures',
@@ -472,7 +473,7 @@ function mapDispatchToProps(dispatch, props) {
               delete: [],
               create: [],
             }),
-          )
+          ),
       );
       // default to database id
       const formRef = formData.getIn(['attributes', 'reference']) || '';

@@ -110,6 +110,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       scrollToTop(this.scrollContainer.current);
     }
   }
+
   componentDidMount() {
     if (this.props.dataReady && this.props.viewEntity && this.state.repeat === null) {
       this.setState({ repeat: this.props.viewEntity.getIn(['attributes', 'repeat']) || false });
@@ -120,7 +121,9 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     this.remoteSubmitForm = submitForm;
   };
 
-  getInitialFormData = ({ measures, viewEntity, users, recommendationsByFw }) => {
+  getInitialFormData = ({
+    measures, viewEntity, users, recommendationsByFw,
+  }) => {
     let attributes = viewEntity.get('attributes');
     if (!attributes.get('reference')) {
       attributes = attributes.set('reference', viewEntity.get('id'));
@@ -130,7 +133,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         id: viewEntity.get('id'),
         attributes: attributes.mergeWith(
           (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-          FORM_INITIAL.get('attributes')
+          FORM_INITIAL.get('attributes'),
         ),
         associatedMeasures: entityOptions(measures, true),
         associatedRecommendationsByFw: recommendationsByFw
@@ -217,7 +220,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
             attribute: 'start_date',
             repeat,
             label: repeat ? 'start_date' : 'start_date_only',
-            modifyFieldAttributes: 
+            modifyFieldAttributes:
             (field, formData) =>
               modifyStartDateField(
                 field,
@@ -228,11 +231,11 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           getCheckboxField(
             intl.formatMessage,
             'repeat',
-            repeat
+            repeat,
           ),
           getFrequencyField(
             intl.formatMessage,
-            (formData) => !this.props.isRepeat(formData)
+            (formData) => !this.props.isRepeat(formData),
           ),
           getDateField({
             formatMessage: intl.formatMessage,
@@ -255,7 +258,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
         ],
       },
     ]);
-  }
+  };
 
   render() {
     const {
@@ -353,7 +356,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                       existingReferences
                         ? existingReferences.filter((r) => r !== viewEntity.getIn(['attributes', 'reference']))
                         : null,
-                      intl
+                      intl,
                     ),
                     aside: this.getHeaderAsideFields(viewEntity, intl),
                   },
@@ -388,6 +391,7 @@ IndicatorEdit.propTypes = {
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
+  isRepeat: PropTypes.bool,
   params: PropTypes.object,
   measures: PropTypes.object,
   recommendationsByFw: PropTypes.object,
@@ -395,8 +399,8 @@ IndicatorEdit.propTypes = {
   users: PropTypes.object,
   highestRole: PropTypes.number,
   onCreateOption: PropTypes.func,
-  onRepeatChange: PropTypes.func,
-  onStartDateChange: PropTypes.func,
+  // onRepeatChange: PropTypes.func,
+  // onStartDateChange: PropTypes.func, // TODO check if we want this
   onEndDateChange: PropTypes.func,
   existingReferences: PropTypes.array,
   intl: PropTypes.object.isRequired,
@@ -433,7 +437,7 @@ function mapDispatchToProps(dispatch, props) {
         && !validateDateAfterDate(dateValue, formData.getIn(['attributes', 'start_date']))
       ) {
         errors = formatMessage(appMessages.forms.endDateBeforeStartDateError);
-      } 
+      }
       return errors;
     },
     onErrorDismiss: () => {
@@ -456,7 +460,7 @@ function mapDispatchToProps(dispatch, props) {
             connectionAttribute: 'associatedMeasures',
             createConnectionKey: 'measure_id',
             createKey: 'indicator_id',
-          })
+          }),
         );
       saveData = saveData.set(
         'recommendationIndicators',
@@ -480,7 +484,7 @@ function mapDispatchToProps(dispatch, props) {
               delete: [],
               create: [],
             }),
-          )
+          ),
       );
 
       // TODO: remove once have singleselect instead of multiselect

@@ -195,13 +195,13 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             },
             '',
           ),
-        }
+        },
       );
     } else {
       inputPlaceholder = intl.formatMessage(
         this.props.multiselect
           ? messages.searchPlaceholderMultiSelect
-          : messages.searchPlaceholderEntities
+          : messages.searchPlaceholderEntities,
       );
     }
 

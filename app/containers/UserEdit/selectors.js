@@ -29,23 +29,23 @@ export const selectViewEntity = createSelector(
     userRoles.filter((association) => qe(
       association.getIn(['attributes', 'user_id']),
       entity.get('id'),
-    ))
+    )),
   ).set(
     'roles',
     userRoles.filter(
       (association) => qe(
         association.getIn(['attributes', 'user_id']),
         entity.get('id'),
-      )
+      ),
     ).map(
       (association) => roles.find(
         (role) => qe(
           role.get('id'),
           association.getIn(['attributes', 'role_id']),
-        )
-      )
-    )
-  )
+        ),
+      ),
+    ),
+  ),
 );
 
 export const selectTaxonomies = createSelector(
@@ -59,7 +59,7 @@ export const selectTaxonomies = createSelector(
     associations,
     'tags_users',
     id,
-  )
+  ),
 );
 
 export const selectRoles = createSelector(
@@ -72,15 +72,15 @@ export const selectRoles = createSelector(
         (association) => qe(
           association.getIn(['attributes', 'user_id']),
           id,
-        )
+        ),
       );
       const entityAssociation = filteredAssociations.find(
         (association) => qe(
           association.getIn(['attributes', 'role_id']),
           role.get('id'),
-        )
+        ),
       );
       return role.set('associated', !!entityAssociation || false);
-    }
-  )
+    },
+  ),
 );

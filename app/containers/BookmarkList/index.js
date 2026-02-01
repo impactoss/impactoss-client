@@ -177,7 +177,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
     this.forceUpdate();
   };
 
-  renderBookmarkTypes = (intl) =>
+  renderBookmarkTypes = (intl) => (
     <div>
       <Group>
         <SidebarGroupLabel>
@@ -214,6 +214,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
         </div>
       </Group>
     </div>
+  );
 
   updateViewport() {
     let viewport = VIEWPORTS.MOBILE;

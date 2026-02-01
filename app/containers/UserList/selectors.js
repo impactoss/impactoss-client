@@ -35,10 +35,10 @@ const selectUsersNested = createSelector(
       const entityRoleIds = entityRoles.filter(
         (association) => qe(
           association.getIn(['attributes', 'user_id']),
-          entity.get('id')
-        )
+          entity.get('id'),
+        ),
       ).map(
-        (association) => association.getIn(['attributes', 'role_id'])
+        (association) => association.getIn(['attributes', 'role_id']),
       );
       const entityHighestRoleId = entityRoleIds.reduce(
         (memo, roleId) => roleId < memo ? roleId : memo,
@@ -49,19 +49,19 @@ const selectUsersNested = createSelector(
         entityCategories.filter(
           (association) => qe(
             association.getIn(['attributes', 'user_id']),
-            entity.get('id')
-          )
+            entity.get('id'),
+          ),
         ).map(
-          (association) => association.getIn(['attributes', 'category_id'])
-        )
+          (association) => association.getIn(['attributes', 'category_id']),
+        ),
       ).set(
         'roles',
         entityHighestRoleId !== USER_ROLES.DEFAULT.value
           ? Map({ 0: entityHighestRoleId })
-          : Map()
+          : Map(),
       );
-    }
-  )
+    },
+  ),
 );
 const selectUsersWithout = createSelector(
   selectUsersNested,
@@ -69,21 +69,21 @@ const selectUsersWithout = createSelector(
   selectWithoutQuery,
   (entities, categories, query) => query
     ? filterEntitiesWithoutAssociation(entities, categories, query)
-    : entities
+    : entities,
 );
 const selectUsersByConnections = createSelector(
   selectUsersWithout,
   selectConnectionQuery,
   (entities, query) => query
     ? filterEntitiesByConnection(entities, query)
-    : entities
+    : entities,
 );
 const selectUsersByCategories = createSelector(
   selectUsersByConnections,
   selectCategoryQuery,
   (entities, query) => query
     ? filterEntitiesByCategories(entities, query)
-    : entities
+    : entities,
 );
 
 // kicks off series of cascading selectors
@@ -103,7 +103,7 @@ export const selectUsers = createSelector(
       entities,
       order || (sortOption ? sortOption.order : 'asc'),
       sort || (sortOption ? sortOption.attribute : 'name'),
-      sortOption ? sortOption.type : 'string'
+      sortOption ? sortOption.type : 'string',
     );
-  }
+  },
 );

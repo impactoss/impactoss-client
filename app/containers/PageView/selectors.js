@@ -12,5 +12,5 @@ import {
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'pages', id }),
   (state) => selectEntities(state, 'users'),
-  (entity, users) => entitySetUser(entity, users)
+  (entity, users) => entitySetUser(entity, users),
 );

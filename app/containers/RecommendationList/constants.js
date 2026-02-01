@@ -4,7 +4,7 @@ import {
   IS_ARCHIVE_STATUSES,
   ARCHIVE_MIN_ROLE,
   SEE_DRAFT_MIN_ROLE,
-  SUPPORT_LEVELS,
+  // SUPPORT_LEVELS,
 } from 'themes/config';
 
 export const DEPENDENCIES = [

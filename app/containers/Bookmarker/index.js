@@ -89,7 +89,7 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
                     (prevState) => ({
                       new: false,
                       open: !prevState.open,
-                    })
+                    }),
                   );
                 }
               }

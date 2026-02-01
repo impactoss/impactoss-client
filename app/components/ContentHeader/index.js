@@ -112,7 +112,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
       default:
         return (<TitleMedium>{title}</TitleMedium>);
     }
-  }
+  };
 
   render() {
     const {

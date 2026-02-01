@@ -36,8 +36,8 @@ export const getGroupOptions = (taxonomies, contextIntl) => {
           label: getTaxTitle(parseInt(taxonomy.get('id'), 10), contextIntl),
         })),
         'asc',
-        'sortBy'
-      )
+        'sortBy',
+      ),
     );
   }
 

@@ -105,12 +105,12 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     this.remoteSubmitForm = submitForm;
   };
 
-  getInitialFormData = ({ taxonomies, roles, viewEntity }) => 
+  getInitialFormData = ({ taxonomies, roles, viewEntity }) =>
     Map({
       id: viewEntity.get('id'),
       attributes: viewEntity.get('attributes').mergeWith(
         (oldVal, newVal) => oldVal === null ? newVal : oldVal,
-        FORM_INITIAL.get('attributes')
+        FORM_INITIAL.get('attributes'),
       ),
       associatedTaxonomies: taxonomyOptions(taxonomies),
       associatedRole: getHighestUserRoleId(roles),
@@ -319,13 +319,13 @@ UserEdit.propTypes = {
   roles: PropTypes.object,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   sessionUserHighestRoleId: PropTypes.number,
   params: PropTypes.object,
   onCreateOption: PropTypes.func,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   onRedirectNotPermitted: PropTypes.func,
-  // authReady: PropTypes.bool,
   sessionUserId: PropTypes.string, // used in nextProps
   canUserAdministerCategories: PropTypes.bool,
   intl: PropTypes.object.isRequired,
@@ -361,7 +361,7 @@ function mapDispatchToProps(dispatch) {
       dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, taxonomies, roles, viewEntity) => {
-      const formData = fromJS(formValues)
+      const formData = fromJS(formValues);
       let saveData = formData
         .set(
           'userCategories',
@@ -369,7 +369,7 @@ function mapDispatchToProps(dispatch) {
             formData,
             taxonomies,
             createKey: 'user_id',
-          })
+          }),
         );
 
       // roles

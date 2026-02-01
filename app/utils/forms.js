@@ -40,7 +40,7 @@ export const entityOption = (entity, defaultToId, hasTags) => Map({
 
 export const entityOptions = (entities, defaultToId = true, hasTags = true) => entities
   ? entities.toList().map(
-    (entity) => entityOption(entity, defaultToId, hasTags)
+    (entity) => entityOption(entity, defaultToId, hasTags),
   )
   : List();
 
@@ -57,8 +57,8 @@ export const userOption = (entity, activeUserId, searchAttributes) => Map({
 export const userOptions = (entities, activeUserId, searchAttributes) => entities
   ? entities.reduce(
     (options, entity) => options.push(
-      userOption(entity, activeUserId, searchAttributes)
-    ), List()
+      userOption(entity, activeUserId, searchAttributes),
+    ), List(),
   )
   : List();
 
@@ -82,7 +82,7 @@ export const taxonomyOptions = (taxonomies) => taxonomies
   ? sortEntities(taxonomies, 'asc', 'priority').reduce(
     (values, tax) => values.set(
       tax.get('id'),
-      entityOptions(tax.get('categories'), false, false)
+      entityOptions(tax.get('categories'), false, false),
     ),
     Map(),
   )
@@ -202,8 +202,8 @@ export const renderTaxonomyControl = ({
     : [];
 
 export const renderIndicatorControl = (entities, onCreateOption, contextIntl) =>
-  entities ?
-    {
+  entities
+    ? {
       id: 'indicators',
       name: 'associatedIndicators',
       dataPath: ['associatedIndicators'],
@@ -223,8 +223,8 @@ export const renderUserControl = (
   label,
   activeUserId,
 ) =>
-  entities ?
-    {
+  entities
+    ? {
       id: 'users',
       name: 'associatedUser',
       dataPath: ['associatedUser'],
@@ -237,8 +237,8 @@ export const renderUserControl = (
     : null;
 
 export const renderParentCategoryControl = (entities, label, activeParentId) =>
-  entities ?
-    {
+  entities
+    ? {
       id: 'associatedCategory',
       name: 'associatedCategory',
       dataPath: ['associatedCategory'],
@@ -250,8 +250,8 @@ export const renderParentCategoryControl = (entities, label, activeParentId) =>
     : null;
 
 const getAssociatedEntities = (entities) =>
-  entities ?
-    entities.reduce(
+  entities
+    ? entities.reduce(
       (entitiesAssociated, entity) => {
         if (entity && entity.get('associated')) {
           return entitiesAssociated.set(entity.get('id'), entity.get('associated'));
@@ -262,9 +262,9 @@ const getAssociatedEntities = (entities) =>
     )
     : Map();
 
-const getAssociatedCategories = (taxonomy) => 
-  taxonomy.get('categories') ?
-    getAssociatedEntities(taxonomy.get('categories'))
+const getAssociatedCategories = (taxonomy) =>
+  taxonomy.get('categories')
+    ? getAssociatedEntities(taxonomy.get('categories'))
     : Map();
 
 export const getCategoryUpdatesFromFormData = ({
@@ -284,7 +284,7 @@ export const getCategoryUpdatesFromFormData = ({
           ? associatedIds.push(associatedId)
           : associatedIds,
         List(),
-      )
+      ),
     ),
     create: updates.get('create').concat(formCategoryIds.reduce((payloads, catId) => !associatedCategories.has(catId)
       ? payloads.push(Map({
@@ -327,7 +327,7 @@ export const getConnectionUpdatesFromFormData = ({
     (associatedIds, associatedId, id) => !formConnectionIds.includes(id)
       ? associatedIds.push(associatedId)
       : associatedIds,
-    List()
+    List(),
   );
   // also remove any other category associations an entity may have
   // if it cannot have multiple categories ()
@@ -345,7 +345,7 @@ export const getConnectionUpdatesFromFormData = ({
           (associationId) => {
             const otherId = connectionCategories.get(associationId);
             return taxonomyCategoryIds.includes(`${otherId}`);
-          }
+          },
         );
         return associationsToRemove
           ? memo.concat(associationsToRemove)
@@ -367,8 +367,8 @@ export const getConnectionUpdatesFromFormData = ({
 // only show the highest rated role (lower role ids means higher)
 export const getHighestUserRoleId = (roles) =>
   roles.reduce((currentHighestRoleId, role) =>
-    role.get('associated') && parseInt(role.get('id'), 10) < parseInt(currentHighestRoleId, 10) ?
-      role.get('id').toString() : currentHighestRoleId.toString(), USER_ROLES.DEFAULT.value);
+    role.get('associated') && parseInt(role.get('id'), 10) < parseInt(currentHighestRoleId, 10)
+      ? role.get('id').toString() : currentHighestRoleId.toString(), USER_ROLES.DEFAULT.value);
 
 export const getRoleFormField = (formatMessage, roleOptions) => ({
   id: 'role',
@@ -393,7 +393,7 @@ export const getFrequencyField = (formatMessage, isFieldDisabled) => ({
   name: 'attributes.frequency_months',
   label: formatMessage(appMessages.attributes.frequency_months),
   options: REPORT_FREQUENCIES,
-  isFieldDisabled: isFieldDisabled,
+  isFieldDisabled,
 });
 
 export const getDocumentStatusField = (formatMessage) => ({
@@ -558,7 +558,7 @@ export const getTextareaField = (formatMessage, attribute = 'description') => ge
   attribute,
 });
 
-export const getDateField = ({  
+export const getDateField = ({
   formatMessage,
   attribute,
   required = false,
@@ -592,7 +592,7 @@ export const modifyStartDateField = (field, isRepeat, intl) => {
     modifiedField.required = true;
     modifiedField.validators = { ...modifiedField.validators, required: validateRequired };
     modifiedField.errorMessages = { ...modifiedField.errorMessages, required: intl.formatMessage(appMessages.forms.fieldRequired) };
-    modifiedField.label = intl.formatMessage(appMessages.attributes['start_date_only']);
+    modifiedField.label = intl.formatMessage(appMessages.attributes.start_date_only);
   } else {
     if (modifiedField.validators
       && modifiedField.validators
@@ -606,7 +606,7 @@ export const modifyStartDateField = (field, isRepeat, intl) => {
       delete modifiedField.errorMessages.required;
     }
     modifiedField.required = false;
-    modifiedField.label = intl.formatMessage(appMessages.attributes['start_date']);
+    modifiedField.label = intl.formatMessage(appMessages.attributes.start_date);
   }
   return modifiedField;
 };
@@ -892,12 +892,11 @@ export const getEntityAttributeFields = (path, args, contextIntl) => {
 };
 
 export const validateField = (value, field) => {
-  //find the first validator that fails and return the corresponding error msg
+  // find the first validator that fails and return the corresponding error msg
   const { validators, errorMessages } = field;
-  const firstErrorKey =
-    validators &&
-    Object.keys(validators).length > 0 &&
-    Object.keys(validators)
+  const firstErrorKey = validators
+    && Object.keys(validators).length > 0
+    && Object.keys(validators)
       .find((validator) =>
         validators[validator]
         && !validators[validator](value));

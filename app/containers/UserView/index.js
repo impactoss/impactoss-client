@@ -23,7 +23,9 @@ import { getEntityTitle } from 'utils/entities';
 import { canUserManageUsers, canUserSeeMeta } from 'utils/permissions';
 import qe from 'utils/quasi-equals';
 
-import { loadEntitiesIfNeeded, updatePath, closeEntity, redirectNotPermitted } from 'containers/App/actions';
+import {
+  loadEntitiesIfNeeded, updatePath, closeEntity, redirectNotPermitted,
+} from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
@@ -63,8 +65,7 @@ export class UserView extends React.PureComponent {
       this.props.onRedirectNotPermitted();
     }
     if (nextProps.dataReady && nextProps.authReady && nextProps.user) {
-      const canView =
-        canUserManageUsers(nextProps.sessionUserHighestRoleId) || nextProps.user.get('id') === nextProps.sessionUserId;
+      const canView = canUserManageUsers(nextProps.sessionUserHighestRoleId) || nextProps.user.get('id') === nextProps.sessionUserId;
       if (!canView) {
         this.props.onRedirectNotPermitted();
       }
@@ -160,7 +161,9 @@ export class UserView extends React.PureComponent {
     roles.reduce((memo, role) => (role.get('id') < memo ? role.get('id') : memo), USER_ROLES.DEFAULT.value);
 
   render() {
-    const { user, dataReady, sessionUserHighestRoleId, taxonomies, sessionUserId, intl } = this.props;
+    const {
+      user, dataReady, sessionUserHighestRoleId, taxonomies, sessionUserId, intl,
+    } = this.props;
     const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
 
     const pageTitle = intl.formatMessage(messages.pageTitle);
@@ -216,6 +219,7 @@ UserView.propTypes = {
   user: PropTypes.object,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   sessionUserHighestRoleId: PropTypes.number,
   params: PropTypes.object,
   sessionUserId: PropTypes.string,

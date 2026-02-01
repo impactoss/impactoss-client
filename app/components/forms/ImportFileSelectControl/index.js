@@ -86,7 +86,7 @@ class ImportFileSelectControl extends React.PureComponent { // eslint-disable-li
       this.setState(
         (prevState) => ({
           errors: prevState.errors.concat(parsed.errors),
-        })
+        }),
       );
     } else {
       this.props.onChange({
@@ -101,7 +101,7 @@ class ImportFileSelectControl extends React.PureComponent { // eslint-disable-li
             errors: prevState.errors.concat([{ error: 0 }]),
           })
         );
-      }*/
+      } */
     // });
   };
 

@@ -182,7 +182,9 @@ class OtpForm extends React.PureComponent {
   };
 
   render() {
-    const { handleSubmit, handleCancel, handleResend, sending } = this.props;
+    const {
+      handleSubmit, handleCancel, handleResend, sending,
+    } = this.props;
 
     return (
       <FormWrapper>

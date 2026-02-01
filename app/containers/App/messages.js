@@ -1429,8 +1429,8 @@ export default defineMessages({
           defaultMessage: 'About tax 12',
         },
       },
-    13: {
-      single: {
+      13: {
+        single: {
           id: 'app.containers.App.entities.taxonomies.13.single',
           defaultMessage: 'Taxonomy 13',
         },

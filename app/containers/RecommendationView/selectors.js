@@ -1,8 +1,8 @@
 import { createSelector } from 'reselect';
-import { Map } from 'immutable';
+// import { Map } from 'immutable';
 
 import {
-  selectReady,
+  // selectReady,
   selectEntity,
   selectEntities,
   // selectMeasureConnections,
@@ -22,15 +22,15 @@ import {
 import {
   entitySetUser,
   prepareTaxonomiesIsAssociated,
-  getEntityCategories,
+  // getEntityCategories,
 } from 'utils/entities';
 
-import { DEPENDENCIES } from './constants';
+// import { DEPENDENCIES } from './constants';
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'recommendations', id }),
   (state) => selectEntities(state, 'users'),
-  (entity, users) => entitySetUser(entity, users)
+  (entity, users) => entitySetUser(entity, users),
 );
 
 // TODO optimise use selectRecommendationCategoriesByRecommendation
@@ -46,15 +46,15 @@ export const selectTaxonomies = createSelector(
     'tags_recommendations',
     'recommendation_id',
     id,
-  )
+  ),
 );
-//
+
 // const selectMeasureAssociations = createSelector(
 //   (state, id) => id,
 //   selectRecommendationMeasuresByRecommendation,
 //   (recommendationId, associations) => associations.get(
-//     parseInt(recommendationId, 10)
-//   )
+//     parseInt(recommendationId, 10),
+//   ),
 // );
 // const selectMeasuresAssociated = createSelector(
 //   selectMeasureAssociations,
@@ -68,9 +68,9 @@ export const selectTaxonomies = createSelector(
 //           : memo;
 //       },
 //       Map(),
-//     )
+//     ),
 // );
-// all connected measures
+// // all connected measures
 // export const selectMeasures = createSelector(
 //   (state) => selectReady(state, { path: DEPENDENCIES }),
 //   selectMeasuresAssociated,
@@ -98,14 +98,14 @@ export const selectTaxonomies = createSelector(
 //             (recId) => connections.getIn([
 //               'recommendations',
 //               recId.toString(),
-//             ])
+//             ]),
 //           ).groupBy(
 //             (recId) => connections.getIn([
 //               'recommendations',
 //               recId.toString(),
 //               'attributes',
 //               'framework_id',
-//             ]).toString()
+//             ]).toString(),
 //           );
 //         return measure.set(
 //           'categories',
@@ -113,30 +113,30 @@ export const selectTaxonomies = createSelector(
 //             measure.get('id'),
 //             measureCategories,
 //             categories,
-//           )
+//           ),
 //         ).set(
 //           'indicators',
-//           measureIndicators.get(parseInt(measure.get('id'), 10))
+//           measureIndicators.get(parseInt(measure.get('id'), 10)),
 //         // currently needs both
 //         ).set(
 //           'recommendations',
-//           entityRecs
+//           entityRecs,
 //         // nest connected recommendation ids byfw
 //         ).set(
 //           'recommendationsByFw',
 //           entityRecsByFw,
 //         );
-//       }
+//       },
 //     );
-//   }
+//   },
 // );
 //
 // const selectIndicatorAssociations = createSelector(
 //   (state, id) => id,
 //   selectRecommendationIndicatorsByRecommendation,
 //   (recommendationId, associations) => associations.get(
-//     parseInt(recommendationId, 10)
-//   )
+//     parseInt(recommendationId, 10),
+//   ),
 // );
 // const selectIndicatorsAssociated = createSelector(
 //   selectIndicatorAssociations,
@@ -150,11 +150,11 @@ export const selectTaxonomies = createSelector(
 //           : memo;
 //       },
 //       Map(),
-//     )
+//     ),
 // );
-
-// selectIndicators,
-// selectIndicators,
+//
+// // selectIndicators,
+// // selectIndicators,
 // export const selectIndicators = createSelector(
 //   (state) => selectReady(state, { path: DEPENDENCIES }),
 //   selectIndicatorsAssociated,
@@ -178,28 +178,28 @@ export const selectTaxonomies = createSelector(
 //             (recId) => connections.getIn([
 //               'recommendations',
 //               recId.toString(),
-//             ])
+//             ]),
 //           ).groupBy(
 //             (recId) => connections.getIn([
 //               'recommendations',
 //               recId.toString(),
 //               'attributes',
 //               'framework_id',
-//             ]).toString()
+//             ]).toString(),
 //           );
 //         return indicator.set(
 //           'measures',
-//           indicatorMeasures.get(parseInt(indicator.get('id'), 10))
+//           indicatorMeasures.get(parseInt(indicator.get('id'), 10)),
 //           // currently needs both
 //         ).set(
 //           'recommendations',
-//           entityRecs
+//           entityRecs,
 //         // nest connected recommendation ids byfw
 //         ).set(
 //           'recommendationsByFw',
 //           entityRecsByFw,
 //         );
-//       }
+//       },
 //     );
-//   }
+//   },
 // );

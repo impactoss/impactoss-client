@@ -120,7 +120,7 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
       });
     }
     if (dataReady) {
-      console.log(this.props.entities.toJS())
+      console.log(this.props.entities.toJS());
       // console.log(this.props.connections.toJS())
       // console.log(this.props.taxonomies.toJS())
       // console.log(this.props.frameworks.toJS())

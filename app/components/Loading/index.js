@@ -27,9 +27,7 @@ const Bar = styled.div`
   background-color: ${palette('primary', 2)};
   left: 0;
 `;
-const BarDeterminate = styled(Bar)`
-  width: ${(props) => props.progress}%
-`;
+
 const BarIndeterminate = styled(Bar)`
   width: ${ANIMATION_WIDTH}%;
   left: ${(props) => props.progress}%;
@@ -64,7 +62,7 @@ class Loading extends React.PureComponent { // eslint-disable-line react/prefer-
       clearInterval(this.loadInterval);
       this.loadInterval = false;
     }
-  }
+  };
 
   handleTimeout = () => {
     // Added timeout
@@ -73,15 +71,15 @@ class Loading extends React.PureComponent { // eslint-disable-line react/prefer-
         progress: prevState.progress < 100
           ? (prevState.progress + ANIMATION_STEP)
           : 0,
-      })
+      }),
     );
-  }
+  };
 
   render() {
     return (
       <Styled>
         {this.props.progress >= 0
-          && <BarDeterminate progress={Math.max(this.props.progress, 5)} />
+          && <Bar style={{ width: `${Math.max(this.props.progress, 5)}%` }} />
         }
         {this.props.progress < 0
           && <BarIndeterminate progress={this.state.progress} />

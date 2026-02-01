@@ -57,7 +57,7 @@ class ScheduleField extends React.PureComponent { // eslint-disable-line react/p
               onClick={() => this.setState(
                 (prevState) => ({
                   showAllDates: !prevState.showAllDates,
-                })
+                }),
               )}
             >
               { this.state.showAllDates

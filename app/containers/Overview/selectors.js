@@ -13,7 +13,7 @@ export const selectRecommendationCount = createSelector(
   (state) => selectRecommendationsWhere(state, { where: { draft: false } }),
   (entities) => entities && entities
     .groupBy((e) => e.getIn(['attributes', 'framework_id']))
-    .map((fwentities) => fwentities.size)
+    .map((fwentities) => fwentities.size),
 );
 // export const selectRecommendationAddressedCount = createSelector(
 //   (state) => selectRecommendationsWhere(state, { where: { draft: false } }),
@@ -34,23 +34,23 @@ export const selectRecommendationCount = createSelector(
 
 export const selectMeasureCount = createSelector(
   (state) => selectMeasuresWhere(state, { where: { draft: false } }),
-  (entities) => entities && entities.size
+  (entities) => entities && entities.size,
 );
 export const selectIndicatorCount = createSelector(
   (state) => selectIndicatorsWhere(state, { where: { draft: false } }),
-  (entities) => entities && entities.size
+  (entities) => entities && entities.size,
 );
 export const selectRecommendationDraftCount = createSelector(
   (state) => selectRecommendationsWhere(state, { where: { draft: true } }),
   (entities) => entities && entities
     .groupBy((e) => e.getIn(['attributes', 'framework_id']))
-    .map((fwentities) => fwentities.size)
+    .map((fwentities) => fwentities.size),
 );
 export const selectMeasureDraftCount = createSelector(
   (state) => selectMeasuresWhere(state, { where: { draft: true } }),
-  (entities) => entities && entities.size
+  (entities) => entities && entities.size,
 );
 export const selectIndicatorDraftCount = createSelector(
   (state) => selectIndicatorsWhere(state, { where: { draft: true } }),
-  (entities) => entities && entities.size
+  (entities) => entities && entities.size,
 );

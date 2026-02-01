@@ -95,6 +95,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       scrollToTop(this.scrollContainer.current);
     }
   }
+
   bindHandleSubmit = (submitForm) => {
     this.remoteSubmitForm = submitForm;
   };
@@ -108,7 +109,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       : Map())
     .set('associatedUser', userOptions(users, null));
 
-  handleRepeatChange = (repeat) => this.setState({ repeat: repeat });
+  // handleRepeatChange = (repeat) => this.setState({ repeat });
 
   getHeaderMainFields = (existingReferences, intl) =>
     ([ // fieldGroups
@@ -174,7 +175,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
     return groups;
   };
 
-  getBodyAsideFields = (users, intl) => 
+  getBodyAsideFields = (users, intl) =>
     ([ // fieldGroups
       { // fieldGroup
         label: intl.formatMessage(appMessages.entities.due_dates.schedule),
@@ -194,10 +195,11 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
           getCheckboxField(
             intl.formatMessage,
             'repeat',
-            false),
+            false,
+          ),
           getFrequencyField(
             intl.formatMessage,
-            (formData) => !this.props.isRepeat(formData)
+            (formData) => !this.props.isRepeat(formData),
           ),
           getDateField({
             formatMessage: intl.formatMessage,
@@ -324,13 +326,15 @@ IndicatorNew.propTypes = {
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
+  isRepeat: PropTypes.bool, // TODO check
   measures: PropTypes.object,
   recommendationsByFw: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
-  onRepeatChange: PropTypes.func,
+  // onRepeatChange: PropTypes.func,
   onEndDateChange: PropTypes.func,
+  handleSubmitFail: PropTypes.func,
   existingReferences: PropTypes.array,
   intl: PropTypes.object.isRequired,
 };
@@ -411,7 +415,7 @@ function mapDispatchToProps(dispatch) {
                 delete: [],
                 create: [],
               }),
-            )
+            ),
         );
       }
       // TODO: remove once have singleselect instead of multiselect
