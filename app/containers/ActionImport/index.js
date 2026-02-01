@@ -64,6 +64,7 @@ function ActionImport({
   authReady,
   onLoadEntitiesIfNeeded,
   onRedirectIfNotPermitted,
+  onResetProgress,
   categories,
   connections,
   handleCancel,
@@ -162,7 +163,7 @@ function ActionImport({
             handleSubmit(formData, connections, categories);
           }}
           handleCancel={handleCancel}
-          resetProgress={resetProgress}
+          resetProgress={onResetProgress}
           errors={errors}
           success={success}
           progress={progress}
@@ -179,6 +180,7 @@ function ActionImport({
 ActionImport.propTypes = {
   onLoadEntitiesIfNeeded: PropTypes.func,
   onRedirectIfNotPermitted: PropTypes.func,
+  onResetProgress: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
@@ -206,7 +208,7 @@ function mapDispatchToProps(dispatch) {
     onLoadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
-    resetProgress: () => {
+    onResetProgress: () => {
       dispatch(resetProgress());
     },
     onRedirectIfNotPermitted: () => {

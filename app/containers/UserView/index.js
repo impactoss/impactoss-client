@@ -245,6 +245,7 @@ UserView.propTypes = {
   user: PropTypes.object,
   taxonomies: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   sessionUserHighestRoleId: PropTypes.number,
   params: PropTypes.object,
   sessionUserId: PropTypes.string,

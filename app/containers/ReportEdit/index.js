@@ -320,17 +320,19 @@ ReportEdit.propTypes = {
   onRedirectIfNotPermitted: PropTypes.func,
   onRedirectNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
+  handleSubmitFail: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
+  authReady: PropTypes.bool,
   highestRole: PropTypes.number,
   params: PropTypes.object,
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   intl: PropTypes.object.isRequired,
-  // userId: PropTypes.string, // used in nextProps
+  userId: PropTypes.string,
 };
 
 const mapStateToProps = (state, props) => ({

@@ -300,8 +300,8 @@ ReportNew.propTypes = {
   onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   highestRole: PropTypes.number,
-  // userId: PropTypes.string, // used in nextProps
-  // dataAndAuthReady: PropTypes.bool, // used in nextProps
+  userId: PropTypes.string, // used in nextProps
+  dataAndAuthReady: PropTypes.bool, // used in nextProps
   intl: PropTypes.object.isRequired,
 };
 

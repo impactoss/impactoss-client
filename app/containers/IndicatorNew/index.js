@@ -109,7 +109,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       : Map())
     .set('associatedUser', userOptions(users, null));
 
-  handleRepeatChange = (repeat) => this.setState({ repeat });
+  // handleRepeatChange = (repeat) => this.setState({ repeat });
 
   getHeaderMainFields = (existingReferences, intl) =>
     ([ // fieldGroups
@@ -326,13 +326,15 @@ IndicatorNew.propTypes = {
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
+  isRepeat: PropTypes.bool, // TODO check
   measures: PropTypes.object,
   recommendationsByFw: PropTypes.object,
   users: PropTypes.object,
   onCreateOption: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
-  onRepeatChange: PropTypes.func,
+  // onRepeatChange: PropTypes.func,
   onEndDateChange: PropTypes.func,
+  handleSubmitFail: PropTypes.func,
   existingReferences: PropTypes.array,
   intl: PropTypes.object.isRequired,
 };

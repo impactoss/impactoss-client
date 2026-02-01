@@ -5,7 +5,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import { fromJS, List } from 'immutable';
+import { fromJS } from 'immutable';
 import { omit } from 'lodash/object';
 
 import asArray from 'utils/as-array';
@@ -164,7 +164,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     let fieldProps;
     if (field.controlType === 'multiselect') {
       const values = fromJS(form.values);
-      const formData = fromJS(this.props.formData);
+      // const formData = fromJS(this.props.formData);
       fieldProps = {
         ...field,
         formData: values,
@@ -441,7 +441,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             {({
               submitForm, isValid, isValidating, isSubmitting
             }) => {
-              bindHandleSubmit && bindHandleSubmit(submitForm);
+              if (bindHandleSubmit) bindHandleSubmit(submitForm);
               return (
                 <StyledForm>
                   <SubmitFailedHandler

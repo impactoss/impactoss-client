@@ -14,7 +14,6 @@ import rehypeExternalLinks from 'rehype-external-links';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { Box } from 'grommet';
-import Row from 'components/styled/Row';
 import Container from 'components/styled/Container';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';

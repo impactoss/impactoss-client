@@ -580,11 +580,9 @@ export const ENTITY_FIELDS = {
       },
       description: {
         type: 'markdown',
-        type: 'text',
       },
       response: {
         type: 'markdown',
-        type: 'text',
       },
       support_level: {
         type: 'number',

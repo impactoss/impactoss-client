@@ -17,7 +17,6 @@ import { fromJS } from 'immutable';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import {
-  API,
   USER_ROLES,
   ENTITY_FIELDS,
   DATE_FORMAT,
@@ -46,6 +45,7 @@ import {
 import Content from 'components/Content';
 import ContentHeader from 'components/ContentHeader';
 import ImportEntitiesForm from 'components/forms/ImportEntitiesForm';
+import validateDateFormat from 'components/forms/validators/validate-date-format';
 
 import appMessages from 'containers/App/messages';
 
@@ -62,12 +62,12 @@ import { save } from './actions';
 function IndicatorImport({
   dataReady,
   authReady,
-  loadEntitiesIfNeeded,
-  redirectIfNotPermitted,
+  onLoadEntitiesIfNeeded,
+  onRedirectIfNotPermitted,
   connections,
   handleCancel,
   handleSubmit,
-  resetProgress,
+  onResetProgress,
   errors,
   success,
   progress,
@@ -76,12 +76,12 @@ function IndicatorImport({
   // reload entities if invalidated
   useEffect(() => {
     if (!dataReady) {
-      loadEntitiesIfNeeded();
+      onLoadEntitiesIfNeeded();
     }
   }, [dataReady]);
   useEffect(() => {
     if (authReady) {
-      redirectIfNotPermitted();
+      onRedirectIfNotPermitted();
     }
   }, [authReady]);
 
@@ -163,7 +163,7 @@ function IndicatorImport({
             handleSubmit(formData, connections);
           }}
           handleCancel={handleCancel}
-          resetProgress={resetProgress}
+          resetProgress={onResetProgress}
           errors={errors}
           success={success}
           progress={progress}
@@ -178,13 +178,13 @@ function IndicatorImport({
 }
 
 IndicatorImport.propTypes = {
-  loadEntitiesIfNeeded: PropTypes.func,
-  redirectIfNotPermitted: PropTypes.func,
+  onLoadEntitiesIfNeeded: PropTypes.func,
+  onRedirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
-  resetProgress: PropTypes.func.isRequired,
+  onResetProgress: PropTypes.func.isRequired,
   progress: PropTypes.number,
   errors: PropTypes.object,
   success: PropTypes.object,
@@ -206,7 +206,7 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
-    resetProgress: () => {
+    onResetProgress: () => {
       dispatch(resetProgress());
     },
     redirectIfNotPermitted: () => {
@@ -283,7 +283,7 @@ function mapDispatchToProps(dispatch) {
                   relationship.values.forEach(
                     (relValue) => {
                       // console.log(relValue)
-                      const [id, value] = relValue.trim().split('|');
+                      const [id,] = relValue.trim().split('|');
                       if (relConfig) {
                         // check if connection id is valid
                         let connectionId;
@@ -309,19 +309,12 @@ function mapDispatchToProps(dispatch) {
                                 connectionId = connection.get('id');
                               }
                             }
-                          } else {
-                            // if (categories && relConfig.lookup.table === API.CATEGORIES) {
-                            //   if (categories.get(`${id}`)) {
-                            //     connectionId = id;
-                            //   }
-                            // } else
-                            if (connections) {
-                              if (
-                                connections.get(relConfig.lookup.table)
-                                && connections.getIn([relConfig.lookup.table, `${id}`])
-                              ) {
-                                connectionId = id;
-                              }
+                          } else if (connections) {
+                            if (
+                              connections.get(relConfig.lookup.table)
+                              && connections.getIn([relConfig.lookup.table, `${id}`])
+                            ) {
+                              connectionId = id;
                             }
                           }
                         }
@@ -421,10 +414,10 @@ function mapDispatchToProps(dispatch) {
     handleCancel: () => {
       dispatch(updatePath(ROUTES.INDICATORS));
     },
-    handleReset: () => {
-      dispatch(resetProgress());
-      dispatch(resetForm());
-    },
+    // handleReset: () => {
+    //   dispatch(resetProgress());
+    //   dispatch(resetForm());
+    // },
   };
 }
 

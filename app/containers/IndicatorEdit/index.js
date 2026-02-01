@@ -391,6 +391,7 @@ IndicatorEdit.propTypes = {
   viewEntity: PropTypes.object,
   dataReady: PropTypes.bool,
   authReady: PropTypes.bool,
+  isRepeat: PropTypes.bool,
   params: PropTypes.object,
   measures: PropTypes.object,
   recommendationsByFw: PropTypes.object,
@@ -398,8 +399,8 @@ IndicatorEdit.propTypes = {
   users: PropTypes.object,
   highestRole: PropTypes.number,
   onCreateOption: PropTypes.func,
-  onRepeatChange: PropTypes.func,
-  onStartDateChange: PropTypes.func,
+  // onRepeatChange: PropTypes.func,
+  // onStartDateChange: PropTypes.func, // TODO check if we want this
   onEndDateChange: PropTypes.func,
   existingReferences: PropTypes.array,
   intl: PropTypes.object.isRequired,

@@ -32,17 +32,6 @@ const PathLineCustom = styled(PathLine)`
 const PathLineArrow = styled(PathLine)`
   fill: ${palette('dark', 2)};
 `;
-const SectionLabel = styled.div`
-  color: ${palette('text', 1)};
-  font-size: ${(props) => props.theme.sizes.text.small};
-  margin-top: 5px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  @media print {
-    font-size: ${(props) => props.theme.sizes.print.small};
-  }
-`;
 
 const roundRect = (rect) => ({
   right: Math.floor(rect.right),
@@ -167,7 +156,7 @@ const connectMeasuresIndicators = (itemRefs) => getConnectionPath(
   getConnectionPoint(itemRefs.buttonIndicators, itemRefs.diagram, 'top'),
 );
 
-const VerticalDiagramSVG = ({ frameworks, itemRefs, version }) => (
+const VerticalDiagramSVG = ({ frameworks, itemRefs }) => (
   <DiagramSvgWrapper>
     {itemRefs.diagram && (
       <DiagramSvg
@@ -269,7 +258,6 @@ const VerticalDiagramSVG = ({ frameworks, itemRefs, version }) => (
 VerticalDiagramSVG.propTypes = {
   frameworks: PropTypes.object,
   itemRefs: PropTypes.object,
-  version: PropTypes.number,
 };
 
 export default VerticalDiagramSVG;
