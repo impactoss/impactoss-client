@@ -160,7 +160,7 @@
     "node-polyfill-webpack-plugin": "^4.0.0",
     "plop": "4.0.1",
     "postcss-styled-syntax": "^0.6.4",
-    "pre-commit": "1.0.10",
+    "pre-commit": "^1.2.2",
     "prettier": "3.3.2",
     "react-app-polyfill": "3.0.0",
     "react-refresh": "^0.14.2",
