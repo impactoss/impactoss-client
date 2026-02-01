@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
-import { injectIntl, intlShape } from 'react-intl';
 // import { isEqual } from 'lodash/lang';
 import { reduce } from 'lodash/collection';
 import { Map } from 'immutable';
+import { injectIntl } from 'react-intl';
 import { qe } from 'utils/quasi-equals';
 
 import Component from 'components/styled/Component';
@@ -262,29 +262,42 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       onEntityClick,
       taxonomies,
       skipTargetId,
+      config,
+      entity,
+      entityPath,
+      connections,
+      intl,
     } = this.props;
 
-    const entity = this.mapToEntityListItem(this.props);
+    const entityItem = this.mapToEntityListItem({
+      config,
+      entity,
+      nestLevel,
+      entityPath,
+      connections,
+      taxonomies,
+      intl,
+    });
 
     const bottomTaxonomies = taxonomies && taxonomies.filter((tax) => !qe(tax.get('id'), PROGRESS_TAXONOMY_ID));
     return (
       <Styled isManager={this.props.isManager} isConnection={this.props.isConnection}>
         <Wrapper>
           <EntityListItemMainTitleWrap
-            id={`list-item-${entity.id}`}
+            id={`list-item-${entityItem.id}`}
             ref={(el) => { this.title = el; }}
             onClick={(evt) => {
               evt.preventDefault();
-              onEntityClick(entity.id, entity.path);
+              onEntityClick(entityItem.id, entityItem.path);
             }}
-            href={`/${entity.path}/${entity.id}`}
+            href={`/${entityItem.path}/${entityItem.id}`}
           >
             <EntityListItemMainTitle nested={nestLevel && nestLevel > 0}>
-              {entity.title}
+              {entityItem.title}
             </EntityListItemMainTitle>
-            {entity.subtitle && (
+            {entityItem.subtitle && (
               <EntityListItemMainSubtitle>
-                {entity.subtitle}
+                {entityItem.subtitle}
               </EntityListItemMainSubtitle>
             )}
           </EntityListItemMainTitleWrap>
@@ -297,14 +310,14 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             </SkipContent>
           )}
           <EntityListItemMainTopWrap>
-            <EntityListItemMainTop entity={entity} />
+            <EntityListItemMainTop entity={entityItem} />
           </EntityListItemMainTopWrap>
-          { (entity.categories || (entity.connectedCounts && this.props.wrapper))
+          { (entityItem.categories || (entityItem.connectedCounts && this.props.wrapper))
             && (
               <EntityListItemMainBottom
-                connections={entity.connectedCounts}
+                connections={entityItem.connectedCounts}
                 wrapper={this.props.wrapper}
-                categories={entity.categories}
+                categories={entityItem.categories}
                 taxonomies={bottomTaxonomies}
                 onEntityClick={onEntityClick}
               />
@@ -317,12 +330,12 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
 }
 
 EntityListItemMain.propTypes = {
-  entity: PropTypes.instanceOf(Map).isRequired, // eslint-disable-line react/no-unused-prop-types
-  taxonomies: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
-  connections: PropTypes.instanceOf(Map), // eslint-disable-line react/no-unused-prop-types
-  config: PropTypes.object, // eslint-disable-line react/no-unused-prop-types
-  entityIcon: PropTypes.func, // eslint-disable-line react/no-unused-prop-types
-  entityPath: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
+  entity: PropTypes.instanceOf(Map).isRequired,
+  taxonomies: PropTypes.instanceOf(Map),
+  connections: PropTypes.instanceOf(Map),
+  config: PropTypes.object,
+  // entityIcon: PropTypes.func,
+  entityPath: PropTypes.string,
   wrapper: PropTypes.object,
   nestLevel: PropTypes.number,
   onEntityClick: PropTypes.func,
@@ -330,7 +343,7 @@ EntityListItemMain.propTypes = {
   isManager: PropTypes.bool,
   isFocus: PropTypes.bool,
   skipTargetId: PropTypes.string,
-  intl: intlShape.isRequired, // eslint-disable-line react/no-unused-prop-types
+  intl: PropTypes.object.isRequired,
 };
 
 export default injectIntl(EntityListItemMain);
