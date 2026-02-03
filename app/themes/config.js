@@ -244,6 +244,8 @@ export const PERMISSIONS = {
   },
 };
 
+export const MIN_PASSWORD_LENGTH = 12;
+
 export const COLUMN_WIDTHS = {
   FULL: 1,
   HALF: 0.5,

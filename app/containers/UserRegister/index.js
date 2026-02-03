@@ -18,6 +18,8 @@ import {
   getPasswordConfirmationField,
 } from 'utils/forms';
 
+// import validatePasswordsMatch from 'components/forms/validators/validate-passwords-match';
+
 import Icon from 'components/Icon';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
@@ -98,8 +100,13 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
             fields={[
               getNameField(intl.formatMessage),
               getEmailFormField(intl.formatMessage),
-              getPasswordField(intl.formatMessage),
-              getPasswordConfirmationField(intl.formatMessage),
+              getPasswordField({
+                formatMessage: intl.formatMessage,
+                isNotLogin: true,
+              }),
+              getPasswordConfirmationField({
+                formatMessage: intl.formatMessage,
+              }),
             ]}
           />
           <BottomLinks>

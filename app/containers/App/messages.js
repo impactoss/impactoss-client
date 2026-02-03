@@ -231,6 +231,10 @@ export default defineMessages({
       id: 'app.containers.App.forms.fieldRequired',
       defaultMessage: 'This field cannot be empty',
     },
+    fieldMaxLengthError: {
+      id: 'app.containers.App.forms.fieldMaxLengthError',
+      defaultMessage: 'Field content tooooo looooong',
+    },
     valueProhibited: {
       id: 'app.containers.App.forms.valueProhibited',
       defaultMessage: 'This value is not allowed',
@@ -278,6 +282,22 @@ export default defineMessages({
     referenceRequiredError: {
       id: 'app.containers.App.forms.referenceRequiredError',
       defaultMessage: '"Reference" is required. ',
+    },
+    passwordNeedsUpperCaseError: {
+      id: 'app.containers.App.forms.passwordNeedsUpperCaseError',
+      defaultMessage: 'At least one uppercase letter is required.',
+    },
+    passwordNeedsLowerCaseError: {
+      id: 'app.containers.App.forms.passwordNeedsLowerCaseError',
+      defaultMessage: 'At least one lowercase letter is required.',
+    },
+    passwordNeedsNumberError: {
+      id: 'app.containers.App.forms.passwordNeedsNumberError',
+      defaultMessage: 'At least one number is required.',
+    },
+    passwordNeedsSpecialCharacterError: {
+      id: 'app.containers.App.forms.passwordNeedsSpecialCharacterError',
+      defaultMessage: 'At least one special character is required.',
     },
   },
 
@@ -424,7 +444,7 @@ export default defineMessages({
     },
     passwordNew: {
       id: 'app.containers.App.placeholders.passwordNew',
-      defaultMessage: 'New Password',
+      defaultMessage: 'Enter new Password',
     },
     passwordConfirmation: {
       id: 'app.containers.App.placeholders.passwordConfirmation',
@@ -571,6 +591,10 @@ export default defineMessages({
     email: {
       id: 'app.containers.App.attributes.email',
       defaultMessage: 'Email address',
+    },
+    passwordNew: {
+      id: 'app.containers.App.attributes.passwordNew',
+      defaultMessage: 'New password',
     },
     domain: {
       id: 'app.containers.App.attributes.domain',

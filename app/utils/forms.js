@@ -15,7 +15,12 @@ import validateDateFormat from 'components/forms/validators/validate-date-format
 import validateRequired from 'components/forms/validators/validate-required';
 import validateNumber from 'components/forms/validators/validate-number';
 import validateEmailFormat from 'components/forms/validators/validate-email-format';
-import validateLength from 'components/forms/validators/validate-length';
+import validateMinLength from 'components/forms/validators/validate-min-length';
+import validateContainsUpperCase from 'components/forms/validators/validate-contains-upper-case';
+import validateContainsLowerCase from 'components/forms/validators/validate-contains-lower-case';
+import validateContainsNumber from 'components/forms/validators/validate-contains-number';
+import validateContainsSpecialCharacter from 'components/forms/validators/validate-contains-special-character';
+import validateMaxLength from 'components/forms/validators/validate-max-length';
 
 import {
   REPORT_FREQUENCIES,
@@ -25,6 +30,7 @@ import {
   DOC_PUBLISH_STATUSES,
   IS_ARCHIVE_STATUSES,
   SUPPORT_LEVELS,
+  MIN_PASSWORD_LENGTH,
 } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
@@ -652,16 +658,31 @@ export const getNameField = (formatMessage) => {
   return field;
 };
 
-export const getPasswordField = (formatMessage) => {
+export const getPasswordField = ({
+  formatMessage,
+  attribute = 'password',
+  isNotLogin = false,
+}) => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
-    attribute: 'password',
+    attribute,
     type: 'password',
     required: true,
+    showErrorsAsHints: isNotLogin,
   });
-  field.validators.passwordLength = (val) => validateLength(val, 6);
-  field.errorMessages.passwordLength = formatMessage(appMessages.forms.passwordShortError);
+  if (isNotLogin) {
+    field.validators.passwordContainsUpperCase = (val) => validateContainsUpperCase(val);
+    field.validators.passwordContainsLowerCase = (val) => validateContainsLowerCase(val);
+    field.validators.passwordContainsNumber = (val) => validateContainsNumber(val);
+    field.validators.passwordContainsSpecialCharacter = (val) => validateContainsSpecialCharacter(val);
+    field.errorMessages.passwordContainsUpperCase = formatMessage(appMessages.forms.passwordNeedsUpperCaseError);
+    field.errorMessages.passwordContainsLowerCase = formatMessage(appMessages.forms.passwordNeedsLowerCaseError);
+    field.errorMessages.passwordContainsNumber = formatMessage(appMessages.forms.passwordNeedsNumberError);
+    field.errorMessages.passwordContainsSpecialCharacter = formatMessage(appMessages.forms.passwordNeedsSpecialCharacterError);
+    field.validators.passwordLength = (val) => validateMinLength(val, MIN_PASSWORD_LENGTH);
+    field.errorMessages.passwordLength = formatMessage(appMessages.forms.passwordShortError, { minLength: MIN_PASSWORD_LENGTH });
+  }
   return field;
 };
 
@@ -677,22 +698,33 @@ export const getPasswordCurrentField = (formatMessage) => {
   return field;
 };
 
-export const getPasswordNewField = (formatMessage) => {
+export const getPasswordNewField = ({ formatMessage, attribute = 'passwordNew' }) => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
-    attribute: 'passwordNew',
+    attribute,
     type: 'password',
+    showErrorsAsHints: true,
     required: true,
   });
+  field.validators.passwordLength = (val) => validateMinLength(val, MIN_PASSWORD_LENGTH);
+  field.validators.passwordContainsUpperCase = (val) => validateContainsUpperCase(val);
+  field.validators.passwordContainsLowerCase = (val) => validateContainsLowerCase(val);
+  field.validators.passwordContainsNumber = (val) => validateContainsNumber(val);
+  field.validators.passwordContainsSpecialCharacter = (val) => validateContainsSpecialCharacter(val);
+  field.errorMessages.passwordLength = formatMessage(appMessages.forms.passwordShortError, { minLength: MIN_PASSWORD_LENGTH });
+  field.errorMessages.passwordContainsUpperCase = formatMessage(appMessages.forms.passwordNeedsUpperCaseError);
+  field.errorMessages.passwordContainsLowerCase = formatMessage(appMessages.forms.passwordNeedsLowerCaseError);
+  field.errorMessages.passwordContainsNumber = formatMessage(appMessages.forms.passwordNeedsNumberError);
+  field.errorMessages.passwordContainsSpecialCharacter = formatMessage(appMessages.forms.passwordNeedsSpecialCharacterError);
   return field;
 };
 
-export const getPasswordConfirmationField = (formatMessage) => {
+export const getPasswordConfirmationField = ({ formatMessage, attribute = 'passwordConfirmation' }) => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
-    attribute: 'passwordConfirmation',
+    attribute,
     type: 'password',
     required: true,
   });
@@ -711,6 +743,8 @@ export const getFormField = ({
   dynamicValidators,
   type,
   prohibitedValues,
+  showErrorsAsHints,
+  maxLength = 10000,
 }) => {
   const field = {
     id: attribute,
@@ -722,10 +756,13 @@ export const getFormField = ({
     validators: {},
     errorMessages: {},
     hint,
+    showErrorsAsHints,
   };
   if (dynamicValidators) {
     field.dynamicValidators = dynamicValidators;
   }
+  field.validators.maxFieldLength = (val) => validateMaxLength(val, maxLength);
+  field.errorMessages.maxFieldLength = formatMessage(appMessages.forms.fieldMaxLengthError, { maxLength });
   if (required) {
     field.validators.required = typeof required === 'function' ? required : validateRequired;
     field.errorMessages.required = formatMessage(appMessages.forms.fieldRequired);
