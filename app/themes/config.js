@@ -237,6 +237,13 @@ export const SEE_ARCHIVED_MIN_ROLE = USER_ROLES.CONTRIBUTOR.value; // edit or cr
 export const SEE_META_MIN_ROLE = USER_ROLES.MANAGER.value; // edit or create when assigned
 export const ARCHIVE_MIN_ROLE = USER_ROLES.ADMIN.value; // archive content
 
+
+export const PERMISSIONS = {
+  user: {
+    updateEmail: false, // or min role
+  },
+};
+
 export const COLUMN_WIDTHS = {
   FULL: 1,
   HALF: 0.5,
