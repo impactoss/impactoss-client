@@ -363,7 +363,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         }
         return (
           <Field
-            key={field.controlType}
+            key={`${field.controlType}-${i}`}
             labelledGroup={!!field.label}
           >
             {this.renderFormField(

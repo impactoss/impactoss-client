@@ -20,5 +20,4 @@ export const canUserPublishReports = (highestRole) => highestRole <= CONTRIBUTOR
 export const canUserBeAssignedToReports = (highestRole) => highestRole <= CONTRIBUTOR_MIN_ROLE_ASSIGNED;
 export const canUserSeeDraftContent = (highestRole) => highestRole <= SEE_DRAFT_MIN_ROLE;
 export const canUserSeeMeta = (highestRole) => highestRole <= SEE_META_MIN_ROLE;
-export const canUserUpdateEmail = () => !ENABLE_AZURE
-  && PERMISSIONS.user.updateEmail;
+export const canUserUpdateEmail = () => !ENABLE_AZURE && PERMISSIONS.user.updateEmail;
