@@ -42,4 +42,8 @@ export default defineMessages({
     id: 'app.containers.UserLogin.submitWithAzure',
     defaultMessage: 'Sign in with your Microsoft account',
   },
+  submitUpdate: {
+    id: 'app.containers.UserLogin.submitUpdate',
+    defaultMessage: 'Update password',
+  },
 });

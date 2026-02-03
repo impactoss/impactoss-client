@@ -780,6 +780,7 @@
   "app.containers.UserLogin.signInWithAzureDescription": "Sign in with your Microsoft account",
   "app.containers.UserLogin.submit": "Sign in",
   "app.containers.UserLogin.submitWithAzure": "Sign in with your Microsoft account",
+  "app.containers.UserLogin.submitUpdate": "Update password",
   "app.containers.UserLoginOAuthSuccess.metaDescription": "Sign in successful",
   "app.containers.UserLoginOAuthSuccess.note": "Forwarding...",
   "app.containers.UserLoginOAuthSuccess.pageTitle": "Sign in successful",
