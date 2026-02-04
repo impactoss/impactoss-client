@@ -686,7 +686,24 @@ export const getPasswordField = ({
   return field;
 };
 
-export const getPasswordCurrentField = (formatMessage) => {
+export const getPasswordConfirmationField = ({
+  formatMessage,
+  attribute = 'passwordConfirmation',
+  match = 'password',
+}) => {
+  const field = getFormField({
+    formatMessage,
+    controlType: 'input',
+    attribute,
+    type: 'password',
+    required: true,
+  });
+  field.validateMatchAttribute = match;
+  field.errorMessages.validateMatchAttribute = formatMessage(appMessages.forms.passwordMismatchError);
+  return field;
+};
+
+export const getPasswordCurrentField = ({ formatMessage }) => {
   const field = getFormField({
     formatMessage,
     controlType: 'input',
@@ -717,17 +734,6 @@ export const getPasswordNewField = ({ formatMessage, attribute = 'passwordNew' }
   field.errorMessages.passwordContainsLowerCase = formatMessage(appMessages.forms.passwordNeedsLowerCaseError);
   field.errorMessages.passwordContainsNumber = formatMessage(appMessages.forms.passwordNeedsNumberError);
   field.errorMessages.passwordContainsSpecialCharacter = formatMessage(appMessages.forms.passwordNeedsSpecialCharacterError);
-  return field;
-};
-
-export const getPasswordConfirmationField = ({ formatMessage, attribute = 'passwordConfirmation' }) => {
-  const field = getFormField({
-    formatMessage,
-    controlType: 'input',
-    attribute,
-    type: 'password',
-    required: true,
-  });
   return field;
 };
 
