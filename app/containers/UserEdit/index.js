@@ -27,7 +27,11 @@ import {
   getTitleField,
   getEmailField,
 } from 'utils/fields';
-import { canUserManageUsers, canUserSeeMeta } from 'utils/permissions';
+import {
+  canUserManageUsers,
+  canUserSeeMeta,
+  canUserUpdateEmail,
+} from 'utils/permissions';
 
 import { scrollToTop } from 'utils/scroll-to-component';
 import { hasNewError } from 'utils/entity-form';
@@ -148,7 +152,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
   };
 
   getBodyMainFields = (entity, intl) => {
-    if (!ENABLE_AZURE) {
+    if (canUserUpdateEmail()) {
       return ([{
         fields: [getEmailFormField(intl.formatMessage)],
       }]);

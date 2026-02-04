@@ -5,6 +5,8 @@ import {
   Field as FormikField, Form, Formik, ErrorMessage,
 } from 'formik';
 import styled from 'styled-components';
+import { Box, Text } from 'grommet';
+import { CircleInformation, StatusGood } from 'grommet-icons';
 
 import { omit } from 'lodash/object';
 import { startCase } from 'lodash/string';
@@ -31,7 +33,16 @@ import Required from '../Required';
 import ControlInput from '../ControlInput';
 
 // These props will be omitted before being passed to the Control component
-const nonControlProps = ['hint', 'label', 'component', 'controlType', 'children', 'errorMessages', 'validators'];
+const nonControlProps = [
+  'hint',
+  'label',
+  'component',
+  'controlType',
+  'children',
+  'errorMessages',
+  'validators',
+  'showErrorsAsHints',
+];
 
 const StyledForm = styled(Form)`
   display: table;
@@ -68,31 +79,82 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
     );
   };
 
-  renderBody = (fieldConfigs) => (
-    <FormBody>
-      <ViewPanel>
-        <Main bottom>
-          <FieldGroupWrapper>
-            {fieldConfigs.map((fieldConfig, i) => (
-              <FormikField
-                key={i}
-                name={fieldConfig.id}
-                validate={(value) => validateField(value, fieldConfig)}
-              >
-                {({ field, meta }) => (
-                  <Field>
-                    {field.label !== false && this.renderLabel(fieldConfig)}
-                    {this.renderField({ ...fieldConfig, ...field })}
-                    {meta.touched && meta.error && this.renderError(field.name)}
-                  </Field>
-                )}
-              </FormikField>
-            ))}
-          </FieldGroupWrapper>
-        </Main>
-      </ViewPanel>
-    </FormBody>
-  );
+  renderBody = (fieldConfigs, values, errors) => {
+    console.log(values, errors);
+    return (
+      <FormBody>
+        <ViewPanel>
+          <Main bottom>
+            <FieldGroupWrapper>
+              {fieldConfigs.map((fieldConfig, i) => (
+                <FormikField
+                  key={i}
+                  name={fieldConfig.id}
+                  validate={(value) => validateField(value, fieldConfig)}
+                >
+                  {({ field, meta }) => {
+                    const value = values[fieldConfig.id];
+                    return (
+                      <Field>
+                        {field.label !== false && this.renderLabel(fieldConfig)}
+                        {this.renderField({ ...fieldConfig, ...field })}
+                        {meta.touched
+                          && meta.error
+                          && !fieldConfig.showErrorsAsHints
+                          && this.renderError(field.name)
+                        }
+                        {fieldConfig.showErrorsAsHints
+                          && fieldConfig.errorMessages
+                          && fieldConfig.validators && (
+                          <Box margin={{ top: 'xsmall' }} gap="xsmall">
+                            {Object.keys(fieldConfig.errorMessages).map((errorKey) => {
+                              let valid = true;
+                              if (fieldConfig.validators[errorKey]) {
+                                valid = !!fieldConfig.validators[errorKey](value);
+                              }
+
+                              // Skip certain validators
+                              if (valid && errorKey === 'maxFieldLength') return null;
+                              if (Object.keys(fieldConfig.errorMessages).indexOf('passwordLength') > -1
+                                  && errorKey === 'required') return null;
+
+                              return (
+                                <Box key={errorKey} direction="row" align="center" gap="xsmall">
+                                  {!valid && (
+                                    <CircleInformation
+                                      style={{ transform: 'rotate(180deg)', opacity: 0.5 }}
+                                      size="xxsmall"
+                                      color="textSecondary"
+                                    />
+                                  )}
+                                  {valid && (
+                                    <StatusGood
+                                      size="xxsmall"
+                                      color="success"
+                                    />
+                                  )}
+                                  <Text
+                                    size="xsmall"
+                                    color={valid ? 'success' : 'textSecondary'}
+                                  >
+                                    {fieldConfig.errorMessages[errorKey]}
+                                  </Text>
+                                </Box>
+                              );
+                            })}
+                          </Box>
+                        )}
+                      </Field>
+                    );
+                  }}
+                </FormikField>
+              ))}
+            </FieldGroupWrapper>
+          </Main>
+        </ViewPanel>
+      </FormBody>
+    );
+  };
 
   render() {
     const {
@@ -105,20 +167,22 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
           initialValues={initialValues}
           onSubmit={handleSubmit}
         >
-          <StyledForm>
-            {fields && this.renderBody(fields)}
-            <FormFooter>
-              <FormFooterButtons>
-                <ButtonCancel type="button" onClick={handleCancel}>
-                  <FormattedMessage {...appMessages.buttons.cancel} />
-                </ButtonCancel>
-                <ButtonSubmit type="submit" disabled={this.props.sending}>
-                  {labels.submit}
-                </ButtonSubmit>
-              </FormFooterButtons>
-              <Clear />
-            </FormFooter>
-          </StyledForm>
+          {({ values, errors }) => (
+            <StyledForm>
+              {fields && this.renderBody(fields, values, errors)}
+              <FormFooter>
+                <FormFooterButtons>
+                  <ButtonCancel type="button" onClick={handleCancel}>
+                    <FormattedMessage {...appMessages.buttons.cancel} />
+                  </ButtonCancel>
+                  <ButtonSubmit type="submit" disabled={this.props.sending}>
+                    {labels.submit}
+                  </ButtonSubmit>
+                </FormFooterButtons>
+                <Clear />
+              </FormFooter>
+            </StyledForm>
+          )}
         </Formik>
       </FormWrapper>
     );

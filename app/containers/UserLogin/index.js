@@ -32,7 +32,7 @@ import { ROUTES } from 'containers/App/constants';
 import { ENABLE_AZURE, IS_PROD, SERVER } from 'themes/config';
 import messages from './messages';
 
-import { login, loginWithAzure } from './actions';
+import { login, loginWithAzure, recover } from './actions';
 import { selectDomain } from './selectors';
 import { FORM_INITIAL } from './constants';
 
@@ -50,6 +50,9 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
   render() {
     const { intl } = this.props;
     const { authError, authSending } = this.props.viewDomain.get('page').toJS();
+    const passwordExpired = authError
+      && authError.codeOrReason
+      && authError.codeOrReason === 'password_expired';
 
     const {
       handleSubmit,
@@ -57,6 +60,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
       onDismissQueryMessages,
       queryMessages,
       handleSubmitWithAzure,
+      handleSubmitRecover,
     } = this.props;
 
     return (
@@ -101,7 +105,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
           {!ENABLE_AZURE && authSending
             && <Loading />
           }
-          {!ENABLE_AZURE && (
+          {!ENABLE_AZURE && !passwordExpired && (
             <>
               <AuthForm
                 sending={authSending}
@@ -143,6 +147,18 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
               </BottomLinks>
             </>
           )}
+          {!ENABLE_AZURE && passwordExpired && (
+            <AuthForm
+              sending={authSending}
+              handleSubmit={handleSubmitRecover}
+              handleCancel={handleCancel}
+              initialValues={FORM_INITIAL}
+              labels={{ submit: intl.formatMessage(messages.submitUpdate) }}
+              fields={[
+                getEmailFormField(intl.formatMessage),
+              ]}
+            />
+          )}
           {ENABLE_AZURE && (
             <>
               <div>
@@ -165,6 +181,7 @@ UserLogin.propTypes = {
   viewDomain: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleSubmitWithAzure: PropTypes.func.isRequired,
+  handleSubmitRecover: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
   onDismissQueryMessages: PropTypes.func,
@@ -181,6 +198,10 @@ export function mapDispatchToProps(dispatch) {
   return {
     handleSubmit: (formData) => {
       dispatch(login(formData));
+      dispatch(dismissQueryMessages());
+    },
+    handleSubmitRecover: (formData) => {
+      dispatch(recover(formData));
       dispatch(dismissQueryMessages());
     },
     handleSubmitWithAzure: () => {
