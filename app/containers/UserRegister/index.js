@@ -18,6 +18,8 @@ import {
   getPasswordConfirmationField,
 } from 'utils/forms';
 
+// import validatePasswordsMatch from 'components/forms/validators/validate-passwords-match';
+
 import Icon from 'components/Icon';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
@@ -48,8 +50,7 @@ const BottomLinks = styled.div`
   padding: 2em 0;
 `;
 
-export class UserRegister extends React.PureComponent {
-  // eslint-disable-line react/prefer-stateless-function
+export class UserRegister extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const {
       intl,
@@ -96,8 +97,13 @@ export class UserRegister extends React.PureComponent {
                 fields={[
                   getNameField(intl.formatMessage),
                   getEmailFormField(intl.formatMessage),
-                  getPasswordField(intl.formatMessage),
-                  getPasswordConfirmationField(intl.formatMessage),
+                  getPasswordField({
+                    formatMessage: intl.formatMessage,
+                    isNotLogin: true,
+                  }),
+                  getPasswordConfirmationField({
+                    formatMessage: intl.formatMessage,
+                  }),
                 ]}
               />
               <BottomLinks>

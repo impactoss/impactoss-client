@@ -39,7 +39,7 @@ import { ROUTES } from 'containers/App/constants';
 import { ENABLE_AZURE, IS_PROD, SERVER } from 'themes/config';
 import messages from './messages';
 
-import { login, loginWithAzure } from './actions';
+import { login, loginWithAzure, recover } from './actions';
 import { selectDomain } from './selectors';
 import { FORM_INITIAL } from './constants';
 
@@ -55,10 +55,13 @@ const AzureButton = styled(ButtonHero)`
 
 export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { intl } = this.props;
     const { authError, authSending } = this.props.viewDomain.get('page').toJS();
+    const passwordExpired = authError
+      && authError.codeOrReason
+      && authError.codeOrReason === 'password_expired';
 
     const {
+      intl,
       handleSubmit,
       handleOtpSubmit,
       handleOtpResend,
@@ -66,6 +69,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
       onDismissQueryMessages,
       queryMessages,
       handleSubmitWithAzure,
+      handleSubmitRecover,
       otpRequired,
       tempToken,
       handleOtpCancel,
@@ -113,7 +117,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
           {!ENABLE_AZURE && authSending
             && <Loading />
           }
-          {!ENABLE_AZURE && !otpRequired && (
+          {!ENABLE_AZURE && !passwordExpired && !otpRequired && (
             <>
               <AuthForm
                 sending={authSending}
@@ -123,7 +127,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                 labels={{ submit: intl.formatMessage(messages.submit) }}
                 fields={[
                   getEmailFormField(intl.formatMessage),
-                  getPasswordField(intl.formatMessage),
+                  getPasswordField({ formatMessage: intl.formatMessage }),
                 ]}
               />
               <BottomLinks>
@@ -155,7 +159,19 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
               </BottomLinks>
             </>
           )}
-          {!ENABLE_AZURE && otpRequired && (
+          {!ENABLE_AZURE && passwordExpired && !otpRequired && (
+            <AuthForm
+              sending={authSending}
+              handleSubmit={handleSubmitRecover}
+              handleCancel={handleCancel}
+              initialValues={FORM_INITIAL}
+              labels={{ submit: intl.formatMessage(messages.submitUpdate) }}
+              fields={[
+                getEmailFormField(intl.formatMessage),
+              ]}
+            />
+          )}
+          {!ENABLE_AZURE && !passwordExpired && otpRequired && (
             <OtpForm
               sending={authSending}
               handleSubmit={(formData) => handleOtpSubmit(formData, tempToken)}
@@ -185,6 +201,7 @@ UserLogin.propTypes = {
   viewDomain: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleSubmitWithAzure: PropTypes.func.isRequired,
+  handleSubmitRecover: PropTypes.func.isRequired,
   handleOtpSubmit: PropTypes.func.isRequired,
   handleOtpResend: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
@@ -208,6 +225,10 @@ export function mapDispatchToProps(dispatch) {
   return {
     handleSubmit: (formData) => {
       dispatch(login(formData));
+      dispatch(dismissQueryMessages());
+    },
+    handleSubmitRecover: (formData) => {
+      dispatch(recover(formData));
       dispatch(dismissQueryMessages());
     },
     handleSubmitWithAzure: () => {

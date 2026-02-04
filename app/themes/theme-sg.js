@@ -531,6 +531,9 @@ theme.global = {
   colors: {
     aHover: '#0063b5',
     highlight: '#0070cc',
+    textSecondary: '#777b7e', // on light background (empowerment)
+    error: '#b20e0e',
+    success: '#00632e',
   },
   edgeSize: {
     hair: '1px',

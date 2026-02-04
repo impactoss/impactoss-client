@@ -224,7 +224,7 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
       path = nestLevel > 0 ? config.expandableColumns[nestLevel - 1].clientPath : config.clientPath;
     }
     let supportLevel;
-    console.log(entity.getIn(['attributes', 'support_level']));
+    // console.log(entity.getIn(['attributes', 'support_level']));
     if (
       typeof entity.getIn(['attributes', 'support_level']) !== 'undefined'
       && entity.getIn(['attributes', 'support_level']) !== 'null'

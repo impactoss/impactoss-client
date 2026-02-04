@@ -64,9 +64,9 @@ export class UserPassword extends React.PureComponent { // eslint-disable-line r
             labels={{ submit: intl.formatMessage(messages.submit) }}
             initialValues={FORM_INITIAL}
             fields={[
-              getPasswordCurrentField(intl.formatMessage),
-              getPasswordNewField(intl.formatMessage),
-              getPasswordConfirmationField(intl.formatMessage),
+              getPasswordCurrentField({ formatMessage: intl.formatMessage }),
+              getPasswordNewField({ formatMessage: intl.formatMessage }),
+              getPasswordConfirmationField({ formatMessage: intl.formatMessage, match: 'passwordNew' }),
             ]}
           />
         </ContentNarrow>
