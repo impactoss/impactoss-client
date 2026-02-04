@@ -299,6 +299,10 @@ export default defineMessages({
       id: 'app.containers.App.forms.passwordNeedsSpecialCharacterError',
       defaultMessage: 'At least one special character is required.',
     },
+    passwordsMustMatch: {
+      id: 'app.containers.App.forms.passwordsMustMatch',
+      defaultMessage: 'Must match Password',
+    },
   },
 
   hints: {

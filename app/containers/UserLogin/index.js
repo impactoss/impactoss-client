@@ -115,7 +115,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                 labels={{ submit: intl.formatMessage(messages.submit) }}
                 fields={[
                   getEmailFormField(intl.formatMessage),
-                  getPasswordField(intl.formatMessage),
+                  getPasswordField({ formatMessage: intl.formatMessage }),
                 ]}
               />
               <BottomLinks>
