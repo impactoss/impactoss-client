@@ -737,6 +737,21 @@ export const getPasswordNewField = ({ formatMessage, attribute = 'passwordNew' }
   return field;
 };
 
+export const getOtpCodeField = (formatMessage) => {
+  const field = getFormField({
+    formatMessage,
+    controlType: 'input',
+    attribute: 'otpCode',
+    hint: appMessages.hints.otpCode && formatMessage(appMessages.hints.otpCode),
+    type: 'text',
+    required: true,
+    pattern: '[0-9]*',
+    autoComplete: 'one-time-code',
+    inputMode: 'numeric',
+  });
+  return field;
+};
+
 export const getFormField = ({
   formatMessage,
   controlType,
@@ -751,6 +766,7 @@ export const getFormField = ({
   prohibitedValues,
   showErrorsAsHints,
   maxLength = 10000,
+  ...props
 }) => {
   const field = {
     id: attribute,
@@ -763,6 +779,7 @@ export const getFormField = ({
     errorMessages: {},
     hint,
     showErrorsAsHints,
+    ...props,
   };
   if (dynamicValidators) {
     field.dynamicValidators = dynamicValidators;

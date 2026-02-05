@@ -114,6 +114,27 @@ export default function createRoutes(store) {
       },
     },
     {
+      path: ROUTES.VERIFY_OTP,
+      name: 'verifyOtp',
+      onEnter: redirectIfSignedIn(),
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/VerifyOtp/reducer'),
+          import('containers/VerifyOtp/sagas'),
+          import('containers/VerifyOtp'),
+        ]);
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('verifyOtp', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    },
+    {
       path: ROUTES.RECOVER_PASSWORD,
       name: 'userPasswordRecover',
       onEnter: redirectIfAzureEnabled(),

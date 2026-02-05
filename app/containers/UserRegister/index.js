@@ -26,15 +26,12 @@ import Loading from 'components/Loading';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
-import OtpForm from 'components/forms/OtpForm';
 import A from 'components/styled/A';
 
-import { selectQueryMessages, selectOtpRequired, selectTempToken } from 'containers/App/selectors';
+import { selectQueryMessages } from 'containers/App/selectors';
 import {
   updatePath,
   dismissQueryMessages,
-  verifyOtp,
-  resendOtp,
 } from 'containers/App/actions';
 
 import { ROUTES } from 'containers/App/constants';
@@ -56,10 +53,6 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
       intl,
       handleCancel,
       handleSubmit,
-      handleOtpSubmit,
-      handleOtpResend,
-      otpRequired,
-      tempToken,
     } = this.props;
     const { registerError, registerSending } = this.props.viewDomain.get('page').toJS();
 
@@ -86,51 +79,41 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
           )}
           {registerError && <Messages type="error" messages={registerError.messages} />}
           {registerSending && <Loading />}
-          {!otpRequired && (
-            <>
-              <AuthForm
-                sending={registerSending}
-                handleSubmit={handleSubmit}
-                handleCancel={handleCancel}
-                labels={{ submit: intl.formatMessage(messages.submit) }}
-                initialValues={FORM_INITIAL}
-                fields={[
-                  getNameField(intl.formatMessage),
-                  getEmailFormField(intl.formatMessage),
-                  getPasswordField({
-                    formatMessage: intl.formatMessage,
-                    isNotLogin: true,
-                  }),
-                  getPasswordConfirmationField({
-                    formatMessage: intl.formatMessage,
-                  }),
-                ]}
-              />
-              <BottomLinks>
-                <p>
-                  <FormattedMessage {...messages.loginLinkBefore} />
-                  <A
-                    href={ROUTES.LOGIN}
-                    onClick={(evt) => {
-                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                      this.props.handleLink(ROUTES.LOGIN, { keepQuery: true });
-                    }}
-                  >
-                    <FormattedMessage {...messages.loginLink} />
-                    <Icon name="arrowRight" text size="1.5em" sizes={{ mobile: '1em' }} />
-                  </A>
-                </p>
-              </BottomLinks>
-            </>
-          )}
-          {otpRequired && (
-            <OtpForm
+          <>
+            <AuthForm
               sending={registerSending}
-              handleSubmit={(formData) => handleOtpSubmit(formData, tempToken)}
-              handleResend={() => handleOtpResend(tempToken)}
+              handleSubmit={handleSubmit}
               handleCancel={handleCancel}
+              labels={{ submit: intl.formatMessage(messages.submit) }}
+              initialValues={FORM_INITIAL}
+              fields={[
+                getNameField(intl.formatMessage),
+                getEmailFormField(intl.formatMessage),
+                getPasswordField({
+                  formatMessage: intl.formatMessage,
+                  isNotLogin: true,
+                }),
+                getPasswordConfirmationField({
+                  formatMessage: intl.formatMessage,
+                }),
+              ]}
             />
-          )}
+            <BottomLinks>
+              <p>
+                <FormattedMessage {...messages.loginLinkBefore} />
+                <A
+                  href={ROUTES.LOGIN}
+                  onClick={(evt) => {
+                    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                    this.props.handleLink(ROUTES.LOGIN, { keepQuery: true });
+                  }}
+                >
+                  <FormattedMessage {...messages.loginLink} />
+                  <Icon name="arrowRight" text size="1.5em" sizes={{ mobile: '1em' }} />
+                </A>
+              </p>
+            </BottomLinks>
+          </>
         </ContentNarrow>
       </div>
     );
@@ -140,34 +123,22 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
 UserRegister.propTypes = {
   viewDomain: PropTypes.object,
   handleSubmit: PropTypes.func.isRequired,
-  handleOtpSubmit: PropTypes.func.isRequired,
-  handleOtpResend: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
   onDismissQueryMessages: PropTypes.func,
   queryMessages: PropTypes.object,
-  otpRequired: PropTypes.bool,
-  tempToken: PropTypes.string,
   intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   queryMessages: selectQueryMessages(state),
-  otpRequired: selectOtpRequired(state),
-  tempToken: selectTempToken(state),
 });
 
 export function mapDispatchToProps(dispatch) {
   return {
     handleSubmit: (formData) => {
       dispatch(register(formData));
-    },
-    handleOtpSubmit: (formData, tempToken) => {
-      dispatch(verifyOtp({ temp_token: tempToken, otp_code: formData.otp_code }));
-    },
-    handleOtpResend: (tempToken) => {
-      dispatch(resendOtp(tempToken));
     },
     handleCancel: () => {
       dispatch(updatePath('/'));

@@ -2,9 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import {
-  Field as FormikField, Form, Formik, ErrorMessage,
+  Field as FormikField,
+  Form,
+  Formik,
+  ErrorMessage,
 } from 'formik';
+
 import styled from 'styled-components';
+import { palette } from 'styled-theme';
 import { Box, Text } from 'grommet';
 import { CircleInformation, StatusGood } from 'grommet-icons';
 
@@ -49,6 +54,17 @@ const StyledForm = styled(Form)`
   display: table;
   width: 100%;
 `;
+
+const Hint = styled.div`
+  color: ${palette('text', 1)};
+  font-size: ${(props) => props.theme.sizes.text.smaller};
+  margin-top: 0px;
+  margin-bottom: 6px;
+  @media print {
+    font-size: ${(props) => props.theme.sizes.print.smaller};
+  }
+`;
+
 
 class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   renderError = (name) => (
@@ -121,22 +137,35 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
                   const hasError = meta.touched && meta.error;
                   const isRequired = !!(fieldConfig.validators && fieldConfig.validators.required);
                   // Build describedby string
-                  let describedBy;
+                  const describedBy = [];
                   if (fieldConfig.showErrorsAsHints) {
-                    describedBy = `${field.name}-hints`;
-                  } else if (hasError) {
-                    describedBy = `${field.name}-error`;
+                    // Special mode: errors shown as hints in a combined element
+                    describedBy.push(`${field.name}-hints`);
+                  } else {
+                    // Normal mode: separate hint and error
+                    if (fieldConfig.hint) {
+                      describedBy.push(`${field.name}-hint`);
+                    }
+                    if (hasError) {
+                      describedBy.push(`${field.name}-error`);
+                    }
                   }
+                  const describedByAttr = describedBy.length > 0 && describedBy.join(' ');
 
                   return (
                     <Field>
                       {field.label !== false && this.renderLabel(fieldConfig)}
+                      {fieldConfig.hint && (
+                        <Hint id={`${field.name}-hint`}>
+                          {fieldConfig.hint}
+                        </Hint>
+                      )}
                       {this.renderField({
                         ...fieldConfig,
                         ...field,
                         'aria-required': isRequired ? 'true' : 'false',
                         'aria-invalid': hasError ? 'true' : 'false',
-                        'aria-describedby': describedBy,
+                        'aria-describedby': describedByAttr,
                       })}
                       {meta.touched
                         && meta.error
@@ -227,6 +256,7 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
             const submitDisabled = !dirty // disabled if no changes are made
               || !isValid // or if validations fail
               || sending; // or already submitted
+
             return (
               <StyledForm>
                 {fields && this.renderBody(fields, values)}
@@ -235,7 +265,17 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
                     <ButtonCancel type="button" onClick={handleCancel}>
                       <FormattedMessage {...appMessages.buttons.cancel} />
                     </ButtonCancel>
-                    <ButtonSubmit type="submit" disabled={submitDisabled}>
+                    {submitDisabled && (
+                      <ScreenReaderOnly id="submit-disabled-hint">
+                        The form is missing required input data or has validation errors
+                      </ScreenReaderOnly>
+                    )}
+                    <ButtonSubmit
+                      type="submit"
+                      disabled={submitDisabled}
+                      aria-disabled={submitDisabled ? 'true' : null}
+                      aria-describedby={submitDisabled ? 'submit-disabled-hint' : null}
+                    >
                       {labels.submit}
                     </ButtonSubmit>
                   </FormFooterButtons>

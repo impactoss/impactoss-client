@@ -23,16 +23,12 @@ import Icon from 'components/Icon';
 import ContentNarrow from 'components/ContentNarrow';
 import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
-import OtpForm from 'components/forms/OtpForm';
 import A from 'components/styled/A';
 
-import { selectQueryMessages, selectOtpRequired, selectTempToken } from 'containers/App/selectors';
+import { selectQueryMessages } from 'containers/App/selectors';
 import {
   updatePath,
   dismissQueryMessages,
-  verifyOtp,
-  resendOtp,
-  resetOtp,
 } from 'containers/App/actions';
 
 import { ROUTES } from 'containers/App/constants';
@@ -62,17 +58,12 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
 
     const {
       intl,
-      handleSubmit,
-      handleOtpSubmit,
-      handleOtpResend,
       handleCancel,
+      handleSubmit,
       onDismissQueryMessages,
       queryMessages,
       handleSubmitWithAzure,
       handleSubmitRecover,
-      otpRequired,
-      tempToken,
-      handleOtpCancel,
     } = this.props;
 
     return (
@@ -117,7 +108,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
           {!ENABLE_AZURE && authSending
             && <Loading />
           }
-          {!ENABLE_AZURE && !passwordExpired && !otpRequired && (
+          {!ENABLE_AZURE && !passwordExpired && (
             <>
               <AuthForm
                 sending={authSending}
@@ -159,7 +150,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
               </BottomLinks>
             </>
           )}
-          {!ENABLE_AZURE && passwordExpired && !otpRequired && (
+          {!ENABLE_AZURE && passwordExpired && (
             <AuthForm
               sending={authSending}
               handleSubmit={handleSubmitRecover}
@@ -169,14 +160,6 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
               fields={[
                 getEmailFormField(intl.formatMessage),
               ]}
-            />
-          )}
-          {!ENABLE_AZURE && !passwordExpired && otpRequired && (
-            <OtpForm
-              sending={authSending}
-              handleSubmit={(formData) => handleOtpSubmit(formData, tempToken)}
-              handleResend={() => handleOtpResend(tempToken)}
-              handleCancel={handleOtpCancel}
             />
           )}
           {ENABLE_AZURE && (
@@ -202,23 +185,16 @@ UserLogin.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleSubmitWithAzure: PropTypes.func.isRequired,
   handleSubmitRecover: PropTypes.func.isRequired,
-  handleOtpSubmit: PropTypes.func.isRequired,
-  handleOtpResend: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  handleOtpCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
   onDismissQueryMessages: PropTypes.func,
   queryMessages: PropTypes.object,
-  otpRequired: PropTypes.bool,
-  tempToken: PropTypes.string,
   intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   queryMessages: selectQueryMessages(state),
-  otpRequired: selectOtpRequired(state),
-  tempToken: selectTempToken(state),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -234,17 +210,8 @@ export function mapDispatchToProps(dispatch) {
     handleSubmitWithAzure: () => {
       dispatch(loginWithAzure());
     },
-    handleOtpSubmit: (formData, tempToken) => {
-      dispatch(verifyOtp({ temp_token: tempToken, otp_code: formData.otp_code }));
-    },
-    handleOtpResend: (tempToken) => {
-      dispatch(resendOtp(tempToken));
-    },
     handleCancel: () => {
       dispatch(updatePath('/'));
-    },
-    handleOtpCancel: () => {
-      dispatch(resetOtp());
     },
     handleLink: (path, args) => {
       dispatch(updatePath(path, args));

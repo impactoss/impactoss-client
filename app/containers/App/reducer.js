@@ -14,7 +14,6 @@ import { fromJS } from 'immutable';
 
 import { checkResponseError } from 'utils/request';
 import { isSignedIn } from 'utils/api-request';
-import { get, set } from 'utils/session-storage';
 import { DB_TABLES, SETTINGS } from 'themes/config';
 
 import {
@@ -37,17 +36,8 @@ import {
   SHOW_SETTINGS_MODAL,
   INITIALIZE_SETTINGS,
   OTP_REQUIRED,
-  RESET_OTP_REQUIRED,
-  VERIFY_OTP_SENDING,
-  VERIFY_OTP_SUCCESS,
-  VERIFY_OTP_ERROR,
-  RESEND_OTP_SUCCESS,
-  RESEND_OTP_ERROR,
+  RESET_OTP,
 } from './constants';
-
-// Check for persisted OTP state from sessionStorage
-const persistedOtpToken = get('otp_temp_token');
-const persistedOtpMessage = get('otp_message');
 
 // The initial state of the App
 const initialState = fromJS({
@@ -57,9 +47,8 @@ const initialState = fromJS({
   auth: {
     sending: false,
     error: false,
-    messages: persistedOtpMessage ? [persistedOtpMessage] : [],
-    otpRequired: !!persistedOtpToken,
-    tempToken: persistedOtpToken,
+    messages: [],
+    otpTempToken: null,
   },
   /* eslint-disable no-param-reassign */
   // Record the time that entities where requested from the server
@@ -89,9 +78,6 @@ const initialState = fromJS({
 function appReducer(state = initialState, payload) {
   switch (payload.type) {
     case LOGOUT_SUCCESS:
-      // Clear persisted OTP state
-      set('otp_temp_token', null);
-      set('otp_message', null);
       return initialState.setIn(['user', 'isSignedIn'], false);
     case AUTHENTICATE_SUCCESS:
       return state
@@ -108,43 +94,14 @@ function appReducer(state = initialState, payload) {
     case AUTHENTICATE_SENDING:
       return state.setIn(['auth', 'sending'], true).setIn(['auth', 'error'], false);
     case OTP_REQUIRED:
-      // Persist OTP state to sessionStorage so it survives page reloads
-      set('otp_temp_token', payload.tempToken);
-      set('otp_message', payload.message || null);
       return state
-        .setIn(['auth', 'sending'], false)
-        .setIn(['auth', 'otpRequired'], true)
-        .setIn(['auth', 'tempToken'], payload.tempToken)
-        .setIn(['auth', 'messages'], payload.message ? [payload.message] : []);
-    case RESET_OTP_REQUIRED:
-      // Reset OTP state
-      set('otp_temp_token', null);
-      set('otp_message', null);
-      return state
-        .setIn(['auth', 'sending'], false)
-        .setIn(['auth', 'otpRequired'], false)
-        .setIn(['auth', 'tempToken'], null)
-        .setIn(['auth', 'messages'], []);
-    case VERIFY_OTP_SENDING:
-      return state.setIn(['auth', 'sending'], true).setIn(['auth', 'error'], false);
-    case VERIFY_OTP_SUCCESS:
-      // Clear persisted OTP state after successful verification
-      set('otp_temp_token', null);
-      set('otp_message', null);
-      return state
-        .setIn(['user', 'attributes'], payload.user)
-        .setIn(['user', 'isSignedIn'], true)
-        .setIn(['auth', 'sending'], false)
-        .setIn(['auth', 'otpRequired'], false)
-        .setIn(['auth', 'tempToken'], null);
-    case VERIFY_OTP_ERROR:
-      return state.setIn(['auth', 'error'], checkResponseError(payload.error)).setIn(['auth', 'sending'], false);
-    case RESEND_OTP_SUCCESS:
-      return state
+        .setIn(['auth', 'otpTempToken'], payload.otpTempToken)
         .setIn(['auth', 'messages'], payload.message ? [payload.message] : [])
-        .setIn(['auth', 'sending'], false);
-    case RESEND_OTP_ERROR:
-      return state.setIn(['auth', 'error'], checkResponseError(payload.error)).setIn(['auth', 'sending'], false);
+        .setIn(['auth', 'isOtpAfterRegister'], !!payload.isRegister);
+    case RESET_OTP:
+      return state
+        .setIn(['auth', 'otpTempToken'], null)
+        .setIn(['auth', 'messages'], []);
     case SET_AUTHENTICATION_STATE:
       return state.setIn(['user', 'isSignedIn'], payload.newAuthState);
     case ADD_ENTITY:

@@ -20,12 +20,15 @@ export function* register({ data }) {
       name: data.name,
     });
     yield put(userRegisterSuccess());
-
-    // Check if OTP is required after registration
+    // Check if OTP is required (202 response)
     if (response.otp_required) {
       // Clear any stale auth tokens before showing OTP form
       yield call(clearAuthValues);
-      yield put(otpRequired(response.temp_token, response.message));
+      yield put(otpRequired({
+        otpTempToken: response.temp_token,
+        message: response.message,
+        isRegister: true,
+      }));
     } else {
       // Normal flow: auto-login when MFA is disabled
       yield put(authenticate({ email: response.data.email, password: data.password }));
