@@ -8,7 +8,7 @@
   },
   "engines": {
     "npm": ">=10.2.0",
-    "node": ">=21.1.0"
+    "node": ">=20.0.0"
   },
   "author": "tmfrnz",
   "license": "MIT",
@@ -19,7 +19,6 @@
     "extract-intl": "formatjs extract 'app/**/*.js' --out-file app/translations/en-GB.json --format internals/scripts/extract-intl-formatter.js",
     "npmcheckversion": "node ./internals/scripts/npmcheckversion.js",
     "preinstall": "npm run npmcheckversion",
-    "postinstall": "npm rebuild sharp",
     "prebuild": "npm run build:clean",
     "build": "npm run prebuild && cross-env NODE_ENV=production SERVER=production webpack --config internals/webpack/webpack.prod.babel.js --color --progress",
     "build:dev": "npm run prebuild && cross-env NODE_ENV=production SERVER=development webpack --config internals/webpack/webpack.prod.babel.js --color --progress",
@@ -152,7 +151,7 @@
     "globals": "^15.6.0",
     "html-loader": "^5.1.0",
     "html-webpack-plugin": "5.6.0",
-    "image-minimizer-webpack-plugin": "^4.1.3",
+    "image-minimizer-webpack-plugin": "4.1.3",
     "lint-staged": "15.2.7",
     "memfs": "4.9.2",
     "minimist": "^1.2.8",
