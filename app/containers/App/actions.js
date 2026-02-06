@@ -74,6 +74,8 @@ import {
   SET_LOAD_NONCURRENT,
   SHOW_SETTINGS_MODAL,
   INITIALIZE_SETTINGS,
+  OTP_REQUIRED,
+  RESET_OTP,
 } from './constants';
 
 export function submitInvalid(valid) {
@@ -422,6 +424,20 @@ export function authenticateError(error) {
   return {
     type: AUTHENTICATE_ERROR,
     error,
+  };
+}
+
+export function otpRequired({ otpTempToken, message, isRegister }) {
+  return {
+    type: OTP_REQUIRED,
+    otpTempToken,
+    message,
+    isRegister,
+  };
+}
+export function resetOtp() {
+  return {
+    type: RESET_OTP,
   };
 }
 

@@ -5,7 +5,9 @@
 import {
   call, put, select, takeLatest, takeEvery, race, take, all,
 } from 'redux-saga/effects';
-import { push, replace, goBack } from 'react-router-redux';
+import {
+  push, replace, goBack, LOCATION_CHANGE,
+} from 'react-router-redux';
 import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
 import { fromJS } from 'immutable';
@@ -31,7 +33,9 @@ import {
   AUTHENTICATE,
   AUTHENTICATE_AZURE,
   LOGOUT,
+  OTP_REQUIRED,
   VALIDATE_TOKEN,
+  AUTHENTICATE_SUCCESS,
   INVALIDATE_ENTITIES,
   SAVE_CONNECTIONS,
   UPDATE_ROUTE_QUERY,
@@ -85,6 +89,7 @@ import {
   forwardOnAuthenticationChange,
   updatePath,
   initializeSettings,
+  otpRequired,
 } from 'containers/App/actions';
 
 import {
@@ -205,9 +210,18 @@ export function* authenticateSaga(payload) {
   try {
     yield put(authenticateSending());
     const response = yield call(apiRequest, 'post', ENDPOINTS.SIGN_IN, { email, password });
-    yield put(authenticateSuccess(response.data));
-    yield put(invalidateEntities()); // important invalidate before forward to allow for reloading of entities
-    yield put(forwardOnAuthenticationChange());
+    // Check if OTP is required (202 response)
+    if (response.otp_required) {
+      yield put(otpRequired({
+        otpTempToken: response.temp_token,
+        message: response.message,
+      }));
+    } else {
+      // Normal sign-in flow
+      yield put(authenticateSuccess(response.data));
+      yield put(invalidateEntities()); // important invalidate before forward to allow for reloading of entities
+      yield put(forwardOnAuthenticationChange());
+    }
   } catch (err) {
     console.log('ERROR in authenticateSaga');
     if (err.response) {
@@ -238,6 +252,20 @@ export function* authenticateWithAzureSaga() {
     }
     yield put(authenticateError(err));
   }
+}
+
+function* requireOtpSaga() {
+  const redirectPathname = yield select(selectRedirectOnAuthSuccessPath);
+  yield put(updatePath(
+    ROUTES.VERIFY_OTP,
+    {
+      replace: true,
+      query: {
+        arg: [PARAMS.REDIRECT_ON_AUTH_SUCCESS],
+        value: redirectPathname,
+      },
+    },
+  ));
 }
 
 export function* recoverSaga(payload) {
@@ -320,7 +348,7 @@ export function* validateTokenSaga() {
       yield put(authenticateSuccess(response.data)); // need to store currentUserData
     }
   } catch (err) {
-    console.log('ERROR in validateTokenSaga');
+    console.log('ERROR in validateTokenSaga', err);
     yield call(clearAuthValues);
     if (err.response) {
       err.response.json = yield err.response.json();
@@ -872,6 +900,34 @@ export function* closeEntitySaga({ path }) {
   );
 }
 
+function* guardAuthRoutes(pathname) {
+  const isSignedIn = yield select(selectIsSignedIn);
+  if (!isSignedIn) return;
+
+  // guard routes
+  const authRoutes = [
+    ROUTES.LOGIN,
+    ROUTES.REGISTER,
+    ROUTES.VERIFY_OTP,
+    ROUTES.RESET_PASSWORD,
+    ROUTES.RECOVER_PASSWORD,
+  ];
+  if (authRoutes.includes(pathname)) {
+    yield put(updatePath('/'));
+  }
+}
+
+// Guard on location change
+function* handleLocationChange(action) {
+  yield call(guardAuthRoutes, action.payload.pathname);
+}
+
+// Guard on auth success
+function* handleAuthSuccess() {
+  const pathname = yield select(selectCurrentPathname);
+  yield call(guardAuthRoutes, pathname);
+}
+
 /**
  * Root saga manages watcher lifecycle
  */
@@ -884,6 +940,9 @@ export default function* rootSaga() {
   yield takeLatest(RECOVER_PASSWORD, recoverSaga);
   yield takeLatest(LOGOUT, logoutSaga);
   yield takeLatest(AUTHENTICATE_FORWARD, authChangeSaga);
+  yield takeLatest(OTP_REQUIRED, requireOtpSaga);
+  yield takeLatest(LOCATION_CHANGE, handleLocationChange);
+  yield takeLatest(AUTHENTICATE_SUCCESS, handleAuthSuccess);
 
   yield takeEvery(SAVE_ENTITY, saveEntitySaga);
   yield takeEvery(SAVE_MULTIPLE_ENTITIES, saveMultipleEntitiesSaga);

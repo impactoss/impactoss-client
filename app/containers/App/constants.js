@@ -32,6 +32,8 @@ export const LOGOUT_SUCCESS = 'impactoss/App/LOGOUT_SUCCESS';
 export const LOGOUT_ERROR = 'impactoss/App/LOGOUT_ERROR';
 export const VALIDATE_TOKEN = 'impactoss/App/VALIDATE_TOKEN';
 export const AUTHENTICATE_FORWARD = 'impactoss/App/AUTHENTICATE_FORWARD';
+export const OTP_REQUIRED = 'impactoss/App/OTP_REQUIRED';
+export const RESET_OTP = 'impactoss/App/RESET_OTP';
 
 export const ADD_ENTITY = 'impactoss/App/ADD_ENTITY';
 export const UPDATE_ENTITY = 'impactoss/App/UPDATE_ENTITY';
@@ -90,12 +92,7 @@ export const CONTENT_SINGLE = 'single';
 export const CONTENT_PAGE = 'page';
 export const CONTENT_MODAL = 'modal';
 
-export const DEPENDENCIES = [
-  'user_roles',
-  'pages',
-  'frameworks',
-  'categories',
-];
+export const DEPENDENCIES = ['user_roles', 'pages', 'frameworks', 'categories'];
 export const SORT_ORDER_OPTIONS = [
   {
     value: 'asc',
@@ -130,6 +127,7 @@ export const ROUTES = {
   OVERVIEW: '/overview',
   PASSWORD: '/password',
   LOGIN: '/login',
+  VERIFY_OTP: '/verify-otp',
   LOGIN_OAUTH_SUCCESS: '/loginOAuthSuccess',
   LOGIN_OAUTH_ERROR: '/loginOAuthError',
   BOOKMARKS: '/bookmarks',

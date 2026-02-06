@@ -326,6 +326,10 @@ export default defineMessages({
       id: 'app.containers.App.hints.printListMore',
       defaultMessage: 'List only showing {no} items.',
     },
+    otpCode: {
+      id: 'app.containers.App.hints.otpCode',
+      defaultMessage: 'Check your email for the verification code',
+    },
   },
   textValues: {
     user_only: {
@@ -506,6 +510,10 @@ export default defineMessages({
       id: 'app.containers.App.placeholders.number',
       defaultMessage: 'ID',
     },
+    otpCode: {
+      id: 'app.containers.App.placeholders.otpCode',
+      defaultMessage: 'Enter code from your Email',
+    },
   },
   attributes: {
     draft: {
@@ -603,6 +611,10 @@ export default defineMessages({
     domain: {
       id: 'app.containers.App.attributes.domain',
       defaultMessage: 'Domain (from Email)',
+    },
+    multiFactorAuthenticationStatus: {
+      id: 'app.containers.App.attributes.multiFactorAuthenticationStatus',
+      defaultMessage: 'Multi-Factor Authentication',
     },
     status: {
       id: 'app.containers.App.attributes.status',
@@ -733,6 +745,10 @@ export default defineMessages({
     is_current: {
       id: 'app.containers.App.attributes.is_current',
       defaultMessage: 'Latest/previous cycle',
+    },
+    otpCode: {
+      id: 'app.containers.App.attributes.otpCode',
+      defaultMessage: 'Verification code',
     },
   },
   nav: {

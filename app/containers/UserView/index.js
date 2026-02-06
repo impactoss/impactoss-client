@@ -24,10 +24,7 @@ import { canUserManageUsers, canUserSeeMeta } from 'utils/permissions';
 import qe from 'utils/quasi-equals';
 
 import {
-  loadEntitiesIfNeeded,
-  updatePath,
-  closeEntity,
-  redirectNotPermitted,
+  loadEntitiesIfNeeded, updatePath, closeEntity, redirectNotPermitted,
 } from 'containers/App/actions';
 
 import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
@@ -48,14 +45,12 @@ import {
 import appMessages from 'containers/App/messages';
 import messages from './messages';
 
-import {
-  selectViewEntity,
-  selectTaxonomies,
-} from './selectors';
+import { selectViewEntity, selectTaxonomies } from './selectors';
 
 import { DEPENDENCIES } from './constants';
 
-export class UserView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class UserView extends React.PureComponent {
+  // eslint-disable-line react/prefer-stateless-function
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
   }
@@ -70,8 +65,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
       this.props.onRedirectNotPermitted();
     }
     if (nextProps.dataReady && nextProps.authReady && nextProps.user) {
-      const canView = canUserManageUsers(nextProps.sessionUserHighestRoleId)
-        || (nextProps.user.get('id') === nextProps.sessionUserId);
+      const canView = canUserManageUsers(nextProps.sessionUserHighestRoleId) || nextProps.user.get('id') === nextProps.sessionUserId;
       if (!canView) {
         this.props.onRedirectNotPermitted();
       }
@@ -111,10 +105,7 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
         },
       ];
     }
-    if (
-      canUserManageUsers(sessionUserHighestRoleId)
-      || (userId === sessionUserId && !ENABLE_AZURE)
-    ) {
+    if (canUserManageUsers(sessionUserHighestRoleId) || (userId === sessionUserId && !ENABLE_AZURE)) {
       buttons = [
         ...buttons,
         {
@@ -133,45 +124,41 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     return buttons;
   };
 
-  getHeaderMainFields = (entity, isManager) => ([{ // fieldGroup
-    fields: [getTitleField(entity, isManager, 'name', appMessages.attributes.name)],
-  }]);
+  getHeaderMainFields = (entity, isManager) => [
+    {
+      // fieldGroup
+      fields: [getTitleField(entity, isManager, 'name', appMessages.attributes.name)],
+    },
+  ];
 
   getHeaderAsideFields = (entity, userId, highestRole) => {
     let fields = [];
-    const canSeeRole = canUserManageUsers(highestRole)
-      || qe(entity.get('id'), userId);
+    const canSeeRole = canUserManageUsers(highestRole) || qe(entity.get('id'), userId);
     if (canSeeRole) {
-      fields = [
-        ...fields,
-        getRoleField(entity),
-      ];
+      fields = [...fields, getRoleField(entity)];
     }
     if (canUserSeeMeta(highestRole)) {
-      fields = [
-        ...fields,
-        getMetaField(entity),
-      ];
+      fields = [...fields, getMetaField(entity)];
     }
     return [{ fields }];
   };
 
-  getBodyMainFields = (entity) => ([{
-    fields: [
-      getEmailField(entity),
-      getTextField(entity, 'domain'),
-    ],
-  }]);
+  getBodyMainFields = (entity) => {
+    const fields = [getEmailField(entity), getTextField(entity, 'domain')];
 
-  getBodyAsideFields = (taxonomies) => ([
-    { // fieldGroup
+    return [{ fields }];
+  };
+
+  getBodyAsideFields = (taxonomies) => [
+    {
+      // fieldGroup
       fields: getTaxonomyFields(taxonomies),
     },
-  ]);
+  ];
 
   // only show the highest rated role (lower role ids means higher)
-  getHighestUserRoleId = (roles) => roles.reduce((memo, role) => (role.get('id') < memo) ? role.get('id') : memo,
-    USER_ROLES.DEFAULT.value);
+  getHighestUserRoleId = (roles) =>
+    roles.reduce((memo, role) => (role.get('id') < memo ? role.get('id') : memo), USER_ROLES.DEFAULT.value);
 
   render() {
     const {
@@ -180,22 +167,15 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
     const isManager = sessionUserHighestRoleId <= USER_ROLES.MANAGER.value;
 
     const pageTitle = intl.formatMessage(messages.pageTitle);
-    const metaTitle = user
-      ? `${pageTitle}: ${getEntityTitle(user)}`
-      : `${pageTitle} ${this.props.params.id}`;
+    const metaTitle = user ? `${pageTitle}: ${getEntityTitle(user)}` : `${pageTitle} ${this.props.params.id}`;
 
-    const canSeeOrg = dataReady && (
-      canUserManageUsers(sessionUserHighestRoleId)
-      || qe(user.get('id'), sessionUserId)
-    );
+    const canSeeOrg = dataReady && (canUserManageUsers(sessionUserHighestRoleId) || qe(user.get('id'), sessionUserId));
 
     return (
       <div>
         <HelmetCanonical
           title={metaTitle}
-          meta={[
-            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
-          ]}
+          meta={[{ name: 'description', content: intl.formatMessage(messages.metaDescription) }]}
         />
         <Content>
           <ContentHeader
@@ -204,32 +184,26 @@ export class UserView extends React.PureComponent { // eslint-disable-line react
             icon="users"
             buttons={user && this.getButtons(this.props)}
           />
-          { !user && !dataReady
-            && <Loading />
-          }
-          { !user && dataReady
-            && (
-              <div>
-                <FormattedMessage {...messages.notFound} />
-              </div>
-            )
-          }
-          { user && dataReady
-            && (
-              <EntityView
-                fields={{
-                  header: {
-                    main: this.getHeaderMainFields(user, isManager),
-                    aside: this.getHeaderAsideFields(user, sessionUserId, sessionUserHighestRoleId),
-                  },
-                  body: {
-                    main: this.getBodyMainFields(user),
-                    aside: canSeeOrg && this.getBodyAsideFields(taxonomies),
-                  },
-                }}
-              />
-            )
-          }
+          {!user && !dataReady && <Loading />}
+          {!user && dataReady && (
+            <div>
+              <FormattedMessage {...messages.notFound} />
+            </div>
+          )}
+          {user && dataReady && (
+            <EntityView
+              fields={{
+                header: {
+                  main: this.getHeaderMainFields(user, isManager),
+                  aside: this.getHeaderAsideFields(user, sessionUserId, sessionUserHighestRoleId),
+                },
+                body: {
+                  main: this.getBodyMainFields(user),
+                  aside: canSeeOrg && this.getBodyAsideFields(taxonomies),
+                },
+              }}
+            />
+          )}
         </Content>
       </div>
     );

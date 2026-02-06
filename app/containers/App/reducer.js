@@ -35,6 +35,8 @@ import {
   OPEN_NEW_ENTITY_MODAL,
   SHOW_SETTINGS_MODAL,
   INITIALIZE_SETTINGS,
+  OTP_REQUIRED,
+  RESET_OTP,
 } from './constants';
 
 // The initial state of the App
@@ -46,13 +48,23 @@ const initialState = fromJS({
     sending: false,
     error: false,
     messages: [],
+    otpTempToken: null,
   },
   /* eslint-disable no-param-reassign */
   // Record the time that entities where requested from the server
-  requested: DB_TABLES.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
+  requested: DB_TABLES.reduce((memo, table) => {
+    memo[table] = null;
+    return memo;
+  }, {}),
   // Record the time that entities where returned from the server
-  ready: DB_TABLES.reduce((memo, table) => { memo[table] = null; return memo; }, {}),
-  entities: DB_TABLES.reduce((memo, table) => { memo[table] = {}; return memo; }, {}),
+  ready: DB_TABLES.reduce((memo, table) => {
+    memo[table] = null;
+    return memo;
+  }, {}),
+  entities: DB_TABLES.reduce((memo, table) => {
+    memo[table] = {};
+    return memo;
+  }, {}),
   /* eslint-enable no-param-reassign */
   user: {
     attributes: null,
@@ -80,15 +92,20 @@ function appReducer(state = initialState, payload) {
         .setIn(['user', 'isSignedIn'], false);
     }
     case AUTHENTICATE_SENDING:
+      return state.setIn(['auth', 'sending'], true).setIn(['auth', 'error'], false);
+    case OTP_REQUIRED:
       return state
-        .setIn(['auth', 'sending'], true)
-        .setIn(['auth', 'error'], false);
+        .setIn(['auth', 'otpTempToken'], payload.otpTempToken)
+        .setIn(['auth', 'messages'], payload.message ? [payload.message] : [])
+        .setIn(['auth', 'isOtpAfterRegister'], !!payload.isRegister);
+    case RESET_OTP:
+      return state
+        .setIn(['auth', 'otpTempToken'], null)
+        .setIn(['auth', 'messages'], []);
     case SET_AUTHENTICATION_STATE:
-      return state
-        .setIn(['user', 'isSignedIn'], payload.newAuthState);
+      return state.setIn(['user', 'isSignedIn'], payload.newAuthState);
     case ADD_ENTITY:
-      return state
-        .setIn(['entities', payload.path, payload.entity.id], fromJS(payload.entity));
+      return state.setIn(['entities', payload.path, payload.entity.id], fromJS(payload.entity));
     case UPDATE_ENTITIES:
       return payload.entities.reduce((stateUpdated, entity) => stateUpdated.setIn(
         ['entities', payload.path, entity.data.id, 'attributes'],
@@ -106,34 +123,27 @@ function appReducer(state = initialState, payload) {
         state,
       );
     case UPDATE_ENTITY:
-      return state
-        .setIn(['entities', payload.path, payload.entity.id, 'attributes'], fromJS(payload.entity.attributes));
+      return state.setIn(
+        ['entities', payload.path, payload.entity.id, 'attributes'],
+        fromJS(payload.entity.attributes),
+      );
     case REMOVE_ENTITY:
-      return state
-        .deleteIn(['entities', payload.path, payload.id]);
+      return state.deleteIn(['entities', payload.path, payload.id]);
     case ENTITIES_REQUESTED:
-      return state
-        .setIn(['requested', payload.path], payload.time);
+      return state.setIn(['requested', payload.path], payload.time);
     case LOAD_ENTITIES_SUCCESS:
       return state
         .setIn(['entities', payload.path], fromJS(payload.entities))
         .setIn(['ready', payload.path], payload.time);
     case LOAD_ENTITIES_ERROR:
       // check unauthorised (401)
-      if (
-        payload
-        && payload.error
-        && payload.error.response
-        && payload.error.response.status === 401
-      ) {
+      if (payload && payload.error && payload.error.response && payload.error.response.status === 401) {
         return state
           .setIn(['server', 'error'], payload.error)
           .setIn(['entities', payload.path], fromJS([]))
           .setIn(['ready', payload.path], Date.now());
       }
-      return state
-        .setIn(['server', 'error'], payload.error)
-        .setIn(['ready', payload.path], null);
+      return state.setIn(['server', 'error'], payload.error).setIn(['ready', payload.path], null);
     case INVALIDATE_ENTITIES:
       // reset requested to initial state
       if (payload.path) {

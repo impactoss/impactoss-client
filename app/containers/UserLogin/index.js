@@ -25,8 +25,14 @@ import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
-import { selectQueryMessages } from 'containers/App/selectors';
-import { updatePath, dismissQueryMessages } from 'containers/App/actions';
+import {
+  selectQueryMessages,
+  selectIsSignedIn,
+} from 'containers/App/selectors';
+import {
+  updatePath,
+  dismissQueryMessages,
+} from 'containers/App/actions';
 
 import { ROUTES } from 'containers/App/constants';
 import { ENABLE_AZURE, IS_PROD, SERVER } from 'themes/config';
@@ -48,20 +54,21 @@ const AzureButton = styled(ButtonHero)`
 
 export class UserLogin extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { intl } = this.props;
     const { authError, authSending } = this.props.viewDomain.get('page').toJS();
     const passwordExpired = authError
       && authError.codeOrReason
       && authError.codeOrReason === 'password_expired';
-
     const {
-      handleSubmit,
+      intl,
       handleCancel,
+      handleSubmit,
       onDismissQueryMessages,
       queryMessages,
       handleSubmitWithAzure,
       handleSubmitRecover,
+      signedIn,
     } = this.props;
+    if (signedIn) return <Loading />;
 
     return (
       <div>
@@ -185,6 +192,7 @@ UserLogin.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
   onDismissQueryMessages: PropTypes.func,
+  signedIn: PropTypes.bool,
   queryMessages: PropTypes.object,
   intl: PropTypes.object.isRequired,
 };
@@ -192,6 +200,7 @@ UserLogin.propTypes = {
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   queryMessages: selectQueryMessages(state),
+  signedIn: selectIsSignedIn(state),
 });
 
 export function mapDispatchToProps(dispatch) {
