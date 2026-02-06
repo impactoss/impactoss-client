@@ -119,13 +119,13 @@ export class RecommendationList extends React.PureComponent { // eslint-disable-
         onClick: () => this.props.handleNew(),
       });
     }
-    if (dataReady) {
-      console.log(this.props.entities.toJS());
-      // console.log(this.props.connections.toJS())
-      // console.log(this.props.taxonomies.toJS())
-      // console.log(this.props.frameworks.toJS())
-      // console.log(this.props.connectedTaxonomies.toJS())
-    }
+    // if (dataReady) {
+    //   console.log(this.props.entities.toJS());
+    //   // console.log(this.props.connections.toJS())
+    //   // console.log(this.props.taxonomies.toJS())
+    //   // console.log(this.props.frameworks.toJS())
+    //   // console.log(this.props.connectedTaxonomies.toJS())
+    // }
     return (
       <div>
         <HelmetCanonical

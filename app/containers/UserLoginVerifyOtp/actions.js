@@ -1,6 +1,6 @@
 /*
  *
- * VerifyOtp actions
+ * UserLoginVerifyOtp actions
  *
  */
 import {

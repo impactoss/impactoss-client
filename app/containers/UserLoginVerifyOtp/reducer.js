@@ -1,6 +1,6 @@
 /*
  *
- * VerifyOtp reducer
+ * UserLoginVerifyOtp reducer
  *
  */
 

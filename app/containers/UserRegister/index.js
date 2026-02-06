@@ -28,7 +28,10 @@ import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
-import { selectQueryMessages } from 'containers/App/selectors';
+import {
+  selectQueryMessages,
+  selectIsSignedIn,
+} from 'containers/App/selectors';
 import {
   updatePath,
   dismissQueryMessages,
@@ -53,7 +56,10 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
       intl,
       handleCancel,
       handleSubmit,
+      signedIn,
     } = this.props;
+    if (signedIn) return <Loading />;
+
     const { registerError, registerSending } = this.props.viewDomain.get('page').toJS();
 
     return (
@@ -127,12 +133,14 @@ UserRegister.propTypes = {
   handleLink: PropTypes.func.isRequired,
   onDismissQueryMessages: PropTypes.func,
   queryMessages: PropTypes.object,
+  signedIn: PropTypes.bool,
   intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   queryMessages: selectQueryMessages(state),
+  signedIn: selectIsSignedIn(state),
 });
 
 export function mapDispatchToProps(dispatch) {

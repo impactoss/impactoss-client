@@ -25,7 +25,10 @@ import ContentHeader from 'components/ContentHeader';
 import AuthForm from 'components/forms/AuthForm';
 import A from 'components/styled/A';
 
-import { selectQueryMessages } from 'containers/App/selectors';
+import {
+  selectQueryMessages,
+  selectIsSignedIn,
+} from 'containers/App/selectors';
 import {
   updatePath,
   dismissQueryMessages,
@@ -55,7 +58,6 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
     const passwordExpired = authError
       && authError.codeOrReason
       && authError.codeOrReason === 'password_expired';
-
     const {
       intl,
       handleCancel,
@@ -64,7 +66,9 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
       queryMessages,
       handleSubmitWithAzure,
       handleSubmitRecover,
+      signedIn,
     } = this.props;
+    if (signedIn) return <Loading />;
 
     return (
       <div>
@@ -188,6 +192,7 @@ UserLogin.propTypes = {
   handleCancel: PropTypes.func.isRequired,
   handleLink: PropTypes.func.isRequired,
   onDismissQueryMessages: PropTypes.func,
+  signedIn: PropTypes.bool,
   queryMessages: PropTypes.object,
   intl: PropTypes.object.isRequired,
 };
@@ -195,6 +200,7 @@ UserLogin.propTypes = {
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   queryMessages: selectQueryMessages(state),
+  signedIn: selectIsSignedIn(state),
 });
 
 export function mapDispatchToProps(dispatch) {

@@ -1,6 +1,6 @@
 /*
  *
- * VerifyOtp
+ * UserLoginVerifyOtp
  *
  */
 
@@ -26,7 +26,10 @@ import {
   updatePath,
   resetOtp,
 } from 'containers/App/actions';
-import { selectIsOtpAfterRegister } from 'containers/App/selectors';
+import {
+  selectIsOtpAfterRegister,
+  selectIsSignedIn,
+} from 'containers/App/selectors';
 
 import messages from './messages';
 
@@ -47,7 +50,7 @@ const Description = styled.p`
   margin-bottom: 24px;
 `;
 
-export class VerifyOtp extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class UserLoginVerifyOtp extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const {
       intl,
@@ -56,7 +59,10 @@ export class VerifyOtp extends React.PureComponent { // eslint-disable-line reac
       handleCancel,
       viewDomain,
       isAfterRegister,
+      signedIn,
     } = this.props;
+    if (signedIn) return <Loading />;
+
     const {
       authError,
       authSending,
@@ -135,18 +141,20 @@ export class VerifyOtp extends React.PureComponent { // eslint-disable-line reac
   }
 }
 
-VerifyOtp.propTypes = {
+UserLoginVerifyOtp.propTypes = {
   viewDomain: PropTypes.object.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleOtpResend: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   isAfterRegister: PropTypes.bool,
+  signedIn: PropTypes.bool,
   intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   viewDomain: selectDomain(state),
   isAfterRegister: selectIsOtpAfterRegister(state),
+  signedIn: selectIsSignedIn(state),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -166,4 +174,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(VerifyOtp));
+export default injectIntl(connect(mapStateToProps, mapDispatchToProps)(UserLoginVerifyOtp));

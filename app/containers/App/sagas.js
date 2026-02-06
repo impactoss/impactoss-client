@@ -5,7 +5,9 @@
 import {
   call, put, select, takeLatest, takeEvery, race, take, all,
 } from 'redux-saga/effects';
-import { push, replace, goBack } from 'react-router-redux';
+import {
+  push, replace, goBack, LOCATION_CHANGE,
+} from 'react-router-redux';
 import { reduce, keyBy } from 'lodash/collection';
 import { without } from 'lodash/array';
 import { fromJS } from 'immutable';
@@ -33,6 +35,7 @@ import {
   LOGOUT,
   OTP_REQUIRED,
   VALIDATE_TOKEN,
+  AUTHENTICATE_SUCCESS,
   INVALIDATE_ENTITIES,
   SAVE_CONNECTIONS,
   UPDATE_ROUTE_QUERY,
@@ -897,6 +900,34 @@ export function* closeEntitySaga({ path }) {
   );
 }
 
+function* guardAuthRoutes(pathname) {
+  const isSignedIn = yield select(selectIsSignedIn);
+  if (!isSignedIn) return;
+
+  // guard routes
+  const authRoutes = [
+    ROUTES.LOGIN,
+    ROUTES.REGISTER,
+    ROUTES.VERIFY_OTP,
+    ROUTES.RESET_PASSWORD,
+    ROUTES.RECOVER_PASSWORD,
+  ];
+  if (authRoutes.includes(pathname)) {
+    yield put(updatePath('/'));
+  }
+}
+
+// Guard on location change
+function* handleLocationChange(action) {
+  yield call(guardAuthRoutes, action.payload.pathname);
+}
+
+// Guard on auth success
+function* handleAuthSuccess() {
+  const pathname = yield select(selectCurrentPathname);
+  yield call(guardAuthRoutes, pathname);
+}
+
 /**
  * Root saga manages watcher lifecycle
  */
@@ -910,6 +941,8 @@ export default function* rootSaga() {
   yield takeLatest(LOGOUT, logoutSaga);
   yield takeLatest(AUTHENTICATE_FORWARD, authChangeSaga);
   yield takeLatest(OTP_REQUIRED, requireOtpSaga);
+  yield takeLatest(LOCATION_CHANGE, handleLocationChange);
+  yield takeLatest(AUTHENTICATE_SUCCESS, handleAuthSuccess);
 
   yield takeEvery(SAVE_ENTITY, saveEntitySaga);
   yield takeEvery(SAVE_MULTIPLE_ENTITIES, saveMultipleEntitiesSaga);

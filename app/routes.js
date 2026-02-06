@@ -119,9 +119,9 @@ export default function createRoutes(store) {
       onEnter: redirectIfSignedIn(),
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/VerifyOtp/reducer'),
-          import('containers/VerifyOtp/sagas'),
-          import('containers/VerifyOtp'),
+          import('containers/UserLoginVerifyOtp/reducer'),
+          import('containers/UserLoginVerifyOtp/sagas'),
+          import('containers/UserLoginVerifyOtp'),
         ]);
         const renderRoute = loadModule(cb);
 
@@ -181,7 +181,10 @@ export default function createRoutes(store) {
     {
       path: ROUTES.REGISTER,
       name: 'userRegister',
-      onEnter: redirectIfAzureEnabled(),
+      onEnter: () => {
+        redirectIfAzureEnabled();
+        redirectIfSignedIn();
+      },
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/UserRegister/reducer'),
