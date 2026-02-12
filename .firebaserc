@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "impactoss-demo-fw"
+    "test": "scotgov-uat",
+    "prod": "scotgov-prod"
   }
 }
