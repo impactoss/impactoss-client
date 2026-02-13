@@ -7,11 +7,7 @@ export default styled.div`
   font-family: ${(props) => props.theme.fonts.claim};
   font-size: ${(props) => props.theme.sizes.header.text.claim};
   background-color: ${palette('header', 0)};
-  color: ${palette('headerBrand', 1)};
-  &:hover {
-    color:${palette('headerBrandHover', 1)};
-    opacity: 0.95;
-  }
+  color: ${palette('headerBrand', 0)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: block;
   }

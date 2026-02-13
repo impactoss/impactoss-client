@@ -13,7 +13,7 @@ const ColumnHeader = styled.div`
   position: relative;
   display: table-cell;
   min-height: 35px;
-  border-right: 1px solid ${palette('light', 2)};
+  border-right: 1px solid ${palette('dark', 0)};
   &:last-child {
     border-right: none;
   }

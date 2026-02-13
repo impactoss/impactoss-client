@@ -4,7 +4,7 @@ import { palette } from 'styled-theme';
 export default styled.h1`
   margin: 0;
   padding-left: 10px;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
   font-family: ${(props) => props.theme.fonts.title};
   font-size: ${(props) => props.theme.sizes.header.text.titleMobile};
   line-height: ${(props) => props.theme.sizes.header.banner.heightMobile}px;

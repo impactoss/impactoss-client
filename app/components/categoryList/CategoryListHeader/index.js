@@ -13,6 +13,7 @@ const Styled = styled.div`
   display: table;
   table-layout: fixed;
   margin-bottom: 20px;
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
   @media print {
     margin-bottom: 15px;
   }

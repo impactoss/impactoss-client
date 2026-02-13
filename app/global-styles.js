@@ -11,7 +11,7 @@ const GlobalStyle = createGlobalStyle`
     font-family: Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 1.428571429;
-    color: #1c2121;;
+    color: #333e48;;
   }
   button, input, select, textarea {
     font-family: Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -45,7 +45,7 @@ const GlobalStyle = createGlobalStyle`
     color: #0077d8;
     text-decoration: none;
     &:hover {
-      color: #0063b5;
+      color: #0065BD;
     }
   }
   .ioss-csv-downloader {
@@ -59,7 +59,7 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     cursor: pointer;
     &:hover {
-      color: #0063b5;
+      color: #0065BD;
       text-decoration: underline;
     }
   }

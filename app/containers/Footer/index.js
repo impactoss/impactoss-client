@@ -23,10 +23,10 @@ import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 const FooterMain = styled.div`
-  margin-top: 80px;
   background-color: ${palette('mainBackground', 0)};
   color: ${palette('dark', 1)};
   padding: 0 0 40px;
+  border-bottom: 12px solid ${palette('primary', 0)};
   @media print {
     color: ${palette('text', 0)};
     background-color: transparent;

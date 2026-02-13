@@ -135,11 +135,11 @@ theme.breakpoints = {
 // global color palettes
 // primary color palette: dark to light
 // 0: main colour, darker, used for links and navigation elements, hover (AA)
-// 1: main colour, used for text links/buttons on light grey (AA Large on f1f4f4 )
+// 1: main colour, used for text links/buttons on light grey (AA Large on f2f3f4 )
 // 2: main colour, used for links and navigation elements (AA large on white)
 // 3: white/placeholder
 // 4: white/placeholder
-const primary = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-ffffff-ffffff');
+const primary = coolorsToHex('https://coolors.co/0065BD-00549B-0077d8-ffffff-ffffff');
 // secondary color palette: dark to light
 // 0: secondary colour, dark / white/placeholder
 // 1: secondary colour, medium / white/placeholder
@@ -153,14 +153,14 @@ const secondary = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-f
 // 2:  dark (AA)
 // 3:  medium gray 1 (AA) --- !!! AA compatible with light[0]
 // 4:  medium gray 2 (AA large)
-const dark = coolorsToHex('https://coolors.co/1c2121-232b2b-323e3e-687271-8d9696');
+const dark = coolorsToHex('https://coolors.co/333e48-333e48-333e48-73777b-8d9696');
 // light grayscale: light to dark
 // 0:  lightest gray (background colour) - also used in global-styles.js !!! AA compatible with dark[3]
 // 1:  light gray (light lines, navigation filter panel)
 // 2:  gray 1 (gray pattern)
 // 3:  gray 2 (icons light)
 // 4:  gray 3 (dark lines)
-const light = coolorsToHex('https://coolors.co/f1f4f4-e0e6e6-d5dddd-cdd6d6-c7d1d1');
+const light = coolorsToHex('https://coolors.co/f2f3f4-dfe2e3-d5dddd-cdd6d6-c7d1d1');
 
 // other palettes
 // 0: AA on light[0] and on error[3]
@@ -168,7 +168,7 @@ const light = coolorsToHex('https://coolors.co/f1f4f4-e0e6e6-d5dddd-cdd6d6-c7d1d
 const error = coolorsToHex('https://coolors.co/b20e0e-c10f0f-d31717-f2e3e3-ffffff');
 const success = coolorsToHex('https://coolors.co/00632e-007034-007c3a-e1f2ed-ffffff');
 // const alert = coolorsToHex('https://coolors.co/c75300-e56700-ed7000-f97807-ffffff');
-// const info = coolorsToHex('https://coolors.co/0063b5-0070cc-0077d8-118ef4-ffffff');
+// const info = coolorsToHex('https://coolors.co/0065BD-00549B-0077d8-118ef4-ffffff');
 
 // colour palettes, usage:
 //   import { palette } from 'styled-theme';
@@ -195,11 +195,11 @@ theme.palette = {
   // taxonomiesHoverAAL: ['#6D787E', '#3A1D49', '#3B3681', '#28865D', '#21827B', '#3D832F', '#003A5C', '#147CA9', '#6D787E'],
   taxonomies: [
     '#8D95A0', // default, not used
-    '#0059A3', // 1: Human Rights Body
-    '#0077D8', // 2: UN session
-    '#416680', // 3: State
-    '#007C70', // 4: Human right
-    '#05A763', // 5: Affected persons
+    '#302682', // 1: Human Rights instruments
+    '#302682', // 2: Reporting cycles
+    '#951B80', // 3: HR Themes
+    '#005E28', // 4: Human right issues
+    '#896A0C', // 5: Affected persons
     '#114060', // 6: Organisation
     '#E56700', // 7: SMART
     '#007c3a', // 8: Progress status
@@ -208,11 +208,11 @@ theme.palette = {
   ],
   taxonomiesHover: [
     '#656F75', // default, not used
-    '#005296', // 1: Human Rights Body
-    '#0070CC', // 2: UN session
-    '#395970', // 3: State
-    '#007267', // 4: Human right
-    '#008740', // 5: Affected persons
+    '#1E1F6B', // 1: Human Rights Body
+    '#1E1F6B', // 2: Reporting cycles (was #302682)
+    '#7A1568', // 3: HR Themes (was #951B80)
+    '#004D21', // 4: Human right issues (was #005E28)
+    '#70560A', // 5: Affected persons (was #896A0C)
     '#0F364C', // 6: Organisation
     '#C75300', // 7: SMART
     '#007034', // 8: Progress status
@@ -262,7 +262,7 @@ theme.palette = {
   // UI PALETTES //////////////////////////////////////////////////////////////
   //
   // main background
-  mainBackground: ['#f1f4f4'],
+  mainBackground: [light[0]],
   // text
   // [#primaryFont, #secondaryFont, #inverse]
   text: [dark[0], dark[3], primary[4]],
@@ -291,10 +291,10 @@ theme.palette = {
   headerBrandHover: [dark[1], dark[3]], // WARNING component sets opacity
 
   // headerNavPages: [ '#bg' ],
-  headerNavPages: [light[0]],
+  headerNavPages: ['transparent'],
   // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
-  headerNavPagesItem: [dark[3], primary[4], 'transparent', primary[1]],
-  headerNavPagesItemHover: [dark[2], primary[4], 'transparent', primary[0]],
+  headerNavPagesItem: [dark[0], primary[4], 'transparent', 'transparent'],
+  headerNavPagesItemHover: [dark[0], primary[4], 'transparent', 'transparent'],
 
   // headerNavAccount: [ '#bg' ],
   headerNavAccount: ['transparent'],
@@ -314,7 +314,7 @@ theme.palette = {
   // aside: ['#bg']
   aside: [primary[4]],
   // asideHeader: ['#bg']
-  asideHeader: [light[0]],
+  asideHeader: [secondary[0]],
 
   // CATEGORY SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
   // asideCatNavItem: ['#color', '#colorActive', '#bg', '#bgActive', '#border'],
@@ -322,19 +322,19 @@ theme.palette = {
   asideCatNavItemHover: [dark[1], primary[4], light[0], primary[2], light[0]],
 
   // ENTITYLIST SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
-  // asideCatNavItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
+  // asideListItem: ['#color', '#active', '#bg', '#bgactive', '#border'],
   // asideListItem: [dark[0], dark[0], primary[4], light[0], light[0]],
-  asideListItem: [dark[2], '#fff', '#fff', dark[2], light[0]],
+  asideListItem: [dark[0], '#fff', '#fff', dark[0], light[1]],
   // asideListItemHover: [dark[0], dark[0], light[2], light[1], light[0]],
-  asideListItemHover: [dark[1], '#fff', light[0], dark[2], light[0]],
+  asideListItemHover: [dark[0], '#fff', light[1], dark[0], light[1]],
 
 
   // asideHeader: [#color, '#bg',]
-  asideListGroup: [dark[2], light[1]],
-  asideListGroupHover: [dark[3], light[0]],
+  asideListGroup: [dark[0], light[0]],
+  asideListGroupHover: [dark[1], light[1]],
 
   // mainListHeader
-  mainListHeader: [dark[0], '#e0e6e6'],
+  mainListHeader: [dark[0], light[1]],
 
   // mainListItem: [#color, '#bg',], eg category and entity list items
   mainListItem: [dark[0], primary[4]],
@@ -354,8 +354,8 @@ theme.palette = {
   buttonCancel: [dark[3]], // form footer cancel
   buttonCancelHover: [primary[1]],
   // buttonDefault: ['#text', '#bg'],
-  buttonDefault: [primary[4], primary[2]], // with background
-  buttonDefaultHover: [primary[4], primary[0]],
+  buttonDefault: [primary[4], primary[0]], // with background
+  buttonDefaultHover: [primary[4], primary[1]],
   buttonDefaultDisabled: [light[0], dark[3]], // with background disabled
   // buttonPrimary: ['#text', '#bg', '#border'],
   buttonDefaultIconOnly: [primary[4], primary[2], primary[1]], // with background, without text
@@ -443,9 +443,9 @@ theme.sizes = {
     },
     // px or em
     text: {
-      title: '1.8em',
+      title: '1.3em',
       titleMobile: '1em',
-      claim: '0.85em',
+      claim: '1.3em',
       claimMobile: '1em',
     },
     print: {
@@ -461,7 +461,7 @@ theme.sizes = {
   home: {
     // px or em
     text: {
-      title: '2.8em',
+      title: '2em',
       titleMobile: '1.4em',
       claim: '1.3em',
       claimMobile: '1em',
@@ -529,8 +529,8 @@ theme.global = {
     xlarge: {},
   },
   colors: {
-    aHover: '#0063b5',
-    highlight: '#0070cc',
+    aHover: '#0065BD',
+    highlight: '#00549B',
     textSecondary: '#777b7e', // on light background (empowerment)
     error: '#b20e0e',
     success: '#00632e',

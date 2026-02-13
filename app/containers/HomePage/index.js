@@ -14,15 +14,13 @@ import rehypeExternalLinks from 'rehype-external-links';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import { Box } from 'grommet';
-import Container from 'components/styled/Container';
+import Icon from 'components/Icon';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
 import { selectFrameworks, selectIsSigningIn, selectReady } from 'containers/App/selectors';
 
-import ButtonHero from 'components/buttons/ButtonHero';
-import ButtonFlat from 'components/buttons/ButtonFlat';
 import NormalImg from 'components/Img';
-import Loading from 'components/Loading';
+import CardTeaser from 'components/CardTeaser';
 import Footer from 'containers/Footer';
 
 import appMessages from 'containers/App/messages';
@@ -35,6 +33,7 @@ import {
   HEADER_PATTERN_HEIGHT,
   SHOW_HEADER_PATTERN_HOME_GRAPHIC,
   HOME_GRAPHIC_WIDTH,
+  SHOW_HOME_CLAIM,
 } from 'themes/config';
 
 import { DEPENDENCIES } from './constants';
@@ -43,15 +42,6 @@ import messages from './messages';
 
 /* eslint-disable react/no-children-prop */
 
-const StyledRow = styled((p) => <Box {...p} align="center" />)`
-  flex-direction: column;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    flex-direction: row;
-    margin-right: -${({ theme }) => theme.gutter}px;
-    margin-left: -${({ theme }) => theme.gutter}px;
-    margin-top: ${({ space }) => space ? 10 : 0}px;
-  }
-`;
 const GraphicHomeWrapper = styled.div`
   width: 100%;
   padding-top: ${(props) => props.hasBrand
@@ -78,12 +68,12 @@ const GraphicHome = styled(NormalImg)`
 `;
 
 const SectionTop = styled.div`
-  min-height: ${(props) => props.hasBrand ? 0 : '80vH'};
   display: ${(props) => props.hasBrand ? 'block' : 'table'};
   width: ${(props) => props.hasBrand ? 'auto' : '100%'};
   background-color: ${palette('home', 0)};
   color: ${palette('homeIntro', 0)};
   text-align: center;
+  min-height: 500px;
   @media print {
     background-color: transparent;
     color: ${palette('text', 0)};
@@ -92,19 +82,24 @@ const SectionTop = styled.div`
   }
 `;
 
-const SectionWrapper = styled.div`
+const SectionTopInner = styled((p) => <Box {...p} />)`
   display: ${(props) => props.hasBrand ? 'block' : 'table-cell'};
   vertical-align: ${(props) => props.hasBrand ? 'baseline' : 'middle'};
   padding-bottom: 2em;
+  min-height: 500px;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding-bottom: 3em;
   }
 `;
 
-const HomeActions = styled.div`
-  padding-top: 1em;
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding-top: 2em;
+const Section = styled((p) => <Box {...p} />)`
+  padding-top: 60px;
+  padding-bottom: 80px;
+  background-color: ${palette('mainBackground', 0)};
+`;
+const SectionInner = styled((p) => <Box {...p} />)`
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    max-width: 800px;
   }
 `;
 
@@ -120,8 +115,21 @@ const Title = styled.h1`
     margin-top: 1em;
   }
 `;
+const SectionTitle = styled.h2`
+  color:${palette('headerBrand', 0)};
+  font-family: ${(props) => props.theme.fonts.title};
+  font-size: ${(props) => props.theme.sizes.home.text.titleMobile};
+  font-weight: 700;
+  margin-top: 0.5em;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: ${(props) => props.theme.sizes.home.text.title};
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    margin-top: 1em;
+  }
+`;
 
-const Claim = styled.h2`
+const Claim = styled.h3`
   color: ${palette('headerBrand', 1)};
   font-family: ${(props) => props.theme.fonts.claim};
   font-size: ${(props) => props.theme.sizes.home.text.claimMobile};
@@ -146,6 +154,10 @@ const Intro = styled(ReactMarkdown)`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 1.1em;
   }
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    font-size: 1.2em;
+    max-width: 666px;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     font-size: 1.25em;
   }
@@ -153,71 +165,24 @@ const Intro = styled(ReactMarkdown)`
     font-size: ${(props) => props.theme.sizes.print.large};
   }
 `;
-const GridSpace = styled((p) => <Box {...p} />)`
-  @media (min-width: 0px) {
-    display: none !important;
-  }
-  @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
-    display: inline-block !important;
-    flex-basis: ${({ flexBasis }) => flexBasis || '15'}%;
-  }
-`;
-const StyledBox = styled((p) => <Box {...p} />)`
-  display: inline-block;
-  vertical-align: top;
-  padding-left: 32px;
-  padding-right: 32px;
-  @media (min-width: 0px) {
-    flex-basis: 100%;
-  }
-  @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
-    flex-basis: ${({ flexBasis }) => flexBasis || '70'}%;
-  }
-`;
-
-const FrameworkButtonGrid = styled((p) => <Box {...p} />)`
-  display: inline-block !important;
-  width: auto !important;
+const SectionDescription = styled(ReactMarkdown)`
+  font-size: 0.8;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    display: flex !important;
-    width: 100% !important;
-    justify-content: center;
+    font-size: 0.9;
   }
-`;
-
-const FrameworkButton = styled(ButtonHero)`
-  max-width: ${({ single }) => single ? 'auto' : '250px'};
-  width: 100%;
-  display: block;
-  margin-bottom: 10px;
-  min-width: auto;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    display: inline-block;
-    margin-bottom: 0;
-    min-width: auto;
-    width: ${({ single }) => single ? 'auto' : '250px'};
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    font-size: 1em;
+    max-width: 666px;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    font-size: 1.1em;
   }
   @media print {
-    font-size: ${(props) => props.theme.sizes.print.small};
-    color: ${palette('primary', 0)};
-    background: transparent;
-    border: 1px solid ${palette('light', 3)};
-    border-radius: 10px;
-    max-width: ${({ count }) => count ? ((100 / count) - 2) : 100}%;
-    min-width: auto;
-    margin: 0 1%;
+    font-size: ${(props) => props.theme.sizes.print.large};
   }
-`;
-
-const StyledButtonFlat = styled(ButtonFlat)`
-  color: ${palette('homeIntro', 0)};
-  @media print {
-    color: ${palette('text', 1)};
-    text-decoration: underline;
-  }
-`;
-const FrameworkHint = styled.div`
-  font-size: ${({ theme }) => theme.sizes.text.small};
 `;
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -226,9 +191,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
   }
 
   render() {
-    const {
-      theme, frameworks, onSelectFramework, onPageLink, signingIn, dataReady, intl,
-    } = this.props;
+    const { onPageLink, theme, intl } = this.props;
     const appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
     return (
       <div>
@@ -239,7 +202,14 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
-          <SectionWrapper hasBrand={SHOW_BRAND_ON_HOME}>
+          <SectionTopInner
+            hasBrand={SHOW_BRAND_ON_HOME}
+            style={{ position: 'relative' }}
+            align="center"
+            justify="evenly"
+            fill="vertical"
+            flex={{ grow: 1 }}
+          >
             <GraphicHomeWrapper
               hasBrand={SHOW_BRAND_ON_HOME}
               showPattern={SHOW_HEADER_PATTERN_HOME_GRAPHIC}
@@ -249,105 +219,81 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
             { !SHOW_HOME_TITLE && theme.media.titleHome
               && <GraphicHome src={theme.media.titleHome} alt={appTitle} />
             }
-            <Container noPaddingBottom>
+            <Box>
               {SHOW_HOME_TITLE_OR_CLAIM && (
-                <StyledRow>
-                  <GridSpace flexBasis="10" />
-                  <StyledBox flexBasis="80">
-                    {SHOW_HOME_TITLE && (
-                      <Title>
-                        <FormattedMessage {...appMessages.app.titleHome} />
-                      </Title>
-                    )}
+                <Box gap="xsmall" align="center">
+                  {SHOW_HOME_TITLE && (
+                    <Title>
+                      <FormattedMessage {...appMessages.app.titleHome} />
+                    </Title>
+                  )}
+                  {SHOW_HOME_CLAIM && (
                     <Claim>
                       <FormattedMessage {...appMessages.app.claim} />
                     </Claim>
-                  </StyledBox>
-                </StyledRow>
-              )}
-              <StyledRow>
-                <GridSpace />
-                <StyledBox>
+                  )}
                   <Intro
                     children={intl.formatMessage(messages.intro)}
                     rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
                   />
-                </StyledBox>
-              </StyledRow>
-              <HomeActions>
-                {(signingIn || !dataReady) && (
-                  <StyledRow>
-                    <GridSpace />
-                    <StyledBox>
-                      <Loading />
-                    </StyledBox>
-                  </StyledRow>
-                )}
-                {(signingIn || !dataReady) && (
-                  <StyledRow>
-                    <GridSpace />
-                    <StyledBox>
-                      {signingIn && (
-                        <FormattedMessage {...messages.signingIn} />
-                      )}
-                      {!signingIn && (
-                        <FormattedMessage {...messages.loading} />
-                      )}
-                    </StyledBox>
-                  </StyledRow>
-                )}
-                {dataReady && !signingIn && frameworks.size > 1 && (
-                  <span role="navigation" aria-label="Primary">
-                    <StyledRow>
-                      <GridSpace />
-                      <StyledBox>
-                        <FrameworkHint>
-                          <FormattedMessage {...messages.selectFramework} />
-                        </FrameworkHint>
-                      </StyledBox>
-                    </StyledRow>
-                    <StyledRow>
-                      <FrameworkButtonGrid direction="row" margin={{ vertical: 'small' }}>
-                        {frameworks.entrySeq().map(([key, fw]) => (
-                          <FrameworkButton
-                            space
-                            key={key}
-                            onClick={() => onSelectFramework(fw.get('id'))}
-                            count={frameworks.size}
-                          >
-                            <FormattedMessage {...appMessages.frameworks[fw.get('id')]} />
-                          </FrameworkButton>
-                        ))}
-                      </FrameworkButtonGrid>
-                    </StyledRow>
-                    <StyledRow>
-                      <GridSpace />
-                      <StyledBox>
-                        <StyledButtonFlat onClick={() => onSelectFramework('all')}>
-                          <FormattedMessage {...messages.exploreAllFrameworks} />
-                        </StyledButtonFlat>
-                      </StyledBox>
-                    </StyledRow>
-                  </span>
-                )}
-                {dataReady && !signingIn && frameworks.size === 1 && (
-                  <StyledRow>
-                    <GridSpace />
-                    <StyledBox role="navigation" aria-label="Primary">
-                      <FrameworkButton
-                        single
-                        onClick={() => onPageLink(ROUTES.OVERVIEW)}
-                        count={1}
-                      >
-                        <FormattedMessage {...messages.explore} />
-                      </FrameworkButton>
-                    </StyledBox>
-                  </StyledRow>
-                )}
-              </HomeActions>
-            </Container>
-          </SectionWrapper>
+                </Box>
+              )}
+              <Box
+                margin={{ top: 'small', bottom: 'large' }}
+                align="center"
+                style={{ minHeight: '58px' }}
+              >
+                <Icon name="arrowDown" palette="primary" paletteIndex={0} />
+              </Box>
+            </Box>
+          </SectionTopInner>
         </SectionTop>
+        <Section align="center">
+          <SectionInner gap="medium">
+            <Box align="center">
+              <Box>
+                <SectionTitle>
+                  <FormattedMessage {...messages.sectionTitle} />
+                </SectionTitle>
+              </Box>
+              <Box>
+                <SectionDescription
+                  children={intl.formatMessage(messages.sectionDescription)}
+                  rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
+                />
+              </Box>
+            </Box>
+            <Box direction="row">
+              <CardTeaser
+                path={ROUTES.OVERVIEW}
+                onClick={(evt) => {
+                  if (evt && evt.preventDefault) evt.preventDefault();
+                  onPageLink(ROUTES.OVERVIEW);
+                }}
+                dataReady
+                title={intl.formatMessage(messages.cardTitleOverview)}
+                description={intl.formatMessage(messages.cardDescriptionOverview)}
+                explore={intl.formatMessage(messages.cardLinkOverview)}
+                graphic="overview"
+                isHome
+                basis="1/2"
+              />
+              <CardTeaser
+                path={ROUTES.RECOMMENDATIONS}
+                onClick={(evt) => {
+                  if (evt && evt.preventDefault) evt.preventDefault();
+                  onPageLink(ROUTES.RECOMMENDATIONS);
+                }}
+                dataReady
+                title={intl.formatMessage(messages.cardTitleRecommendations)}
+                description={intl.formatMessage(messages.cardDescriptionRecommendations)}
+                explore={intl.formatMessage(messages.cardLinkRecommendations)}
+                graphic="overview"
+                isHome
+              />
+            </Box>
+          </SectionInner>
+        </Section>
         <Footer fill />
       </div>
     );

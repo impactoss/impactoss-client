@@ -10,7 +10,7 @@ const Sidebar = styled.div`
   background-color: ${palette('aside', 0)};
   z-index:100;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1);
     width: ${(props) => props.responsiveSmall
     ? props.theme.sizes.aside.width.small
     : props.theme.sizes.aside.width.large

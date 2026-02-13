@@ -150,7 +150,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
                   </SidebarHeader>
                   {taxonomyGroups && map(taxonomyGroups, (group) => (
                     <div key={group.id}>
-                      <SidebarGroupLabel id="mycrazyid">
+                      <SidebarGroupLabel>
                         {group.frameworkId && (
                           <FormattedMessage
                             {... appMessages.taxonomyGroups.objectives}

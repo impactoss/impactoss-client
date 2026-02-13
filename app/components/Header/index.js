@@ -16,6 +16,8 @@ import {
   SHOW_BRAND_ON_HOME,
   SHOW_HEADER_SHADOW_ON_HOME,
   TEXT_TRUNCATE,
+  IS_PROD,
+  SERVER,
 } from 'themes/config';
 
 import appMessages from 'containers/App/messages';
@@ -144,7 +146,7 @@ const LinkSuperTitle = styled.div`
 const LinkTitle = styled.div`
   font-size: ${(props) => props.theme.sizes.text.small};
   font-weight: bold;
-  color: ${(props) => props.active ? palette('text', 2) : 'inherit'};
+  color: ${(props) => props.active ? palette('text', 2) : palette('primary', 0)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.theme.sizes.text.default};
   }
@@ -521,19 +523,26 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                   onClick={(evt) => this.onClick(evt, brandPath)}
                   title={appTitle}
                 >
-                  {SHOW_HEADER_LOGO && (
-                    <Logo src={this.props.theme.media.headerLogo} alt={appTitle} />
-                  )}
-                  {SHOW_HEADER_TITLE && (
-                    <BrandText>
-                      <BrandTitle>
-                        <FormattedMessage {...appMessages.app.title} />
-                      </BrandTitle>
-                      <BrandClaim>
-                        <FormattedMessage {...appMessages.app.claim} />
-                      </BrandClaim>
-                    </BrandText>
-                  )}
+                  <Box direction="row">
+                    {SHOW_HEADER_LOGO && (
+                      <Logo src={this.props.theme.media.headerLogo} alt={appTitle} />
+                    )}
+                    {SHOW_HEADER_TITLE && (
+                      <BrandText>
+                        <BrandTitle>
+                          <FormattedMessage {...appMessages.app.title} />
+                        </BrandTitle>
+                        <BrandClaim>
+                          <FormattedMessage {...appMessages.app.claim} />
+                          {!IS_PROD && (
+                            <span style={{ textTransform: 'uppercase' }}>
+                              {` [${SERVER}]`}
+                            </span>
+                          )}
+                        </BrandClaim>
+                      </BrandText>
+                    )}
+                  </Box>
                 </Brand>
                 {this.renderSecondary(navItemsSecondary, search, hasSettings, onShowSettings, size)}
               </Banner>

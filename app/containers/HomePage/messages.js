@@ -66,4 +66,36 @@ export default defineMessages({
     id: 'app.containers.HomePage.selectFramework',
     defaultMessage: 'Select an implementation framework to start exploring',
   },
+  sectionTitle: {
+    id: 'app.containers.HomePage.sectionTitle',
+    defaultMessage: 'Explore the Human Rights Tracker',
+  },
+  sectionDescription: {
+    id: 'app.containers.HomePage.sectionDescription',
+    defaultMessage: 'Start by selecting a category group or go straight to the full list of recommendations.',
+  },
+  cardTitleOverview: {
+    id: 'app.containers.HomePage.cardTitleOverview',
+    defaultMessage: 'Explore by category group',
+  },
+  cardDescriptionOverview: {
+    id: 'app.containers.HomePage.cardDescriptionOverview',
+    defaultMessage: 'Get a breakdown of recommendations by human rights themes, issues, affected groups, or UN human rights instruments.',
+  },
+  cardLinkOverview: {
+    id: 'app.containers.HomePage.cardLinkOverview',
+    defaultMessage: 'All categories',
+  },
+  cardTitleRecommendations: {
+    id: 'app.containers.HomePage.cardTitleRecommendations',
+    defaultMessage: 'List of recommendations',
+  },
+  cardDescriptionRecommendations: {
+    id: 'app.containers.HomePage.cardDescriptionRecommendations',
+    defaultMessage: 'Explore and search the full list of recommendations across all human rights instruments.',
+  },
+  cardLinkRecommendations: {
+    id: 'app.containers.HomePage.cardLinkRecommendations',
+    defaultMessage: 'All recommendations',
+  },
 });

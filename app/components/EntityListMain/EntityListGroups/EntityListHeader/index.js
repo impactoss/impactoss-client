@@ -22,6 +22,7 @@ const Styled = styled.div`
   color: ${palette('mainListHeader', 0)};
   background-color: ${palette('mainListHeader', 1)};
   display: table;
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
 `;
 
 class EntityListHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function

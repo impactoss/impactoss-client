@@ -63,7 +63,7 @@ export const FEATURES = {
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
 export const SHOW_HEADER_TITLE = true;
-export const SHOW_HEADER_LOGO = false;
+export const SHOW_HEADER_LOGO = true;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.header
@@ -79,12 +79,13 @@ export const SHOW_SIDEBAR_HEADER_PATTERN = false;
 // - app.containers.App.app.title
 // - app.containers.App.app.claim
 export const SHOW_HOME_TITLE_OR_CLAIM = true;
-export const SHOW_HOME_TITLE = false;
-export const SHOW_HEADER_SHADOW_ON_HOME = false;
+export const SHOW_HOME_TITLE = true;
+export const SHOW_HOME_CLAIM = false;
+export const SHOW_HEADER_SHADOW_ON_HOME = true;
 
 export const SHOW_BRAND_ON_HOME = true;
 export const HOME_GRAPHIC_WIDTH = 1200;
-export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = true;
+export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
 
 // show footer logo section
 export const FOOTER = {

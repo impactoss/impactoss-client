@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import NormalImg from 'components/Img';
 
 const Logo = styled(NormalImg)`
-  float:left;
   padding-left: ${(props) => props.theme.sizes.header.paddingLeft.mobile || 6}px;
   height: ${(props) => props.theme.sizes.header.banner.heightMobile}px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
