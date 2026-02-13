@@ -15,6 +15,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
+import Plausible from 'plausible-tracker';
 
 // Import ThemeProvider
 import { Grommet } from 'grommet';
@@ -33,6 +34,7 @@ import { makeSelectLocationState } from 'containers/App/selectors';
 // Import Language Provider
 import LanguageProvider from 'containers/LanguageProvider';
 
+import { CLIENT_URL, ENABLE_PLAUSIBLE } from 'themes/config';
 import theme from 'themes/theme-sg';
 import './fonts/fonts.css';
 
@@ -64,6 +66,13 @@ const rootRoute = {
   childRoutes: createRoutes(store),
 };
 
+if (ENABLE_PLAUSIBLE) {
+  const plausible = Plausible({
+    domain: CLIENT_URL.production,
+    // trackLocalhost: true,
+  });
+  plausible.enableAutoPageviews();
+}
 const container = document.getElementById('app');
 const root = createRoot(container);
 const render = (messages) => {

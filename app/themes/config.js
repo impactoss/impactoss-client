@@ -15,7 +15,7 @@ import packageJson from '../../package.json';
 
 export const SERVER = (process && process.env && process.env.SERVER) || 'development';
 const SERVER_ENDPOINTS = {
-  production: 'http://api.humanrightstracker.gov.scot',
+  production: 'https://api.humanrightstracker.gov.scot',
   UAT: 'https://sg-uat-493c281f27a0.herokuapp.com/',
   development: 'https://sg-api-dev.impactoss.org/',
 };
@@ -23,8 +23,8 @@ export const SERVER_ENDPOINT = SERVER_ENDPOINTS[SERVER];
 // used for redirect and canonical tag
 
 export const CLIENT_URL = {
-  production: 'https://scotgov-prod.web.app',
-  UAT: 'https://scotgov-uat.web.app',
+  production: 'https://humanrightstracker.gov.scot',
+  UAT: 'https://uat.humanrightstracker.gov.scot',
   development: 'https://sg-dev.impactoss.org',
 };
 export const IS_PROD = SERVER === 'production';
@@ -35,9 +35,10 @@ export const VERSION = `${packageJson.version}${version_text}`;
 
 // enable azure for test and prod environments but not for dev
 export const ENABLE_AZURE = false; // IS_PROD || IS_TEST;
-
 // enable multi-factor authentication
 export const ENABLE_MULTI_FACTOR_AUTHENTICATION = true;
+// enable plausible analytics
+export const ENABLE_PLAUSIBLE = IS_PROD || IS_TEST;
 
 // default language locale
 export const DEFAULT_LOCALE = 'en-GB';
