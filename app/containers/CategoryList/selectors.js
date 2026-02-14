@@ -198,6 +198,10 @@ const getCategoryCounts = ({
         'recommendations',
         associatedRecsPublic ? associatedRecsPublic.size : 0,
       );
+      category = category.set(
+        'totalAssociations',
+        category.get('recommendationsPublicCount'),
+      );
 
       // measures connected via recommendation
       // if (!tagsMeasures && !childCatsTagMeasures) {
@@ -340,6 +344,12 @@ const mapCategoryGroups = (
         'recommendations',
         filteredCategories.reduce(
           (sum, cat) => sum + cat.get('recommendationsPublicCount'),
+          0,
+        ),
+      ).set(
+        'totalAssociations',
+        filteredCategories.reduce(
+          (sum, cat) => sum + cat.get('totalAssociations'),
           0,
         ),
       ).set(

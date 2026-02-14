@@ -23,7 +23,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   *:focus-visible {
-    outline: 2px solid black;
+    outline: 2px solid #00549B;
     outline-offset: 2px;
   }
 
@@ -45,7 +45,7 @@ const GlobalStyle = createGlobalStyle`
     color: #0065BD;
     text-decoration: none;
     &:hover {
-      color: #0077d8;
+      color: #00549B;
     }
   }
   .ioss-csv-downloader {
@@ -59,7 +59,7 @@ const GlobalStyle = createGlobalStyle`
     cursor: pointer;
     color: #0065BD;
     &:hover {
-      color: #0077d8;
+      color: #00549B;
       text-decoration: underline;
     }
   }

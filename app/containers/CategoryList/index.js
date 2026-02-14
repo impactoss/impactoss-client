@@ -191,6 +191,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                     sortOptions={SORT_OPTIONS}
                     sortBy={this.props.location.query && this.props.location.query.sort}
                     sortOrder={this.props.location.query && this.props.location.query.order}
+                    isCategoryAdmin={hasUserRole[CATEGORY_ADMIN_MIN_ROLE]}
                   />
                 )
               }

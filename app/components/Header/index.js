@@ -134,7 +134,7 @@ const HideSecondaryWrap = styled.div`
 const HideSecondary = styled(Button)``;
 
 const LinkSuperTitle = styled.div`
-  color: ${(props) => props.active ? palette('text', 2) : 'inherit'};
+  color: ${(props) => props.active ? palette('text', 2) : palette('text', 0)};
   font-size: ${(props) => props.theme.sizes.text.smallMobile};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.theme.sizes.text.smaller};

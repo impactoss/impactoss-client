@@ -11,14 +11,14 @@ import coolorsToHex from 'coolors-to-hex';
 // import impactossLogo from 'themes/media/impactoss.png';
 // import impactossLogo2x from 'themes/media/impactoss@2x.png';
 
-import partner1 from 'themes/media/partner1.png';
-import partner2 from 'themes/media/partner2.png';
-import partner3 from 'themes/media/partner3.png';
-import partner4 from 'themes/media/partner4.png';
-import partner1x2x from 'themes/media/partner1@2x.png';
-import partner2x2x from 'themes/media/partner2@2x.png';
-import partner3x2x from 'themes/media/partner3@2x.png';
-import partner4x2x from 'themes/media/partner4@2x.png';
+import partner1 from 'themes/media/scotgovlogo.svg';
+// import partner2 from 'themes/media/partner2.png';
+// import partner3 from 'themes/media/partner3.png';
+// import partner4 from 'themes/media/partner4.png';
+// import partner1x2x from 'themes/media/scotgovlogo.svg';
+// import partner2x2x from 'themes/media/partner2@2x.png';
+// import partner3x2x from 'themes/media/partner3@2x.png';
+// import partner4x2x from 'themes/media/partner4@2x.png';
 
 import headerLogo from 'themes/media/headerLogo.png';
 import headerLogo2x from 'themes/media/headerLogo@2x.png';
@@ -64,10 +64,7 @@ theme.media = {
   // partnerLogos: [
   // ],
   agencyLogos: [
-    [partner1, partner1x2x],
-    [partner2, partner2x2x],
-    [partner3, partner3x2x],
-    [partner4, partner4x2x],
+    [partner1],
     // [footerLogo1, footerLogo1_2x],
   ],
 };
@@ -287,14 +284,14 @@ theme.palette = {
   header: [secondary[1]],
 
   // headerBrand: [ '#title', '#claim' ],
-  headerBrand: [dark[0], dark[3]],
-  headerBrandHover: [dark[1], dark[3]], // WARNING component sets opacity
+  headerBrand: [dark[0], dark[0]],
+  headerBrandHover: [primary[1], primary[1]], // WARNING component sets opacity
 
   // headerNavPages: [ '#bg' ],
   headerNavPages: ['transparent'],
   // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
-  headerNavPagesItem: [dark[0], primary[4], 'transparent', 'transparent'],
-  headerNavPagesItemHover: [dark[0], primary[4], 'transparent', 'transparent'],
+  headerNavPagesItem: [dark[0], primary[1], 'transparent', 'transparent'],
+  headerNavPagesItemHover: [dark[0], primary[1], 'transparent', 'transparent'],
 
   // headerNavAccount: [ '#bg' ],
   headerNavAccount: ['transparent'],
@@ -349,7 +346,7 @@ theme.palette = {
   // BUTTONS / LINKS
   //
   // button: ['#colorPrimary', '#colorSecondary', #disabled],
-  buttonFlat: [primary[1], dark[3], light[4]], // aka ghost button
+  buttonFlat: [primary[0], dark[3], light[4]], // aka ghost button
   buttonFlatHover: [primary[0], primary[1]],
   buttonCancel: [dark[3]], // form footer cancel
   buttonCancelHover: [primary[1]],

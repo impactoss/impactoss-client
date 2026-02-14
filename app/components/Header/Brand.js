@@ -11,9 +11,8 @@ export default styled.a`
   overflow: hidden;
   padding-right: 46px;
   height: ${(props) => props.theme.sizes.header.banner.heightMobile}px;
-  &:hover {
+  &:hover, &:focus-visible {
     color: ${palette('headerBrandHover', 0)};
-    opacity: 0.75;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-right: 46px;

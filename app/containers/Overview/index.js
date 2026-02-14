@@ -58,9 +58,9 @@ const ViewContainer = styled(Container)`
 `;
 
 const AboutLink = styled(A)`
-  color: ${palette('primary', 1)};
+  color: ${palette('primary', 0)};
   &:hover {
-    color: ${palette('primary', 0)};
+    color: ${palette('primary', 1)};
     text-decoration: underline;
   }
 `;

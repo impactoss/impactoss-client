@@ -55,12 +55,15 @@ const LogoItemLink = styled(A)`
 `;
 
 const Logo = styled(NormalImg)`
-  height: 50px;
+  height: ${({ isAgency }) => isAgency ? 42 : 50}px;
+  margin-top: ${({ isAgency }) => isAgency ? 4 : 0}px;
   @media (min-width: ${({ theme }) => theme.breakpoints.medium}) {
-    height: 55px;
+    height: ${({ isAgency }) => isAgency ? 45 : 55}px;
+    margin-top: ${({ isAgency }) => isAgency ? 5 : 0}px;
   }
   @media (min-width: ${({ theme }) => theme.breakpoints.large}) {
-    height: 68px;
+    height: ${({ isAgency }) => isAgency ? 56 : 68}px;
+    margin-top: ${({ isAgency }) => isAgency ? 6 : 0}px;
   }
 `;
 
@@ -110,7 +113,7 @@ const Footer = ({
             >
               <Box>
                 <FooterNote>
-                  <FormattedMessage {...messages.agencies.note} />
+                  <FormattedMessage {...messages.disclaimer2} />
                 </FooterNote>
               </Box>
               <Box>
@@ -126,7 +129,7 @@ const Footer = ({
                       title={intl.formatMessage(messages.agencies[`title${i + 1}`])}
                       target="_blank"
                     >
-                      <Logo src={src} alt={intl.formatMessage(messages.agencies[`title${i + 1}`])} />
+                      <Logo isAgency src={src} alt={intl.formatMessage(messages.agencies[`title${i + 1}`])} />
                     </LogoItemLink>
                   ))}
                 </Box>

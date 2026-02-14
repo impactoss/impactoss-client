@@ -93,6 +93,7 @@ export const FOOTER = {
     1, // copyright (page db id as generated in seed file)
     2, // disclaimer
     3, // privacy
+    4, // a11y
   ],
 };
 

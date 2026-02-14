@@ -292,6 +292,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       frameworks,
       frameworkId,
       intl,
+      isCategoryAdmin,
     } = this.props;
 
     const headerColumns = this.getListHeaderColumns({
@@ -318,30 +319,37 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         <CategoryListHeader columns={headerColumns} />
         <CategoryListBody>
           {categoryGroups.valueSeq().toArray().map((group) => {
-            if (group.get('categories')) {
-              return (
-                <span key={group.get('id')}>
-                  {group.get('type') === 'categories' && group.get('categories').size > 0
-                    && (
-                      <GroupHeaderLink to={`/category/${group.get('id')}`}>
-                        <GroupHeader>
-                          {getCategoryTitle(group)}
-                        </GroupHeader>
-                      </GroupHeaderLink>
-                    )
-                  }
-                  {group.get('categories').map((cat) => (
-                    <CategoryListItem
-                      key={cat.get('id')}
-                      category={cat}
-                      columns={columns}
-                      onPageLink={onPageLink}
-                      frameworks={frameworks}
-                      frameworkId={frameworkId}
-                    />
-                  ))}
-                </span>
-              );
+            if (group.get('categories') && group.get('categories').size > 0) {
+              return (group.get('totalAssociations') > 0 || isCategoryAdmin)
+                ? (
+                  <span key={group.get('id')}>
+                    {group.get('type') === 'categories'
+                      && group.get('categories').size > 0
+                      && (
+                        <GroupHeaderLink to={`/category/${group.get('id')}`}>
+                          <GroupHeader>
+                            {getCategoryTitle(group)}
+                          </GroupHeader>
+                        </GroupHeaderLink>
+                      )
+                    }
+                    {group.get('categories').map(
+                      (cat) => (cat.get('totalAssociations') > 0 || isCategoryAdmin)
+                        ? (
+                          <CategoryListItem
+                            key={cat.get('id')}
+                            category={cat}
+                            columns={columns}
+                            onPageLink={onPageLink}
+                            frameworks={frameworks}
+                            frameworkId={frameworkId}
+                          />
+                        )
+                        : null,
+                    )}
+                  </span>
+                )
+                : null;
             }
             return null;
           })}
@@ -361,6 +369,7 @@ CategoryListItems.propTypes = {
   sortBy: PropTypes.string,
   sortOrder: PropTypes.string,
   userOnly: PropTypes.bool,
+  isCategoryAdmin: PropTypes.bool,
   frameworkId: PropTypes.string,
   intl: PropTypes.object.isRequired,
 };

@@ -121,7 +121,7 @@ export function CardTeaser({
                 >
                   <Title
                     size={isHome ? 'xlarge' : 'large'}
-                    weight={isHome ? '400' : '600'}
+                    weight={isHome ? 400 : 600}
                   >
                     {title}
                   </Title>
