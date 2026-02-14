@@ -545,7 +545,7 @@ theme.global = {
     ml: '36px',
     large: '48px',
     xlarge: '64px',
-    xxlarge: '100px',
+    xxlarge: '80px',
   },
 };
 

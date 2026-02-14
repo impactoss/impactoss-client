@@ -67,7 +67,7 @@ export const SHOW_HEADER_LOGO = true;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.header
-export const SHOW_HEADER_PATTERN = true;
+export const SHOW_HEADER_PATTERN = false;
 export const HEADER_PATTERN_HEIGHT = 254;
 
 // show header pattern

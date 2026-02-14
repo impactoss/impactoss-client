@@ -24,6 +24,12 @@ const Styled = styled.div`
 const TitleLarge = styled.h1`
   line-height: 1;
   margin-top: 10px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    font-size: 2em;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    font-size: 2em;
+  }
 `;
 const TitleMedium = styled.h3`
   line-height: 1;

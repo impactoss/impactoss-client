@@ -1182,6 +1182,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.1.description',
           defaultMessage: 'About human rights bodies',
         },
+        teaser: {
+          id: 'app.containers.App.entities.taxonomies.1.teaser',
+          defaultMessage: 'About human rights bodies',
+        },
       },
       2: {
         single: {
@@ -1207,6 +1211,10 @@ export default defineMessages({
         description: {
           id: 'app.containers.App.entities.taxonomies.2.description',
           defaultMessage: 'About cycles',
+        },
+        teaser: {
+          id: 'app.containers.App.entities.taxonomies.2.teaser',
+          defaultMessage: 'About human rights bodies',
         },
       },
       3: {
@@ -1234,6 +1242,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.3.description',
           defaultMessage: 'About human rights issues',
         },
+        teaser: {
+          id: 'app.containers.App.entities.taxonomies.3.teaser',
+          defaultMessage: 'About human rights bodies',
+        },
       },
       4: {
         single: {
@@ -1259,6 +1271,10 @@ export default defineMessages({
         description: {
           id: 'app.containers.App.entities.taxonomies.4.description',
           defaultMessage: 'About affected persons',
+        },
+        teaser: {
+          id: 'app.containers.App.entities.taxonomies.4.teaser',
+          defaultMessage: 'About human rights bodies',
         },
       },
       5: {
@@ -1286,6 +1302,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.5.description',
           defaultMessage: 'About thematic clusters',
         },
+        teaser: {
+          id: 'app.containers.App.entities.taxonomies.5.teaser',
+          defaultMessage: 'About human rights bodies',
+        },
       },
       6: {
         single: {
@@ -1311,6 +1331,10 @@ export default defineMessages({
         description: {
           id: 'app.containers.App.entities.taxonomies.6.description',
           defaultMessage: 'About organisations',
+        },
+        teaser: {
+          id: 'app.containers.App.entities.taxonomies.6.teaser',
+          defaultMessage: 'About human rights bodies',
         },
       },
       7: {
@@ -1338,6 +1362,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.7.description',
           defaultMessage: 'About Sustainable Development Goals',
         },
+        teaser: {
+          id: 'app.containers.App.entities.taxonomies.7.teaser',
+          defaultMessage: 'About human rights bodies',
+        },
       },
       8: {
         single: {
@@ -1363,6 +1391,10 @@ export default defineMessages({
         description: {
           id: 'app.containers.App.entities.taxonomies.8.description',
           defaultMessage: 'About tax 8',
+        },
+        teaser: {
+          id: 'app.containers.App.entities.taxonomies.8.teaser',
+          defaultMessage: 'About human rights bodies',
         },
       },
       9: {
@@ -1390,6 +1422,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.9.description',
           defaultMessage: 'About tax 9',
         },
+        teaser: {
+          id: 'app.containers.App.entities.taxonomies.9.teaser',
+          defaultMessage: 'About human rights bodies',
+        },
       },
       10: {
         single: {
@@ -1415,6 +1451,10 @@ export default defineMessages({
         description: {
           id: 'app.containers.App.entities.taxonomies.10.description',
           defaultMessage: 'About tax 10',
+        },
+        teaser: {
+          id: 'app.containers.App.entities.taxonomies.10.teaser',
+          defaultMessage: 'About human rights bodies',
         },
       },
       11: {
@@ -1442,6 +1482,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.11.description',
           defaultMessage: 'About tax 10',
         },
+        teaser: {
+          id: 'app.containers.App.entities.taxonomies.11.teaser',
+          defaultMessage: 'About human rights bodies',
+        },
       },
       12: {
         single: {
@@ -1468,6 +1512,10 @@ export default defineMessages({
           id: 'app.containers.App.entities.taxonomies.12.description',
           defaultMessage: 'About tax 12',
         },
+        teaser: {
+          id: 'app.containers.App.entities.taxonomies.12.teaser',
+          defaultMessage: 'About human rights bodies',
+        },
       },
       13: {
         single: {
@@ -1493,6 +1541,10 @@ export default defineMessages({
         description: {
           id: 'app.containers.App.entities.taxonomies.13.description',
           defaultMessage: 'About tax 13',
+        },
+        teaser: {
+          id: 'app.containers.App.entities.taxonomies.13.teaser',
+          defaultMessage: 'About human rights bodies',
         },
       },
     },

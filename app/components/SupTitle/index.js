@@ -7,7 +7,7 @@ import Icon from 'components/Icon';
 
 const Styled = styled.span`
   text-transform: uppercase;
-  color: ${palette('text', 1)};
+  color: ${palette('text', 0)};
   font-weight: bold;
   font-size: 0.85em;
   letter-spacing: 0.75px;

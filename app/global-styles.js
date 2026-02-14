@@ -42,24 +42,24 @@ const GlobalStyle = createGlobalStyle`
     background: transparent;
     border: none;
     text-align: left;
-    color: #0077d8;
+    color: #0065BD;
     text-decoration: none;
     &:hover {
-      color: #0065BD;
+      color: #0077d8;
     }
   }
   .ioss-csv-downloader {
     background: transparent;
     border: none;
     text-align: left;
-    color: #0077d8;
     text-decoration: none;
     font-weight: 500;
     padding: 0;
     margin: 0;
     cursor: pointer;
+    color: #0065BD;
     &:hover {
-      color: #0065BD;
+      color: #0077d8;
       text-decoration: underline;
     }
   }

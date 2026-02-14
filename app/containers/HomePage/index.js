@@ -3,7 +3,7 @@
  *
  */
 
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
@@ -13,7 +13,10 @@ import rehypeExternalLinks from 'rehype-external-links';
 
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
-import { Box } from 'grommet';
+import { Box, ResponsiveContext } from 'grommet';
+
+import { isMinSize } from 'utils/responsive';
+
 import Icon from 'components/Icon';
 
 import { loadEntitiesIfNeeded, updatePath } from 'containers/App/actions';
@@ -82,7 +85,7 @@ const SectionTop = styled.div`
   }
 `;
 
-const SectionTopInner = styled((p) => <Box {...p} />)`
+const SectionTopInner = styled((p) => <Box pad={{ horizontal: 'small' }} {...p} />)`
   display: ${(props) => props.hasBrand ? 'block' : 'table-cell'};
   vertical-align: ${(props) => props.hasBrand ? 'baseline' : 'middle'};
   padding-bottom: 2em;
@@ -97,7 +100,7 @@ const Section = styled((p) => <Box {...p} />)`
   padding-bottom: 80px;
   background-color: ${palette('mainBackground', 0)};
 `;
-const SectionInner = styled((p) => <Box {...p} />)`
+const SectionInner = styled((p) => <Box pad={{ horizontal: 'small' }} {...p} />)`
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     max-width: 800px;
   }
@@ -185,119 +188,113 @@ const SectionDescription = styled(ReactMarkdown)`
   }
 `;
 
-export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  UNSAFE_componentWillMount() {
-    this.props.loadEntitiesIfNeeded();
-  }
+export function HomePage({ onPageLink, theme, intl }) {
+  const appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
+  const size = useContext(ResponsiveContext);
 
-  render() {
-    const { onPageLink, theme, intl } = this.props;
-    const appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
-    return (
-      <div>
-        <HelmetCanonical
-          title={intl.formatMessage(messages.pageTitle)}
-          meta={[
-            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
-          ]}
-        />
-        <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
-          <SectionTopInner
+  return (
+    <div>
+      <HelmetCanonical
+        title={intl.formatMessage(messages.pageTitle)}
+        meta={[
+          { name: 'description', content: intl.formatMessage(messages.metaDescription) },
+        ]}
+      />
+      <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
+        <SectionTopInner
+          hasBrand={SHOW_BRAND_ON_HOME}
+          style={{ position: 'relative' }}
+          align="center"
+          justify="evenly"
+          fill="vertical"
+          flex={{ grow: 1 }}
+        >
+          <GraphicHomeWrapper
             hasBrand={SHOW_BRAND_ON_HOME}
-            style={{ position: 'relative' }}
-            align="center"
-            justify="evenly"
-            fill="vertical"
-            flex={{ grow: 1 }}
+            showPattern={SHOW_HEADER_PATTERN_HOME_GRAPHIC}
           >
-            <GraphicHomeWrapper
-              hasBrand={SHOW_BRAND_ON_HOME}
-              showPattern={SHOW_HEADER_PATTERN_HOME_GRAPHIC}
-            >
-              <GraphicHome src={theme.media.graphicHome} alt={intl.formatMessage(appMessages.app.title)} />
-            </GraphicHomeWrapper>
-            { !SHOW_HOME_TITLE && theme.media.titleHome
-              && <GraphicHome src={theme.media.titleHome} alt={appTitle} />
-            }
-            <Box>
-              {SHOW_HOME_TITLE_OR_CLAIM && (
-                <Box gap="xsmall" align="center">
-                  {SHOW_HOME_TITLE && (
-                    <Title>
-                      <FormattedMessage {...appMessages.app.titleHome} />
-                    </Title>
-                  )}
-                  {SHOW_HOME_CLAIM && (
-                    <Claim>
-                      <FormattedMessage {...appMessages.app.claim} />
-                    </Claim>
-                  )}
-                  <Intro
-                    children={intl.formatMessage(messages.intro)}
-                    rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
-                  />
-                </Box>
-              )}
-              <Box
-                margin={{ top: 'small', bottom: 'large' }}
-                align="center"
-                style={{ minHeight: '58px' }}
-              >
-                <Icon name="arrowDown" palette="primary" paletteIndex={0} />
-              </Box>
-            </Box>
-          </SectionTopInner>
-        </SectionTop>
-        <Section align="center">
-          <SectionInner gap="medium">
-            <Box align="center">
-              <Box>
-                <SectionTitle>
-                  <FormattedMessage {...messages.sectionTitle} />
-                </SectionTitle>
-              </Box>
-              <Box>
-                <SectionDescription
-                  children={intl.formatMessage(messages.sectionDescription)}
+            <GraphicHome src={theme.media.graphicHome} alt={intl.formatMessage(appMessages.app.title)} />
+          </GraphicHomeWrapper>
+          { !SHOW_HOME_TITLE && theme.media.titleHome
+            && <GraphicHome src={theme.media.titleHome} alt={appTitle} />
+          }
+          <Box>
+            {SHOW_HOME_TITLE_OR_CLAIM && (
+              <Box gap="xsmall" align="center">
+                {SHOW_HOME_TITLE && (
+                  <Title>
+                    <FormattedMessage {...appMessages.app.titleHome} />
+                  </Title>
+                )}
+                {SHOW_HOME_CLAIM && (
+                  <Claim>
+                    <FormattedMessage {...appMessages.app.claim} />
+                  </Claim>
+                )}
+                <Intro
+                  children={intl.formatMessage(messages.intro)}
                   rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
                 />
               </Box>
+            )}
+            <Box
+              margin={{ top: 'small', bottom: 'large' }}
+              align="center"
+              style={{ minHeight: '58px' }}
+            >
+              <Icon name="arrowDown" palette="primary" paletteIndex={0} />
             </Box>
-            <Box direction="row">
-              <CardTeaser
-                path={ROUTES.OVERVIEW}
-                onClick={(evt) => {
-                  if (evt && evt.preventDefault) evt.preventDefault();
-                  onPageLink(ROUTES.OVERVIEW);
-                }}
-                dataReady
-                title={intl.formatMessage(messages.cardTitleOverview)}
-                description={intl.formatMessage(messages.cardDescriptionOverview)}
-                explore={intl.formatMessage(messages.cardLinkOverview)}
-                graphic="overview"
-                isHome
-                basis="1/2"
-              />
-              <CardTeaser
-                path={ROUTES.RECOMMENDATIONS}
-                onClick={(evt) => {
-                  if (evt && evt.preventDefault) evt.preventDefault();
-                  onPageLink(ROUTES.RECOMMENDATIONS);
-                }}
-                dataReady
-                title={intl.formatMessage(messages.cardTitleRecommendations)}
-                description={intl.formatMessage(messages.cardDescriptionRecommendations)}
-                explore={intl.formatMessage(messages.cardLinkRecommendations)}
-                graphic="overview"
-                isHome
+          </Box>
+        </SectionTopInner>
+      </SectionTop>
+      <Section align="center">
+        <SectionInner gap="medium">
+          <Box align="center">
+            <Box>
+              <SectionTitle>
+                <FormattedMessage {...messages.sectionTitle} />
+              </SectionTitle>
+            </Box>
+            <Box>
+              <SectionDescription
+                children={intl.formatMessage(messages.sectionDescription)}
+                rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
               />
             </Box>
-          </SectionInner>
-        </Section>
-        <Footer fill />
-      </div>
-    );
-  }
+          </Box>
+          <Box gap="ms" direction={isMinSize(size, 'small') ? 'row' : 'column'}>
+            <CardTeaser
+              path={ROUTES.OVERVIEW}
+              onClick={(evt) => {
+                if (evt && evt.preventDefault) evt.preventDefault();
+                onPageLink(ROUTES.OVERVIEW);
+              }}
+              title={intl.formatMessage(messages.cardTitleOverview)}
+              description={intl.formatMessage(messages.cardDescriptionOverview)}
+              explore={intl.formatMessage(messages.cardLinkOverview)}
+              graphic="overview"
+              isHome
+              basis={isMinSize(size, 'small') ? '1/2' : '1'}
+            />
+            <CardTeaser
+              path={ROUTES.RECOMMENDATIONS}
+              onClick={(evt) => {
+                if (evt && evt.preventDefault) evt.preventDefault();
+                onPageLink(ROUTES.RECOMMENDATIONS);
+              }}
+              dataReady
+              title={intl.formatMessage(messages.cardTitleRecommendations)}
+              description={intl.formatMessage(messages.cardDescriptionRecommendations)}
+              explore={intl.formatMessage(messages.cardLinkRecommendations)}
+              graphic="overview"
+              isHome
+            />
+          </Box>
+        </SectionInner>
+      </Section>
+      <Footer fill />
+    </div>
+  );
 }
 
 HomePage.propTypes = {

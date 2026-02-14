@@ -41,6 +41,7 @@ import Description from 'components/styled/Description';
 // relative
 import VerticalDiagram from './VerticalDiagram';
 import HorizontalDiagram from './HorizontalDiagram';
+import TaxonomyPreview from './TaxonomyPreview';
 import messages from './messages';
 import { DEPENDENCIES } from './constants';
 import {
@@ -206,6 +207,14 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 recommendationCount={recommendationCount}
                 recommendationDraftCount={recommendationDraftCount}
                 frameworkId={frameworks.first().get('id')}
+                mouseOverTaxonomy={this.state.mouseOverTaxonomy}
+              />
+            )}
+            {!FEATURES.measure && dataReady && (
+              <TaxonomyPreview
+                taxonomies={taxonomies}
+                onTaxonomyLink={onTaxonomyLink}
+                onTaxonomyOver={this.onTaxonomyMouseOver}
                 mouseOverTaxonomy={this.state.mouseOverTaxonomy}
               />
             )}
