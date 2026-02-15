@@ -72,7 +72,14 @@ export const testEntityAssociation = (entity, associatedPath) => {
 export const prepareEntitySearchTarget = (entity, fields, queryLength) => reduce(
   fields,
   (target, field) => queryLength > SEARCH.MIN_LENGTH || field === 'reference '
-    ? `${target} ${cleanupSearchTarget(entity.getIn(['attributes', field]))}`
+    ? `${target} ${cleanupSearchTarget(
+      entity.getIn(['attributes', field]),
+      field === 'description'
+      || field === 'content'
+      || field === 'response'
+      || field === 'outcome'
+      || field === 'indicator_summary',
+    )}`
     : target,
   entity.get('id'),
 );
@@ -182,13 +189,14 @@ export const filterEntitiesByKeywords = (
   searchAttributes,
 ) => {
   try {
-    const regex = new RegExp(regExMultipleWords(query), 'i');
+    const q = cleanupSearchTarget(query);
+    const regex = new RegExp(regExMultipleWords(q), 'i');
     return entities && entities.filter(
       (entity) => regex.test(
         prepareEntitySearchTarget(
           entity,
           searchAttributes,
-          query.length,
+          q.length,
         ),
       ),
     );

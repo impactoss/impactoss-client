@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { reduce } from 'lodash/collection';
 import { Box } from 'grommet';
+import DebounceInput from 'react-debounce-input';
 
 import appMessage from 'utils/app-message';
 import { lowerCase } from 'utils/string';
@@ -19,11 +20,13 @@ import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 import ButtonTagFilter from 'components/buttons/ButtonTagFilter';
 import ButtonTagFilterInverse from 'components/buttons/ButtonTagFilterInverse';
-import DebounceInput from 'react-debounce-input';
 import PrintOnly from 'components/styled/PrintOnly';
 import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
+import InfoOverlay from 'components/InfoOverlay';
 
 import appMessages from 'containers/App/messages';
+import SearchInfo from './SearchInfo';
+
 import messages from './messages';
 
 const Search = styled.div`
@@ -170,6 +173,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       searchAttributes,
       placeholderMessageId,
       intl,
+      showHint,
     } = this.props;
     const searchHasFilters = (searchQuery || filters.length > 0);
     let inputPlaceholder;
@@ -208,141 +212,171 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
     const inputId = this.props.multiselect ? 'ms-search' : 'search';
 
     return (
-      <Search
-        active={this.state.active}
-        small={this.props.multiselect}
-        hidePrint={!searchHasFilters}
-        hasFocus={this.state.hasFocus}
-        onClick={() => this.input && this.input.focus()}
+      <Box
+        direction="row"
+        align="center"
+        fill="vertical"
+        flex={{ shrink: 0 }}
+        gap="xxsmall"
       >
-        <ScreenReaderOnly>
-          <StyledLabel htmlFor={inputId}>
-            {inputPlaceholder}
-          </StyledLabel>
-        </ScreenReaderOnly>
-        {filters.length > 0 && (
-          <LabelPrint>
-            <FormattedMessage {...messages.labelPrintFilters} />
-          </LabelPrint>
-        )}
-        <Box direction="row" fill="horizontal" justify="between">
-          <Box
-            direction={filters && filters.length > 3 ? 'column' : 'row'}
-            gap="xsmall"
-            fill="horizontal"
-          >
-            {filters.length > 0 && (
-              <Tags>
-                {filters.map((filter, i) => filter.inverse
-                  ? (
-                    <ButtonTagFilterInverse
-                      ref={(el) => { this.lastFilter = el; }}
-                      key={i}
-                      onClick={filter.onClick}
-                      palette={filter.type || 'attributes'}
-                      paletteHover={`${filter.type || 'attributes'}Hover`}
-                      pIndex={parseInt(filter.id, 10) || 0}
-                      disabled={!filter.onClick}
-                      title={this.getFilterTitle(filter)}
-                      onKeyDown={(e) => {
-                        const key = e.keyCode || e.charCode;
-                        if (filter.onClick && key === 8) {
-                          filter.onClick();
-                          this.focusLastFilter();
+        <Search
+          active={this.state.active}
+          small={this.props.multiselect}
+          hidePrint={!searchHasFilters}
+          hasFocus={this.state.hasFocus}
+          onClick={() => this.input && this.input.focus()}
+        >
+          <ScreenReaderOnly>
+            <StyledLabel htmlFor={inputId}>
+              {inputPlaceholder}
+            </StyledLabel>
+          </ScreenReaderOnly>
+          {filters.length > 0 && (
+            <LabelPrint>
+              <FormattedMessage {...messages.labelPrintFilters} />
+            </LabelPrint>
+          )}
+          <Box direction="row" fill="horizontal" justify="between">
+            <Box
+              direction={filters && filters.length > 3 ? 'column' : 'row'}
+              gap="xsmall"
+              fill="horizontal"
+            >
+              {filters.length > 0 && (
+                <Tags>
+                  {filters.map((filter, i) => filter.inverse
+                    ? (
+                      <ButtonTagFilterInverse
+                        ref={(el) => { this.lastFilter = el; }}
+                        key={i}
+                        onClick={filter.onClick}
+                        palette={filter.type || 'attributes'}
+                        paletteHover={`${filter.type || 'attributes'}Hover`}
+                        pIndex={parseInt(filter.id, 10) || 0}
+                        disabled={!filter.onClick}
+                        title={this.getFilterTitle(filter)}
+                        onKeyDown={(e) => {
+                          const key = e.keyCode || e.charCode;
+                          if (filter.onClick && key === 8) {
+                            filter.onClick();
+                            this.focusLastFilter();
+                          }
+                        }}
+                      >
+                        {this.getFilterLabel(filter)}
+                        {filter.onClick
+                          && <Icon name="removeSmall" text textRight hidePrint />
                         }
-                      }}
-                    >
-                      {this.getFilterLabel(filter)}
-                      {filter.onClick
-                        && <Icon name="removeSmall" text textRight hidePrint />
-                      }
-                    </ButtonTagFilterInverse>
-                  )
-                  : (
-                    <ButtonTagFilter
-                      ref={(el) => { this.lastFilter = el; }}
-                      key={i}
-                      onClick={filter.onClick}
-                      palette={filter.type || 'attributes'}
-                      paletteHover={`${filter.type || 'attributes'}Hover`}
-                      pIndex={parseInt(filter.id, 10) || 0}
-                      disabled={!filter.onClick}
-                      title={this.getFilterTitle(filter)}
-                      onKeyDown={(e) => {
-                        const key = e.keyCode || e.charCode;
-                        if (filter.onClick && key === 8) {
-                          filter.onClick();
-                          this.focusLastFilter();
+                      </ButtonTagFilterInverse>
+                    )
+                    : (
+                      <ButtonTagFilter
+                        ref={(el) => { this.lastFilter = el; }}
+                        key={i}
+                        onClick={filter.onClick}
+                        palette={filter.type || 'attributes'}
+                        paletteHover={`${filter.type || 'attributes'}Hover`}
+                        pIndex={parseInt(filter.id, 10) || 0}
+                        disabled={!filter.onClick}
+                        title={this.getFilterTitle(filter)}
+                        onKeyDown={(e) => {
+                          const key = e.keyCode || e.charCode;
+                          if (filter.onClick && key === 8) {
+                            filter.onClick();
+                            this.focusLastFilter();
+                          }
+                        }}
+                      >
+                        {this.getFilterLabel(filter)}
+                        {filter.onClick
+                          && <Icon name="removeSmall" text textRight hidePrint />
                         }
-                      }}
-                    >
-                      {this.getFilterLabel(filter)}
-                      {filter.onClick
-                        && <Icon name="removeSmall" text textRight hidePrint />
-                      }
-                    </ButtonTagFilter>
-                  ))
-                }
-              </Tags>
-            )}
-            <SearchInput
-              id={inputId}
-              placeholder={inputPlaceholder}
-              inputRef={(el) => { this.input = el; }}
-              minLength={1}
-              debounceTimeout={500}
-              value={searchQuery || ''}
-              onChange={(e) => onSearch(e.target.value)}
-              onFocus={() => this.setState({ active: true, hasFocus: true })}
-              onBlur={() => this.setState({ active: false, hasFocus: false })}
-              onKeyDown={(e) => {
-                const key = e.keyCode || e.charCode;
-                if (filters.length > 0 && (!searchQuery || searchQuery.length === 0)) {
-                  // backspace
-                  if (key === 8) {
-                    this.focusLastFilter();
+                      </ButtonTagFilter>
+                    ))
                   }
-                  // enter
-                } else if (this.props.onSkipToResults && key === 13) {
-                  this.props.onSkipToResults();
-                }
-              }}
+                </Tags>
+              )}
+              <SearchInput
+                id={inputId}
+                placeholder={inputPlaceholder}
+                inputRef={(el) => { this.input = el; }}
+                minLength={1}
+                debounceTimeout={500}
+                value={searchQuery || ''}
+                onChange={(e) => onSearch(e.target.value)}
+                onFocus={() => this.setState({ active: true, hasFocus: true })}
+                onBlur={() => this.setState({ active: false, hasFocus: false })}
+                onKeyDown={(e) => {
+                  const key = e.keyCode || e.charCode;
+                  if (filters.length > 0 && (!searchQuery || searchQuery.length === 0)) {
+                    // backspace
+                    if (key === 8) {
+                      this.focusLastFilter();
+                    }
+                    // enter
+                  } else if (this.props.onSkipToResults && key === 13) {
+                    this.props.onSkipToResults();
+                  }
+                }}
+              />
+            </Box>
+            <Box direction="row" align="center" fill="vertical" flex={{ shrink: 0 }}>
+              {searchHasFilters && (
+                <ButtonTagSearch
+                  onClick={onClear}
+                  small={this.props.multiselect}
+                  title={intl.formatMessage(messages.removeAll)}
+                >
+                  <Icon name="removeSmall" />
+                </ButtonTagSearch>
+              )}
+              {searchQuery && (
+                <LabelPrint>
+                  <FormattedMessage {...messages.labelPrintKeywords} />
+                </LabelPrint>
+              )}
+              {searchQuery && (
+                <SearchValuePrint>
+                  {searchQuery}
+                </SearchValuePrint>
+              )}
+              <ButtonTagSearch
+                as="a"
+                href={`#${resultsId}`}
+                title={intl.formatMessage(messages.skipToResults)}
+                isSearchIcon
+              >
+                <Icon name="search" size="1em" />
+              </ButtonTagSearch>
+            </Box>
+          </Box>
+        </Search>
+        {showHint && (
+          <Box style={{ minWidth: '36px' }}>
+            <InfoOverlay
+              title={intl.formatMessage(messages.searchInfoTitle)}
+              padButton="none"
+              round
+              content={(
+                <SearchInfo
+                  searchAttributes={searchAttributes}
+                />
+              )}
             />
           </Box>
-          <Box direction="row" align="center" fill="vertical" flex={{ shrink: 0 }}>
-            {searchHasFilters && (
-              <ButtonTagSearch
-                onClick={onClear}
-                small={this.props.multiselect}
-                title={this.props.intl.formatMessage(messages.removeAll)}
-              >
-                <Icon name="removeSmall" />
-              </ButtonTagSearch>
-            )}
-            {searchQuery && (
-              <LabelPrint>
-                <FormattedMessage {...messages.labelPrintKeywords} />
-              </LabelPrint>
-            )}
-            {searchQuery && (
-              <SearchValuePrint>
-                {searchQuery}
-              </SearchValuePrint>
-            )}
-            <ButtonTagSearch
-              as="a"
-              href={`#${resultsId}`}
-              title={this.props.intl.formatMessage(messages.skipToResults)}
-              isSearchIcon
-            >
-              <Icon name="search" size="1em" />
-            </ButtonTagSearch>
-          </Box>
-        </Box>
-      </Search>
+        )}
+      </Box>
     );
   }
 }
+// colorButton={theme.global.colors.hint}
+// <ButtonTagSearch
+// onClick={onClear}
+// small={this.props.multiselect}
+// title={this.context.intl.formatMessage(messages.removeAll)}
+// >
+// <Icon name="info" size="medium" />
+// </ButtonTagSearch>
 
 TagSearch.defaultProps = {
   resultsId: 'entity-list-main',
@@ -360,7 +394,12 @@ TagSearch.propTypes = {
   onClear: PropTypes.func,
   multiselect: PropTypes.bool,
   focusOnMount: PropTypes.bool,
+  showHint: PropTypes.bool,
   intl: PropTypes.object.isRequired,
+};
+
+TagSearch.defaultProps = {
+  showHint: true,
 };
 
 export default injectIntl(TagSearch);

@@ -103,6 +103,7 @@
     "regenerator-runtime": "^0.14.1",
     "rehype-external-links": "^3.0.0",
     "reselect": "5.1.1",
+    "remarkable": "^1.7.4",
     "sanitize.css": "13.0.0",
     "styled-components": "6.1.13",
     "styled-theme": "^0.3.3",

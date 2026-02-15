@@ -63,7 +63,7 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
       return (
         <BookmarkerContainer>
           <ButtonFlatIconOnly
-            subtle
+            subtle={!bookmark}
             title={bookmark
               ? intl.formatMessage(messages.editBookmark)
               : intl.formatMessage(messages.newBookmark)
