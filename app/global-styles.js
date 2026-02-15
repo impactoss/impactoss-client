@@ -186,6 +186,12 @@ const GlobalStyle = createGlobalStyle`
       }
     }
   }
+  .formatted-message-remarkable code {
+    background-color: #f2f3f4;
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+
   .download-csv-modal {
     z-index:105;
     max-width: none !important;
