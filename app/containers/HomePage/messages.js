@@ -76,7 +76,7 @@ export default defineMessages({
   },
   cardTitleOverview: {
     id: 'app.containers.HomePage.cardTitleOverview',
-    defaultMessage: 'Explore by category group',
+    defaultMessage: 'Explore by category',
   },
   cardDescriptionOverview: {
     id: 'app.containers.HomePage.cardDescriptionOverview',

@@ -12,6 +12,7 @@ export default styled.a`
   -webkit-touch-callout: none;
   user-select: none;
   outline: 0;
+  outline: none !important;
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     padding: 8px 1em;
   }

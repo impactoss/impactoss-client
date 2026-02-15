@@ -49,41 +49,46 @@ export function TaxonomyPreview({
   }
   const rows = taxonomies && splitIntoRows(taxonomies, rowMax);
   return (
-    <Styled gap="xxlarge" margin={{ vertical: 'xxlarge' }}>
-      {rows.entrySeq().map(([rowIndex, row]) => (
-        <Box key={rowIndex} direction="row" gap="ms">
-          {row.valueSeq().map((taxonomy) => {
-            const title = intl.formatMessage(appMessages.entities.taxonomies[taxonomy.get('id')].plural);
-            const description = truncateText(
-              intl.formatMessage(appMessages.entities.taxonomies[taxonomy.get('id')].teaser), 160,
-            );
-            const explore = intl.formatMessage(messages.buttons.teaserSelect);
-            return (
-              <CardTeaser
-                key={taxonomy.get('id')}
-                title={title}
-                description={description}
-                explore={explore}
-                ariaLabel={`${explore}: ${title} - ${description}`}
-                basis={`1/${row.size}`}
-                taxonomy={taxonomy}
-                onClick={(e) => {
-                  if (e) e.preventDefault();
-                  onTaxonomyLink(`${ROUTES.TAXONOMIES}/${taxonomy.get('id')}`);
-                }}
-                path={`${ROUTES.TAXONOMIES}/${taxonomy.get('id')}`}
-                isHome={false}
-                colors={[
-                  theme.palette.taxonomies[parseInt(taxonomy.get('id'), 10)],
-                  theme.palette.taxonomiesHover[parseInt(taxonomy.get('id'), 10)],
-                ]}
-                icon={`taxonomy_${taxonomy.get('id')}`}
-              />
-            );
-          })}
-        </Box>
-      ))}
-    </Styled>
+    <nav aria-label={intl.formatMessage(messages.taxonomyPreviewAriaNavLabel)}>
+      <Styled
+        gap="xxlarge"
+        margin={{ vertical: 'xxlarge' }}
+      >
+        {rows.entrySeq().map(([rowIndex, row]) => (
+          <Box key={rowIndex} direction="row" gap="ms">
+            {row.valueSeq().map((taxonomy) => {
+              const title = intl.formatMessage(appMessages.entities.taxonomies[taxonomy.get('id')].plural);
+              const description = truncateText(
+                intl.formatMessage(appMessages.entities.taxonomies[taxonomy.get('id')].teaser), 160,
+              );
+              const explore = intl.formatMessage(messages.buttons.teaserSelect);
+              return (
+                <CardTeaser
+                  key={taxonomy.get('id')}
+                  title={title}
+                  description={description}
+                  explore={explore}
+                  ariaLabel={`${explore}: ${title} - ${description}`}
+                  basis={`1/${row.size}`}
+                  taxonomy={taxonomy}
+                  onClick={(e) => {
+                    if (e) e.preventDefault();
+                    onTaxonomyLink(`${ROUTES.TAXONOMIES}/${taxonomy.get('id')}`);
+                  }}
+                  path={`${ROUTES.TAXONOMIES}/${taxonomy.get('id')}`}
+                  isHome={false}
+                  colors={[
+                    theme.palette.taxonomies[parseInt(taxonomy.get('id'), 10)],
+                    theme.palette.taxonomiesHover[parseInt(taxonomy.get('id'), 10)],
+                  ]}
+                  icon={`taxonomy_${taxonomy.get('id')}`}
+                />
+              );
+            })}
+          </Box>
+        ))}
+      </Styled>
+    </nav>
   );
 }
 

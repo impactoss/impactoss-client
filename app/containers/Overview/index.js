@@ -29,6 +29,7 @@ import Footer from 'containers/Footer';
 // components
 import ContainerWrapperSidebar from 'components/styled/Container/ContainerWrapperSidebar';
 import Container from 'components/styled/Container';
+import ScreenReaderHide from 'components/styled/ScreenReaderHide';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
@@ -140,7 +141,22 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
       recommendationCount = this.props.recommendationCountByFw.first();
       recommendationDraftCount = this.props.recommendationDraftCountByFw.first();
     }
-
+    const description = intl.formatMessage(
+      messages.description,
+      {
+        moreLink: (
+          <AboutLink
+            href={`${ROUTES.PAGES}/${ABOUT_PAGE_ID}`}
+            onClick={(evt) => {
+              if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+              onPageLink(`${ROUTES.PAGES}/${ABOUT_PAGE_ID}`);
+            }}
+          >
+            <FormattedMessage {...messages.moreLink} />
+          </AboutLink>
+        ),
+      },
+    );
     return (
       <div>
         <HelmetCanonical
@@ -158,29 +174,16 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             />
             <div style={{ position: 'relative' }}>
               <Description>
-                <FormattedMessage
-                  {...messages.description}
-                  values={{
-                    moreLink: (
-                      <AboutLink
-                        href={`${ROUTES.PAGES}/${ABOUT_PAGE_ID}`}
-                        onClick={(evt) => {
-                          if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                          onPageLink(`${ROUTES.PAGES}/${ABOUT_PAGE_ID}`);
-                        }}
-                      >
-                        <FormattedMessage {...messages.moreLink} />
-                      </AboutLink>
-                    ),
-                  }}
-                />
+                {description}
               </Description>
-              <SkipContent
-                href="#sidebar-taxonomy-options"
-                title={intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
-              >
-                <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
-              </SkipContent>
+              {FEATURES.measures && (
+                <SkipContent
+                  href="#sidebar-taxonomy-options"
+                  title={intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
+                >
+                  <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
+                </SkipContent>
+              )}
             </div>
             {!dataReady && <Loading />}
             {dataReady && allFrameworks.size > 1 && (
@@ -216,6 +219,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 onTaxonomyLink={onTaxonomyLink}
                 onTaxonomyOver={this.onTaxonomyMouseOver}
                 mouseOverTaxonomy={this.state.mouseOverTaxonomy}
+                ariaNavLabel={description}
               />
             )}
           </ViewContainer>
@@ -223,14 +227,16 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
         </ContainerWrapperSidebar>
         {!dataReady && <EntityListSidebarLoading responsiveSmall />}
         {dataReady && (
-          <TaxonomySidebar
-            taxonomies={taxonomies}
-            frameworkId={frameworkId}
-            frameworks={frameworks}
-            onTaxonomyLink={onTaxonomyLink}
-            onTaxonomyOver={this.onTaxonomyMouseOver}
-            active={this.state.mouseOverTaxonomyDiagram}
-          />
+          <ScreenReaderHide>
+            <TaxonomySidebar
+              taxonomies={taxonomies}
+              frameworkId={frameworkId}
+              frameworks={frameworks}
+              onTaxonomyLink={onTaxonomyLink}
+              onTaxonomyOver={this.onTaxonomyMouseOver}
+              active={this.state.mouseOverTaxonomyDiagram}
+            />
+          </ScreenReaderHide>
         )}
       </div>
     );

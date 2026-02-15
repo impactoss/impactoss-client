@@ -13,7 +13,7 @@ import rehypeExternalLinks from 'rehype-external-links';
 
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
-import { Box, ResponsiveContext } from 'grommet';
+import { Box, Text, ResponsiveContext } from 'grommet';
 
 import { isMinSize } from 'utils/responsive';
 
@@ -168,7 +168,7 @@ const Intro = styled(ReactMarkdown)`
     font-size: ${(props) => props.theme.sizes.print.large};
   }
 `;
-const SectionDescription = styled(ReactMarkdown)`
+const SectionDescription = styled(Text)`
   font-size: 0.8;
   margin-left: auto;
   margin-right: auto;
@@ -251,45 +251,46 @@ export function HomePage({ onPageLink, theme, intl }) {
         <SectionInner gap="medium">
           <Box align="center">
             <Box>
-              <SectionTitle>
+              <SectionTitle id="home-nav-title">
                 <FormattedMessage {...messages.sectionTitle} />
               </SectionTitle>
             </Box>
             <Box>
-              <SectionDescription
-                children={intl.formatMessage(messages.sectionDescription)}
-                rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
-              />
+              <SectionDescription>
+                <FormattedMessage {...messages.sectionDescription} />
+              </SectionDescription>
             </Box>
           </Box>
-          <Box gap="ms" direction={isMinSize(size, 'small') ? 'row' : 'column'}>
-            <CardTeaser
-              path={ROUTES.OVERVIEW}
-              onClick={(evt) => {
-                if (evt && evt.preventDefault) evt.preventDefault();
-                onPageLink(ROUTES.OVERVIEW);
-              }}
-              title={intl.formatMessage(messages.cardTitleOverview)}
-              description={intl.formatMessage(messages.cardDescriptionOverview)}
-              explore={intl.formatMessage(messages.cardLinkOverview)}
-              graphicSrc={theme.media.teaserCategories}
-              isHome
-              basis={isMinSize(size, 'small') ? '1/2' : '1'}
-            />
-            <CardTeaser
-              path={ROUTES.RECOMMENDATIONS}
-              onClick={(evt) => {
-                if (evt && evt.preventDefault) evt.preventDefault();
-                onPageLink(ROUTES.RECOMMENDATIONS);
-              }}
-              dataReady
-              title={intl.formatMessage(messages.cardTitleRecommendations)}
-              description={intl.formatMessage(messages.cardDescriptionRecommendations)}
-              explore={intl.formatMessage(messages.cardLinkRecommendations)}
-              graphicSrc={theme.media.teaserRecommendations}
-              isHome
-            />
-          </Box>
+          <nav aria-label="Explore the tracker">
+            <Box gap="ms" direction={isMinSize(size, 'small') ? 'row' : 'column'}>
+              <CardTeaser
+                path={ROUTES.OVERVIEW}
+                onClick={(evt) => {
+                  if (evt && evt.preventDefault) evt.preventDefault();
+                  onPageLink(ROUTES.OVERVIEW);
+                }}
+                title={intl.formatMessage(messages.cardTitleOverview)}
+                description={intl.formatMessage(messages.cardDescriptionOverview)}
+                explore={intl.formatMessage(messages.cardLinkOverview)}
+                graphicSrc={theme.media.teaserCategories}
+                isHome
+                basis={isMinSize(size, 'small') ? '1/2' : '1'}
+              />
+              <CardTeaser
+                path={ROUTES.RECOMMENDATIONS}
+                onClick={(evt) => {
+                  if (evt && evt.preventDefault) evt.preventDefault();
+                  onPageLink(ROUTES.RECOMMENDATIONS);
+                }}
+                dataReady
+                title={intl.formatMessage(messages.cardTitleRecommendations)}
+                description={intl.formatMessage(messages.cardDescriptionRecommendations)}
+                explore={intl.formatMessage(messages.cardLinkRecommendations)}
+                graphicSrc={theme.media.teaserRecommendations}
+                isHome
+              />
+            </Box>
+          </nav>
         </SectionInner>
       </Section>
       <Footer fill />

@@ -137,9 +137,12 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
           && (
             <Sidebar responsiveSmall>
               <Scrollable>
-                <Component>
+                <Component as="nav" aria-labelledby="taxonomy-sidebar-title">
                   <SidebarHeader responsiveSmall>
-                    <SupTitle title={intl.formatMessage(messages.title)} />
+                    <SupTitle
+                      title={intl.formatMessage(messages.title)}
+                      id="taxonomy-sidebar-title"
+                    />
                     { this.state.viewport < VIEWPORTS.SMALL
                     && (
                       <ToggleHide onClick={this.onHideSidebar}>
@@ -149,8 +152,12 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
                     }
                   </SidebarHeader>
                   {taxonomyGroups && map(taxonomyGroups, (group) => (
-                    <div key={group.id}>
-                      <SidebarGroupLabel>
+                    <div
+                      key={group.id}
+                      role="group"
+                      aria-labelledby={`sidebar-group-${group.id}`}
+                    >
+                      <SidebarGroupLabel id={`sidebar-group-${group.id}`}>
                         {group.frameworkId && (
                           <FormattedMessage
                             {... appMessages.taxonomyGroups.objectives}
