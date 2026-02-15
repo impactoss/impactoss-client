@@ -272,7 +272,7 @@ export function HomePage({ onPageLink, theme, intl }) {
               title={intl.formatMessage(messages.cardTitleOverview)}
               description={intl.formatMessage(messages.cardDescriptionOverview)}
               explore={intl.formatMessage(messages.cardLinkOverview)}
-              graphic="overview"
+              graphicSrc={theme.media.teaserCategories}
               isHome
               basis={isMinSize(size, 'small') ? '1/2' : '1'}
             />
@@ -286,7 +286,7 @@ export function HomePage({ onPageLink, theme, intl }) {
               title={intl.formatMessage(messages.cardTitleRecommendations)}
               description={intl.formatMessage(messages.cardDescriptionRecommendations)}
               explore={intl.formatMessage(messages.cardLinkRecommendations)}
-              graphic="overview"
+              graphicSrc={theme.media.teaserRecommendations}
               isHome
             />
           </Box>

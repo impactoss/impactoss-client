@@ -20,8 +20,9 @@ import partner1 from 'themes/media/scotgovlogo.svg';
 // import partner3x2x from 'themes/media/partner3@2x.png';
 // import partner4x2x from 'themes/media/partner4@2x.png';
 
-import headerLogo from 'themes/media/headerLogo.png';
-import headerLogo2x from 'themes/media/headerLogo@2x.png';
+import headerLogo from 'themes/media/headerLogo.svg';
+import teaserCategories from 'themes/media/teaserCategories.svg';
+import teaserRecommendations from 'themes/media/teaserRecommendations.svg';
 
 // import footerLogo1 from 'themes/media/footer-logo-nzgov.png';
 // import footerLogo1_2x from 'themes/media/footer-logo-nzgov@2x.png';
@@ -55,7 +56,9 @@ const theme = {};
 // };
 
 theme.media = {
-  headerLogo: [headerLogo, headerLogo2x],
+  headerLogo: [headerLogo],
+  teaserCategories: [teaserCategories],
+  teaserRecommendations: [teaserRecommendations],
   graphicHome: [graphicHome, graphicHome2x],
   impactossLogo: [impactossLogo, impactossLogo2x],
   // titleHome: [titleHome, titleHome2x],
@@ -431,7 +434,7 @@ theme.sizes = {
   },
   header: {
     banner: {
-      height: 88,
+      height: 95,
       heightMobile: 50,
     },
     nav: {
@@ -440,9 +443,9 @@ theme.sizes = {
     },
     // px or em
     text: {
-      title: '1.3em',
+      title: '1.25em',
       titleMobile: '1em',
-      claim: '1.3em',
+      claim: '1.25em',
       claimMobile: '1em',
     },
     print: {
@@ -453,6 +456,11 @@ theme.sizes = {
       mobile: 5,
       small: 6,
       large: 10,
+    },
+    paddingLogo: {
+      mobile: '2px 0 2px 5px',
+      small: '4px 0 4px 10px',
+      large: '7px 0 7px 20px',
     },
   },
   home: {
@@ -473,7 +481,7 @@ theme.sizes = {
 theme.text = {
   xxxlarge: { size: '48px', height: '60px', maxWidth: '800px' },
   xxlarge: { size: '30px', height: '36px', maxWidth: '800px' },
-  xlarge: { size: '20px', height: '28px', maxWidth: '800px' },
+  xlarge: { size: '22px', height: '28px', maxWidth: '800px' },
   large: { size: '18px', height: '24px', maxWidth: '800px' },
   largeTall: { size: '18px', height: '26px', maxWidth: '800px' },
   medium: { size: '16px', height: '21px', maxWidth: '800px' },
@@ -551,21 +559,6 @@ theme.layer = {
   overlay: {
     background: 'rgba(0, 0, 0, 0.80)',
   },
-};
-
-theme.text = {
-  xxxlarge: { size: '48px', height: '60px', maxWidth: '800px' },
-  xxlarge: { size: '30px', height: '36px', maxWidth: '800px' },
-  xlarge: { size: '20px', height: '28px', maxWidth: '800px' },
-  large: { size: '18px', height: '24px', maxWidth: '800px' },
-  largeTall: { size: '18px', height: '26px', maxWidth: '800px' },
-  medium: { size: '16px', height: '21px', maxWidth: '800px' },
-  mediumTall: { size: '16px', height: '23px', maxWidth: '800px' },
-  mediumTight: { size: '16px', height: '18px', maxWidth: '800px' },
-  small: { size: '14px', height: '18px', maxWidth: '700px' },
-  xsmall: { size: '13px', height: '16px', maxWidth: '600px' },
-  xxsmall: { size: '12px', height: '14px', maxWidth: '500px' },
-  xxxsmall: { size: '11px', height: '13px', maxWidth: '500px' },
 };
 
 theme.icon = {

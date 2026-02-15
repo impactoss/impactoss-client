@@ -25,7 +25,12 @@ import GlobalSettings from 'containers/GlobalSettings';
 import { sortEntities } from 'utils/sort';
 import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
 
-import { FOOTER, SHOW_HEADER_SHADOW_ON_HOME, FEATURES } from 'themes/config';
+import {
+  FOOTER,
+  SHOW_HEADER_SHADOW_ON_HOME,
+  SHOW_HOME_MAIN_NAV,
+  FEATURES,
+} from 'themes/config';
 
 import { ROUTES, DEPENDENCIES } from './constants';
 
@@ -59,7 +64,7 @@ import messages from './messages';
 const Main = styled.div`
   position: ${(props) => (props.isHome && !SHOW_HEADER_SHADOW_ON_HOME) ? 'relative' : 'absolute'};
   top: ${(props) => {
-    if (props.isHome) {
+    if (props.isHome && !SHOW_HOME_MAIN_NAV) {
       if (!SHOW_HEADER_SHADOW_ON_HOME) return 0;
       return props.theme.sizes.header.banner.heightMobile;
     }
@@ -78,7 +83,7 @@ const Main = styled.div`
   }};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     top: ${(props) => {
-    if (props.isHome) {
+    if (props.isHome && !SHOW_HOME_MAIN_NAV) {
       if (!SHOW_HEADER_SHADOW_ON_HOME) return 0;
       return props.theme.sizes.header.banner.height;
     }

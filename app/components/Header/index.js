@@ -15,6 +15,7 @@ import {
   SHOW_HEADER_PATTERN,
   SHOW_BRAND_ON_HOME,
   SHOW_HEADER_SHADOW_ON_HOME,
+  SHOW_HOME_MAIN_NAV,
   TEXT_TRUNCATE,
   IS_PROD,
   SERVER,
@@ -488,7 +489,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             sticky={!isHome}
             hasBackground={!isHome}
             hasShadow={!isHome || SHOW_HEADER_SHADOW_ON_HOME}
-            hasNav={!isHome}
+            hasNav={!isHome || SHOW_HOME_MAIN_NAV}
             hasBrand={SHOW_BRAND_ON_HOME || !isHome}
           >
             {this.state.showFrameworks && (
@@ -547,7 +548,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                 {this.renderSecondary(navItemsSecondary, search, hasSettings, onShowSettings, size)}
               </Banner>
             )}
-            {!isHome && (
+            {(!isHome || SHOW_HOME_MAIN_NAV) && (
               <NavMain hasBorder role="navigation" aria-label="primary">
                 <Box direction="row">
                   {frameworkOptions && (

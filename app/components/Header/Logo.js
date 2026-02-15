@@ -3,14 +3,14 @@ import styled from 'styled-components';
 import NormalImg from 'components/Img';
 
 const Logo = styled(NormalImg)`
-  padding-left: ${(props) => props.theme.sizes.header.paddingLeft.mobile || 6}px;
+  padding: ${(props) => props.theme.sizes.header.paddingLogo.mobile || 0};
   height: ${(props) => props.theme.sizes.header.banner.heightMobile}px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding-left: ${(props) => props.theme.sizes.header.paddingLeft.small || 12}px;
+    padding: ${(props) => props.theme.sizes.header.paddingLogo.small || 0};
     height: ${(props) => props.theme.sizes.header.banner.height}px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding-left: ${(props) => props.theme.sizes.header.paddingLeft.large || 20}px;
+    padding: ${(props) => props.theme.sizes.header.paddingLogo.large || 0};
   }
   @media print {
     padding-left: 0;

@@ -47,6 +47,10 @@ export default defineMessages({
       id: 'app.containers.Overview.buttons.measuresAdditional',
       defaultMessage: '{count} Government actions',
     },
+    teaserSelect: {
+      id: 'app.containers.Overview.buttons.teaserSelect',
+      defaultMessage: 'Select',
+    },
   },
   diagram: {
     categorised: {
