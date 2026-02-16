@@ -160,7 +160,7 @@ const dark = coolorsToHex('https://coolors.co/333e48-333e48-333e48-73777b-8d9696
 // 2:  gray 1 (gray pattern)
 // 3:  gray 2 (icons light)
 // 4:  gray 3 (dark lines)
-const light = coolorsToHex('https://coolors.co/f2f3f4-dfe2e3-d5dddd-cdd6d6-c7d1d1');
+const light = coolorsToHex('https://coolors.co/f2f3f4-dfe2e3-d0d4d6-cdd6d6-c7d1d1');
 
 // other palettes
 // 0: AA on light[0] and on error[3]
@@ -271,8 +271,8 @@ theme.palette = {
   // links
   // also see global-styles.js for default link "a"
   // [#primaryLink, #linkOnLightBackground, #textColorLink, #linkOnDark]
-  link: [primary[2], primary[1], dark[0], primary[4]],
-  linkHover: [primary[0], primary[0], primary[2], light[1]],
+  link: [primary[0], primary[1], dark[0], primary[4]],
+  linkHover: [primary[1], primary[0], primary[2], light[1]],
 
   // home: [ '#bg' ],
   home: [primary[4]],
@@ -536,7 +536,8 @@ theme.global = {
   colors: {
     aHover: '#0065BD',
     highlight: '#00549B',
-    textSecondary: '#777b7e', // on light background (empowerment)
+    text: dark[0], // on light background (empowerment)
+    textSecondary: dark[3], // on light background (empowerment)
     error: '#b20e0e',
     success: '#00632e',
   },

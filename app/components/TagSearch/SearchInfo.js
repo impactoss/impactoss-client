@@ -19,7 +19,7 @@ import appMessages from 'containers/App/messages';
 import messages from './messages';
 
 const StyledLabel = styled((p) => <Text size="small" {...p} />)`
-  color: ${palette('text', 1)};
+  color: ${palette('text', 0)};
 `;
 const UL = styled.ul`
   margin: 0;

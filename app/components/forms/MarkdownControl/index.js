@@ -135,6 +135,8 @@ function MarkdownControl(props) {
                 title={intl.formatMessage(messages.infoOverlayTitle)}
                 colorButton={theme.global.colors.hint}
                 padButton="none"
+                overlayId="markdown-help"
+                round
                 content={(
                   <div>
                     <p>
@@ -176,7 +178,6 @@ function MarkdownControl(props) {
                               <A
                                 href={intl.formatMessage(messages.url)}
                                 target="_blank"
-                                isOnLightBackground
                               >
                                 <FormattedMessage {...messages.infoOverlaySixthSection} />
                               </A>,

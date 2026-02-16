@@ -630,6 +630,8 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                       <Config
                         as="button"
                         onClick={() => onShowSettings()}
+                        title={intl.formatMessage(appMessages.labels.settings)}
+                        aria-label={intl.formatMessage(appMessages.labels.settings)}
                       >
                         <Icon name="settings" size="24px" />
                       </Config>

@@ -22,59 +22,59 @@ export const CONFIG = {
     {
       group: 'entities',
       targets: [
-        {
-          path: 'measures',
-          clientPath: 'actions',
-          search: ['reference', 'title', 'description', 'outcome'],
-          sorting: [
-            {
-              attribute: 'id', // proxy for created at
-              type: 'number',
-              order: 'desc',
-              default: true,
-            },
-            {
-              attribute: 'title',
-              type: 'string',
-              order: 'asc',
-            },
-            {
-              attribute: 'updated_at',
-              type: 'date',
-              order: 'desc',
-            },
-          ],
-        },
-        {
-          path: 'indicators',
-          search: ['reference', 'title', 'description'],
-          sorting: [
-            {
-              attribute: 'id', // proxy for created at
-              type: 'number',
-              order: 'desc',
-              default: true,
-            },
-            {
-              attribute: 'reference',
-              type: 'string',
-              order: 'asc',
-            },
-            {
-              attribute: 'title',
-              type: 'string',
-              order: 'asc',
-            },
-            {
-              attribute: 'updated_at',
-              type: 'date',
-              order: 'desc',
-            },
-          ],
-        },
+        // {
+        //   path: 'measures',
+        //   clientPath: 'actions',
+        //   search: ['reference', 'title', 'description', 'outcome'],
+        //   sorting: [
+        //     {
+        //       attribute: 'id', // proxy for created at
+        //       type: 'number',
+        //       order: 'desc',
+        //       default: true,
+        //     },
+        //     {
+        //       attribute: 'title',
+        //       type: 'string',
+        //       order: 'asc',
+        //     },
+        //     {
+        //       attribute: 'updated_at',
+        //       type: 'date',
+        //       order: 'desc',
+        //     },
+        //   ],
+        // },
+        // {
+        //   path: 'indicators',
+        //   search: ['reference', 'title', 'description'],
+        //   sorting: [
+        //     {
+        //       attribute: 'id', // proxy for created at
+        //       type: 'number',
+        //       order: 'desc',
+        //       default: true,
+        //     },
+        //     {
+        //       attribute: 'reference',
+        //       type: 'string',
+        //       order: 'asc',
+        //     },
+        //     {
+        //       attribute: 'title',
+        //       type: 'string',
+        //       order: 'asc',
+        //     },
+        //     {
+        //       attribute: 'updated_at',
+        //       type: 'date',
+        //       order: 'desc',
+        //     },
+        //   ],
+        // },
         {
           path: 'recommendations',
-          search: ['reference', 'title', 'description', 'response'],
+          search: ['reference', 'title', 'description'],
           groupByFramework: true,
           sorting: [
             {
@@ -100,29 +100,29 @@ export const CONFIG = {
             },
           ],
         },
-        {
-          path: 'progress_reports',
-          clientPath: 'reports',
-          search: ['title', 'description', 'document_url'],
-          sorting: [
-            {
-              attribute: 'id', // proxy for created at
-              type: 'number',
-              order: 'desc',
-              default: true,
-            },
-            {
-              attribute: 'title',
-              type: 'string',
-              order: 'asc',
-            },
-            {
-              attribute: 'updated_at',
-              type: 'date',
-              order: 'desc',
-            },
-          ],
-        },
+        // {
+        //   path: 'progress_reports',
+        //   clientPath: 'reports',
+        //   search: ['title', 'description', 'document_url'],
+        //   sorting: [
+        //     {
+        //       attribute: 'id', // proxy for created at
+        //       type: 'number',
+        //       order: 'desc',
+        //       default: true,
+        //     },
+        //     {
+        //       attribute: 'title',
+        //       type: 'string',
+        //       order: 'asc',
+        //     },
+        //     {
+        //       attribute: 'updated_at',
+        //       type: 'date',
+        //       order: 'desc',
+        //     },
+        //   ],
+        // },
       ],
     },
     {

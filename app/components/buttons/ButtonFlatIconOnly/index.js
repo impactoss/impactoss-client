@@ -4,8 +4,8 @@ import { palette } from 'styled-theme';
 import Button from '../Button';
 
 const ButtonFlatIconOnly = styled(Button)`
-  color: ${({ subtle }) => (subtle ? palette('text', 1) : palette('buttonFlatHover', 0))};
-  stroke: ${({ subtle }) => (subtle ? palette('text', 1) : palette('buttonFlatHover', 0))};
+  color: ${({ subtle }) => (subtle ? palette('text', 1) : palette('buttonFlat', 0))};
+  stroke: ${({ subtle }) => (subtle ? palette('text', 1) : palette('buttonFlat', 0))};
   border-radius: 999px;
   padding: 6px;
   min-width: 30px;

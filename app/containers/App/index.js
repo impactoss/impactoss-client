@@ -323,7 +323,10 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           <ReactModal
             isOpen
             appElement={document.getElementById('app')}
-            contentLabel="Settings"
+            aria={{
+              labelledby: 'settings-dialog-title',
+              describedby: 'settings-dialog-desc',
+            }}
             onRequestClose={() => onShowSettings(false)}
             className="global-settings-modal"
             overlayClassName="global-settings-modal-overlay"

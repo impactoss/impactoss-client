@@ -345,6 +345,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
             <InfoOverlay
               title={intl.formatMessage(messages.searchInfoTitle)}
               padButton="none"
+              overlayId="search-info"
               round
               content={(
                 <SearchInfo

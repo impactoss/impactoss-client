@@ -79,11 +79,11 @@ const Target = styled(Button)`
   text-align: left;
   color: ${palette('asideListGroup', 0)};
   background-color: ${palette('light', 1)};
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
   &:hover {
     color: ${palette('text', 0)};
     background-color: ${palette('light', 2)};
   }
-  border-bottom: 1px solid ${palette('asideListGroup', 1)};
   margin-bottom: 8px;
   @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
     font-size: 0.85em;
@@ -101,9 +101,12 @@ const ListHint = styled.div`
 const ListWrapper = styled.div``;
 
 const SettingsLink = styled(A)`
-  color: ${palette('primary', 1)};
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 500;
   &:hover {
-    color: ${palette('primary', 0)};
     text-decoration: underline;
   }
 `;
@@ -277,6 +280,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                         values={{
                           settingsLink: (
                             <SettingsLink
+                              as="button"
                               onClick={() => onShowSettingsModal()}
                             >
                               <FormattedMessage {...messages.settingsLinkAnchor} />
@@ -371,10 +375,10 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                                       <Text size="large">{title}</Text>
                                                     </Box>
                                                     {otherTargets && active && (
-                                                      <FormUp size="medium" />
+                                                      <FormUp size="medium" color="text" />
                                                     )}
                                                     {otherTargets && !active && (
-                                                      <FormDown size="medium" />
+                                                      <FormDown size="medium" color="text" />
                                                     )}
                                                   </Box>
                                                 </Target>

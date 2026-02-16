@@ -78,6 +78,7 @@ function InfoOverlay({
   inline,
   dropBackground,
   round,
+  overlayId,
 }) {
   const infoRef = useRef(null);
   const [info, showInfo] = useState(false);
@@ -144,6 +145,7 @@ function InfoOverlay({
           title={title}
           markdown={markdown}
           content={content}
+          overlayId={overlayId || 'info-overlay'}
         />
       )}
     </>
@@ -163,6 +165,7 @@ InfoOverlay.propTypes = {
   icon: PropTypes.string,
   dropBackground: PropTypes.string,
   colorButton: PropTypes.string,
+  overlayId: PropTypes.string,
   padButton: PropTypes.oneOfType([
     PropTypes.object,
     PropTypes.string,

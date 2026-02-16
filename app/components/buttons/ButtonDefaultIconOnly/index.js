@@ -7,9 +7,9 @@ const ButtonDefaultIconOnly = styled(ButtonDefault)`
   padding: 0;
   color: ${palette('buttonDefaultIconOnly', 0)};
   background-color: ${palette('buttonDefaultIconOnly', 1)};
-  &:active {
+  /* &:active {
     border: 2px solid ${palette('buttonDefaultIconOnly', 2)};
-  }
+  } */
   &:hover, &:focus-visible {
     color: ${palette('buttonDefaultIconOnlyHover', 0)};
     background-color: ${palette('buttonDefaultIconOnlyHover', 1)};

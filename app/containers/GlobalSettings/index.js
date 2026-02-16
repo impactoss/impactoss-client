@@ -60,18 +60,18 @@ const StyledForm = styled.form`
 
 const StyledTitle = styled(Text)`
   text-transform: uppercase;
-  color: ${palette('text', 1)};
+  color: ${palette('text', 0)};
 `;
 const TitleWrapper = styled((p) => <Box {...p} />)`
-  fill: ${palette('text', 1)};
+  fill: ${palette('text', 0)};
 `;
 
 const StyledLabel = styled(Text)`
-  color: ${palette('text', 1)};
+  color: ${palette('text', 0)};
 `;
 
 const StyledBodyText = styled(Text)`
-  color: ${palette('dark', 3)};
+  color: ${palette('dark', 0)};
 `;
 
 const CloseButton = styled((p) => <ButtonDefaultIconOnly {...p} />)``;
@@ -107,10 +107,11 @@ const GlobalSettings = ({
   onSetLoadArchived,
   onSetLoadNonCurrent,
   onClose,
+  intl,
 }) => {
   const size = React.useContext(ResponsiveContext);
   return (
-    <Box background="white" pad="large">
+    <Box background="white" pad="large" round="small">
       <StyledContainer>
         <Box
           direction="row"
@@ -120,19 +121,33 @@ const GlobalSettings = ({
         >
           <TitleWrapper direction="row" gap="small">
             <Icon name="settings" size="24px" />
-            <StyledTitle size="large" weight="bold">
+            <StyledTitle
+              id="settings-dialog-title"
+              role="heading"
+              aria-level="2"
+              size="large"
+              weight="bold"
+            >
               <FormattedMessage {...appMessages.labels.settings} />
             </StyledTitle>
           </TitleWrapper>
           {onClose && (
             <Box>
-              <CloseButton onClick={onClose}>
+              <CloseButton
+                onClick={onClose}
+                aria-label={intl.formatMessage(appMessages.buttons.close)}
+                title={intl.formatMessage(appMessages.buttons.close)}
+              >
                 <Icon name="close" />
               </CloseButton>
             </Box>
           )}
         </Box>
-        <Box gap="small" margin={{ bottom: 'medium' }}>
+        <Box
+          id="settings-dialog-desc"
+          gap="small"
+          margin={{ bottom: 'medium' }}
+        >
           <StyledLabel size="large" weight="bold">
             <FormattedMessage {...messages.subHeading} />
           </StyledLabel>
@@ -166,7 +181,9 @@ const GlobalSettings = ({
                             <Box basis={isMinSize(size, 'small') ? '1/2' : '1'}>
                               <Toggle
                                 toggle
-                                name="radio-ignore-noncurrent"
+                                role="switch"
+                                aria-checked={active}
+                                name={`setting-${key}`}
                                 checked={active}
                                 label={(
                                   <StyledBodyText weight={500}>

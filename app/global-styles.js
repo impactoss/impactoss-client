@@ -197,6 +197,7 @@ const GlobalStyle = createGlobalStyle`
     max-width: none !important;
   }
 
+  .overlay-modal,
   .global-settings-modal,
   .download-csv-modal,
   .new-entity-modal {
@@ -215,6 +216,7 @@ const GlobalStyle = createGlobalStyle`
     max-width: 1170px;
   }
   @media (min-width: 769px) {
+    .overlay-modal,
     .global-settings-modal,
     .download-csv-modal,
     .new-entity-modal {
@@ -227,6 +229,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .download-csv-modal,
+  .overlay-modal-overlay,
   .global-settings-modal-overlay,
   .new-entity-modal-overlay {
     position: fixed;
