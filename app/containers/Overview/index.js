@@ -54,10 +54,6 @@ import {
   selectMeasureDraftCount,
 } from './selectors';
 
-const ViewContainer = styled(Container)`
-  min-height: 66vH;
-`;
-
 const AboutLink = styled(A)`
   color: ${palette('primary', 0)};
   &:hover {
@@ -166,7 +162,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <ContainerWrapperSidebar sidebarResponsiveSmall>
-          <ViewContainer>
+          <Container>
             <ContentHeader
               type={CONTENT_LIST}
               supTitle={intl.formatMessage(messages.supTitle)}
@@ -222,7 +218,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
                 ariaNavLabel={description}
               />
             )}
-          </ViewContainer>
+          </Container>
           <Footer hasBorder />
         </ContainerWrapperSidebar>
         {!dataReady && <EntityListSidebarLoading responsiveSmall />}

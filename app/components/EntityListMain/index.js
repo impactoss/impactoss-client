@@ -43,9 +43,7 @@ const EntityListSearch = styled.div`
   }
 `;
 
-const ListEntities = styled.div`
-  position: relative;
-`;
+const ListEntities = styled.div``;
 const ListWrapper = styled.div``;
 const PrintHintKey = styled(PrintOnly)`
   font-style: italic;

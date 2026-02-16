@@ -51,7 +51,7 @@ const Table = styled.span`
   }
 `;
 const TableCell = styled.span`
-  padding: 0 0.3em;
+  padding: 0 0.3em 0 0;
   &:last-child {
     padding-right: 0;
   }

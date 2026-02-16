@@ -20,6 +20,7 @@ import { getPager } from './pagination';
 import messages from './messages';
 
 const ListEntitiesMain = styled.div`
+  overflow: hidden;
 `;
 const ListEntitiesEmpty = styled.div``;
 const ListEntitiesGroup = styled.div`

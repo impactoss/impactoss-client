@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 
 const ContainerWrapper = styled.div`
+display: flex;
+flex-direction: column;
 position: absolute;
 top: 0;
 bottom: 0;

@@ -183,7 +183,7 @@ CardTeaser.propTypes = {
   colors: PropTypes.array,
   description: PropTypes.string,
   explore: PropTypes.string,
-  graphicSrc: PropTypes.string,
+  graphicSrc: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
   basis: PropTypes.string,
   icon: PropTypes.string,
   ariaLabel: PropTypes.string,

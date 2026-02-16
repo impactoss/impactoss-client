@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 
-const Content = styled.div`
-  min-height: 66vH;
-`;
+// min-height: 66vH;
+const Content = styled.div``;
 export default Content;

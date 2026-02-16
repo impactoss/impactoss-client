@@ -53,13 +53,6 @@ const Styled = styled(ContainerWrapper)`
   background-color: ${palette('primary', 4)}
 `;
 
-const ViewContainer = styled(Container)`
-  min-height: 66vH;
-  @media print {
-    min-height: 50vH;
-  }
-`;
-
 export class PageView extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
@@ -134,7 +127,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <Styled className={`content-${CONTENT_PAGE}`} ref={this.scrollContainerRef}>
-          <ViewContainer isNarrow={!isManager}>
+          <Container isNarrow={!isManager}>
             <ContentHeader
               title={page ? page.getIn(['attributes', 'title']) : 'Page'}
               supTitle={page ? page.getIn(['attributes', 'menu_title']) : ''}
@@ -158,7 +151,7 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
                 />
               )
             }
-          </ViewContainer>
+          </Container>
           <Footer fill />
         </Styled>
       </div>

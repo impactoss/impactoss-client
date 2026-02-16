@@ -334,7 +334,6 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         </ShowSecondary>
         <NavSecondary
           visible={this.state.showSecondary}
-          aria-hidden={!this.state.showSecondary}
           role="navigation"
           aria-label="secondary"
           onClick={(evt) => {

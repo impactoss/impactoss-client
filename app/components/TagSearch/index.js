@@ -21,7 +21,6 @@ import Button from 'components/buttons/Button';
 import ButtonTagFilter from 'components/buttons/ButtonTagFilter';
 import ButtonTagFilterInverse from 'components/buttons/ButtonTagFilterInverse';
 import PrintOnly from 'components/styled/PrintOnly';
-import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 import InfoOverlay from 'components/InfoOverlay';
 
 import appMessages from 'containers/App/messages';
@@ -99,8 +98,6 @@ const SearchValuePrint = styled(PrintOnly)`
   font-size: ${(props) => props.theme.sizes.print.default};
   font-weight: bold;
 `;
-// const ButtonTagSearch = styled.div``;
-const StyledLabel = styled.label``;
 
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor() {
@@ -209,8 +206,6 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
       );
     }
 
-    const inputId = this.props.multiselect ? 'ms-search' : 'search';
-
     return (
       <Box
         direction="row"
@@ -226,11 +221,6 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
           hasFocus={this.state.hasFocus}
           onClick={() => this.input && this.input.focus()}
         >
-          <ScreenReaderOnly>
-            <StyledLabel htmlFor={inputId}>
-              {inputPlaceholder}
-            </StyledLabel>
-          </ScreenReaderOnly>
           {filters.length > 0 && (
             <LabelPrint>
               <FormattedMessage {...messages.labelPrintFilters} />
@@ -297,9 +287,8 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                 </Tags>
               )}
               <SearchInput
-                id={inputId}
                 placeholder={inputPlaceholder}
-                inputRef={(el) => { this.input = el; }}
+                aria-label={inputPlaceholder}
                 minLength={1}
                 debounceTimeout={500}
                 value={searchQuery || ''}

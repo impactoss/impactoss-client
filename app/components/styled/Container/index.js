@@ -2,8 +2,10 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 const Container = styled.div`
+  flex: 1;
   margin-right: auto;
   margin-left: auto;
+  width: 100%;
   max-width: 100%;
   padding-bottom: ${(props) => props.noPaddingBottom || props.inModal ? 0 : '3em'};
   padding-left: ${(props) => props.inModal ? 6 : 12}px;

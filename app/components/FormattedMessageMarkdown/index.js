@@ -6,7 +6,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, intlShape } from 'react-intl';
+import { injectIntl } from 'react-intl';
 import Remarkable from 'remarkable';
 
 const md = new Remarkable({ html: false, breaks: false });
@@ -26,7 +26,7 @@ const FormattedMessageMarkdown = ({
 
 FormattedMessageMarkdown.propTypes = {
   message: PropTypes.object,
-  intl: intlShape,
+  intl: PropTypes.object,
 };
 
 export default injectIntl(FormattedMessageMarkdown);
