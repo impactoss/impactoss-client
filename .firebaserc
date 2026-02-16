@@ -1,5 +1,7 @@
 {
   "projects": {
+    "default": "scotgov-dev",
+    "dev": "scotgov-dev",
     "test": "scotgov-uat",
     "prod": "scotgov-prod"
   }
