@@ -195,7 +195,7 @@ const Footer = ({
                           {page.getIn(['attributes', 'menu_title']) || page.getIn(['attributes', 'title'])}
                         </FooterLink>
                       )
-                      : 'page not found';
+                      : null;
                   })}
                   <FooterLink
                     target="_blank"
