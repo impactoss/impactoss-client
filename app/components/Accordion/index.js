@@ -16,6 +16,13 @@ const getActives = ({ activePanels, panelId, single }) => {
 
 const StyledButton = styled((p) => <Button plain {...p} />)`
   width: 100%;
+  &:focus {
+    box-shadow: none;
+  }
+  &:focus-visible {
+    outline: 2px solid #00549B;
+    outline-offset: 2px;
+  }
   &:hover {
     opacity: 0.8;
   }
@@ -31,10 +38,16 @@ export function Accordion({
     <div>
       {options.filter((o) => !!o).map((option) => {
         const open = activePanels.indexOf(option.id) > -1;
+        const panelId = `accordion-panel-${option.id}`;
+        const buttonId = `accordion-btn-${option.id}`;
+
         return (
           <div key={option.id}>
             <div>
               <StyledButton
+                id={buttonId}
+                aria-expanded={open}
+                aria-controls={open ? panelId : undefined}
                 onClick={() => onActive(
                   getActives({ activePanels, panelId: option.id, single }),
                 )}
@@ -46,7 +59,11 @@ export function Accordion({
               </StyledButton>
             </div>
             {open && option.content && (
-              <div>
+              <div
+                id={panelId}
+                role="region"
+                aria-labelledby={buttonId}
+              >
                 {option.content}
               </div>
             )}

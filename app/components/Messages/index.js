@@ -103,7 +103,13 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
     return !(message || messageKey || messages)
       ? null
       : (
-        <Styled palette={type} details={details} withoutShadow={details} spaceMessage={this.props.spaceMessage}>
+        <Styled
+          role={type === 'error' ? 'alert' : 'status'}
+          palette={type}
+          details={details}
+          withoutShadow={details}
+          spaceMessage={this.props.spaceMessage}
+        >
           <MessageWrapper details={details}>
             { type === 'error' && preMessage
             && (
@@ -159,7 +165,11 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
           { onDismiss && !details
           && (
             <DismissWrapper>
-              <Dismiss onClick={onDismiss}>
+              <Dismiss
+                onClick={onDismiss}
+                aria-label="Dismiss message"
+                title="Dismiss message"
+              >
                 <Icon name="removeLarge" />
               </Dismiss>
             </DismissWrapper>

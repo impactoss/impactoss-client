@@ -23,6 +23,13 @@ const Styled = styled((p) => <Button plain {...p} />)`
   }
   border-bottom: 1px solid;
   border-bottom-color: ${({ expanded }) => expanded ? palette('light', 2) : 'transparent'};
+  &:focus {
+    box-shadow: none;
+  }
+  &:focus-visible {
+    outline: 2px solid #00549B;
+    outline-offset: 2px;
+  }
 `;
 
 const Count = styled((p) => <Box {...p} />)`
@@ -42,6 +49,7 @@ export function OptionGroupToggle({
     <Box>
       <Styled
         expanded={expanded}
+        aria-expanded={expanded}
         onClick={onToggle}
         title={intl.formatMessage(
           expanded ? messages.groupHide : messages.groupShow,
@@ -56,10 +64,10 @@ export function OptionGroupToggle({
               </Count>
             )}
             {expanded && (
-              <FormUp size="medium" />
+              <FormUp size="medium" aria-hidden="true" role="presentation" />
             )}
             {!expanded && (
-              <FormDown size="medium" />
+              <FormDown size="medium" aria-hidden="true" role="presentation" />
             )}
           </Box>
         </Box>

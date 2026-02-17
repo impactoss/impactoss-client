@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 const Container = styled.div`
-  flex: 1;
+  flex: ${(props) => props.inModal ? '0 1 auto' : '1'};
   margin-right: auto;
   margin-left: auto;
   width: 100%;

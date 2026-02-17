@@ -153,7 +153,7 @@ const secondary = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-f
 // 2:  dark (AA)
 // 3:  medium gray 1 (AA) --- !!! AA compatible with light[0]
 // 4:  medium gray 2 (AA large)
-const dark = coolorsToHex('https://coolors.co/333e48-333e48-333e48-6a7076-8d9696');
+const dark = coolorsToHex('https://coolors.co/333e48-333e48-333e48-6a7076-6a7076');
 // light grayscale: light to dark
 // 0:  lightest gray (background colour) - also used in global-styles.js !!! AA compatible with dark[3]
 // 1:  light gray (light lines, navigation filter panel)

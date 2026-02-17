@@ -194,7 +194,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         {config.downloadCSV && this.state.downloadActive && (
           <ReactModal
             isOpen
-            contentLabel="test"
+            contentLabel="Download CSV"
             onRequestClose={() => this.onDownloadDismiss()}
             className="download-csv-modal"
             overlayClassName="download-csv-modal-overlay"

@@ -130,7 +130,11 @@ class ImportFileSelectControl extends React.PureComponent { // eslint-disable-li
                 <FileName>
                   {this.props.value.file.name}
                 </FileName>
-                <Remove onClick={this.handleRemove}>
+                <Remove
+                  onClick={this.handleRemove}
+                  aria-label={`Remove file ${this.props.value.file.name}`}
+                  title="Remove file"
+                >
                   <Icon name="removeLarge" />
                 </Remove>
               </DocumentWrapEdit>
@@ -162,6 +166,7 @@ class ImportFileSelectControl extends React.PureComponent { // eslint-disable-li
                   {...getRootProps()}
                   type="button"
                   title={intl.formatMessage(messages.selectFile)}
+                  aria-label={intl.formatMessage(messages.selectFile)}
                   icon="add"
                 />
               )}

@@ -30,7 +30,6 @@ import ContentHeader from 'components/ContentHeader';
 import CsvDownloadHandler from 'components/CsvDownloadHandler';
 
 import ButtonForm from 'components/buttons/ButtonForm';
-import ButtonSubmit from 'components/buttons/ButtonSubmit';
 import { filterEntitiesByKeywords } from 'utils/entities';
 import { isMinSize } from 'utils/responsive';
 
@@ -409,6 +408,7 @@ export function EntityListDownload({
                   gap={(isMinSize(size, 'small') || !csvSuffix) ? 'none' : 'small'}
                 >
                   <TextInput
+                    id="input-filename"
                     minLength={1}
                     debounceTimeout={500}
                     value={csvFilename}
@@ -451,16 +451,10 @@ export function EntityListDownload({
               filename={`${csvFilename}${csvSuffix ? csvDateSuffix : ''}`}
               bom={false}
               config={{ quoteChar: '', escapeChar: '' }}
+              onClick={() => onClose()}
+              buttonType="submit"
             >
-              <ButtonSubmit
-                type="button"
-                onClick={(evt) => {
-                  evt.preventDefault();
-                  onClose();
-                }}
-              >
-                <FormattedMessage {...messages.buttonDownload} />
-              </ButtonSubmit>
+              <FormattedMessage {...messages.buttonDownload} />
             </CsvDownloadHandler>
           </Box>
         </Footer>
