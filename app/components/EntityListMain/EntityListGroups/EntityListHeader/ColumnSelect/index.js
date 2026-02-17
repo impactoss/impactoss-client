@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { FormattedMessage, injectIntl } from 'react-intl';
+import { palette } from 'styled-theme';
 
 import IndeterminateCheckbox from 'components/forms/IndeterminateCheckbox';
 import SelectReset from 'components/SelectReset';
@@ -21,13 +22,21 @@ const SortButton = styled(ButtonFlatIconOnly)`
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0;
   }
+  &:hover, &:focus-visible {
+    background-color: ${palette('light', 0)};
+  }
 `;
 const Styled = styled((p) => <ColumnHeader {...p} />)`
-  padding-right: 0;
+  padding-right: 6px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  vertical-align: middle;
 `;
 const LabelWrap = styled.div`
   display: table-cell;
   padding-right: 4px;
+  position: relative;
+  top: 2px;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-left: 0px;
   }
@@ -37,6 +46,8 @@ const CheckboxWrap = styled(PrintHide)`
   text-align: center;
   vertical-align: middle;
   width: 20px;
+  position: relative;
+  top: 1px;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     width: 43px;
   }
@@ -55,6 +66,8 @@ const SelectWrapper = styled.div`
   display: table-cell;
   text-align: right;
   padding-right: 2px;
+  position: relative;
+  top: 2px;
 `;
 
 const SelectAll = styled(A)`

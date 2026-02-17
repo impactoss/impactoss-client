@@ -22,6 +22,7 @@ import messages from './messages';
 
 const Styled = styled.div`
   page-break-before: always;
+  margin: -50px 0 50px;
 `;
 
 const Title = styled.div`

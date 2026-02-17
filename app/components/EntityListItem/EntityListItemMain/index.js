@@ -304,9 +304,9 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
           {skipTargetId && (
             <SkipContent
               href={skipTargetId}
-              title="Skip to next list item or group, continue to list item details"
+              title="Skip to next list recommendation or group, continue to recommendation categories"
             >
-              Skip to next list item or group, continue to list item details
+              Skip to next list item or group, continue to recommendation categories
             </SkipContent>
           )}
           <EntityListItemMainTopWrap>

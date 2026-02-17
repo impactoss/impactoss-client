@@ -19,9 +19,9 @@ export default styled(Link)`
   padding: ${(props) => props.theme.sizes.header.mainNavItem.padding.mobile};
   height: ${(props) => props.theme.sizes.header.nav.heightMobile - 1}px;
   border-left: 1px solid ${({ active }) => active ? palette('primary', 0) : palette('text', 0)};
-  &:first-child {
+  /* &:first-child {
     border-left-width: 0;
-  }
+  } */
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     min-width: 120px;
     font-size: 0.9em;

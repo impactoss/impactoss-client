@@ -30,10 +30,18 @@ const FooterMain = styled.div`
   @media print {
     color: ${palette('text', 0)};
     background-color: transparent;
-    border: 1px solid;
+    border-top: 1px solid;
+    border-bottom: 2px solid ${palette('primary', 0)};
   }
 `;
 
+const FooterLinks = styled(
+  (p) => <Box align="start" border="top" {...p} />,
+)`
+  @media print {
+    display: none !important;
+  }
+`;
 const FooterLink = styled(A)`
   display: inline-block;
   font-weight: 600;
@@ -160,12 +168,10 @@ const Footer = ({
           </Box>
           <Box gap={isMobile ? 'medium' : 'xsmall'}>
             {pages && (
-              <Box
+              <FooterLinks
                 direction={isMobile ? 'column' : 'row'}
                 justify={isMobile ? 'start' : 'between'}
-                align="start"
                 gap={isMobile ? 'small' : 'none'}
-                border="top"
                 pad={{ top: isMobile ? 'medium' : 'small' }}
               >
                 <FooterLink
@@ -205,7 +211,7 @@ const Footer = ({
                     <FormattedMessage {...messages.govLinkAnchor} />
                   </FooterLink>
                 </Box>
-              </Box>
+              </FooterLinks>
             )}
             <Box
               border={isMobile ? 'top' : false}

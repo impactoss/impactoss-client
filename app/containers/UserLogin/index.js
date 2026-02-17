@@ -90,6 +90,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
               type="info"
               messageKey="signingInServer"
               messageArgs={{ server: SERVER }}
+              spaceMessage
             />
           )}
           {queryMessages.info
@@ -98,6 +99,7 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
                 type="info"
                 onDismiss={onDismissQueryMessages}
                 messageKey={queryMessages.info}
+                spaceMessage
               />
             )
           }

@@ -19,10 +19,8 @@ import Loading from 'components/Loading';
 
 import EntityListSidebar from 'components/EntityListSidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
-import EntityListPrintKey from 'components/EntityListPrintKey';
 import EntityListMain from 'components/EntityListMain';
 import EntityListDownload from 'components/EntityListDownload';
-import PrintOnly from 'components/styled/PrintOnly';
 
 import {
   selectHasUserRole,
@@ -289,16 +287,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               )}
             globalSettings={globalSettings}
           />
-        )}
-        {this.props.dataReady && this.props.config.taxonomies && (
-          <PrintOnly>
-            <EntityListPrintKey
-              entities={entities}
-              taxonomies={this.props.taxonomies}
-              config={this.props.config}
-              locationQuery={this.props.locationQuery}
-            />
-          </PrintOnly>
         )}
         {(progress !== null && progress < 100)
           && (

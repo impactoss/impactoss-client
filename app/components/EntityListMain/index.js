@@ -17,6 +17,7 @@ import ContainerWrapperSidebar from 'components/styled/Container/ContainerWrappe
 import Container from 'components/styled/Container';
 import Content from 'components/styled/Content';
 import SkipContent from 'components/styled/SkipContent';
+import EntityListPrintKey from 'components/EntityListPrintKey';
 
 import Loading from 'components/Loading';
 import ContentHeader from 'components/ContentHeader';
@@ -323,6 +324,16 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
             )}
           </StyledContent>
         </Container>
+        {this.props.dataReady && config.taxonomies && (
+          <PrintOnly>
+            <EntityListPrintKey
+              entities={entities}
+              taxonomies={taxonomies}
+              config={config}
+              locationQuery={this.props.locationQuery}
+            />
+          </PrintOnly>
+        )}
         <Footer hasBorder />
       </ContainerWrapperSidebar>
     );

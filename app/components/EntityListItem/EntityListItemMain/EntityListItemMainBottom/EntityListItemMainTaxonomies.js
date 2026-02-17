@@ -34,7 +34,7 @@ const Styled = styled.div`
 // border-top-color:;
 
 class EntityListItemMainTaxonomies extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  getEntityTags = (categories, taxonomies, onClick) => {
+  getEntityTags = (categories, taxonomies, onClick, intl) => {
     const tags = [];
     if (categories) {
       taxonomies
@@ -49,9 +49,12 @@ class EntityListItemMainTaxonomies extends React.PureComponent { // eslint-disab
                 const label = (category.getIn(['attributes', 'short_title']) && category.getIn(['attributes', 'short_title']).trim().length > 0
                   ? category.getIn(['attributes', 'short_title'])
                   : category.getIn(['attributes', 'title']));
+                const title = `${intl.formatMessage(
+                  appMessages.entities.taxonomies[tax.get('id')].shortSingle,
+                )}: ${category.getIn(['attributes', 'title'])}`;
                 tags.push({
                   taxId: tax.get('id'),
-                  title: category.getIn(['attributes', 'title']),
+                  title,
                   inverse: category.getIn(['attributes', 'draft']),
                   label: truncateText(label, TEXT_TRUNCATE.ENTITY_TAG, categories.size < 5),
                   onClick: () => onClick(catId, 'category'),
@@ -94,7 +97,7 @@ class EntityListItemMainTaxonomies extends React.PureComponent { // eslint-disab
       categories, taxonomies, onEntityClick, intl,
     } = this.props;
     const smartTaxonomy = taxonomies && taxonomies.find((tax) => tax.getIn(['attributes', 'is_smart']));
-    const entityTags = categories && this.getEntityTags(categories, taxonomies, onEntityClick);
+    const entityTags = categories && this.getEntityTags(categories, taxonomies, onEntityClick, intl);
 
     return (
       <Styled>

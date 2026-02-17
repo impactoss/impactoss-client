@@ -27,6 +27,9 @@ const ButtonFactory = ({ button, onWhite }) => {
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
           title={button.buttonTitle || title}
+          aria-label={button.buttonTitle || title}
+          aria-disabled={button.disabled || null}
+          aria-describedby={button.describedby || null}
         >
           <ScreenReaderHide>
             {title}
@@ -40,6 +43,9 @@ const ButtonFactory = ({ button, onWhite }) => {
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
           title={button.buttonTitle || title}
+          aria-label={button.buttonTitle || title}
+          aria-disabled={button.disabled || null}
+          aria-describedby={button.describedby || null}
         >
           <ScreenReaderHide>
             {title}
@@ -54,7 +60,10 @@ const ButtonFactory = ({ button, onWhite }) => {
           strong
           type={button.submit ? 'submit' : 'button'}
           title={button.title || intl.formatMessage(appMessages.buttons.add)}
+          aria-label={button.title || intl.formatMessage(appMessages.buttons.add)}
           disabled={button.disabled}
+          aria-disabled={button.disabled || null}
+          aria-describedby={button.describedby || null}
         />
       );
     case 'addFromMultiselect':
@@ -66,6 +75,8 @@ const ButtonFactory = ({ button, onWhite }) => {
           type={button.submit ? 'submit' : 'button'}
           title={title || intl.formatMessage(appMessages.buttons.add)}
           disabled={button.disabled}
+          aria-disabled={button.disabled || null}
+          aria-describedby={button.describedby || null}
           inForm
         />
       );
@@ -78,6 +89,9 @@ const ButtonFactory = ({ button, onWhite }) => {
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
           title={button.buttonTitle || title}
+          aria-label={button.buttonTitle || title}
+          aria-disabled={button.disabled || null}
+          aria-describedby={button.describedby || null}
         >
           <ScreenReaderHide>{title}</ScreenReaderHide>
         </ButtonFlat>
@@ -90,6 +104,9 @@ const ButtonFactory = ({ button, onWhite }) => {
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
           title={button.buttonTitle || title}
+          aria-label={button.buttonTitle || title}
+          aria-disabled={button.disabled || null}
+          aria-describedby={button.describedby || null}
         >
           <ScreenReaderHide>{title}</ScreenReaderHide>
         </ButtonFlat>
@@ -102,6 +119,9 @@ const ButtonFactory = ({ button, onWhite }) => {
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
           title={button.buttonTitle || title}
+          aria-label={button.buttonTitle || title}
+          aria-disabled={button.disabled || null}
+          aria-describedby={button.describedby || null}
         >
           <ScreenReaderHide>{title}</ScreenReaderHide>
         </ButtonFlat>
@@ -114,6 +134,9 @@ const ButtonFactory = ({ button, onWhite }) => {
           title={title || intl.formatMessage(appMessages.buttons.close)}
           disabled={button.disabled}
           onWhite={onWhite}
+          aria-label={title || intl.formatMessage(appMessages.buttons.close)}
+          aria-disabled={button.disabled || null}
+          aria-describedby={button.describedby || null}
         >
           <Icon name="close" />
         </ButtonDefaultIconOnly>
@@ -126,6 +149,9 @@ const ButtonFactory = ({ button, onWhite }) => {
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
           title={button.buttonTitle || title}
+          aria-label={button.buttonTitle || title}
+          aria-disabled={button.disabled || null}
+          aria-describedby={button.describedby || null}
           inForm
         >
           <ScreenReaderHide>{title}</ScreenReaderHide>
@@ -139,6 +165,9 @@ const ButtonFactory = ({ button, onWhite }) => {
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
           title={button.buttonTitle || title}
+          aria-label={button.buttonTitle || title}
+          aria-disabled={button.disabled || null}
+          aria-describedby={button.describedby || null}
         >
           <ScreenReaderHide>{title}</ScreenReaderHide>
         </ButtonFlat>
@@ -153,6 +182,9 @@ const ButtonFactory = ({ button, onWhite }) => {
           title={title}
           subtle
           onWhite={onWhite}
+          aria-label={title}
+          aria-disabled={button.disabled || null}
+          aria-describedby={button.describedby || null}
         >
           <Icon name={button.icon} />
         </ButtonFlatIconOnly>
@@ -167,6 +199,9 @@ const ButtonFactory = ({ button, onWhite }) => {
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
           title={button.buttonTitle || title}
+          aria-label={button.buttonTitle || title}
+          aria-disabled={button.disabled || null}
+          aria-describedby={button.describedby || null}
         >
           <ScreenReaderHide>{title}</ScreenReaderHide>
         </ButtonFlat>
