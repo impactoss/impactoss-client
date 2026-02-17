@@ -13,7 +13,7 @@ const ButtonFlatIconOnly = styled(Button)`
   &:hover, &:focus-visible {
     color: ${({ subtle }) => (subtle ? palette('buttonFlat', 0) : palette('buttonFlat', 0))};
     stroke: ${({ subtle }) => (subtle ? palette('buttonFlat', 0) : palette('buttonFlatHover', 0))};
-    background-color: ${({ onWhite }) => onWhite ? palette('light', 0) : palette('primary', 4)};
+    background-color: ${({ whiteBG }) => whiteBG ? palette('light', 0) : palette('primary', 4)};
   }
   &:focus-visible {
     outline: 1px solid ${({ subtle }) => (subtle ? palette('buttonFlat', 0) : palette('buttonFlatHover', 0))};

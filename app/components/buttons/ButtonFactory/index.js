@@ -15,7 +15,7 @@ import ButtonDefaultIconOnly from '../ButtonDefaultIconOnly';
 import ButtonFlatIconOnly from '../ButtonFlatIconOnly';
 import Bookmarker from '../../../containers/Bookmarker';
 
-const ButtonFactory = ({ button, onWhite }) => {
+const ButtonFactory = ({ button, whiteBG }) => {
   const intl = useIntl();
   let { title } = button;
 
@@ -133,7 +133,7 @@ const ButtonFactory = ({ button, onWhite }) => {
           type={button.submit ? 'submit' : 'button'}
           title={title || intl.formatMessage(appMessages.buttons.close)}
           disabled={button.disabled}
-          onWhite={onWhite}
+          whiteBG={whiteBG}
           aria-label={title || intl.formatMessage(appMessages.buttons.close)}
           aria-disabled={button.disabled || null}
           aria-describedby={button.describedby || null}
@@ -181,7 +181,7 @@ const ButtonFactory = ({ button, onWhite }) => {
           onClick={button.onClick && (() => button.onClick())}
           title={title}
           subtle
-          onWhite={onWhite}
+          whiteBG={whiteBG}
           aria-label={title}
           aria-disabled={button.disabled || null}
           aria-describedby={button.describedby || null}
@@ -211,7 +211,7 @@ const ButtonFactory = ({ button, onWhite }) => {
 
 ButtonFactory.propTypes = {
   button: PropTypes.object.isRequired,
-  onWhite: PropTypes.bool,
+  whiteBG: PropTypes.bool,
 };
 
 export default ButtonFactory;

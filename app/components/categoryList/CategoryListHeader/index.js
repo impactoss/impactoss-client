@@ -83,7 +83,7 @@ class CategoryListHeader extends React.PureComponent { // eslint-disable-line re
                 </Title>
                 {col.onClick && (
                   <SortButton
-                    onWhite
+                    whiteBG
                     onClick={col.onClick}
                     title={col.sortTitle || 'Sort'}
                   >
