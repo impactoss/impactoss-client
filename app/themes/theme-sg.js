@@ -153,7 +153,7 @@ const secondary = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-f
 // 2:  dark (AA)
 // 3:  medium gray 1 (AA) --- !!! AA compatible with light[0]
 // 4:  medium gray 2 (AA large)
-const dark = coolorsToHex('https://coolors.co/333e48-333e48-333e48-73777b-8d9696');
+const dark = coolorsToHex('https://coolors.co/333e48-333e48-333e48-6a7076-8d9696');
 // light grayscale: light to dark
 // 0:  lightest gray (background colour) - also used in global-styles.js !!! AA compatible with dark[3]
 // 1:  light gray (light lines, navigation filter panel)
@@ -161,7 +161,7 @@ const dark = coolorsToHex('https://coolors.co/333e48-333e48-333e48-73777b-8d9696
 // 3:  gray 2 (icons light)
 // 4:  gray 3 (dark lines)
 const light = coolorsToHex('https://coolors.co/f2f3f4-dfe2e3-d0d4d6-cdd6d6-c7d1d1');
-
+// ga7076
 // other palettes
 // 0: AA on light[0] and on error[3]
 // 1: AA on white
@@ -291,7 +291,7 @@ theme.palette = {
   headerBrandHover: [primary[1], primary[1]], // WARNING component sets opacity
 
   // headerNavPages: [ '#bg' ],
-  headerNavPages: ['transparent'],
+  headerNavPages: ['#fff'],
   // headerNavPagesItem: [ '#color', '#colorActive', '#bg', '#bgActive' ],
   headerNavPagesItem: [dark[0], primary[1], 'transparent', 'transparent'],
   headerNavPagesItemHover: [dark[0], primary[1], 'transparent', 'transparent'],
@@ -306,7 +306,7 @@ theme.palette = {
   headerNavMain: [secondary[4], secondary[4]],
   // headerNavMainItem: ['#color', '#colorActive', '#bg', '#bgActive'],
   headerNavMainItem: [dark[3], primary[1], 'transparent', dark[2]],
-  headerNavMainItemHover: [primary[1], primary[1], 'transparent', dark[1]],
+  headerNavMainItemHover: [primary[0], primary[1], 'transparent', dark[1]],
 
   //
   // SIDEBAR "PALETTES" //////////////////////////////////////////////////////////////
@@ -338,7 +338,7 @@ theme.palette = {
 
   // mainListItem: [#color, '#bg',], eg category and entity list items
   mainListItem: [dark[0], primary[4]],
-  mainListItemHover: [dark[3], primary[4]],
+  mainListItemHover: [primary[0], primary[4]],
 
   // multiselect header [#color, #bg]
   // compare asideListItem
@@ -364,8 +364,8 @@ theme.palette = {
   // buttonSecondary: [secondary[4], secondary[1]],
   // buttonSecondaryHover: [secondary[4], secondary[0]],
   // buttonToggleInactive: ['#color', '#bg'],
-  buttonToggleInactive: [dark[2], light[1]], // list sidebar filter/edit toggle button
-  buttonToggleInactiveHover: [dark[2], light[0]],
+  buttonToggleInactive: [dark[0], light[0]], // list sidebar filter/edit toggle button
+  buttonToggleInactiveHover: [dark[0], light[1]],
   // ButtonInverse: ['#color', '#bg'],
   buttonInverse: [primary[2], primary[4]], // used for taxonomy tags, background only
   buttonInverseHover: [primary[0], primary[4]],
@@ -434,12 +434,12 @@ theme.sizes = {
   },
   header: {
     banner: {
-      height: 95,
+      height: 80,
       heightMobile: 50,
     },
     nav: {
-      height: 50,
-      heightMobile: 37,
+      height: 40,
+      heightMobile: 27,
     },
     // px or em
     text: {
@@ -461,6 +461,26 @@ theme.sizes = {
       mobile: '2px 0 2px 5px',
       small: '4px 0 4px 10px',
       large: '7px 0 7px 20px',
+    },
+    mainNavItem: {
+      padding: {
+        mobile: '4px 10px',
+        small: '9px 12px',
+        medium: '9px 16px',
+        large: '9px 16px;',
+      },
+      paddingSearch: {
+        mobile: '4px 10px',
+        small: '9px 12px',
+        medium: '9px 16px',
+        large: '9px 16px;',
+      },
+      paddingConfig: {
+        mobile: '4px 10px',
+        small: '8px 12px',
+        medium: '8px 12px',
+        large: '8px 12px;',
+      },
     },
   },
   home: {

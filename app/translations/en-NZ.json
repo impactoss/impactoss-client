@@ -515,7 +515,7 @@
   "app.containers.App.nav.indicatorsSuper": "Progress",
   "app.containers.App.nav.measures": "Actions",
   "app.containers.App.nav.measuresSuper": "Implementation",
-  "app.containers.App.nav.overview": "By category",
+  "app.containers.App.nav.overview": "Categories",
   "app.containers.App.nav.overviewSuper": "Overview",
   "app.containers.App.nav.pages": "Page admin",
   "app.containers.App.nav.recommendationsSuper": "Objectives",

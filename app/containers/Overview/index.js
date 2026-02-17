@@ -161,7 +161,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <ContainerWrapperSidebar sidebarResponsiveSmall>
+        <ContainerWrapperSidebar hasSidebar sidebarResponsiveSmall>
           <Container>
             <ContentHeader
               type={CONTENT_LIST}

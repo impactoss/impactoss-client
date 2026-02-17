@@ -16,7 +16,7 @@ import MultiSelectControl from 'components/forms/MultiSelectControl';
 import { FILTER_FORM_MODEL, INITIAL_FORM } from './constants';
 import { setFilter } from './actions';
 
-const Styled = styled(ContainerWrapperSidebar)`
+const Styled = styled((p) => <ContainerWrapperSidebar hasSidebar {...p} />)`
   z-index: ${(props) => props.sidebarResponsiveLarge ? 99 : 101};
   background-color: rgba(0,0,0,0.2);
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {

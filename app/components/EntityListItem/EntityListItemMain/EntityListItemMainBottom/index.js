@@ -9,7 +9,7 @@ import EntityListItemMainConnections from './EntityListItemMainConnections';
 import EntityListItemMainTaxonomies from './EntityListItemMainTaxonomies';
 
 const Styled = styled((p) => <Component {...p} />)`
-  margin-bottom: -5px;
+  margin-bottom: -3px;
   display: none;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     display: block;

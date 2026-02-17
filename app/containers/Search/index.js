@@ -95,7 +95,7 @@ const Target = styled(Button)`
 `;
 
 const ListHint = styled.div`
-  color:  ${palette('dark', 3)};
+  color:  ${palette('text', 0)};
   padding-bottom: 10px;
 `;
 const ListWrapper = styled.div``;

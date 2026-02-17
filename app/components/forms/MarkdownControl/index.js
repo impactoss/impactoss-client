@@ -76,12 +76,12 @@ const ViewButton = styled((p) => (
   />
 ))`
   background: none;
-  opacity: ${({ active }) => active ? 1 : 0.6};
   border-bottom: 3px solid;
   border-bottom-color: ${({ active }) => active ? palette('primary', 1) : 'transparent'};
+  color: ${({ active }) => active ? palette('primary', 1) : palette('text', 1)};
   &:hover {
-    opacity: 0.8;
-    border-bottom-color: ${({ active, theme }) => active ? theme.global.colors.aHover : 'transparent'};
+    border-bottom-color: ${({ active }) => active ? palette('primary', 0) : palette('text', 1)};
+    color: ${({ active }) => active ? palette('primary', 1) : palette('text', 1)};
   }
 `;
 const MDButtonText = styled((p) => (

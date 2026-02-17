@@ -143,7 +143,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
                 buttons.map((button, i) => button && (
                   <TableCellInner key={i}>
                     <ButtonWrap>
-                      <ButtonFactory button={button} />
+                      <ButtonFactory button={button} onWhite={type === CONTENT_PAGE} />
                     </ButtonWrap>
                   </TableCellInner>
                 ))
@@ -164,7 +164,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
                     buttons.map((button, i) => (
                       <TableCellInner key={i}>
                         <ButtonWrap>
-                          <ButtonFactory button={button} />
+                          <ButtonFactory button={button} onWhite={type === CONTENT_PAGE} />
                         </ButtonWrap>
                       </TableCellInner>
                     ))

@@ -69,6 +69,8 @@ export const SHOW_HEADER_LOGO = true;
 // specified in themes/[theme].js: theme.backgroundImages.header
 export const SHOW_HEADER_PATTERN = false;
 export const HEADER_PATTERN_HEIGHT = 254;
+export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
+export const SHOW_HEADER_SUPTITLE = false;
 
 // show header pattern
 // specified in themes/[theme].js: theme.backgroundImages.sidebarHeader
@@ -82,11 +84,10 @@ export const SHOW_HOME_TITLE_OR_CLAIM = true;
 export const SHOW_HOME_TITLE = true;
 export const SHOW_HOME_CLAIM = false;
 export const SHOW_HEADER_SHADOW_ON_HOME = true;
-export const SHOW_HOME_MAIN_NAV = false;
-
+export const SHOW_HOME_MAIN_NAV = true;
 export const SHOW_BRAND_ON_HOME = true;
 export const HOME_GRAPHIC_WIDTH = 1200;
-export const SHOW_HEADER_PATTERN_HOME_GRAPHIC = false;
+
 
 // show footer logo section
 export const FOOTER = {

@@ -15,9 +15,10 @@ import ButtonDefaultIconOnly from '../ButtonDefaultIconOnly';
 import ButtonFlatIconOnly from '../ButtonFlatIconOnly';
 import Bookmarker from '../../../containers/Bookmarker';
 
-const ButtonFactory = ({ button }) => {
+const ButtonFactory = ({ button, onWhite }) => {
   const intl = useIntl();
   let { title } = button;
+
   switch (button.type) {
     case 'primary':
       return (
@@ -112,6 +113,7 @@ const ButtonFactory = ({ button }) => {
           type={button.submit ? 'submit' : 'button'}
           title={title || intl.formatMessage(appMessages.buttons.close)}
           disabled={button.disabled}
+          onWhite={onWhite}
         >
           <Icon name="close" />
         </ButtonDefaultIconOnly>
@@ -150,6 +152,7 @@ const ButtonFactory = ({ button }) => {
           onClick={button.onClick && (() => button.onClick())}
           title={title}
           subtle
+          onWhite={onWhite}
         >
           <Icon name={button.icon} />
         </ButtonFlatIconOnly>
@@ -173,6 +176,7 @@ const ButtonFactory = ({ button }) => {
 
 ButtonFactory.propTypes = {
   button: PropTypes.object.isRequired,
+  onWhite: PropTypes.bool,
 };
 
 export default ButtonFactory;

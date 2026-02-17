@@ -25,10 +25,10 @@ const Styled = styled.div`
   width: 100%;
   display: block;
   padding-top: 3px;
-  margin-top: 8px;
+  margin-top: 0px;
   @media print {
     padding-top: 2px;
-    margin-top: 3px;
+    margin-top: 0px;
   }
 `;
 // border-top-color:;

@@ -17,6 +17,7 @@ import { qe } from 'utils/quasi-equals';
 
 import { loadEntitiesIfNeeded, openBookmark } from 'containers/App/actions';
 import { selectReady, selectEntities } from 'containers/App/selectors';
+import { FEATURES } from 'themes/config';
 import { CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
@@ -119,7 +120,7 @@ const TargetTitle = styled.div`
 `;
 
 const ListHint = styled.div`
-  color:  ${palette('dark', 3)};
+  color:  ${palette('text', 0)};
   padding-bottom: 10px;
 `;
 const ListWrapper = styled.div``;
@@ -244,6 +245,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
     } = this.props;
     const filtered = activeType && activeType !== '';
     const bookmarksFiltered = bookmarksForSearch.filter((e) => !filtered || qe(activeType, e.getIn(['attributes', 'view', 'type'])));
+    const hasSidebar = FEATURES.measures;
     return (
       <div>
         <HelmetCanonical
@@ -255,7 +257,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
         {!dataReady
           && <EntityListSidebarLoading responsiveSmall />
         }
-        {dataReady && this.state.viewport && this.state.viewport !== VIEWPORTS.MOBILE
+        {hasSidebar && dataReady && this.state.viewport && this.state.viewport !== VIEWPORTS.MOBILE
           && (
             <PrintHide>
               <Sidebar responsiveSmall>
@@ -273,7 +275,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
             </PrintHide>
           )
         }
-        <ContainerWrapperSidebar sidebarResponsiveSmall>
+        <ContainerWrapperSidebar hasSidebar={hasSidebar} sidebarResponsiveSmall>
           <Container>
             <Content>
               <ContentHeader
@@ -301,6 +303,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                       searchQuery={location.query.search || ''}
                       onSearch={onSearch}
                       onClear={() => onClear(['search'])}
+                      showHint={false}
                     />
                   </EntityListSearch>
                   <ListWrapper>

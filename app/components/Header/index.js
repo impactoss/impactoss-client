@@ -15,6 +15,7 @@ import {
   SHOW_HEADER_PATTERN,
   SHOW_BRAND_ON_HOME,
   SHOW_HEADER_SHADOW_ON_HOME,
+  SHOW_HEADER_SUPTITLE,
   SHOW_HOME_MAIN_NAV,
   TEXT_TRUNCATE,
   IS_PROD,
@@ -168,31 +169,35 @@ const SelectFrameworks = styled(LinkMain)`
 `;
 const Search = styled(LinkMain)`
   display: none;
-  padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
   border-right: none;
+  padding: ${(props) => props.theme.sizes.header.mainNavItem.paddingSearch.mobile};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: inline-block;
     min-width: auto;
-    padding: 15px ${(props) => props.theme.sizes.header.paddingLeft.small}px 0;
     border-left: none;
+    padding: ${(props) => props.theme.sizes.header.mainNavItem.paddingSearch.small};
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    padding: ${(props) => props.theme.sizes.header.mainNavItem.paddingSearch.medium};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding-left: 18px;
-    padding-right: 18px;
+    padding: ${(props) => props.theme.sizes.header.mainNavItem.paddingSearch.large};
   }
 `;
 const Config = styled(LinkMain)`
   display: none;
-  padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
-  border-left: 1px solid ${palette('dark', 3)};
+  border-left: 1px solid ${palette('text', 0)};
+  padding: ${(props) => props.theme.sizes.header.mainNavItem.paddingConfig.mobile};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: inline-block;
     min-width: auto;
-    padding: 13px ${(props) => props.theme.sizes.header.paddingLeft.small}px;
+    padding: ${(props) => props.theme.sizes.header.mainNavItem.paddingConfig.small};
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    padding: ${(props) => props.theme.sizes.header.mainNavItem.paddingConfig.medium};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding-left: 18px;
-    padding-right: 18px;
+    padding: ${(props) => props.theme.sizes.header.mainNavItem.paddingConfig.large};
   }
 `;
 const SearchSecondary = styled(LinkPage)`
@@ -603,9 +608,11 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                       active={item.active}
                       onClick={(evt) => this.onClick(evt, item.path)}
                     >
-                      <LinkSuperTitle active={item.active}>
-                        {item.titleSuper}
-                      </LinkSuperTitle>
+                      {(frameworkOptions || SHOW_HEADER_SUPTITLE) && (
+                        <LinkSuperTitle active={item.active}>
+                          {item.titleSuper}
+                        </LinkSuperTitle>
+                      )}
                       <LinkTitle active={item.active}>
                         {item.title}
                       </LinkTitle>

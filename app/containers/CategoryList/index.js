@@ -155,7 +155,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <ContainerWrapperSidebar sidebarResponsiveSmall>
+        <ContainerWrapperSidebar hasSidebar sidebarResponsiveSmall>
           <Container>
             <Content>
               <ContentHeader

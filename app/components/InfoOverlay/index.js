@@ -42,14 +42,14 @@ const Markdown = styled(ReactMarkdown)`
 `;
 
 const StyledButton = styled(Button)`
-  color: ${({ colorButton }) => colorButton || palette('dark', 1)};
-  stroke: ${({ colorButton }) => colorButton || palette('dark', 1)};
+  color: ${({ colorButton }) => colorButton || palette('dark', 3)};
+  stroke: ${({ colorButton }) => colorButton || palette('dark', 3)};
   background-color: transparent;
   border-radius: ${({ round }) => round ? 999 : 0}px;
   &:hover, &:focus-visible {
     color: ${palette('primary', 0)};
     stroke: ${palette('primary', 0)};
-    background-color: ${palette('light', 2)};
+    background-color: ${palette('primary', 4)};
   }
   &:focus-visible {
     outline: 1px solid ${palette('primary', 0)};

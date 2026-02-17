@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { Box } from 'grommet';
 
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 import Icon from 'components/Icon';
@@ -21,42 +22,38 @@ const Styled = styled.div`
 
 
 const Column = styled(ColumnHeader)`
-  position: relative;
+  padding-right: 6px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  vertical-align: middle;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding-right: 30px;
+    padding-top: 2px;
+    padding-bottom: 2px;
   }
 `;
 
-const Title = styled.span``;
+const Title = styled.span`
+  position: relative;
+  top: 2px;
+`;
 
 const Via = styled.span`
   font-style: italic;
 `;
 
-
-const SortWrapper = styled.div`
-  float: right;
-  background-color: ${palette('light', 1)};
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding: 4px 2px 0 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    float: none;
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
-    padding: 6px 2px 0 0;
-  }
-  @media print {
-    padding-top: 0;
-    background-color: transparent;
-  }
-`;
 const SortButton = styled(ButtonFlatIconOnly)`
   color: inherit;
   padding: 0;
+  position: relative;
+  top: 1px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0;
+  }
+  @media print {
+    display: none !important;
+  }
+  &:hover, &:focus-visible {
+    background-color: ${palette('light', 0)};
   }
 `;
 
@@ -70,22 +67,30 @@ class CategoryListHeader extends React.PureComponent { // eslint-disable-line re
         {
           columns.map((col, i) => (
             <Column key={i} colWidth={col.width}>
-              <Title>
-                {col.header}
-                {col.via && (
-                  <Via>{` ${col.via}`}</Via>
-                )}
-                {col.by && (
-                  <span>{col.by}</span>
-                )}
-              </Title>
-              {col.onClick && (
-                <SortWrapper>
-                  <SortButton onClick={col.onClick} title={col.sortTitle || 'Sort'}>
+              <Box
+                direction="row"
+                justify="between"
+                align="center"
+              >
+                <Title>
+                  {col.header}
+                  {col.via && (
+                    <Via>{` ${col.via}`}</Via>
+                  )}
+                  {col.by && (
+                    <span>{col.by}</span>
+                  )}
+                </Title>
+                {col.onClick && (
+                  <SortButton
+                    onWhite
+                    onClick={col.onClick}
+                    title={col.sortTitle || 'Sort'}
+                  >
                     <Icon name={col.sortIcon} hidePrint={!col.active} />
                   </SortButton>
-                </SortWrapper>
-              )}
+                )}
+              </Box>
             </Column>
           ))
         }
