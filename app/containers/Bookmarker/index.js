@@ -68,6 +68,10 @@ class Bookmarker extends React.PureComponent { // eslint-disable-line react/pref
               ? intl.formatMessage(messages.editBookmark)
               : intl.formatMessage(messages.newBookmark)
             }
+            aria-label={bookmark
+              ? intl.formatMessage(messages.editBookmark)
+              : intl.formatMessage(messages.newBookmark)
+            }
             onClick={
               () => {
                 if (!bookmark) {
