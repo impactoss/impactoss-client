@@ -28,6 +28,7 @@ import Sidebar from 'components/styled/Sidebar';
 import SidebarHeader from 'components/styled/SidebarHeader';
 import PrintHide from 'components/styled/PrintHide';
 import SkipContent from 'components/styled/SkipContent';
+import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 
 import EntityListSidebarGroups from './EntityListSidebarGroups';
 
@@ -278,7 +279,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     } = this.props;
     const { activeOption } = this.state;
 
-    const hasSelected = entityIdsSelected && entityIdsSelected.size > 0;
+    const selectedCount = entityIdsSelected ? entityIdsSelected.size : 0;
+    const hasSelected = selectedCount > 0;
     const hasEntities = entities && entities.size > 0;
     const formModel = activePanel === FILTERS_PANEL ? FILTER_FORM_MODEL : EDIT_FORM_MODEL;
 
@@ -388,24 +390,34 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
               <Sidebar onClick={(evt) => evt.stopPropagation()}>
                 <ScrollableWrapper>
                   <SidebarHeader hasButtons={canEdit}>
-                    {canEdit
-                    && (
-                      <ButtonToggle
-                        options={this.getSidebarButtons(intl)}
-                        activePanel={activePanel}
-                        onSelect={onPanelSelect}
-                      />
+                    {canEdit && (
+                      <>
+                        <ButtonToggle
+                          options={this.getSidebarButtons(intl)}
+                          activePanel={activePanel}
+                          onSelect={onPanelSelect}
+                        />
+                        <ScreenReaderOnly aria-live="polite">
+                          {activePanel === EDIT_PANEL && selectedCount === 0 && (
+                            intl.formatMessage(messages.header.editModeNoneSelected)
+                          )}
+                          {activePanel === EDIT_PANEL && selectedCount > 0 && (
+                            intl.formatMessage(messages.header.editMode, { count: selectedCount })
+                          )}
+                          {activePanel === FILTERS_PANEL && (
+                            intl.formatMessage(messages.header.filterMode)
+                          )}
+                        </ScreenReaderOnly>
+                      </>
                     )}
-                    {!canEdit
-                    && <SupTitle title={intl.formatMessage(messages.header.filter)} />
-                    }
-                    { this.state.viewport < VIEWPORTS.LARGE
-                    && (
+                    {!canEdit && (
+                      <SupTitle title={intl.formatMessage(messages.header.filter)} />
+                    )}
+                    { this.state.viewport < VIEWPORTS.LARGE && (
                       <ToggleHide onClick={this.onHideSidebar}>
                         <Icon name="close" />
                       </ToggleHide>
-                    )
-                    }
+                    )}
                   </SidebarHeader>
                   <div>
                     { (activePanel === FILTERS_PANEL || (activePanel === EDIT_PANEL && hasSelected && hasEntities))

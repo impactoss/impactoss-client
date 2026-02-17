@@ -252,6 +252,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                       onResetFilters(currentFilterArgs(config, locationQuery));
                       onDismissAllErrors();
                     }}
+                    resultsId="entity-list-main"
                   />
                   <SkipContent
                     href="#filter-options"

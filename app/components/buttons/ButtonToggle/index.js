@@ -58,6 +58,7 @@ class ButtonToggle extends React.PureComponent { // eslint-disable-line react/pr
                     strong
                     outline
                     align={i === 0 ? 'left' : 'right'}
+                    aria-pressed="true"
                   />
                 </ButtonActive>
               );
@@ -78,6 +79,7 @@ class ButtonToggle extends React.PureComponent { // eslint-disable-line react/pr
                   inactive
                   border={{ palette: 'light', pIndex: 2 }}
                   strong
+                  aria-pressed="false"
                 />
               </ButtonInactive>
             );

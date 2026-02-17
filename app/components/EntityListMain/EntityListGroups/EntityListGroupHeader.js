@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import ScreenReaderHide from 'components/styled/ScreenReaderHide';
+import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 
 import Link from 'containers/Link';
 import { ROUTES } from 'containers/App/constants';
@@ -80,16 +81,18 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
         <ListEntitiesGroupHeaderLink
           id={`list-group-${group.get('id')}`}
           to={`${ROUTES.CATEGORIES}/${group.get('id')}`}
-          title={intl.formatMessage(
-            messages.groupHeaderTitle,
-            { label: group.get('label'), type: groupTypeTitle },
-          )}
         >
-          <ScreenReaderHide>
-            <ListEntitiesGroupHeader>
+          <ListEntitiesGroupHeader>
+            <ScreenReaderOnly>
+              {intl.formatMessage(messages.groupHeaderTitle, {
+                label: group.get('label'),
+                type: groupTypeTitle,
+              })}
+            </ScreenReaderOnly>
+            <ScreenReaderHide>
               {group.get('label')}
-            </ListEntitiesGroupHeader>
-          </ScreenReaderHide>
+            </ScreenReaderHide>
+          </ListEntitiesGroupHeader>
         </ListEntitiesGroupHeaderLink>
       )
       : (
@@ -101,11 +104,17 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
               { label: group.get('label'), type: groupTypeTitle },
             )}
           >
-            <ScreenReaderHide>
-              <ListEntitiesSubgroupHeader>
+            <ListEntitiesSubgroupHeader>
+              <ScreenReaderOnly>
+                {intl.formatMessage(messages.subgroupHeaderTitle, {
+                  label: group.get('label'),
+                  type: groupTypeTitle,
+                })}
+              </ScreenReaderOnly>
+              <ScreenReaderHide>
                 {group.get('label')}
-              </ListEntitiesSubgroupHeader>
-            </ScreenReaderHide>
+              </ScreenReaderHide>
+            </ListEntitiesSubgroupHeader>
           </ListEntitiesGroupHeaderLink>
           {expanded && <Divider />}
         </ListEntitiesGroupHeaderWrapper>

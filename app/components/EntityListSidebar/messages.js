@@ -18,6 +18,18 @@ export default defineMessages({
       id: 'app.components.EntityListSidebar.header.editButton',
       defaultMessage: 'Edit',
     },
+    filterMode: {
+      id: 'app.components.EntityListSidebar.header.filterMode',
+      defaultMessage: 'Filter mode active.',
+    },
+    editMode: {
+      id: 'app.components.EntityListSidebar.header.editMode',
+      defaultMessage: 'Edit mode active. {count} items selected. Edit options available.',
+    },
+    editModeNoneSelected: {
+      id: 'app.components.EntityListSidebar.header.editModeNoneSelected',
+      defaultMessage: 'Edit mode active. Please select one or more entities from the list for available edit options.',
+    },
   },
   sidebarToggle: {
     showFilter: {

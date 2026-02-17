@@ -63,6 +63,7 @@ class EntityListSidebarGroupLabel extends React.PureComponent { // eslint-disabl
         title={intl.formatMessage(
           expanded ? messages.groupExpand.hide : messages.groupExpand.show,
         )}
+        aria-expanded={expanded}
       >
         <GroupLabel>{label}</GroupLabel>
         <GroupIcon><Icon name={icon} /></GroupIcon>
