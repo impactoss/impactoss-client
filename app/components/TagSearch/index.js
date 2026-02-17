@@ -333,6 +333,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                 as="a"
                 href={`#${resultsId}`}
                 title={intl.formatMessage(messages.skipToResults)}
+                aria-label={intl.formatMessage(messages.skipToResults)}
                 isSearchIcon
               >
                 <Icon name="search" size="1em" />

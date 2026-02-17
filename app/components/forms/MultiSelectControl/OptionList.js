@@ -173,7 +173,7 @@ class OptionList extends React.PureComponent {
     const hasMore = options.size < this.props.options.size;
 
     return (
-      <Styled>
+      <Styled aria-live="polite">
         <ListWrapper id="option-list">
           {groups && groups.toList().map((group, gid) => (
             <GroupWrapper key={gid}>

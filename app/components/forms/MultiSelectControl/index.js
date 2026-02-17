@@ -143,6 +143,7 @@ class MultiSelectControl extends React.Component {
       panelId: this.props.panelId,
     });
     document.addEventListener('mousedown', this.handleClickOutside);
+    document.addEventListener('keydown', this.handleKeyDown);
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -158,7 +159,14 @@ class MultiSelectControl extends React.Component {
 
   componentWillUnmount() {
     document.removeEventListener('mousedown', this.handleClickOutside);
+    document.removeEventListener('keydown', this.handleKeyDown);
   }
+
+  handleKeyDown = (event) => {
+    if (event.key === 'Escape') {
+      this.props.onCancel();
+    }
+  };
 
   onSearch = (value) => {
     this.setState({
@@ -339,7 +347,11 @@ class MultiSelectControl extends React.Component {
     options = this.filterOptions(options, this.props, this.state);
     const filteredOptionsSelected = options.filter((option) => option.get('checked') || this.isOptionIndeterminate(option));
     return (
-      <div ref={this.setWrapperRef}>
+      <div
+        role="dialog"
+        ref={this.setWrapperRef}
+        aria-label={this.props.title}
+      >
         <Header
           title={this.props.title}
           onCancel={this.props.onCancel}
@@ -431,15 +443,17 @@ class MultiSelectControl extends React.Component {
         {this.props.buttons
           && (
             <ControlFooter>
-              <ButtonGroup>
-                {
-                  this.props.buttons.map((action, i) => action && action.position !== 'left' && this.renderButton(action, i, hasChanges))
-                }
-              </ButtonGroup>
               <ButtonGroup left>
                 {
                   this.props.buttons.map((action, i) => (
                     action && action.position === 'left' && this.renderButton(action, i, hasChanges)
+                  ))
+                }
+              </ButtonGroup>
+              <ButtonGroup>
+                {
+                  this.props.buttons.map((action, i) => (
+                    action && action.position !== 'left' && this.renderButton(action, i, hasChanges)
                   ))
                 }
               </ButtonGroup>

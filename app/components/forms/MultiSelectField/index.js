@@ -123,7 +123,14 @@ const MultiSelectWithout = styled.div`
   }
 `;
 const MultiSelectWithoutLink = styled(A)`
+  display: block;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
   color: ${palette('text', 1)};
+  margin-top: 2px;
   &:hover {
     color: ${palette('link', 0)};
   }
@@ -149,6 +156,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
       multiselectOpen: null,
     };
     this.controlRef = React.createRef();
+    this.dropdownRef = React.createRef();
   }
 
   componentDidUpdate() {
@@ -175,6 +183,10 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
   onCloseMultiselect = () => {
     this.setState({
       multiselectOpen: null,
+    }, () => {
+      if (this.dropdownRef.current) {
+        this.dropdownRef.current.focus();
+      }
     });
   };
 
@@ -209,7 +221,7 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
   );
 
   renderMultiselectActiveOption = (option, field, i) => (
-    <MultiselectActiveOptionListItem key={i}>
+    <MultiselectActiveOptionListItem key={i} role="listitem">
       <MultiselectActiveOption>
         {option.get('draft')
           && <ItemStatus draft />
@@ -224,6 +236,8 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
           if (evt !== undefined && evt.preventDefault) evt.preventDefault();
           this.onMultiSelectItemRemove(option, field);
         }}
+        title={`Remove ${option.get('label')}`}
+        aria-label={`Remove ${option.get('label')}`}
       >
         <Icon name="removeSmall" />
       </MultiselectActiveOptionRemove>
@@ -238,20 +252,23 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
     return (
       <MultiSelectFieldWrapper>
         <MultiSelectDropdown
+          ref={this.dropdownRef}
           onClick={(evt) => {
             if (evt !== undefined && evt.preventDefault) evt.preventDefault();
             this.onToggleMultiselect(field);
           }}
+          aria-haspopup="dialog"
+          aria-expanded={this.state.multiselectOpen === id}
         >
           { field.label }
-          <MultiSelectDropdownIcon>
+          <MultiSelectDropdownIcon aria-hidden="true" role="presentation">
             <Icon name={this.state.multiselectOpen === id ? 'dropdownClose' : 'dropdownOpen'} />
           </MultiSelectDropdownIcon>
         </MultiSelectDropdown>
-        <MultiselectActiveOptions>
+        <MultiselectActiveOptions aria-live="polite">
           { options.size > 0
             ? (
-              <MultiselectActiveOptionList>
+              <MultiselectActiveOptionList role="list">
                 {options.map((option, i) => this.renderMultiselectActiveOption(option, field, i))}
               </MultiselectActiveOptionList>
             )
@@ -262,7 +279,9 @@ class MultiSelectField extends React.Component { // eslint-disable-line react/pr
                   values={{ entities: lowerCase(field.label) }}
                 />
                 <MultiSelectWithoutLink
-                  href="#add"
+                  as="button"
+                  aria-hidden="true"
+                  tabIndex={-1}
                   onClick={(evt) => {
                     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
                     this.onToggleMultiselect(field);

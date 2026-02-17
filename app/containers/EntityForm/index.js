@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
+import { toLower } from 'lodash/string';
 
 import { fromJS } from 'immutable';
 import { omit } from 'lodash/object';
@@ -126,7 +127,7 @@ const controls = {
 };
 
 // These props will be omitted before being passed to the Control component
-const NON_CONTROL_PROPS = ['hint', 'label', 'component', 'controlType', 'children', 'errorMessages'];
+const NON_CONTROL_PROPS = ['hint', 'label', 'component', 'controlType', 'children', 'errorMessages', 'validators'];
 
 
 class EntityForm extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -315,81 +316,84 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     );
   };
 
-  renderGroup = (group, hasEntityNewModal, scrollContainer) => (
-    <FieldGroupWrapper>
-      {group.label
-        && (
+  renderGroup = (group, hasEntityNewModal, scrollContainer) => {
+    const groupId = group.label ? `group-${toLower(group.label).replace(/\s+/g, '-')}` : null;
+    return (
+      <FieldGroupWrapper
+        role={groupId ? 'group' : undefined}
+        aria-labelledby={groupId}
+      >
+        {group.label && (
           <FieldGroupLabel>
-            <GroupLabel>
+            <GroupLabel id={groupId}>
               {group.label}
             </GroupLabel>
-            { group.icon
-            && (
-              <GroupIcon>
+            {group.icon && (
+              <GroupIcon aria-hidden="true" role="presentation">
                 <Icon name={group.icon} />
               </GroupIcon>
             )}
           </FieldGroupLabel>
-        )
-      }
-      {group.fields.map((field, i) => {
-        if (!field) return null;
-        if (field.controlType !== 'info') {
-          const isContextRequiredForField = !!field.dynamicValidators
-            || !!field.modifyFieldAttributes
-            || !!field.isFieldDisabled;
-          const FieldComponentWrapper = isContextRequiredForField ? FieldWithContext : FormikField;
+        )}
+        {group.fields.map((field, i) => {
+          if (!field) return null;
+          if (field.controlType !== 'info') {
+            const isContextRequiredForField = !!field.dynamicValidators
+              || !!field.modifyFieldAttributes
+              || !!field.isFieldDisabled;
+            const FieldComponentWrapper = isContextRequiredForField ? FieldWithContext : FormikField;
+            return (
+              <FieldComponentWrapper
+                key={i}
+                name={field.name}
+                validate={(value, formData) => this.fieldValidation(value, field, formData)}
+                field={isContextRequiredForField ? field : null}
+              >
+                {({ field: formikField, form, meta }) => {
+                  const fieldProps = this.getFieldProps(field, form, formikField, meta);
+                  return (
+                    <Field id={`field-${field.id}`} labelledGroup={!!field.label}>
+                      {this.renderFormField(
+                        fieldProps,
+                        false,
+                        hasEntityNewModal,
+                        scrollContainer,
+                        form,
+                      )}
+                      {meta.touched && meta.error && (
+                        <ErrorWrapper>
+                          <ErrorMessage
+                            className="errors"
+                            name={formikField.name}
+                            show={(fieldValue) => fieldValue.touched || !fieldValue.pristine}
+                          />
+                        </ErrorWrapper>
+                      )}
+                    </Field>
+                  );
+                }
+                }
+              </FieldComponentWrapper>
+            );
+          }
           return (
-            <FieldComponentWrapper
-              key={i}
-              name={field.name}
-              validate={(value, formData) => this.fieldValidation(value, field, formData)}
-              field={isContextRequiredForField ? field : null}
+            <Field
+              key={`${field.controlType}-${i}`}
+              labelledGroup={!!field.label}
             >
-              {({ field: formikField, form, meta }) => {
-                const fieldProps = this.getFieldProps(field, form, formikField, meta);
-                return (
-                  <Field id={`field-${field.id}`} labelledGroup={!!field.label}>
-                    {this.renderFormField(
-                      fieldProps,
-                      false,
-                      hasEntityNewModal,
-                      scrollContainer,
-                      form,
-                    )}
-                    {meta.touched && meta.error && (
-                      <ErrorWrapper>
-                        <ErrorMessage
-                          className="errors"
-                          name={formikField.name}
-                          show={(fieldValue) => fieldValue.touched || !fieldValue.pristine}
-                        />
-                      </ErrorWrapper>
-                    )}
-                  </Field>
-                );
-              }
-              }
-            </FieldComponentWrapper>
+              {this.renderFormField(
+                field,
+                false,
+                hasEntityNewModal,
+                scrollContainer,
+              )}
+            </Field>
           );
+        })
         }
-        return (
-          <Field
-            key={`${field.controlType}-${i}`}
-            labelledGroup={!!field.label}
-          >
-            {this.renderFormField(
-              field,
-              false,
-              hasEntityNewModal,
-              scrollContainer,
-            )}
-          </Field>
-        );
-      })
-      }
-    </FieldGroupWrapper>
-  );
+      </FieldGroupWrapper>
+    );
+  };
 
   renderMain = (
     fieldGroups,
