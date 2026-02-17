@@ -66,7 +66,6 @@ import {
   CLOSE_ENTITY,
   OPEN_NEW_ENTITY_MODAL,
   RESET_PROGRESS,
-  SUBMIT_INVALID,
   DISMISS_QUERY_MESSAGES,
   SET_FRAMEWORK,
   OPEN_BOOKMARK,
@@ -77,13 +76,6 @@ import {
   OTP_REQUIRED,
   RESET_OTP,
 } from './constants';
-
-export function submitInvalid(valid) {
-  return {
-    type: SUBMIT_INVALID,
-    valid,
-  };
-}
 
 export function resetProgress() {
   return {

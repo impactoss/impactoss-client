@@ -40,7 +40,6 @@ import qe from 'utils/quasi-equals';
 import {
   loadEntitiesIfNeeded,
   updatePath,
-  submitInvalid,
   saveErrorDismiss,
   openNewEntityModal,
   redirectNotPermitted,
@@ -60,7 +59,6 @@ import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
-import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
 import appMessages from 'containers/App/messages';
@@ -104,10 +102,6 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
       scrollToTop(this.scrollContainer.current);
     }
   }
-
-  bindHandleSubmit = (submitForm) => {
-    this.remoteSubmitForm = submitForm;
-  };
 
   getInitialFormData = ({ taxonomies, roles, viewEntity }) =>
     Map({
@@ -204,7 +198,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     const isAdmin = sessionUserHighestRoleId <= USER_ROLES.ADMIN.value;
 
     const reference = this.props.params.id;
-    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
+    const { saveSending, saveError } = viewDomain.get('page').toJS();
 
     const editableRoles = this.getEditableUserRoles(roles, sessionUserHighestRoleId);
 
@@ -217,35 +211,6 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <Content ref={this.scrollContainer}>
-          <ContentHeader
-            title={intl.formatMessage(messages.pageTitle)}
-            type={CONTENT_SINGLE}
-            icon="users"
-            buttons={
-              viewEntity && [{
-                type: 'cancel',
-                onClick: () => this.props.handleCancel(this.props.params.id),
-              },
-              {
-                type: 'save',
-                disabled: saveSending,
-                onClick: (e) => {
-                  if (this.remoteSubmitForm) {
-                    this.remoteSubmitForm(e);
-                  }
-                },
-              }]
-            }
-          />
-          {!submitValid
-            && (
-              <Messages
-                type="error"
-                messageKey="submitInvalid"
-                onDismiss={this.props.onErrorDismiss}
-              />
-            )
-          }
           {saveError
             && (
               <Messages
@@ -270,14 +235,12 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
               <EntityForm
                 formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
-                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   taxonomies,
                   roles,
                   viewEntity,
                 )}
-                handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
                 fields={{
                   header: {
@@ -301,6 +264,9 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
+                headerTitle={intl.formatMessage(messages.pageTitle)}
+                headerType={CONTENT_SINGLE}
+                headerIcon="users"
               />
             )
           }
@@ -355,14 +321,8 @@ function mapDispatchToProps(dispatch) {
     onRedirectNotPermitted: () => {
       dispatch(redirectNotPermitted());
     },
-    onErrorDismiss: () => {
-      dispatch(submitInvalid(true));
-    },
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
-    },
-    handleSubmitFail: () => {
-      dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, taxonomies, roles, viewEntity) => {
       const formData = fromJS(formValues);

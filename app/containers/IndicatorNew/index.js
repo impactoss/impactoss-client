@@ -45,7 +45,6 @@ import {
   redirectIfNotPermitted,
   updatePath,
   openNewEntityModal,
-  submitInvalid,
   saveErrorDismiss,
 } from 'containers/App/actions';
 
@@ -59,7 +58,6 @@ import {
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
-import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
 import {
@@ -95,10 +93,6 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       scrollToTop(this.scrollContainer.current);
     }
   }
-
-  bindHandleSubmit = (submitForm) => {
-    this.remoteSubmitForm = submitForm;
-  };
 
   getInitialFormData = ({
     measures, users, recommendationsByFw,
@@ -233,7 +227,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
       existingReferences,
       intl,
     } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
+    const { saveSending, saveError } = viewDomain.get('page').toJS();
     return (
       <div>
         <HelmetCanonical
@@ -246,35 +240,6 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
           ]}
         />
         <Content ref={this.scrollContainer}>
-          <ContentHeader
-            title={intl.formatMessage(messages.pageTitle)}
-            type={CONTENT_SINGLE}
-            icon="indicators"
-            buttons={
-              dataReady ? [{
-                type: 'cancel',
-                onClick: this.props.handleCancel,
-              },
-              {
-                type: 'save',
-                disabled: saveSending,
-                onClick: (e) => {
-                  if (this.remoteSubmitForm) {
-                    this.remoteSubmitForm(e);
-                  }
-                },
-              }] : null
-            }
-          />
-          {!submitValid
-            && (
-              <Messages
-                type="error"
-                messageKey="submitInvalid"
-                onDismiss={this.props.onErrorDismiss}
-              />
-            )
-          }
           {saveError
             && (
               <Messages
@@ -292,9 +257,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
               <EntityForm
                 formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
-                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
-                handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 fields={{
                   header: {
@@ -307,6 +270,9 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
+                haderTitle={intl.formatMessage(messages.pageTitle)}
+                haderType={CONTENT_SINGLE}
+                haderIcon="indicators"
               />
             )
           }
@@ -321,7 +287,6 @@ IndicatorNew.propTypes = {
   redirectIfNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
-  onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   dataReady: PropTypes.bool,
@@ -334,7 +299,6 @@ IndicatorNew.propTypes = {
   connectedTaxonomies: PropTypes.object,
   // onRepeatChange: PropTypes.func,
   onEndDateChange: PropTypes.func,
-  handleSubmitFail: PropTypes.func,
   existingReferences: PropTypes.array,
   intl: PropTypes.object.isRequired,
 };
@@ -372,14 +336,8 @@ function mapDispatchToProps(dispatch) {
       }
       return null;
     },
-    onErrorDismiss: () => {
-      dispatch(submitInvalid(true));
-    },
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
-    },
-    handleSubmitFail: () => {
-      dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, recommendationsByFw) => {
       const formData = fromJS(formValues);

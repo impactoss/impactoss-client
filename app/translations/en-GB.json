@@ -525,7 +525,6 @@
   "app.containers.App.messages.registeringServer": "Note: registering for {server} database",
   "app.containers.App.messages.signInGuestReport": "Please sign in or register first to submit a progress update",
   "app.containers.App.messages.signingInServer": "Note: signing in to {server} database",
-  "app.containers.App.messages.submitInvalid": "One or more fields have errors.",
   "app.containers.App.nav.bookmarks": "Bookmarks",
   "app.containers.App.nav.indicators": "Indicators",
   "app.containers.App.nav.indicatorsSuper": "Progress",

@@ -52,7 +52,6 @@ import {
   redirectIfNotPermitted,
   updatePath,
   deleteEntity,
-  submitInvalid,
   saveErrorDismiss,
   openNewEntityModal,
 } from 'containers/App/actions';
@@ -67,7 +66,6 @@ import {
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
-import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 import NotFoundEntity from 'containers/NotFoundEntity';
 
@@ -111,10 +109,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       scrollToTop(this.scrollContainer.current);
     }
   }
-
-  bindHandleSubmit = (submitForm) => {
-    this.remoteSubmitForm = submitForm;
-  };
 
   getInitialFormData = ({
     viewEntity, users, measures, recommendationsByFw, parentOptions,
@@ -285,7 +279,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
       saveError,
       deleteSending,
       deleteError,
-      submitValid,
     } = viewDomain.get('page').toJS();
 
     let pageTitle = intl.formatMessage(messages.pageTitle);
@@ -304,35 +297,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           ]}
         />
         <Content ref={this.scrollContainer}>
-          <ContentHeader
-            title={pageTitle}
-            type={CONTENT_SINGLE}
-            icon="categories"
-            buttons={
-              viewEntity && dataReady ? [{
-                type: 'cancel',
-                onClick: () => this.props.handleCancel(reference),
-              },
-              {
-                type: 'save',
-                disabled: saveSending,
-                onClick: (e) => {
-                  if (this.remoteSubmitForm) {
-                    this.remoteSubmitForm(e);
-                  }
-                },
-              }] : null
-            }
-          />
-          {!submitValid
-            && (
-              <Messages
-                type="error"
-                messageKey="submitInvalid"
-                onDismiss={this.props.onErrorDismiss}
-              />
-            )
-          }
           {saveError
             && (
               <Messages
@@ -359,14 +323,12 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
               <EntityForm
                 formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
-                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   measures,
                   recommendationsByFw,
                   viewEntity,
                 )}
-                handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
                 handleDelete={canUserDeleteEntities(highestRole)
                   ? () => this.props.handleDelete(viewEntity.getIn(['attributes', 'taxonomy_id']))
@@ -396,6 +358,9 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
+                headerTitle={pageTitle}
+                headerType={CONTENT_SINGLE}
+                headerIcon="categories"
               />
             )
           }
@@ -411,7 +376,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
 CategoryEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
@@ -428,7 +392,6 @@ CategoryEdit.propTypes = {
   recommendationsByFw: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
   users: PropTypes.object,
-  onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func,
   intl: PropTypes.object.isRequired,
@@ -457,14 +420,8 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(CATEGORY_ADMIN_MIN_ROLE));
     },
-    onErrorDismiss: () => {
-      dispatch(submitInvalid(true));
-    },
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
-    },
-    handleSubmitFail: () => {
-      dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, measures, recommendationsByFw, viewEntity) => {
       const formData = fromJS(formValues);

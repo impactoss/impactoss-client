@@ -39,7 +39,6 @@ import {
   redirectIfNotPermitted,
   updatePath,
   openNewEntityModal,
-  submitInvalid,
   saveErrorDismiss,
 } from 'containers/App/actions';
 
@@ -58,7 +57,6 @@ import {
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
-import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
 import {
@@ -94,10 +92,6 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       scrollToTop(this.scrollContainer.current);
     }
   }
-
-  bindHandleSubmit = (submitForm) => {
-    this.remoteSubmitForm = submitForm;
-  };
 
   getInitialFormData = ({ frameworkId }) =>
     Map(FORM_INITIAL.setIn(
@@ -205,7 +199,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
       canUserAdministerCategories,
       intl,
     } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
+    const { saveSending, saveError } = viewDomain.get('page').toJS();
     const fwSpecified = (frameworkId && frameworkId !== 'all');
 
     const type = intl.formatMessage(
@@ -234,35 +228,6 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
           ]}
         />
         <Content ref={this.scrollContainer}>
-          <ContentHeader
-            title={intl.formatMessage(messages.pageTitle, { type })}
-            type={CONTENT_SINGLE}
-            icon={fwSpecified ? `recommendations_${frameworkId}` : 'recommendations'}
-            buttons={
-              dataReady ? [{
-                type: 'cancel',
-                onClick: this.props.handleCancel,
-              },
-              {
-                type: 'save',
-                disabled: saveSending,
-                onClick: (e) => {
-                  if (this.remoteSubmitForm) {
-                    this.remoteSubmitForm(e);
-                  }
-                },
-              }] : null
-            }
-          />
-          {!submitValid
-            && (
-              <Messages
-                type="error"
-                messageKey="submitInvalid"
-                onDismiss={this.props.onErrorDismiss}
-              />
-            )
-          }
           {saveError
             && (
               <Messages
@@ -280,13 +245,11 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
               <EntityForm
                 formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
-                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   currentFramework,
                   fwTaxonomies,
                 )}
-                handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 fields={{ // isManager, taxonomies,
                   header: {
@@ -311,6 +274,9 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
+                headerTitle={intl.formatMessage(messages.pageTitle, { type })}
+                headerType={CONTENT_SINGLE}
+                headerIcon={fwSpecified ? `recommendations_${frameworkId}` : 'recommendations'}
               />
             )
           }
@@ -326,7 +292,6 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
 RecommendationNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
@@ -337,7 +302,6 @@ RecommendationNew.propTypes = {
   indicators: PropTypes.object,
   onCreateOption: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
-  onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   frameworkId: PropTypes.string,
   frameworks: PropTypes.object,
@@ -368,14 +332,8 @@ function mapDispatchToProps(dispatch) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    onErrorDismiss: () => {
-      dispatch(submitInvalid(true));
-    },
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
-    },
-    handleSubmitFail: () => {
-      dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, currentFramework, fwTaxonomies) => {
       const formData = fromJS(formValues);

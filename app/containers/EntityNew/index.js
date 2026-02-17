@@ -9,8 +9,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Map, List, fromJS } from 'immutable';
 
-import { Box } from 'grommet';
-
 import { getEntityAttributeFields } from 'utils/forms';
 import { qe } from 'utils/quasi-equals';
 import { scrollToTop } from 'utils/scroll-to-component';
@@ -19,7 +17,6 @@ import { injectIntl } from 'react-intl';
 
 import {
   newEntity,
-  submitInvalid,
   saveErrorDismiss,
 } from 'containers/App/actions';
 
@@ -42,7 +39,6 @@ import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl
 import Content from 'components/Content';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
-import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
 import { selectDomain } from './selectors';
@@ -62,10 +58,6 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
       scrollToTop(this.scrollContainer.current);
     }
   }
-
-  bindHandleSubmit = (submitForm) => {
-    this.remoteSubmitForm = submitForm;
-  };
 
   getInitialFormData = ({ frameworkId }) =>
     Map(FORM_INITIAL.setIn(
@@ -96,7 +88,7 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
       indicatorReferences,
       intl,
     } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
+    const { saveSending, saveError } = viewDomain.get('page').toJS();
 
     let pageTitle;
     let hasResponse;
@@ -143,35 +135,6 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
           ref={this.scrollContainer}
           inModal={inModal}
         >
-          <Box margin={{ left: 'medium' }}>
-            <ContentHeader
-              title={pageTitle}
-              type={CONTENT_MODAL}
-              icon={icon}
-              buttons={[{
-                type: 'cancel',
-                onClick: this.props.onCancel,
-              },
-              {
-                type: 'save',
-                disabled: saveSending,
-                onClick: (e) => {
-                  if (this.remoteSubmitForm) {
-                    this.remoteSubmitForm(e);
-                  }
-                },
-              }]}
-            />
-          </Box>
-          {!submitValid
-            && (
-              <Messages
-                type="error"
-                messageKey="submitInvalid"
-                onDismiss={this.props.onErrorDismiss}
-              />
-            )
-          }
           {saveError
             && (
               <Messages
@@ -188,12 +151,10 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             formData={this.getInitialFormData(this.props).toJS()}
             inModal={inModal}
             saving={saveSending}
-            bindHandleSubmit={this.bindHandleSubmit}
             handleSubmit={(formData) => this.props.handleSubmit(
               formData,
               attributes,
             )}
-            handleSubmitFail={this.props.handleSubmitFail}
             handleCancel={this.props.onCancel}
             scrollContainer={this.scrollContainer.current}
             fields={getEntityAttributeFields(
@@ -218,6 +179,9 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
               },
               intl,
             )}
+            headerTitle={pageTitle}
+            headerType={CONTENT_MODAL}
+            headerIcon={icon}
           />
           {saveSending
             && <Loading />
@@ -234,13 +198,11 @@ EntityNew.propTypes = {
   taxonomy: PropTypes.object,
   parentTaxonomy: PropTypes.object,
   categoryParentOptions: PropTypes.object,
-  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   inModal: PropTypes.bool,
   // onSaveSuccess: PropTypes.func,
   viewDomain: PropTypes.object,
-  onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   framework: PropTypes.object,
   frameworks: PropTypes.object,
@@ -278,14 +240,8 @@ const mapStateToProps = (state, { path, attributes }) => ({
 
 function mapDispatchToProps(dispatch, props) {
   return {
-    onErrorDismiss: () => {
-      dispatch(submitInvalid(true));
-    },
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
-    },
-    handleSubmitFail: () => {
-      dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, attributes) => {
       const formData = fromJS(formValues);

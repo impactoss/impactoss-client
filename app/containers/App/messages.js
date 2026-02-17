@@ -1632,10 +1632,6 @@ export default defineMessages({
       id: 'app.containers.App.messages.signInGuestReport',
       defaultMessage: 'Please sign in or register first to submit a progress report',
     },
-    submitInvalid: {
-      id: 'app.containers.App.messages.submitInvalid',
-      defaultMessage: 'One or more fields have errors.',
-    },
     recoverSuccess: {
       id: 'app.containers.App.messages.recoverSuccess',
       defaultMessage: 'Please check your email and follow the instructions to reset your password.',

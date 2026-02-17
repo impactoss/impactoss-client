@@ -77,7 +77,6 @@ export const OPEN_BOOKMARK = 'impactoss/App/OPEN_BOOKMARK';
 export const OPEN_NEW_ENTITY_MODAL = 'impactoss/App/OPEN_NEW_ENTITY_MODAL';
 export const SHOW_SETTINGS_MODAL = 'impactoss/App/SHOW_SETTINGS_MODAL';
 
-export const SUBMIT_INVALID = 'impactoss/App/SUBMIT_INVALID';
 export const DISMISS_QUERY_MESSAGES = 'impactoss/App/DISMISS_QUERY_MESSAGES';
 export const SET_FRAMEWORK = 'impactoss/App/SET_FRAMEWORK';
 export const SET_LOAD_ARCHIVED = 'impactoss/App/SET_LOAD_ARCHIVED';

@@ -50,7 +50,6 @@ import {
   redirectIfNotPermitted,
   updatePath,
   deleteEntity,
-  submitInvalid,
   saveErrorDismiss,
 } from 'containers/App/actions';
 
@@ -63,7 +62,6 @@ import {
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
-import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 import NotFoundEntity from 'containers/NotFoundEntity';
 
@@ -116,10 +114,6 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
       scrollToTop(this.scrollContainer.current);
     }
   }
-
-  bindHandleSubmit = (submitForm) => {
-    this.remoteSubmitForm = submitForm;
-  };
 
   getInitialFormData = ({ viewEntity }) => {
     let attributes = viewEntity.get('attributes');
@@ -204,7 +198,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
     } = this.props;
     const reference = this.props.params.id;
     const {
-      saveSending, saveError, deleteSending, deleteError, submitValid,
+      saveSending, saveError, deleteSending, deleteError,
     } = viewDomain.get('page').toJS();
 
     let pageTitle = intl.formatMessage(messages.pageTitle);
@@ -222,35 +216,6 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           ]}
         />
         <Content ref={this.scrollContainer}>
-          <ContentHeader
-            title={pageTitle}
-            type={CONTENT_SINGLE}
-            icon="reports"
-            buttons={
-              viewEntity && dataReady ? [{
-                type: 'cancel',
-                onClick: () => this.props.handleCancel(reference),
-              },
-              {
-                type: 'save',
-                disabled: saveSending,
-                onClick: (e) => {
-                  if (this.remoteSubmitForm) {
-                    this.remoteSubmitForm(e);
-                  }
-                },
-              }] : null
-            }
-          />
-          {!submitValid
-            && (
-              <Messages
-                type="error"
-                messageKey="submitInvalid"
-                onDismiss={this.props.onErrorDismiss}
-              />
-            )
-          }
           {saveError
             && (
               <Messages
@@ -277,12 +242,10 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
               <EntityForm
                 formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
-                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   viewEntity,
                 )}
-                handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(reference)}
                 handleDelete={canUserDeleteEntities(this.props.highestRole)
                   ? () => this.props.handleDelete(viewEntity.getIn(['attributes', 'indicator_id']))
@@ -303,6 +266,9 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
+                headerTitle={pageTitle}
+                headerType={CONTENT_SINGLE}
+                headerIcon="reports"
               />
             )
           }
@@ -320,7 +286,6 @@ ReportEdit.propTypes = {
   onRedirectIfNotPermitted: PropTypes.func,
   onRedirectNotPermitted: PropTypes.func,
   handleSubmit: PropTypes.func.isRequired,
-  handleSubmitFail: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
@@ -329,7 +294,6 @@ ReportEdit.propTypes = {
   authReady: PropTypes.bool,
   highestRole: PropTypes.number,
   params: PropTypes.object,
-  onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   intl: PropTypes.object.isRequired,
   userId: PropTypes.string,
@@ -357,14 +321,8 @@ function mapDispatchToProps(dispatch, props) {
     onRedirectNotPermitted: () => {
       dispatch(redirectNotPermitted());
     },
-    onErrorDismiss: () => {
-      dispatch(submitInvalid(true));
-    },
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
-    },
-    handleSubmitFail: () => {
-      dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, viewEntity) => {
       const formData = fromJS(formValues);

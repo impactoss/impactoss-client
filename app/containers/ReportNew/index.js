@@ -41,7 +41,6 @@ import appMessages from 'containers/App/messages';
 import {
   loadEntitiesIfNeeded,
   updatePath,
-  submitInvalid,
   saveErrorDismiss,
   redirectNotPermitted,
 } from 'containers/App/actions';
@@ -56,7 +55,6 @@ import {
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
-import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
 import {
@@ -108,10 +106,6 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
       scrollToTop(this.scrollContainer.current);
     }
   }
-
-  bindHandleSubmit = (submitForm) => {
-    this.remoteSubmitForm = submitForm;
-  };
 
   getHeaderMainFields = (intl) =>
     ([ // fieldGroups
@@ -197,42 +191,12 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
           ]}
         />
         <Content ref={this.scrollContainer}>
-          <ContentHeader
-            title={pageTitle}
-            type={CONTENT_SINGLE}
-            icon="reports"
-            buttons={
-              dataReady ? [{
-                type: 'cancel',
-                onClick: () => this.props.handleCancel(indicatorReference),
-              },
-              {
-                type: 'save',
-                disabled: saveSending,
-                onClick: (e) => {
-                  if (this.remoteSubmitForm) {
-                    this.dismissDraftNote();
-                    this.remoteSubmitForm(e);
-                  }
-                },
-              }] : null
-            }
-          />
           { !canUserPublish && !this.state.draftNoteDismissed && dataReady && !saveError && !!submitValid
             && (
               <Messages
                 type="info"
                 message={intl.formatMessage(messages.draftNote)}
                 onDismiss={this.dismissDraftNote}
-              />
-            )
-          }
-          {!submitValid
-            && (
-              <Messages
-                type="error"
-                messageKey="submitInvalid"
-                onDismiss={this.props.onErrorDismiss}
               />
             )
           }
@@ -253,7 +217,6 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
               <EntityForm
                 formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
-                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => {
                   this.dismissDraftNote();
                   this.props.handleSubmit(
@@ -262,7 +225,6 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                     highestRole,
                   );
                 }}
-                handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(indicatorReference)}
                 fields={{
                   header: {
@@ -275,6 +237,9 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
+                headerTitle={pageTitle}
+                headerType={CONTENT_SINGLE}
+                headerIcon="reports"
               />
             )
           }
@@ -289,7 +254,6 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
 
 ReportNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
@@ -297,7 +261,6 @@ ReportNew.propTypes = {
   onRedirectNotPermitted: PropTypes.func,
   indicator: PropTypes.object,
   params: PropTypes.object,
-  onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   highestRole: PropTypes.number,
   userId: PropTypes.string, // used in nextProps
@@ -321,17 +284,11 @@ function mapDispatchToProps(dispatch) {
     loadEntitiesIfNeeded: () => {
       DEPENDENCIES.forEach((path) => dispatch(loadEntitiesIfNeeded(path)));
     },
-    onErrorDismiss: () => {
-      dispatch(submitInvalid(true));
-    },
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
     },
     onRedirectNotPermitted: () => {
       dispatch(redirectNotPermitted());
-    },
-    handleSubmitFail: () => {
-      dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, indicatorReference, highestRole) => {
       const formData = fromJS(formValues);

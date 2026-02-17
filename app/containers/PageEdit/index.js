@@ -38,7 +38,6 @@ import {
   redirectIfNotPermitted,
   updatePath,
   deleteEntity,
-  submitInvalid,
   saveErrorDismiss,
 } from 'containers/App/actions';
 
@@ -51,7 +50,6 @@ import {
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
-import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 import NotFoundEntity from 'containers/NotFoundEntity';
 
@@ -89,10 +87,6 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
       scrollToTop(this.scrollContainer.current);
     }
   }
-
-  bindHandleSubmit = (submitForm) => {
-    this.remoteSubmitForm = submitForm;
-  };
 
   getInitialFormData = ({ viewEntity }) =>
     viewEntity
@@ -143,7 +137,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
     } = this.props;
     const reference = this.props.params.id;
     const {
-      saveSending, saveError, deleteSending, deleteError, submitValid,
+      saveSending, saveError, deleteSending, deleteError,
     } = viewDomain.get('page').toJS();
 
     return (
@@ -155,34 +149,6 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
           ]}
         />
         <Content ref={this.scrollContainer}>
-          <ContentHeader
-            title={intl.formatMessage(messages.pageTitle)}
-            type={CONTENT_SINGLE}
-            buttons={
-              viewEntity && dataReady ? [{
-                type: 'cancel',
-                onClick: this.props.handleCancel,
-              },
-              {
-                type: 'save',
-                disabled: saveSending,
-                onClick: (e) => {
-                  if (this.remoteSubmitForm) {
-                    this.remoteSubmitForm(e);
-                  }
-                },
-              }] : null
-            }
-          />
-          {!submitValid
-            && (
-              <Messages
-                type="error"
-                messageKey="submitInvalid"
-                onDismiss={this.props.onErrorDismiss}
-              />
-            )
-          }
           {saveError
             && (
               <Messages
@@ -209,9 +175,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
               <EntityForm
                 formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
-                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(formData, viewEntity)}
-                handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
@@ -224,6 +188,8 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
+                headerTitle={intl.formatMessage(messages.pageTitle)}
+                headerType={CONTENT_SINGLE}
               />
             )
           }
@@ -239,7 +205,6 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
 PageEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
@@ -249,7 +214,6 @@ PageEdit.propTypes = {
   params: PropTypes.object,
   viewEntity: PropTypes.object,
   highestRole: PropTypes.number,
-  onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   intl: PropTypes.object.isRequired,
 };
@@ -270,14 +234,8 @@ function mapDispatchToProps(dispatch, props) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.ADMIN.value));
     },
-    onErrorDismiss: () => {
-      dispatch(submitInvalid(true));
-    },
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
-    },
-    handleSubmitFail: () => {
-      dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, viewEntity) => {
       const formData = fromJS(formValues);

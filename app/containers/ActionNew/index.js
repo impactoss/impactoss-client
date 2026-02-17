@@ -40,7 +40,6 @@ import {
   redirectIfNotPermitted,
   updatePath,
   openNewEntityModal,
-  submitInvalid,
   saveErrorDismiss,
 } from 'containers/App/actions';
 
@@ -56,7 +55,6 @@ import {
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
-import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
 import appMessages from 'containers/App/messages';
@@ -94,10 +92,6 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
       scrollToTop(this.scrollContainer.current);
     }
   }
-
-  bindHandleSubmit = (submitForm) => {
-    this.remoteSubmitForm = submitForm;
-  };
 
   getInitialFormData = ({ taxonomies, recommendationsByFw, indicators }) =>
     FORM_INITIAL
@@ -219,7 +213,7 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
       intl,
     } = this.props;
 
-    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
+    const { saveSending, saveError } = viewDomain.get('page').toJS();
     return (
       <div>
         <HelmetCanonical
@@ -232,35 +226,6 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           ]}
         />
         <Content ref={this.scrollContainer}>
-          <ContentHeader
-            title={intl.formatMessage(messages.pageTitle)}
-            type={CONTENT_SINGLE}
-            icon="measures"
-            buttons={
-              dataReady ? [{
-                type: 'cancel',
-                onClick: this.props.handleCancel,
-              },
-              {
-                type: 'save',
-                disabled: saveSending,
-                onClick: (e) => {
-                  if (this.remoteSubmitForm) {
-                    this.remoteSubmitForm(e);
-                  }
-                },
-              }] : null
-            }
-          />
-          {!submitValid
-            && (
-              <Messages
-                type="error"
-                messageKey="submitInvalid"
-                onDismiss={this.props.onErrorDismiss}
-              />
-            )
-          }
           {saveError
             && (
               <Messages
@@ -280,7 +245,6 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                 saving={saveSending}
                 bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(formData, recommendationsByFw)}
-                handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 fields={{
                   header: {
@@ -304,6 +268,9 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
+                headerTitle={intl.formatMessage(messages.pageTitle)}
+                headerType={CONTENT_SINGLE}
+                headerIcon="measures"
               />
             )
           }
@@ -319,7 +286,6 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
 ActionNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
@@ -330,7 +296,6 @@ ActionNew.propTypes = {
   indicators: PropTypes.object,
   onCreateOption: PropTypes.func,
   connectedTaxonomies: PropTypes.object,
-  onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   existingReferences: PropTypes.array,
   canUserAdministerCategories: PropTypes.bool,
@@ -357,14 +322,8 @@ function mapDispatchToProps(dispatch) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(USER_ROLES.MANAGER.value));
     },
-    onErrorDismiss: () => {
-      dispatch(submitInvalid(true));
-    },
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
-    },
-    handleSubmitFail: () => {
-      dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, recommendationsByFw) => {
       const formData = fromJS(formValues);

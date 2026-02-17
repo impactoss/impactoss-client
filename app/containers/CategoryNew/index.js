@@ -45,7 +45,6 @@ import {
   loadEntitiesIfNeeded,
   redirectIfNotPermitted,
   updatePath,
-  submitInvalid,
   saveErrorDismiss,
   openNewEntityModal,
 } from 'containers/App/actions';
@@ -60,7 +59,6 @@ import {
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
-import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 
 import { getEntityTitle } from 'utils/entities';
@@ -103,10 +101,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       scrollToTop(this.scrollContainer.current);
     }
   }
-
-  bindHandleSubmit = (submitForm) => {
-    this.remoteSubmitForm = submitForm;
-  };
 
   getInitialFormData = ({
     users, measures, recommendationsByFw, parentOptions,
@@ -256,7 +250,7 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
       parentTaxonomy,
       intl,
     } = this.props;
-    const { saveSending, saveError, submitValid } = viewDomain.get('page').toJS();
+    const { saveSending, saveError } = viewDomain.get('page').toJS();
     const taxonomyReference = this.props.params.id;
 
     let pageTitle = intl.formatMessage(messages.pageTitle);
@@ -265,7 +259,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
         taxonomy: this.getTaxTitle(taxonomy.get('id')),
       });
     }
-    console.log('recommendationsByFw', recommendationsByFw && recommendationsByFw.toJS());
     return (
       <div>
         <HelmetCanonical
@@ -278,35 +271,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
           ]}
         />
         <Content ref={this.scrollContainer}>
-          <ContentHeader
-            title={pageTitle}
-            type={CONTENT_SINGLE}
-            icon="categories"
-            buttons={
-              dataReady ? [{
-                type: 'cancel',
-                onClick: () => this.props.handleCancel(taxonomyReference),
-              },
-              {
-                type: 'save',
-                disabled: saveSending,
-                onClick: (e) => {
-                  if (this.remoteSubmitForm) {
-                    this.remoteSubmitForm(e);
-                  }
-                },
-              }] : null
-            }
-          />
-          {!submitValid
-            && (
-              <Messages
-                type="error"
-                messageKey="submitInvalid"
-                onDismiss={this.props.onErrorDismiss}
-              />
-            )
-          }
           {saveError
             && (
               <Messages
@@ -324,14 +288,12 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
               <EntityForm
                 formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
-                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   measures,
                   recommendationsByFw,
                   taxonomy,
                 )}
-                handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={() => this.props.handleCancel(taxonomyReference)}
                 fields={{ // isManager, taxonomies,
                   header: {
@@ -352,6 +314,9 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
+                headerTitle={pageTitle}
+                headerType={CONTENT_SINGLE}
+                headerIcon="categories"
               />
             )
           }
@@ -364,7 +329,6 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
 CategoryNew.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   dataReady: PropTypes.bool,
@@ -379,7 +343,6 @@ CategoryNew.propTypes = {
   measures: PropTypes.object,
   recommendationsByFw: PropTypes.object,
   connectedTaxonomies: PropTypes.object,
-  onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   onCreateOption: PropTypes.func,
   intl: PropTypes.object.isRequired,
@@ -407,14 +370,8 @@ function mapDispatchToProps(dispatch) {
     redirectIfNotPermitted: () => {
       dispatch(redirectIfNotPermitted(CATEGORY_ADMIN_MIN_ROLE));
     },
-    onErrorDismiss: () => {
-      dispatch(submitInvalid(true));
-    },
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
-    },
-    handleSubmitFail: () => {
-      dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, measures, recommendationsByFw, taxonomy) => {
       const formData = fromJS(formValues);

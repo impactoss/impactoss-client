@@ -53,7 +53,6 @@ import {
   updatePath,
   deleteEntity,
   openNewEntityModal,
-  submitInvalid,
   saveErrorDismiss,
 } from 'containers/App/actions';
 
@@ -67,7 +66,6 @@ import {
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
-import ContentHeader from 'components/ContentHeader';
 import EntityForm from 'containers/EntityForm';
 import NotFoundEntity from 'containers/NotFoundEntity';
 import {
@@ -116,10 +114,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       this.setState({ repeat: this.props.viewEntity.getIn(['attributes', 'repeat']) || false });
     }
   }
-
-  bindHandleSubmit = (submitForm) => {
-    this.remoteSubmitForm = submitForm;
-  };
 
   getInitialFormData = ({
     measures, viewEntity, users, recommendationsByFw,
@@ -274,7 +268,7 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
       intl,
     } = this.props;
     const {
-      saveSending, saveError, deleteSending, deleteError, submitValid,
+      saveSending, saveError, deleteSending, deleteError,
     } = viewDomain.get('page').toJS();
     return (
       <div>
@@ -285,35 +279,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           ]}
         />
         <Content ref={this.scrollContainer}>
-          <ContentHeader
-            title={intl.formatMessage(messages.pageTitle)}
-            type={CONTENT_SINGLE}
-            icon="indicators"
-            buttons={
-              viewEntity && dataReady ? [{
-                type: 'cancel',
-                onClick: this.props.handleCancel,
-              },
-              {
-                type: 'save',
-                disabled: saveSending,
-                onClick: (e) => {
-                  if (this.remoteSubmitForm) {
-                    this.remoteSubmitForm(e);
-                  }
-                },
-              }] : null
-            }
-          />
-          {!submitValid
-            && (
-              <Messages
-                type="error"
-                messageKey="submitInvalid"
-                onDismiss={this.props.onErrorDismiss}
-              />
-            )
-          }
           {saveError
             && (
               <Messages
@@ -340,14 +305,12 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
               <EntityForm
                 formData={this.getInitialFormData(this.props).toJS()}
                 saving={saveSending}
-                bindHandleSubmit={this.bindHandleSubmit}
                 handleSubmit={(formData) => this.props.handleSubmit(
                   formData,
                   measures,
                   recommendationsByFw,
                   viewEntity,
                 )}
-                handleSubmitFail={this.props.handleSubmitFail}
                 handleCancel={this.props.handleCancel}
                 handleDelete={canUserDeleteEntities(this.props.highestRole) ? this.props.handleDelete : null}
                 fields={{
@@ -366,6 +329,9 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                   },
                 }}
                 scrollContainer={this.scrollContainer.current}
+                headerTitle={intl.formatMessage(messages.pageTitle)}
+                headerType={CONTENT_SINGLE}
+                headerIcon="indicators"
               />
             )
           }
@@ -381,11 +347,9 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
 IndicatorEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   redirectIfNotPermitted: PropTypes.func,
-  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
-  onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
   viewEntity: PropTypes.object,
@@ -440,14 +404,8 @@ function mapDispatchToProps(dispatch, props) {
       }
       return errors;
     },
-    onErrorDismiss: () => {
-      dispatch(submitInvalid(true));
-    },
     onServerErrorDismiss: () => {
       dispatch(saveErrorDismiss());
-    },
-    handleSubmitFail: () => {
-      dispatch(submitInvalid(false));
     },
     handleSubmit: (formValues, measures, recommendationsByFw, viewEntity) => {
       const formData = fromJS(formValues);

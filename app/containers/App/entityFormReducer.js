@@ -8,7 +8,6 @@ import {
   DELETE_SENDING,
   DELETE_ERROR,
   DELETE_SUCCESS,
-  SUBMIT_INVALID,
   SAVE_ERROR_DISMISS,
   LOGOUT_SUCCESS,
 } from 'containers/App/constants';
@@ -22,7 +21,6 @@ const initialState = fromJS({
   deleteSending: false,
   deleteSuccess: false,
   deleteError: false,
-  submitValid: true,
 });
 
 export const entityFormReducer = (state = initialState, action) => {
@@ -63,8 +61,6 @@ export const entityFormReducer = (state = initialState, action) => {
         .set('deleteSending', false)
         .set('deleteSuccess', false)
         .set('deleteError', checkResponseError(action.error));
-    case SUBMIT_INVALID:
-      return state.set('submitValid', action.valid);
     default:
       return state;
   }

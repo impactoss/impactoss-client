@@ -34,6 +34,7 @@ import GroupIcon from 'components/fields/GroupIcon';
 import GroupLabel from 'components/fields/GroupLabel';
 import Clear from 'components/styled/Clear';
 import ViewPanel from 'components/EntityView/ViewPanel';
+import ContentHeader from 'components/ContentHeader';
 
 import FieldLabel from 'components/forms/Label';
 import ErrorWrapper from 'components/forms/ErrorWrapper';
@@ -57,9 +58,10 @@ import DateControl from 'components/forms/DateControl';
 import RadioControl from 'components/forms/RadioControl';
 import Required from 'components/forms/Required';
 import MultiSelectField from 'components/forms/MultiSelectField';
+import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
+
 import messages from './messages';
 
-import SubmitFailedHandler from './SubmitFailedHandler';
 import FieldWithContext from './FieldWithContext';
 
 const StyledForm = styled(Form)`
@@ -160,7 +162,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
 
   handleSubmit = (formData) => !this.props.saving && this.props.handleSubmit(formData);
 
-  getFieldProps = (field, form, formikField) => {
+  getFieldProps = (field, form, formikField, meta) => {
     let fieldProps;
     if (field.controlType === 'multiselect') {
       const values = fromJS(form.values);
@@ -176,7 +178,14 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
         ? field.modifyFieldAttributes(field, form.values)
         : field;
 
-      fieldProps = { ...modifiedField, onChange: formikField.onChange, value: formikField.value };
+      fieldProps = {
+        ...modifiedField,
+        onChange: formikField.onChange,
+        onBlur: formikField.onBlur,
+        value: formikField.value,
+        'aria-invalid': (meta.touched && meta.error) ? 'true' : null,
+        'aria-required': (field.validators && !!field.validators.required) ? 'true' : null,
+      };
     }
     return fieldProps;
   };
@@ -232,7 +241,10 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     const FieldComponent = this.getFieldComponent(field);
 
     return (
-      <FieldComponent id={id} {...props}>
+      <FieldComponent
+        id={id}
+        {...props}
+      >
         {this.renderFieldChildren(field)}
       </FieldComponent>
     );
@@ -335,9 +347,9 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
               field={isContextRequiredForField ? field : null}
             >
               {({ field: formikField, form, meta }) => {
-                const fieldProps = this.getFieldProps(field, form, formikField);
+                const fieldProps = this.getFieldProps(field, form, formikField, meta);
                 return (
-                  <Field id={field.id} labelledGroup={!!field.label}>
+                  <Field id={`field-${field.id}`} labelledGroup={!!field.label}>
                     {this.renderFormField(
                       fieldProps,
                       false,
@@ -422,121 +434,145 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
     const {
       fields,
       handleSubmit,
-      bindHandleSubmit,
       handleCancel,
-      handleSubmitFail,
       inModal,
       newEntityModal,
       scrollContainer,
       formData,
+      saving,
+      headerTitle,
+      headerType,
+      headerIcon,
     } = this.props;
     const hasEntityNewModal = !!newEntityModal;
     return (
       <div>
-        <FormWrapper withoutShadow={inModal} hasMarginBottom={!inModal}>
-          <Formik
-            initialValues={formData}
-            onSubmit={(values) => handleSubmit(values)}
-          >
-            {({
-              submitForm, isValid, isValidating, isSubmitting,
-            }) => {
-              if (bindHandleSubmit) bindHandleSubmit(submitForm);
-              return (
-                <StyledForm>
-                  <SubmitFailedHandler
-                    isValid={isValid}
-                    isValidating={isValidating}
-                    isSubmitting={isSubmitting}
-                    handleSubmitFail={() => {
-                      handleSubmitFail();
-                    }}
+        <Formik
+          initialValues={formData}
+          onSubmit={(values) => handleSubmit(values)}
+        >
+          {({
+            submitForm, isValid, dirty,
+          }) => {
+            const submitDisabled = !dirty // disabled if no changes are made
+              || !isValid // or if validations fail
+              || saving; // or already submitted
+            return (
+              <>
+                {headerTitle && (
+                  <ContentHeader
+                    title={headerTitle}
+                    type={headerType}
+                    icon={headerIcon}
+                    buttons={[
+                      { type: 'cancel', onClick: handleCancel },
+                      {
+                        type: 'save',
+                        disabled: submitDisabled,
+                        onClick: submitForm,
+                        describedby: submitDisabled ? 'submit-disabled-hint' : null,
+                      },
+                    ]}
                   />
-                  <FormBody>
-                    {fields.header && (
-                      <ViewPanel>
-                        {fields.header.main && this.renderMain(
-                          fields.header.main,
-                          !!fields.header.aside,
-                          false,
-                          hasEntityNewModal,
-                          scrollContainer,
-                        )}
-                        {fields.header.aside && this.renderAside(
-                          fields.header.aside,
-                          false,
-                          hasEntityNewModal,
-                          scrollContainer,
-                        )}
-                      </ViewPanel>
-                    )}
-                    {fields.body
-                      && (
+                )}
+                <FormWrapper withoutShadow={inModal} hasMarginBottom={!inModal}>
+                  <StyledForm>
+                    <FormBody>
+                      {fields.header && (
                         <ViewPanel>
-                          {fields.body.main && this.renderMain(
-                            fields.body.main,
-                            true,
-                            true,
+                          {fields.header.main && this.renderMain(
+                            fields.header.main,
+                            !!fields.header.aside,
+                            false,
                             hasEntityNewModal,
                             scrollContainer,
                           )}
-                          {fields.body.aside && this.renderAside(
-                            fields.body.aside,
-                            true,
+                          {fields.header.aside && this.renderAside(
+                            fields.header.aside,
+                            false,
                             hasEntityNewModal,
                             scrollContainer,
                           )}
                         </ViewPanel>
-                      )
-                    }
-                  </FormBody>
-                  <FormFooter>
-                    {this.props.handleDelete && !this.state.deleteConfirmed
-                      && (
-                        <DeleteWrapper>
-                          <ButtonPreDelete type="button" onClick={this.preDelete}>
-                            <Icon name="trash" sizes={{ mobile: '1.8em' }} />
-                          </ButtonPreDelete>
-                        </DeleteWrapper>
-                      )
-                    }
-                    {this.props.handleDelete && this.state.deleteConfirmed
-                      && (
-                        <FormFooterButtons left>
-                          <DeleteConfirmText>
-                            <FormattedMessage {...messages.confirmDeleteQuestion} />
-                          </DeleteConfirmText>
-                          <ButtonCancel
-                            type="button"
-                            onClick={() => this.preDelete(false)}
-                          >
-                            <FormattedMessage {...messages.buttons.cancelDelete} />
-                          </ButtonCancel>
-                          <ButtonDelete type="button" onClick={this.props.handleDelete}>
-                            <FormattedMessage {...messages.buttons.confirmDelete} />
-                          </ButtonDelete>
-                        </FormFooterButtons>
-                      )
-                    }
-                    {!this.state.deleteConfirmed
-                      && (
-                        <FormFooterButtons>
-                          <ButtonCancel type="button" onClick={handleCancel}>
-                            <FormattedMessage {...appMessages.buttons.cancel} />
-                          </ButtonCancel>
-                          <ButtonSubmit type="submit" disabled={this.props.saving}>
-                            <FormattedMessage {...appMessages.buttons.save} />
-                          </ButtonSubmit>
-                        </FormFooterButtons>
-                      )
-                    }
-                    <Clear />
-                  </FormFooter>
-                </StyledForm>
-              );
-            }}
-          </Formik>
-        </FormWrapper>
+                      )}
+                      {fields.body
+                        && (
+                          <ViewPanel>
+                            {fields.body.main && this.renderMain(
+                              fields.body.main,
+                              true,
+                              true,
+                              hasEntityNewModal,
+                              scrollContainer,
+                            )}
+                            {fields.body.aside && this.renderAside(
+                              fields.body.aside,
+                              true,
+                              hasEntityNewModal,
+                              scrollContainer,
+                            )}
+                          </ViewPanel>
+                        )
+                      }
+                    </FormBody>
+                    <FormFooter>
+                      {this.props.handleDelete && !this.state.deleteConfirmed
+                        && (
+                          <DeleteWrapper>
+                            <ButtonPreDelete type="button" onClick={this.preDelete}>
+                              <Icon name="trash" sizes={{ mobile: '1.8em' }} />
+                            </ButtonPreDelete>
+                          </DeleteWrapper>
+                        )
+                      }
+                      {this.props.handleDelete && this.state.deleteConfirmed
+                        && (
+                          <FormFooterButtons left>
+                            <DeleteConfirmText>
+                              <FormattedMessage {...messages.confirmDeleteQuestion} />
+                            </DeleteConfirmText>
+                            <ButtonCancel
+                              type="button"
+                              onClick={() => this.preDelete(false)}
+                            >
+                              <FormattedMessage {...messages.buttons.cancelDelete} />
+                            </ButtonCancel>
+                            <ButtonDelete type="button" onClick={this.props.handleDelete}>
+                              <FormattedMessage {...messages.buttons.confirmDelete} />
+                            </ButtonDelete>
+                          </FormFooterButtons>
+                        )
+                      }
+                      {!this.state.deleteConfirmed
+                        && (
+                          <FormFooterButtons>
+                            <ButtonCancel type="button" onClick={handleCancel}>
+                              <FormattedMessage {...appMessages.buttons.cancel} />
+                            </ButtonCancel>
+                            {submitDisabled && (
+                              <ScreenReaderOnly id="submit-disabled-hint">
+                                The form is missing required input data or has validation errors
+                              </ScreenReaderOnly>
+                            )}
+                            <ButtonSubmit
+                              type="submit"
+                              disabled={submitDisabled}
+                              aria-disabled={submitDisabled ? 'true' : null}
+                              aria-describedby={submitDisabled ? 'submit-disabled-hint' : null}
+                            >
+                              <FormattedMessage {...appMessages.buttons.save} />
+                            </ButtonSubmit>
+                          </FormFooterButtons>
+                        )
+                      }
+                      <Clear />
+                    </FormFooter>
+                  </StyledForm>
+                </FormWrapper>
+              </>
+            );
+          }}
+        </Formik>
       </div>
     );
   }
@@ -547,9 +583,7 @@ const mapStateToProps = (state) => ({
 });
 
 EntityForm.propTypes = {
-  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
-  bindHandleSubmit: PropTypes.func,
   handleCancel: PropTypes.func.isRequired,
   handleDelete: PropTypes.func,
   fields: PropTypes.object,
@@ -559,6 +593,9 @@ EntityForm.propTypes = {
   newEntityModal: PropTypes.object,
   scrollContainer: PropTypes.object,
   intl: PropTypes.object.isRequired,
+  headerType: PropTypes.string,
+  headerTitle: PropTypes.string,
+  headerIcon: PropTypes.string,
 };
 EntityForm.defaultProps = {
   saving: false,
