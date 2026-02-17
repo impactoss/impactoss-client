@@ -100,7 +100,7 @@ class EntityListItemMainTaxonomies extends React.PureComponent { // eslint-disab
     const entityTags = categories && this.getEntityTags(categories, taxonomies, onEntityClick, intl);
 
     return (
-      <Styled>
+      <Styled role="group" aria-label="Categories">
         {smartTaxonomy && (
           <SmartGroup border={entityTags && entityTags.length > 0}>
             {this.getEntitySmartTags(categories, smartTaxonomy, onEntityClick, intl).map((tag, i) => (
@@ -109,6 +109,7 @@ class EntityListItemMainTaxonomies extends React.PureComponent { // eslint-disab
                 onClick={tag.onClick}
                 taxId={parseInt(tag.taxId, 10)}
                 title={tag.title}
+                aria-label={tag.title}
                 isSmartTag
                 isSmart={tag.isSmart}
               >
@@ -125,6 +126,7 @@ class EntityListItemMainTaxonomies extends React.PureComponent { // eslint-disab
               taxId={parseInt(tag.taxId, 10)}
               disabled={!tag.onClick}
               title={tag.title}
+              aria-label={tag.title}
             >
               {tag.label}
             </ButtonTagCategoryInverse>
@@ -136,6 +138,7 @@ class EntityListItemMainTaxonomies extends React.PureComponent { // eslint-disab
               taxId={parseInt(tag.taxId, 10)}
               disabled={!tag.onClick}
               title={tag.title}
+              aria-label={tag.title}
             >
               {tag.label}
             </ButtonTagCategory>
