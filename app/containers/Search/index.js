@@ -358,6 +358,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                             <Box key={target.get('path')}>
                                               <Box gap="xsmall">
                                                 <Target
+                                                  id={`search-target-btn-${target.get('path')}`}
                                                   onClick={(evt) => {
                                                     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
                                                     if (active) {
@@ -368,6 +369,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                                   }}
                                                   active={active}
                                                   disabled={!otherTargets}
+                                                  aria-expanded={otherTargets ? active : null}
                                                 >
                                                   <Box direction="row" gap="small" align="center" justify="between">
                                                     <Box direction="row" gap="xsmall" pad={{ vertical: 'xsmall' }}>
@@ -375,17 +377,22 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                                       <Text size="large">{title}</Text>
                                                     </Box>
                                                     {otherTargets && active && (
-                                                      <FormUp size="medium" color="text" />
+                                                      <FormUp size="medium" color="text" aria-hidden="true" />
                                                     )}
                                                     {otherTargets && !active && (
-                                                      <FormDown size="medium" color="text" />
+                                                      <FormDown size="medium" color="text" aria-hidden="true" />
                                                     )}
                                                   </Box>
                                                 </Target>
                                               </Box>
                                               {
                                                 (active || !otherTargets) && (
-                                                  <Box margin={{ bottom: 'large' }} gap="xsmall">
+                                                  <Box
+                                                    role="region"
+                                                    aria-labelledby={`search-target-btn-${target.get('path')}`}
+                                                    margin={{ bottom: 'large' }}
+                                                    gap="xsmall"
+                                                  >
                                                     {target.get('results').toList().map((entity, key) => (
                                                       <EntityListItem
                                                         key={key}
