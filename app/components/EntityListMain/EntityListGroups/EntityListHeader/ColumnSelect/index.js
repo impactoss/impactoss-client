@@ -157,8 +157,15 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
                       ? intl.formatMessage(messages.sortOrderAsc)
                       : intl.formatMessage(messages.sortOrderDesc)
                   }
+                  aria-label={
+                    sortOrderOption
+                    && sortOrderOption.value
+                    && sortOrderOption.value === 'asc'
+                      ? intl.formatMessage(messages.sortOrderAsc)
+                      : intl.formatMessage(messages.sortOrderDesc)
+                  }
                 >
-                  <Icon name={sortOrderOption.icon} />
+                  <Icon name={sortOrderOption.icon} aria-hidden="true" role="presentation" />
                 </SortButton>
               )}
             </SelectWrapper>
