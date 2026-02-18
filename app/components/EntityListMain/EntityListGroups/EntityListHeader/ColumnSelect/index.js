@@ -131,7 +131,7 @@ class ColumnSelect extends React.PureComponent { // eslint-disable-line react/pr
           )}
           {!isSelect && (
             <LabelWrap>
-              <Label>{label}</Label>
+              <Label as="span">{label}</Label>
             </LabelWrap>
           )}
           {sortOptions && (

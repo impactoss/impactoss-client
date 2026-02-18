@@ -643,6 +643,7 @@ export const getEmailFormField = (formatMessage) => {
     type: 'email',
     required: true,
   });
+  field.autoComplete = 'email';
   field.validators.email = validateEmailFormat;
   field.errorMessages.email = formatMessage(appMessages.forms.emailFormatError);
   return field;
@@ -671,6 +672,7 @@ export const getPasswordField = ({
     required: true,
     showErrorsAsHints: isNotLogin,
   });
+  field.autoComplete = isNotLogin ? 'new-password' : 'current-password';
   if (isNotLogin) {
     field.validators.passwordContainsUpperCase = (val) => validateContainsUpperCase(val);
     field.validators.passwordContainsLowerCase = (val) => validateContainsLowerCase(val);
@@ -698,6 +700,7 @@ export const getPasswordConfirmationField = ({
     type: 'password',
     required: true,
   });
+  field.autoComplete = 'new-password';
   field.validateMatchAttribute = match;
   field.errorMessages.validateMatchAttribute = formatMessage(appMessages.forms.passwordMismatchError);
   return field;
@@ -712,6 +715,7 @@ export const getPasswordCurrentField = ({ formatMessage }) => {
     type: 'password',
     required: true,
   });
+  field.autoComplete = 'current-password';
   return field;
 };
 
@@ -724,6 +728,7 @@ export const getPasswordNewField = ({ formatMessage, attribute = 'passwordNew' }
     showErrorsAsHints: true,
     required: true,
   });
+  field.autoComplete = 'new-password';
   field.validators.passwordLength = (val) => validateMinLength(val, MIN_PASSWORD_LENGTH);
   field.validators.passwordContainsUpperCase = (val) => validateContainsUpperCase(val);
   field.validators.passwordContainsLowerCase = (val) => validateContainsLowerCase(val);

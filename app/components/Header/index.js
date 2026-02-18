@@ -535,7 +535,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                   onClick={(evt) => this.onClick(evt, brandPath)}
                   title={appTitle}
                 >
-                  <ScreenReaderHide>
+                  <ScreenReaderHide noTabIndex>
                     <Box direction="row">
                       {SHOW_HEADER_LOGO && (
                         <Logo

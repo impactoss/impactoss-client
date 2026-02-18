@@ -287,8 +287,10 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                 </Tags>
               )}
               <SearchInput
+                name="search"
                 placeholder={inputPlaceholder}
                 aria-label={inputPlaceholder}
+                autoComplete="off"
                 minLength={1}
                 debounceTimeout={500}
                 value={searchQuery || ''}
