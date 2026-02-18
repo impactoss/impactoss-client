@@ -1,21 +1,21 @@
 {
   "hosting": {
-    "public": "build",
+    "public": "build/dev",
     "rewrites": [
-      {
-        "source": "/robots.txt",
-        "destination": "/robots.txt"
-      },
       {
         "source": "**",
         "destination": "/index.html"
       }
     ],
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "ignore": ["**/.*", "**/node_modules/**"],
     "headers": [
       {
         "source": "**",
         "headers": [
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://sg-api-dev.impactoss.org; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+          },
           {
             "key": "X-Content-Type-Options",
             "value": "nosniff"
