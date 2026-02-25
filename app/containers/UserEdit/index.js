@@ -281,7 +281,6 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
 
 UserEdit.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
-  handleSubmitFail: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   viewDomain: PropTypes.object,
@@ -293,7 +292,6 @@ UserEdit.propTypes = {
   sessionUserHighestRoleId: PropTypes.number,
   params: PropTypes.object,
   onCreateOption: PropTypes.func,
-  onErrorDismiss: PropTypes.func.isRequired,
   onServerErrorDismiss: PropTypes.func.isRequired,
   onRedirectNotPermitted: PropTypes.func,
   sessionUserId: PropTypes.string, // used in nextProps
@@ -347,12 +345,11 @@ function mapDispatchToProps(dispatch) {
           ? memo.push(role.get('id'))
           : memo,
         List());
-
       saveData = saveData.set('userRoles', Map({
         delete: roles.reduce((memo, role) => role.get('associated')
             && !newRoleIds.includes(role.get('id'))
             && !newRoleIds.includes(parseInt(role.get('id'), 10))
-          ? memo.push(role.getIn(['associated', 'id']))
+          ? memo.push(role.get('associationId'))
           : memo,
         List()),
         create: newRoleIds.reduce((memo, id) => roles.find((role) => role.get('id') === id && !role.get('associated'))
