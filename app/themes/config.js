@@ -24,7 +24,7 @@ export const SERVER_ENDPOINT = SERVER_ENDPOINTS[SERVER];
 
 export const CLIENT_URL = {
   production: 'https://humanrightstracker.gov.scot',
-  UAT: 'https://uat.humanrightstracker.gov.scot',
+  UAT: 'https://api-uat.humanrightstracker.gov.scot',
   development: 'https://sg-dev.impactoss.org',
 };
 export const IS_PROD = SERVER === 'production';
@@ -38,7 +38,7 @@ export const ENABLE_AZURE = false; // IS_PROD || IS_TEST;
 // enable multi-factor authentication
 export const ENABLE_MULTI_FACTOR_AUTHENTICATION = true;
 // enable plausible analytics
-export const ENABLE_PLAUSIBLE = IS_PROD || IS_TEST;
+export const ENABLE_PLAUSIBLE = IS_PROD;// || IS_TEST;
 
 // default language locale
 export const DEFAULT_LOCALE = 'en-GB';
