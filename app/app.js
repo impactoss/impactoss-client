@@ -68,7 +68,7 @@ const rootRoute = {
 
 if (ENABLE_PLAUSIBLE) {
   const plausible = Plausible({
-    domain: CLIENT_URL.production,
+    domain: CLIENT_URL.production.replace(/^https?:\/\//, ''),
     // trackLocalhost: true,
   });
   plausible.enableAutoPageviews();
