@@ -16,7 +16,7 @@ import packageJson from '../../package.json';
 export const SERVER = (process && process.env && process.env.SERVER) || 'development';
 const SERVER_ENDPOINTS = {
   production: 'https://api.humanrightstracker.gov.scot',
-  UAT: 'https://sg-uat-493c281f27a0.herokuapp.com/',
+  UAT: 'https://api-uat.humanrightstracker.gov.scot',
   development: 'https://sg-api-dev.impactoss.org/',
 };
 export const SERVER_ENDPOINT = SERVER_ENDPOINTS[SERVER];
@@ -24,7 +24,7 @@ export const SERVER_ENDPOINT = SERVER_ENDPOINTS[SERVER];
 
 export const CLIENT_URL = {
   production: 'https://humanrightstracker.gov.scot',
-  UAT: 'https://api-uat.humanrightstracker.gov.scot',
+  UAT: 'https://uat.humanrightstracker.gov.scot',
   development: 'https://sg-dev.impactoss.org',
 };
 export const IS_PROD = SERVER === 'production';
