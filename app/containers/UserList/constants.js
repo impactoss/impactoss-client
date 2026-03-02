@@ -1,12 +1,12 @@
-import { USER_ROLES } from 'themes/config';
+import { USER_ROLES, API } from 'themes/config';
 
 export const DEPENDENCIES = [
-  'user_roles',
-  'users',
-  'roles',
-  'user_categories',
-  'categories',
-  'taxonomies',
+  API.USER_ROLES,
+  API.USERS,
+  API.ROLES,
+  API.TAXONOMIES,
+  API.CATEGORIES,
+  API.USER_CATEGORIES,
 ];
 
 export const CONFIG = {
@@ -43,13 +43,19 @@ export const CONFIG = {
     query: 'connected',
     options: [
       {
-        edit: false,
-        search: true,
+        query: 'role',
+        type: 'user-roles',
+        search: false,
         popover: false,
         message: 'entities.roles.single',
+        entityType: 'roles',
         path: 'roles', // filter by recommendation connection
         key: 'role_id',
+        ownKey: 'user_id',
+        connectPath: API.USER_ROLES, // filter by recommendation connection
+        single: true,
         labels: Object.values(USER_ROLES),
+        adminOnly: true,
       },
     ],
   },

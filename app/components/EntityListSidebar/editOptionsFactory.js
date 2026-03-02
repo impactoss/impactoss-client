@@ -130,13 +130,12 @@ export const makeConnectionEditOptions = (
     search: true,
     options: {},
     selectedCount: entities.size,
-    multiple: true,
+    multiple: option ? !option.single : true,
     required: false,
     advanced: true,
     selectAll: true,
     tagFilterGroups: option && makeTagFilterGroups(connectedTaxonomies, contextIntl),
   };
-
   if (option) {
     const fwid = option.groupByFramework && activeEditOption.optionId.split('_')[1];
     editOptions.title = messages.title;
@@ -150,7 +149,9 @@ export const makeConnectionEditOptions = (
           0);
         editOptions.options[connection.get('id')] = {
           reference: getEntityReference(connection),
-          label: getEntityTitle(connection),
+          label: (option.labels && contextIntl)
+            ? getEntityTitle(connection, option.labels, contextIntl)
+            : getEntityTitle(connection),
           value: connection.get('id'),
           checked: checkedState(count, entities.size),
           tags: connection.get('categories'),

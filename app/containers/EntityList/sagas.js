@@ -120,6 +120,7 @@ export function* save({ data }) {
     entity: data.entity,
     saveRef: data.saveRef,
     redirect: false,
+    context: 'entityList',
   }));
 }
 export function* saveMultiple({ path, data }) {
@@ -138,6 +139,7 @@ export function* newConnection({ data }) {
     entity: data.entity,
     saveRef: data.saveRef,
     redirect: false,
+    context: 'entityList',
   }));
 }
 
@@ -147,6 +149,7 @@ export function* deleteConnection({ data }) {
     id: data.id,
     saveRef: data.saveRef,
     redirect: false,
+    context: 'entityList',
   }));
 }
 

@@ -46,7 +46,7 @@ const selectUsersNested = createSelector(
       );
       return entity.set(
         'categories',
-        entityCategories.filter(
+        entityCategories && entityCategories.filter(
           (association) => qe(
             association.getIn(['attributes', 'user_id']),
             entity.get('id'),
@@ -59,6 +59,9 @@ const selectUsersNested = createSelector(
         entityHighestRoleId !== USER_ROLES.DEFAULT.value
           ? Map({ 0: entityHighestRoleId })
           : Map(),
+      ).set(
+        'allRoles',
+        entityRoleIds,
       );
     },
   ),

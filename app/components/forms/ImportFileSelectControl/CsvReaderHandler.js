@@ -13,7 +13,7 @@ const CsvReaderHandler = ({ children, ...props }) => {
 };
 
 CsvReaderHandler.propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
   isButton: PropTypes.bool,
 };
 

@@ -13,7 +13,7 @@ import ReactModal from 'react-modal';
 
 import { Map, List, fromJS } from 'immutable';
 
-// import { getEntityReference } from 'utils/entities';
+import qe from 'utils/quasi-equals';
 import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 
@@ -105,6 +105,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     this.props.updateClientPath();
   }
 
+  componentWillUnmount() {
+    this.props.onDismissAllErrors();
+  }
+
   onDownloadClick = () => {
     this.setState({ downloadActive: true });
   };
@@ -157,7 +161,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     const sending = viewDomain.get('sending');
     const success = viewDomain.get('success');
     const errors = viewDomain.get('errors').size > 0 ? this.mapErrors(viewDomain.get('errors')) : Map();
-
     const entities = (errors.size > 0)
       ? this.filterByError(this.props.entities, errors)
       : this.props.entities;
@@ -284,6 +287,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 activeEditOption,
                 this.props.entityIdsSelected,
                 viewDomain.get('errors'),
+                this.props.connections,
               )}
             globalSettings={globalSettings}
           />
@@ -524,7 +528,13 @@ function mapDispatchToProps(dispatch, props) {
     onCreateOption: (args) => {
       dispatch(openNewEntityModal(args));
     },
-    handleEditSubmit: (formData, activeEditOption, entityIdsSelected, errors) => {
+    handleEditSubmit: (
+      formData,
+      activeEditOption,
+      entityIdsSelected,
+      errors,
+      connections,
+    ) => {
       dispatch(resetProgress());
 
       const entities = props.entities.filter(
@@ -555,8 +565,6 @@ function mapDispatchToProps(dispatch, props) {
             }
           });
 
-          console.log('activeEditOption.optionId', activeEditOption.optionId, newValue);
-          console.log('entities', entities.toJS());
           if (activeEditOption.optionId === 'support_level' && newValue === 'null') {
             newValue = null;
           }
@@ -568,7 +576,8 @@ function mapDispatchToProps(dispatch, props) {
               (entity) => Map()
                 .set('path', props.config.serverPath)
                 .set('entity', entity.setIn(['attributes', activeEditOption.optionId], newValue))
-                .set('saveRef', entity.get('id')),
+                .set('saveRef', entity.get('id'))
+                .set('context', 'entityList'),
             ).toJS(),
           ));
         }
@@ -606,42 +615,113 @@ function mapDispatchToProps(dispatch, props) {
                 existingAssignments = List();
                 break;
             }
-            // create connections
-            if (creates.size > 0) {
-              // exclude existing relations from the changeSet
-              entityCreates = !!existingAssignments && existingAssignments.size > 0
-                ? creates.filter(
-                  (id) => !existingAssignments.includes(parseInt(id, 10)),
-                )
-                : creates;
-              entityCreates = entityCreates.map(
-                (id) => fromJS({
+            if (activeEditOption.connection === 'roles') {
+              const roles = connections.get('roles');
+              // "creates" includes single new "highest" role
+              // existingAssignments includes previous highest role
+              // if new highest role higher (that is actually lower)
+              //    --> create all roles higher than old role up to the new highest role
+              const prevHighestRoleId = existingAssignments
+                ? existingAssignments.toList().first()
+                : USER_ROLES.DEFAULT.value;
+              // console.log('entity', entity && entity.toJS())
+              // console.log('existingAssignments', existingAssignments && existingAssignments.toJS())
+              // console.log('prevHighestRoleId', prevHighestRoleId)
+              const newHighestRoleId = creates.size > 0 ? creates.first() : USER_ROLES.DEFAULT.value;
+              // console.log('newHighestRoleId', newHighestRoleId)
+              const prevRoleIds = prevHighestRoleId
+                ? roles.filter(
+                  (role) => {
+                    const theRole = Object.values(USER_ROLES).find((r) => qe(r.value, parseInt(role.get('id'), 10)));
+                    const prevHighestRole = Object.values(USER_ROLES).find((r) => qe(r.value, parseInt(prevHighestRoleId, 10)));
+                    return prevHighestRole.order <= theRole.order;
+                  },
+                ).map(
+                  (role) => parseInt(role.get('id'), 10),
+                ).toList()
+                : List();
+              // console.log('prevRoleIds', prevRoleIds && prevRoleIds.toJS())
+              const createRoleIds = newHighestRoleId === USER_ROLES.DEFAULT.value
+                ? List()
+                : roles.filter(
+                  (role) => {
+                    const theRole = Object.values(USER_ROLES).find((r) => qe(r.value, parseInt(role.get('id'), 10)));
+                    const newHighestRole = Object.values(USER_ROLES).find((r) => qe(r.value, parseInt(newHighestRoleId, 10)));
+                    return newHighestRole && newHighestRole.order <= theRole.order && !prevRoleIds.includes(theRole.value);
+                  },
+                ).map((role) => parseInt(role.get('id'), 10)).toList();
+              const deleteRoleIds = roles.filter(
+                (role) => {
+                  const theRole = Object.values(USER_ROLES).find((r) => qe(r.value, parseInt(role.get('id'), 10)));
+                  const newHighestRole = Object.values(USER_ROLES).find((r) => qe(r.value, parseInt(newHighestRoleId, 10)));
+                  return !newHighestRole || (newHighestRole.order > theRole.order && prevRoleIds.includes(theRole.value));
+                },
+              ).map((role) => parseInt(role.get('id'), 10)).toList();
+              // console.log('createRoleIds', createRoleIds.toJS())
+              // console.log('deleteRoleIds', deleteRoleIds.toJS())
+              // console.log('entity.allRoles', entity.get('allRoles').toJS())
+              if (createRoleIds.size > 0) {
+                entityCreates = createRoleIds.map((id) => fromJS({
                   path: activeEditOption.path,
                   entity: {
                     attributes: {
                       [activeEditOption.ownKey]: entity.get('id'),
-                      [activeEditOption.key]: id,
+                      [activeEditOption.key]: id.toString(),
                     },
                   },
                   saveRef: entity.get('id'),
-                }),
-              );
-            }
-            // delete connections
-            if (
-              deletes.size > 0
-              && !!existingAssignments
-              && existingAssignments.size > 0
-            ) {
-              entityDeletes = existingAssignments.filter(
-                (assigned) => deletes.includes(assigned.toString()),
-              ).map(
-                (assigned, id) => fromJS({
-                  path: activeEditOption.path,
-                  id,
-                  saveRef: entity.get('id'),
-                }),
-              ).toList();
+                }));
+              }
+              if (deleteRoleIds.size > 0) {
+                // console.log(deleteConnections.toJS())
+                entityDeletes = entity.get('allRoles').filter(
+                  (roleId) => deleteRoleIds.includes(roleId),
+                ).map(
+                  (assigned, id) => fromJS({
+                    path: activeEditOption.path,
+                    id,
+                    saveRef: entity.get('id'),
+                  }),
+                ).toList();
+              }
+            } else {
+              // create connections
+              if (creates.size > 0) {
+                // exclude existing relations from the changeSet
+                entityCreates = !!existingAssignments && existingAssignments.size > 0
+                  ? creates.filter(
+                    (id) => !existingAssignments.includes(parseInt(id, 10)),
+                  )
+                  : creates;
+                entityCreates = entityCreates.map(
+                  (id) => fromJS({
+                    path: activeEditOption.path,
+                    entity: {
+                      attributes: {
+                        [activeEditOption.ownKey]: entity.get('id'),
+                        [activeEditOption.key]: id,
+                      },
+                    },
+                    saveRef: entity.get('id'),
+                  }),
+                );
+              }
+              // delete connections
+              if (
+                deletes.size > 0
+                && !!existingAssignments
+                && existingAssignments.size > 0
+              ) {
+                entityDeletes = existingAssignments.filter(
+                  (assigned) => deletes.includes(assigned.toString()),
+                ).map(
+                  (assigned, id) => fromJS({
+                    path: activeEditOption.path,
+                    id,
+                    saveRef: entity.get('id'),
+                  }),
+                ).toList();
+              }
             }
             return memo
               .set('creates', memo.get('creates').concat(entityCreates))

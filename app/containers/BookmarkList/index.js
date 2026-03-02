@@ -137,10 +137,12 @@ const getTypeLabel = (type, formatMessage, short = true) => {
     ? type.split('_')
     : [type, null];
   let label = formatMessage(appMessages.entities[path].plural);
-  if (framework) {
-    label = `${label} | ${formatMessage(appMessages[short ? 'frameworks_short' : 'frameworks'][framework])}`;
-  } else if (path === 'recommendations') {
-    label = `${label} | ${formatMessage(appMessages.frameworks.all)}`;
+  if (FEATURES.multiFramework) {
+    if (framework) {
+      label = `${label} | ${formatMessage(appMessages[short ? 'frameworks_short' : 'frameworks'][framework])}`;
+    } else if (path === 'recommendations') {
+      label = `${label} | ${formatMessage(appMessages.frameworks.all)}`;
+    }
   }
   return label;
 };

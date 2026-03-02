@@ -1,8 +1,10 @@
+import { API } from 'themes/config';
+
 export const DEPENDENCIES = [
-  'user_roles',
-  'users',
-  'roles',
-  'categories',
-  'taxonomies',
-  'user_categories',
+  API.USER_ROLES,
+  API.USERS,
+  API.ROLES,
+  API.TAXONOMIES,
+  // API.CATEGORIES,
+  // API.USER_CATEGORIES,
 ];

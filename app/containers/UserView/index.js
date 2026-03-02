@@ -199,7 +199,7 @@ export class UserView extends React.PureComponent {
                 },
                 body: {
                   main: this.getBodyMainFields(user),
-                  aside: canSeeOrg && this.getBodyAsideFields(taxonomies),
+                  aside: canSeeOrg && taxonomies && this.getBodyAsideFields(taxonomies),
                 },
               }}
             />

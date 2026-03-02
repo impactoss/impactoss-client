@@ -54,6 +54,7 @@ export const FEATURES = {
   indicators: false,
   progress_reports: false,
   sdgs: false,
+  multiFramework: false,
 };
 
 // UI settings ************************
@@ -191,10 +192,10 @@ export const SERVER_ERRORS = {
 
 // user roles
 export const USER_ROLES = {
-  ADMIN: { value: 1, message: 'ui.userRoles.admin' },
-  MANAGER: { value: 2, message: 'ui.userRoles.manager' },
-  CONTRIBUTOR: { value: 3, message: 'ui.userRoles.contributor' },
-  DEFAULT: { value: 9999, message: 'ui.userRoles.default' }, // note: client side only - no role assigned on server
+  ADMIN: { value: 1, message: 'ui.userRoles.admin', order: 1 },
+  MANAGER: { value: 2, message: 'ui.userRoles.manager', order: 2 },
+  CONTRIBUTOR: { value: 3, message: 'ui.userRoles.contributor', order: 3 },
+  DEFAULT: { value: 9999, message: 'ui.userRoles.default', order: 9999 }, // note: client side only - no role assigned on server
 };
 // Entity publish statuses
 export const PUBLISH_STATUSES = [
@@ -285,7 +286,7 @@ export const API = {
   RECOMMENDATION_CATEGORIES: 'recommendation_categories',
   // RECOMMENDATION_ACTIONS: 'recommendation_measures',
   RECOMMENDATIONS: 'recommendations',
-  USER_CATEGORIES: 'user_categories',
+  // USER_CATEGORIES: 'user_categories',
   // PROGRESS_REPORTS: 'progress_reports',
   // DUE_DATES: 'due_dates',
   FRAMEWORKS: 'frameworks',
@@ -596,6 +597,7 @@ export const ENTITY_FIELDS = {
         required: true,
         import: true,
         skipImport: true,
+        skipExport: true,
       },
       reference: {
         type: 'text',
