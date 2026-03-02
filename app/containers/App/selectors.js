@@ -1020,7 +1020,7 @@ export const selectViewRecommendationFrameworkId = createSelector(
 
 // if there are any non-current categories from the relevant taxonomies then we have multiple cycles
 export const selectHasPreviousCycles = createSelector(
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   (categories) => categories.some(
     (cat) => !cat.getIn(['attributes', 'is_current'])
       && CURRENT_TAXONOMY_IDS.indexOf(parseInt(cat.getIn(['attributes', 'taxonomy_id']), 10)) > -1,

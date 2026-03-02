@@ -10,7 +10,7 @@ import {
   selectTaxonomiesSorted,
   selectTaxonomies,
   selectFWRecommendations,
-  // selectFWMeasures,
+  selectCategories,
   selectRecommendationCategoriesByCategory,
   // selectMeasureCategoriesByCategory,
   // selectRecommendationMeasuresByMeasure,
@@ -45,11 +45,26 @@ export const selectTaxonomy = createSelector(
     && taxonomies.get(category.getIn(['attributes', 'taxonomy_id']).toString()),
 );
 
+const hasSiblings = (entity, categories) => {
+  if (entity && categories) {
+    return !!entity.getIn(['attributes', 'parent_id']) && categories.some((cat) =>
+      // not self
+      entity.get('id') !== cat.get('id')
+      // same parent
+      && qe(entity.getIn(['attributes', 'parent_id']), cat.getIn(['attributes', 'parent_id']))
+      // not draft
+      && !cat.getIn(['attributes', 'draft'])
+      // not archived
+      && !cat.getIn(['attributes', 'is_archive']));
+  }
+  return null;
+};
+
 export const selectViewEntity = createSelector(
   selectCategory,
   (state) => selectEntities(state, 'users'),
   selectTaxonomiesSorted,
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   (entity, users, taxonomies, categories) => entity
     && entitySetSingles(
       entity, [
@@ -74,7 +89,7 @@ export const selectViewEntity = createSelector(
           relatedKey: 'parent_id',
         },
       ],
-    ),
+    ).set('hasSiblings', hasSiblings(entity, categories)),
 );
 
 export const selectParentTaxonomy = createSelector(
@@ -98,6 +113,8 @@ export const selectParentTaxonomy = createSelector(
     return null;
   },
 );
+
+
 export const selectChildTaxonomies = createSelector(
   selectCategory,
   selectTaxonomiesSorted,

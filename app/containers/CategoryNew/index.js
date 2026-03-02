@@ -207,10 +207,10 @@ export class CategoryNew extends React.PureComponent { // eslint-disable-line re
     fields.push({
       fields: [
         taxonomy.getIn(['attributes', 'has_date'])
-          && getDateField(
-            intl.formatMessage,
-            'date',
-          ),
+          && getDateField({
+            formatMessage: intl.formatMessage,
+            attribute: 'date',
+          }),
         getFormField({
           formatMessage: intl.formatMessage,
           controlType: 'url',

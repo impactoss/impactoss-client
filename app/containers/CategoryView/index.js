@@ -119,6 +119,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       fields: [
         isManager && getStatusField(entity),
         !entity.getIn(['attributes', 'draft'])
+        && entity.get('hasSiblings')
         && CURRENT_TAXONOMY_IDS.indexOf(entity.getIn(['attributes', 'taxonomy_id'])) > -1
         && getStatusField(
           entity,
