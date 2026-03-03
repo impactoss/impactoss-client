@@ -30,7 +30,7 @@ import { Grommet } from 'grommet';
 import theme from 'themes/theme-nz';
 import './fonts/fonts.css';
 
-// Load the favicon, and the .htaccess file
+// Load the favicon
 /* eslint-disable import/no-unresolved, import/extensions */
 import '!file-loader?name=[name].[ext]!./favicon.ico';
 import '!file-loader?name=[name].[ext]!./favicon-16x16.png';
