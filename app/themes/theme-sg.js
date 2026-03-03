@@ -20,7 +20,7 @@ import partner1 from 'themes/media/scotgovlogo.svg';
 // import partner3x2x from 'themes/media/partner3@2x.png';
 // import partner4x2x from 'themes/media/partner4@2x.png';
 
-import headerLogo from 'themes/media/headerLogo.svg';
+import headerLogo from 'themes/media/headerLogo.png';
 import teaserCategories from 'themes/media/teaserCategories.svg';
 import teaserRecommendations from 'themes/media/teaserRecommendations.svg';
 
@@ -30,7 +30,8 @@ import teaserRecommendations from 'themes/media/teaserRecommendations.svg';
 // import footerLogo2_2x from 'themes/media/footer-logo-nzjustice@2x.png';
 
 import graphicHome from 'themes/media/homeGraphic.png';
-import graphicHome2x from 'themes/media/homeGraphic@2x.png';
+// import graphicHome2x from 'themes/media/homeGraphic@2x.png';
+import graphicHomeSection from 'themes/media/homeGraphicSection.png';
 
 import impactossLogo from 'themes/media/impactoss-logo.png';
 import impactossLogo2x from 'themes/media/impactoss-logo@2x.png';
@@ -59,7 +60,8 @@ theme.media = {
   headerLogo: [headerLogo],
   teaserCategories: [teaserCategories],
   teaserRecommendations: [teaserRecommendations],
-  graphicHome: [graphicHome, graphicHome2x],
+  graphicHome: [graphicHome],
+  graphicHomeSection: [graphicHomeSection],
   impactossLogo: [impactossLogo, impactossLogo2x],
   // titleHome: [titleHome, titleHome2x],
   // up to 6 partner logos,

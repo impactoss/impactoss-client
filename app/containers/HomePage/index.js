@@ -13,7 +13,9 @@ import rehypeExternalLinks from 'rehype-external-links';
 
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
-import { Box, Text, ResponsiveContext } from 'grommet';
+import {
+  Box, Text, ResponsiveContext, Image,
+} from 'grommet';
 
 import { isMinSize } from 'utils/responsive';
 
@@ -36,6 +38,7 @@ import {
   HEADER_PATTERN_HEIGHT,
   SHOW_HEADER_PATTERN_HOME_GRAPHIC,
   HOME_GRAPHIC_WIDTH,
+  HOME_GRAPHIC_WIDTH_XS,
   SHOW_HOME_CLAIM,
 } from 'themes/config';
 
@@ -47,16 +50,6 @@ import messages from './messages';
 
 const GraphicHomeWrapper = styled.div`
   width: 100%;
-  padding-top: ${(props) => props.hasBrand
-    ? props.theme.sizes.header.banner.heightMobile
-    : 0
-}px;
-  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    padding-top: ${(props) => props.hasBrand
-    ? props.theme.sizes.header.banner.height
-    : 0
-}px;
-  }
   background-image: ${(props) => (props.showPattern && props.theme.backgroundImages.header)
     ? props.theme.backgroundImages.header
     : 'none'
@@ -67,16 +60,26 @@ const GraphicHomeWrapper = styled.div`
 
 const GraphicHome = styled(NormalImg)`
   width: 100%;
-  max-width: ${HOME_GRAPHIC_WIDTH}px;
+  max-width: ${HOME_GRAPHIC_WIDTH_XS}px;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    max-width: ${HOME_GRAPHIC_WIDTH}px;
+  }
 `;
 
 const SectionTop = styled.div`
-  display: ${(props) => props.hasBrand ? 'block' : 'table'};
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: ${(props) => props.hasBrand ? 'auto' : '100%'};
   background-color: ${palette('home', 0)};
   color: ${palette('homeIntro', 0)};
   text-align: center;
-  min-height: 500px;
+  min-height: 400px;
+  /* border: 1px solid red; */
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    min-height: auto;
+    min-height: calc(100vh - ${({ theme }) => theme.sizes.header.banner.height + theme.sizes.header.nav.height}px - 200px);
+  }
   @media print {
     background-color: transparent;
     color: ${palette('text', 0)};
@@ -85,24 +88,85 @@ const SectionTop = styled.div`
   }
 `;
 
-const SectionTopInner = styled((p) => <Box pad={{ horizontal: 'small' }} {...p} />)`
-  display: ${(props) => props.hasBrand ? 'block' : 'table-cell'};
-  vertical-align: ${(props) => props.hasBrand ? 'baseline' : 'middle'};
-  padding-bottom: 2em;
-  min-height: 500px;
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    padding-bottom: 3em;
-  }
+const SectionTopInner = styled((p) => <Box pad={{ horizontal: 'small', top: 'medium' }} {...p} />)`
+  width: 100%;
+  position: relative;
+  /* border: 1px solid blue; */
+  /* padding-bottom: 140px; */
 `;
 
 const Section = styled((p) => <Box {...p} />)`
-  padding-top: 60px;
+  padding-top: 30px;
   padding-bottom: 80px;
   background-color: ${palette('mainBackground', 0)};
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    padding-top: 60px;
+  }
 `;
 const SectionInner = styled((p) => <Box pad={{ horizontal: 'small' }} {...p} />)`
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     max-width: 800px;
+  }
+`;
+const BackgroundImageSection = styled((p) => <Box {...p} />)`
+  overflow: hidden;
+  margin-top: -50px;
+  background: linear-gradient(to bottom, #ffffff 5%, ${palette('mainBackground', 0)} 60%);
+`;
+
+
+const CirclesContainer = styled.div`
+  position: absolute;
+  top: -8%;
+  bottom: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1170px;
+  pointer-events: none;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    top: -5%;
+    bottom: 42%;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    top: 2%;
+    bottom: 40%;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    top: -5%;
+  }
+`;
+
+const Circle = styled.div`
+  position: absolute;
+  border-radius: 50%;
+  background-color: ${({ id }) => palette('taxonomies', id)};
+  width: ${({ size }) => size}%;
+  min-width: ${({ minSize }) => minSize}px;
+  min-height: ${({ minSize }) => minSize}px;
+  left: ${({ x }) => x}%;
+  top: ${({ y }) => y}%;
+  transform: translate(-50%, -50%);
+  will-change: transform; /* ready for parallax */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+`;
+
+const IconWrap = styled.div`
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    width: 40px;
+    height: 40px;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    width: 44px;
+    height: 44px;
   }
 `;
 
@@ -113,9 +177,6 @@ const Title = styled.h1`
   margin-top: 0.5em;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: ${(props) => props.theme.sizes.home.text.title};
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
-    margin-top: 1em;
   }
 `;
 const SectionTitle = styled.h2`
@@ -188,10 +249,26 @@ const SectionDescription = styled(Text)`
   }
 `;
 
+const CIRCLES = [
+  {
+    id: 2, size: 6, minSize: 30, x: 10, y: 25,
+  },
+  {
+    id: 3, size: 11, minSize: 50, x: 21, y: 42,
+  },
+  {
+    id: 1, size: 8, minSize: 40, x: 31, y: 23,
+  },
+  {
+    id: 4, size: 11, minSize: 50, x: 74, y: 25,
+  },
+  {
+    id: 5, size: 15, minSize: 60, x: 88, y: 50,
+  },
+];
 export function HomePage({ onPageLink, theme, intl }) {
   const appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
   const size = useContext(ResponsiveContext);
-
   return (
     <div>
       <HelmetCanonical
@@ -209,6 +286,21 @@ export function HomePage({ onPageLink, theme, intl }) {
           fill="vertical"
           flex={{ grow: 1 }}
         >
+          <CirclesContainer>
+            {CIRCLES.map((c) => (
+              <Circle key={c.id} {...c}>
+                <IconWrap>
+                  <Icon
+                    name={`taxonomy_${c.id}`}
+                    size="100%"
+                    color="white"
+                    alt=""
+                    role="presentation"
+                  />
+                </IconWrap>
+              </Circle>
+            ))}
+          </CirclesContainer>
           <GraphicHomeWrapper
             hasBrand={SHOW_BRAND_ON_HOME}
             showPattern={SHOW_HEADER_PATTERN_HOME_GRAPHIC}
@@ -220,7 +312,7 @@ export function HomePage({ onPageLink, theme, intl }) {
           }
           <Box>
             {SHOW_HOME_TITLE_OR_CLAIM && (
-              <Box gap="xsmall" align="center">
+              <Box gap="xsmall" align="center" responsive={false}>
                 {SHOW_HOME_TITLE && (
                   <Title>
                     <FormattedMessage {...appMessages.app.titleHome} />
@@ -238,7 +330,7 @@ export function HomePage({ onPageLink, theme, intl }) {
               </Box>
             )}
             <Box
-              margin={{ top: 'small', bottom: 'large' }}
+              margin={{ top: 'small' }}
               align="center"
               style={{ minHeight: '58px' }}
             >
@@ -247,6 +339,12 @@ export function HomePage({ onPageLink, theme, intl }) {
           </Box>
         </SectionTopInner>
       </SectionTop>
+      <BackgroundImageSection>
+        <Image
+          src={theme.media.graphicHomeSection}
+          fit="contain"
+        />
+      </BackgroundImageSection>
       <Section align="center">
         <SectionInner gap="medium">
           <Box align="center">
