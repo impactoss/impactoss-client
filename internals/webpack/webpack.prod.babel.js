@@ -97,15 +97,6 @@ module.exports = require('./webpack.base.babel')({
       minRatio: 0.8,
     }),
 
-    new WebpackPwaManifest({
-      name: 'IMPACT OSS - NZ',
-      short_name: 'IMPACT OSS - NZ',
-      description: 'IMPACT OSS - NZ',
-      background_color: '#ffffff',
-      theme_color: '#ffffff',
-      inject: true,
-      ios: true,
-    }),
     new CopyPlugin({ patterns: [{ from: 'app/robots.txt', to: 'robots.txt' }] }),
 
     /*
