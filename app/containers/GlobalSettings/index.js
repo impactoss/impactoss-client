@@ -71,7 +71,7 @@ const StyledLabel = styled(Text)`
 `;
 
 const StyledBodyText = styled(Text)`
-  color: ${palette('dark', 3)};
+  color: ${palette('dark', 1)};
 `;
 
 const CloseButton = styled((p) => <ButtonDefaultIconOnly {...p} />)``;
@@ -93,7 +93,7 @@ const Toggle = styled(CheckBox)`
     outline: unset;
     box-shadow: unset;
     &:hover {
-      border-color: ${palette('dark', 3)} !important;
+      border-color: ${palette('dark', 1)} !important;
     }
     span {
       background: ${({ checked }) => checked ? palette('buttonDefaultIconOnly', 1) : palette('text', 1)} !important;

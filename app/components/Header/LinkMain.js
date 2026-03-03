@@ -6,7 +6,7 @@ import Link from './Link';
 export default styled(Link)`
   display: inline-block;
   vertical-align: top;
-  color: ${({ active }) => active ? palette('text', 2) : palette('dark', 3)};
+  color: ${({ active }) => active ? palette('text', 2) : palette('dark', 1)};
   background:  ${({ active }) => active ? palette('primary', 0) : 'transparent'};
   &:hover, &:focus-visible {
     color:${({ active }) => active ? palette('text', 2) : palette('headerNavMainItemHover', 0)};
@@ -17,7 +17,7 @@ export default styled(Link)`
   font-size: 0.8em;
   padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
   height: ${(props) => props.theme.sizes.header.nav.heightMobile}px;
-  border-left: 1px solid ${palette('dark', 3)};
+  border-left: 1px solid ${palette('dark', 1)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     min-width: 120px;
     font-size: 0.9em;

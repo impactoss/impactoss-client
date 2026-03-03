@@ -5,7 +5,7 @@ import FieldIcon from './FieldIcon';
 
 const ListItemIcon = styled(FieldIcon)`
   top: 0.5em;
-  color: ${palette('dark', 3)}
+  color: ${palette('dark', 1)}
 `;
 
 export default ListItemIcon;
