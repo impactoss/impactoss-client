@@ -98,7 +98,7 @@ const primary = coolorsToHex('https://coolors.co/73018e-510064-360441-ffffff-fff
 // 2: secondary colour, main / white/placeholder
 // 3: white/placeholder
 // 4: white/placeholder
-const secondary = coolorsToHex('https://coolors.co/ba5d03-ffffff-ffffff-ffffff-ffffff');
+const secondary = coolorsToHex('https://coolors.co/ba5d03-964b00-ffffff-ffffff-ffffff');
 // dark grayscale: dark to light
 // 0:  darkest (AA)
 // 1:  darker (AA)
@@ -229,7 +229,7 @@ theme.palette = {
   footerLinksHover: [primary[2]],
 
   // header: [ '#bg' ],
-  header: [secondary[1]],
+  header: [secondary[2]],
 
   // headerBrand: [ '#title', '#claim' ],
   headerBrand: [dark[0], dark[3]],
