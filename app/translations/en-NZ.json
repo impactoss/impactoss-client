@@ -489,7 +489,7 @@
   "app.containers.App.frameworks_short.5": "Framework 5",
   "app.containers.App.frameworks_short.common": "multiple",
   "app.containers.App.hints.autoReference": "Leave blank to assign database id",
-  "app.containers.App.hints.content": "Note: first paragraph styled as lead paragraph",
+  "app.containers.App.hints.content": " ",
   "app.containers.App.hints.fullRecommendation": "Note: also use when title would be too long",
   "app.containers.App.hints.printListMore": "List only showing {no} items.",
   "app.containers.App.hints.user_only": "Check to categorise users only",

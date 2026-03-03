@@ -299,12 +299,12 @@ const DiagramSvgWrapper = styled.div`
 `;
 
 const PathLineCustom = styled(PathLine)`
-  stroke: ${palette('dark', 2)};
+  stroke: ${palette('dark', 1)};
   stroke-width: 0.5px;
   fill: none;
 `;
 const PathLineArrow = styled(PathLine)`
-  fill: ${palette('dark', 2)};
+  fill: ${palette('dark', 1)};
 `;
 
 const STATE_INITIAL = {

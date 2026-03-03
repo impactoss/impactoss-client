@@ -72,7 +72,7 @@ const Styled = styled.div`
   @media print {
     display: ${({ isHome }) => isHome ? 'none' : 'block'};
     height: ${({ theme }) => theme.sizes.header.banner.height}px;
-    border-bottom: 1px solid ${palette('dark', 2)};
+    border-bottom: 1px solid ${palette('dark', 1)};
     position: static;
     box-shadow: none;
     background: white;
@@ -179,7 +179,7 @@ const Search = styled(LinkMain)`
 const Config = styled(LinkMain)`
   display: none;
   padding: 2px ${(props) => props.theme.sizes.header.paddingLeft.mobile}px 1px;
-  border-left: 1px solid ${palette('dark', 3)};
+  border-left: 1px solid ${palette('dark', 1)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     display: inline-block;
     min-width: auto;

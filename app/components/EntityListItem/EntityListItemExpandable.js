@@ -29,14 +29,14 @@ const Styled = styled((p) => <Component {...p} />)`
 `;
 const IconWrap = styled.span`
   display: inline-block;
-  color: ${palette('dark', 2)};
+  color: ${palette('dark', 1)};
   top: -4px;
   position: relative;
 `;
 
 const Count = styled.span`
   display: inline-block;
-  color: ${palette('dark', 2)};
+  color: ${palette('dark', 1)};
   padding: 0 8px;
   font-size: 1.5em;
   @media print {
