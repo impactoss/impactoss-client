@@ -187,6 +187,15 @@ const Footer = ({
                   align={isMobile ? 'start' : 'end'}
                   role="navigation"
                 >
+                  <FooterLink
+                    onClick={(evt) => {
+                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                      onPageLink(ROUTES.SEARCH);
+                    }}
+                    href={ROUTES.SEARCH}
+                  >
+                    <FormattedMessage {...appMessages.nav.search} />
+                  </FooterLink>
                   {pages.size > 0 && FOOTER.INTERNAL_LINKS && FOOTER.INTERNAL_LINKS.map((pageId) => {
                     const page = pages.find((p) => qe(p.get('id'), pageId));
                     return page
