@@ -86,17 +86,22 @@ export class SelectReset extends React.PureComponent { // eslint-disable-line re
       intl,
     } = this.props;
     const optionActive = find(options, (option) => option.value === value);
+    const resetButtonShown = isReset && optionActive.value !== emptyValue;
     return (
       <Styled hidePrint={hidePrint}>
         {(label || labelScreenreaderOnly) && (
-          <Label htmlFor={index}>
+          <Label
+            htmlFor={resetButtonShown ? null : index}
+            as={resetButtonShown ? 'span' : 'label'}
+            aria-hidden={resetButtonShown ? 'true' : null}
+          >
             {label || ''}
             {labelScreenreaderOnly && (
               <ScreenReaderOnly>{labelScreenreaderOnly}</ScreenReaderOnly>
             )}
           </Label>
         )}
-        {(!isReset || optionActive.value === emptyValue) && (
+        {!resetButtonShown && (
           <Select
             id={index}
             onChange={(event) => onChange(event.target.value)}
@@ -116,16 +121,16 @@ export class SelectReset extends React.PureComponent { // eslint-disable-line re
             ))}
           </Select>
         )}
-        {isReset && optionActive.value !== emptyValue && (
+        {resetButtonShown && (
           <Reset
-            id={index}
             onClick={() => onChange(emptyValue)}
+            aria-label={`${label} ${optionActive.label}`}
             title={intl.formatMessage(messages.resetTitle, { label: optionActive.label })}
           >
             <ScreenReaderHide>
               {optionActive.label}
+              <Icon name="removeSmall" text textRight hidePrint />
             </ScreenReaderHide>
-            <Icon name="removeSmall" text textRight hidePrint />
           </Reset>
         )}
       </Styled>

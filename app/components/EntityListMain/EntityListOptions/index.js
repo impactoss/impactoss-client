@@ -76,7 +76,7 @@ export class EntityListOptions extends React.Component { // eslint-disable-line 
       intl,
     } = this.props;
     return (
-      <Styled>
+      <Styled role="toolbar" aria-label="List grouping options">
         {groupOptions.size > 0
           && (
             <EntityListGroupBy

@@ -278,7 +278,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
           )
         }
         <ContainerWrapperSidebar hasSidebar={hasSidebar} sidebarResponsiveSmall>
-          <Container>
+          <Container role="main">
             <Content>
               <ContentHeader
                 type={CONTENT_LIST}

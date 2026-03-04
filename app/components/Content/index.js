@@ -7,7 +7,7 @@ import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
 
 const Content = React.forwardRef((props, ref) => (
   <ContainerWrapper ref={ref}>
-    <Container inModal={props.inModal}>
+    <Container inModal={props.inModal} role={props.inModal ? null : 'main'}>
       {props.children}
     </Container>
     {!props.inModal && (

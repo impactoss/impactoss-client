@@ -280,120 +280,122 @@ export function HomePage({ onPageLink, theme, intl }) {
           { name: 'description', content: intl.formatMessage(messages.metaDescription) },
         ]}
       />
-      <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
-        <SectionTopInner
-          hasBrand={SHOW_BRAND_ON_HOME}
-          style={{ position: 'relative' }}
-          align="center"
-          justify="evenly"
-          fill="vertical"
-          flex={{ grow: 1 }}
-        >
-          <CirclesContainer>
-            {CIRCLES.map((c) => (
-              <Circle key={c.id} {...c}>
-                <IconWrap>
-                  <Icon
-                    name={`taxonomy_${c.id}`}
-                    size="100%"
-                    color="white"
-                    alt=""
-                    role="presentation"
-                  />
-                </IconWrap>
-              </Circle>
-            ))}
-          </CirclesContainer>
-          <GraphicHomeWrapper
+      <main>
+        <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
+          <SectionTopInner
             hasBrand={SHOW_BRAND_ON_HOME}
-            showPattern={SHOW_HEADER_PATTERN_HOME_GRAPHIC}
+            style={{ position: 'relative' }}
+            align="center"
+            justify="evenly"
+            fill="vertical"
+            flex={{ grow: 1 }}
           >
-            <GraphicHome src={theme.media.graphicHome} alt={intl.formatMessage(appMessages.app.title)} />
-          </GraphicHomeWrapper>
-          { !SHOW_HOME_TITLE && theme.media.titleHome
-            && <GraphicHome src={theme.media.titleHome} alt={appTitle} />
-          }
-          <Box>
-            {SHOW_HOME_TITLE_OR_CLAIM && (
-              <Box gap="xsmall" align="center" responsive={false}>
-                {SHOW_HOME_TITLE && (
-                  <Title>
-                    <FormattedMessage {...appMessages.app.titleHome} />
-                  </Title>
-                )}
-                {SHOW_HOME_CLAIM && (
-                  <Claim>
-                    <FormattedMessage {...appMessages.app.claim} />
-                  </Claim>
-                )}
-                <Intro
-                  children={intl.formatMessage(messages.intro)}
-                  rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
+            <CirclesContainer>
+              {CIRCLES.map((c) => (
+                <Circle key={c.id} {...c}>
+                  <IconWrap>
+                    <Icon
+                      name={`taxonomy_${c.id}`}
+                      size="100%"
+                      color="white"
+                      alt=""
+                      role="presentation"
+                    />
+                  </IconWrap>
+                </Circle>
+              ))}
+            </CirclesContainer>
+            <GraphicHomeWrapper
+              hasBrand={SHOW_BRAND_ON_HOME}
+              showPattern={SHOW_HEADER_PATTERN_HOME_GRAPHIC}
+            >
+              <GraphicHome src={theme.media.graphicHome} alt={intl.formatMessage(appMessages.app.title)} />
+            </GraphicHomeWrapper>
+            { !SHOW_HOME_TITLE && theme.media.titleHome
+              && <GraphicHome src={theme.media.titleHome} alt={appTitle} />
+            }
+            <Box>
+              {SHOW_HOME_TITLE_OR_CLAIM && (
+                <Box gap="xsmall" align="center" responsive={false}>
+                  {SHOW_HOME_TITLE && (
+                    <Title>
+                      <FormattedMessage {...appMessages.app.titleHome} />
+                    </Title>
+                  )}
+                  {SHOW_HOME_CLAIM && (
+                    <Claim>
+                      <FormattedMessage {...appMessages.app.claim} />
+                    </Claim>
+                  )}
+                  <Intro
+                    children={intl.formatMessage(messages.intro)}
+                    rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
+                  />
+                </Box>
+              )}
+              <Box
+                margin={{ top: 'small' }}
+                align="center"
+                style={{ minHeight: '58px' }}
+              >
+                <Icon name="arrowDown" palette="primary" paletteIndex={0} />
+              </Box>
+            </Box>
+          </SectionTopInner>
+        </SectionTop>
+        <BackgroundImageSection>
+          <Image
+            src={theme.media.graphicHomeSection}
+            fit="contain"
+          />
+        </BackgroundImageSection>
+        <Section align="center">
+          <SectionInner gap="medium">
+            <Box align="center">
+              <Box>
+                <SectionTitle id="home-nav-title">
+                  <FormattedMessage {...messages.sectionTitle} />
+                </SectionTitle>
+              </Box>
+              <Box>
+                <SectionDescription>
+                  <FormattedMessage {...messages.sectionDescription} />
+                </SectionDescription>
+              </Box>
+            </Box>
+            <nav aria-label="Explore the tracker">
+              <Box gap="ms" direction={isMinSize(size, 'small') ? 'row' : 'column'}>
+                <CardTeaser
+                  path={ROUTES.OVERVIEW}
+                  onClick={(evt) => {
+                    if (evt && evt.preventDefault) evt.preventDefault();
+                    onPageLink(ROUTES.OVERVIEW);
+                  }}
+                  title={intl.formatMessage(messages.cardTitleOverview)}
+                  description={intl.formatMessage(messages.cardDescriptionOverview)}
+                  explore={intl.formatMessage(messages.cardLinkOverview)}
+                  graphicSrc={theme.media.teaserCategories}
+                  isHome
+                  basis={isMinSize(size, 'small') ? '1/2' : '1'}
+                />
+                <CardTeaser
+                  path={ROUTES.RECOMMENDATIONS}
+                  onClick={(evt) => {
+                    if (evt && evt.preventDefault) evt.preventDefault();
+                    onPageLink(ROUTES.RECOMMENDATIONS);
+                  }}
+                  dataReady
+                  title={intl.formatMessage(messages.cardTitleRecommendations)}
+                  description={intl.formatMessage(messages.cardDescriptionRecommendations)}
+                  explore={intl.formatMessage(messages.cardLinkRecommendations)}
+                  graphicSrc={theme.media.teaserRecommendations}
+                  isHome
                 />
               </Box>
-            )}
-            <Box
-              margin={{ top: 'small' }}
-              align="center"
-              style={{ minHeight: '58px' }}
-            >
-              <Icon name="arrowDown" palette="primary" paletteIndex={0} />
-            </Box>
-          </Box>
-        </SectionTopInner>
-      </SectionTop>
-      <BackgroundImageSection>
-        <Image
-          src={theme.media.graphicHomeSection}
-          fit="contain"
-        />
-      </BackgroundImageSection>
-      <Section align="center">
-        <SectionInner gap="medium">
-          <Box align="center">
-            <Box>
-              <SectionTitle id="home-nav-title">
-                <FormattedMessage {...messages.sectionTitle} />
-              </SectionTitle>
-            </Box>
-            <Box>
-              <SectionDescription>
-                <FormattedMessage {...messages.sectionDescription} />
-              </SectionDescription>
-            </Box>
-          </Box>
-          <nav aria-label="Explore the tracker">
-            <Box gap="ms" direction={isMinSize(size, 'small') ? 'row' : 'column'}>
-              <CardTeaser
-                path={ROUTES.OVERVIEW}
-                onClick={(evt) => {
-                  if (evt && evt.preventDefault) evt.preventDefault();
-                  onPageLink(ROUTES.OVERVIEW);
-                }}
-                title={intl.formatMessage(messages.cardTitleOverview)}
-                description={intl.formatMessage(messages.cardDescriptionOverview)}
-                explore={intl.formatMessage(messages.cardLinkOverview)}
-                graphicSrc={theme.media.teaserCategories}
-                isHome
-                basis={isMinSize(size, 'small') ? '1/2' : '1'}
-              />
-              <CardTeaser
-                path={ROUTES.RECOMMENDATIONS}
-                onClick={(evt) => {
-                  if (evt && evt.preventDefault) evt.preventDefault();
-                  onPageLink(ROUTES.RECOMMENDATIONS);
-                }}
-                dataReady
-                title={intl.formatMessage(messages.cardTitleRecommendations)}
-                description={intl.formatMessage(messages.cardDescriptionRecommendations)}
-                explore={intl.formatMessage(messages.cardLinkRecommendations)}
-                graphicSrc={theme.media.teaserRecommendations}
-                isHome
-              />
-            </Box>
-          </nav>
-        </SectionInner>
-      </Section>
+            </nav>
+          </SectionInner>
+        </Section>
+      </main>
       <Footer fill />
     </div>
   );

@@ -105,7 +105,7 @@ const Footer = ({
   const size = useContext(ResponsiveContext);
   const isMobile = isMaxSize(size, 'xsmall');
   return (
-    <FooterMain>
+    <FooterMain as="footer">
       <Container noPaddingBottom>
         <Wrapper fill={fill}>
           <Box
@@ -185,6 +185,7 @@ const Footer = ({
                   direction={isMobile ? 'column' : 'row'}
                   gap="small"
                   align={isMobile ? 'start' : 'end'}
+                  role="navigation"
                 >
                   {pages.size > 0 && FOOTER.INTERNAL_LINKS && FOOTER.INTERNAL_LINKS.map((pageId) => {
                     const page = pages.find((p) => qe(p.get('id'), pageId));

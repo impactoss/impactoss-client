@@ -156,7 +156,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
           ]}
         />
         <ContainerWrapperSidebar hasSidebar sidebarResponsiveSmall>
-          <Container>
+          <Container role="main">
             <Content>
               <ContentHeader
                 type={CONTENT_LIST}

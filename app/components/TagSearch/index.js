@@ -288,6 +288,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
               )}
               <SearchInput
                 name="search"
+                role="search"
                 placeholder={inputPlaceholder}
                 aria-label={inputPlaceholder}
                 autoComplete="off"

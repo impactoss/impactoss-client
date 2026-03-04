@@ -138,7 +138,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
       >
         {buttons && (
           <VisibleMobile>
-            <ButtonGroup>
+            <ButtonGroup role="toolbar" aria-label="Page or form actions">
               {
                 buttons.map((button, i) => button && (
                   <TableCellInner key={i}>
@@ -159,7 +159,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
             </TableCell>
             {buttons && (
               <TableCell hiddenMobile>
-                <ButtonGroup>
+                <ButtonGroup role="toolbar" aria-label="Page or form actions">
                   {
                     buttons.map((button, i) => (
                       <TableCellInner key={i}>

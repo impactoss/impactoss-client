@@ -480,7 +480,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                   />
                 )}
                 <FormWrapper withoutShadow={inModal} hasMarginBottom={!inModal}>
-                  <StyledForm>
+                  <StyledForm aria-label={headerTitle}>
                     <FormBody>
                       {fields.header && (
                         <ViewPanel>

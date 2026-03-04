@@ -343,7 +343,13 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
       }
     }
     return (
-      <Styled id="filter-options">
+      <Styled
+        id="filter-options"
+        role="region"
+        aria-label={
+          canEdit ? 'List filter and edit options' : 'List filter options'
+        }
+      >
         { (!this.state.visible && this.state.viewport < VIEWPORTS.LARGE)
           && (
             <ToggleShow onClick={this.onShowSidebar}>

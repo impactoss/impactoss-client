@@ -162,7 +162,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <ContainerWrapperSidebar hasSidebar sidebarResponsiveSmall>
-          <Container>
+          <Container role="main">
             <ContentHeader
               type={CONTENT_LIST}
               supTitle={intl.formatMessage(messages.supTitle)}

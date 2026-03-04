@@ -293,7 +293,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           onShowSettings={() => onShowSettings(true)}
           hasSettings={dataReady && hasSettings}
         />
-        <Main isHome={isHome} role="main" id="main-content">
+        <Main isHome={isHome} id="main-content">
           {React.Children.toArray(children)}
         </Main>
         {newEntityModal
