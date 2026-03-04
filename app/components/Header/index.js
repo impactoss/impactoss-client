@@ -26,7 +26,6 @@ import appMessages from 'containers/App/messages';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
 import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
-import ScreenReaderHide from 'components/styled/ScreenReaderHide';
 import PrintHide from 'components/styled/PrintHide';
 
 import Logo from './Logo';
@@ -484,10 +483,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     const navItems = filter(this.props.navItems, (item) => !item.isSecondary);
     const navItemsSecondary = filter(this.props.navItems, (item) => item.isSecondary);
 
-    let appTitle = `${intl.formatMessage(appMessages.app.title)} - ${intl.formatMessage(appMessages.app.claim)}`;
-    if (!IS_PROD) {
-      appTitle = `${appTitle} (connected to ${SERVER} server)`;
-    }
+    const appTitle = 'Home';
 
     const currentFrameworkOption = frameworkOptions
       && frameworkOptions.find((option) => option.active);
@@ -536,32 +532,30 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                   onClick={(evt) => this.onClick(evt, brandPath)}
                   title={appTitle}
                 >
-                  <ScreenReaderHide noTabIndex>
-                    <Box direction="row">
-                      {SHOW_HEADER_LOGO && (
-                        <Logo
-                          src={this.props.theme.media.headerLogo}
-                          alt=""
-                          role="presentation"
-                        />
-                      )}
-                      {SHOW_HEADER_TITLE && (
-                        <BrandText>
-                          <BrandTitle>
-                            <FormattedMessage {...appMessages.app.title} />
-                          </BrandTitle>
-                          <BrandClaim>
-                            <FormattedMessage {...appMessages.app.claim} />
-                            {!IS_PROD && (
-                              <span style={{ textTransform: 'uppercase' }}>
-                                {` [${SERVER}]`}
-                              </span>
-                            )}
-                          </BrandClaim>
-                        </BrandText>
-                      )}
-                    </Box>
-                  </ScreenReaderHide>
+                  <Box direction="row">
+                    {SHOW_HEADER_LOGO && (
+                      <Logo
+                        src={this.props.theme.media.headerLogo}
+                        alt=""
+                        aria-hidden="true"
+                      />
+                    )}
+                    {SHOW_HEADER_TITLE && (
+                      <BrandText>
+                        <BrandTitle>
+                          <FormattedMessage {...appMessages.app.title} />
+                        </BrandTitle>
+                        <BrandClaim>
+                          <FormattedMessage {...appMessages.app.claim} />
+                          {!IS_PROD && (
+                            <span style={{ textTransform: 'uppercase' }}>
+                              {` [${SERVER}]`}
+                            </span>
+                          )}
+                        </BrandClaim>
+                      </BrandText>
+                    )}
+                  </Box>
                 </Brand>
                 {this.renderSecondary(navItemsSecondary, search, hasSettings, onShowSettings, size)}
               </Banner>
