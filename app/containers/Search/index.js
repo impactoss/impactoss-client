@@ -377,10 +377,10 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                                       <Text size="large">{title}</Text>
                                                     </Box>
                                                     {otherTargets && active && (
-                                                      <FormUp size="medium" color="text" aria-hidden="true" />
+                                                      <FormUp size="medium" color="text" aria-hidden="true" aria-label={null} />
                                                     )}
                                                     {otherTargets && !active && (
-                                                      <FormDown size="medium" color="text" aria-hidden="true" />
+                                                      <FormDown size="medium" color="text" aria-hidden="true" aria-label={null} />
                                                     )}
                                                   </Box>
                                                 </Target>

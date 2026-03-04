@@ -102,6 +102,7 @@ function InfoOverlay({
           onBlur={() => null}
           onClick={() => !tooltip && showInfo(!info)}
           title={title}
+          aria-label={title}
           colorButton={colorButton}
           round={round}
         >
@@ -110,12 +111,16 @@ function InfoOverlay({
               <CircleQuestion
                 style={{ stroke: 'inherit' }}
                 size="21px"
+                aria-hidden="true"
+                aria-label={null}
               />
             )
             : (
               <CircleInformation
                 style={{ stroke: 'inherit' }}
                 size="21px"
+                aria-hidden="true"
+                aria-label={null}
               />
             )}
         </StyledButton>

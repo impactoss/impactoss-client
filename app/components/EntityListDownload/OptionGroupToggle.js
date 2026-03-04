@@ -54,6 +54,9 @@ export function OptionGroupToggle({
         title={intl.formatMessage(
           expanded ? messages.groupHide : messages.groupShow,
         )}
+        aria-label={intl.formatMessage(
+          expanded ? messages.groupHide : messages.groupShow,
+        )}
       >
         <Box direction="row" justify="between" align="center">
           <Text size="xlarge" weight={600}>{label}</Text>
@@ -64,10 +67,10 @@ export function OptionGroupToggle({
               </Count>
             )}
             {expanded && (
-              <FormUp size="medium" aria-hidden="true" role="presentation" />
+              <FormUp size="medium" aria-hidden="true" role="presentation" aria-label={null} />
             )}
             {!expanded && (
-              <FormDown size="medium" aria-hidden="true" role="presentation" />
+              <FormDown size="medium" aria-hidden="true" role="presentation" aria-label={null} />
             )}
           </Box>
         </Box>

@@ -48,6 +48,8 @@ export function Accordion({
                 id={buttonId}
                 aria-expanded={open}
                 aria-controls={open ? panelId : undefined}
+                title={option.titleButton}
+                aria-label={option.titleButton}
                 onClick={() => onActive(
                   getActives({ activePanels, panelId: option.id, single }),
                 )}

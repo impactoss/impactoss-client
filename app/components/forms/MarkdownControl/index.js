@@ -193,6 +193,7 @@ function MarkdownControl(props) {
           <Box direction="row" align="center" gap="hair" justify="end">
             <MDButton
               title={intl.formatMessage(messages.buttonTitleHeading2)}
+              aria-label={intl.formatMessage(messages.buttonTitleHeading2)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -200,10 +201,11 @@ function MarkdownControl(props) {
                 }
               }}
             >
-              <MDButtonText>H2</MDButtonText>
+              <MDButtonText aria-hidden="true">H2</MDButtonText>
             </MDButton>
             <MDButton
               title={intl.formatMessage(messages.buttonTitleHeading3)}
+              aria-label={intl.formatMessage(messages.buttonTitleHeading3)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -211,50 +213,55 @@ function MarkdownControl(props) {
                 }
               }}
             >
-              <MDButtonText>H3</MDButtonText>
+              <MDButtonText aria-hidden="true">H3</MDButtonText>
             </MDButton>
             <MDButton
               title={intl.formatMessage(messages.buttonTitleBold)}
+              aria-label={intl.formatMessage(messages.buttonTitleBold)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
                   textareaRef.current.trigger('bold');
                 }
               }}
-              icon={<Bold size="xsmall" />}
+              icon={<Bold size="xsmall" aria-hidden="true" aria-label={null} />}
             />
             <MDButton
               title={intl.formatMessage(messages.buttonTitleItalic)}
+              aria-label={intl.formatMessage(messages.buttonTitleItalic)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
                   textareaRef.current.trigger('italic');
                 }
               }}
-              icon={<Italic size="xsmall" />}
+              icon={<Italic size="xsmall" aria-hidden="true" aria-label={null} />}
             />
             <MDButton
               title={intl.formatMessage(messages.buttonTitleLink)}
+              aria-label={intl.formatMessage(messages.buttonTitleLink)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
                   textareaRef.current.trigger('link');
                 }
               }}
-              icon={<LinkIcon size="18px" />}
+              icon={<LinkIcon size="18px" aria-hidden="true" aria-label={null} />}
             />
             <MDButton
               title={intl.formatMessage(messages.buttonTitleUnorderedList)}
+              aria-label={intl.formatMessage(messages.buttonTitleUnorderedList)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
                   textareaRef.current.trigger('unordered-list');
                 }
               }}
-              icon={<List size="xsmall" />}
+              icon={<List size="xsmall" aria-hidden="true" aria-label={null} />}
             />
             <MDButton
               title={intl.formatMessage(messages.buttonTitleOrderedList)}
+              aria-label={intl.formatMessage(messages.buttonTitleOrderedList)}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -262,7 +269,13 @@ function MarkdownControl(props) {
                 }
               }}
             >
-              <MDButtonText size="xxsmall" style={{ top: '-4px' }}>123</MDButtonText>
+              <MDButtonText
+                size="xxsmall"
+                style={{ top: '-2px' }}
+                aria-hidden="true"
+              >
+                123
+              </MDButtonText>
             </MDButton>
           </Box>
         </Box>

@@ -35,8 +35,8 @@ function AccordionHeader({ title, open, level = 1 }) {
       </Box>
       <Box margin={{ left: 'auto' }}>
         <PrintHide>
-          {!open && <Down size="small" />}
-          {open && <Up size="small" />}
+          {!open && <Down aria-hidden="true" aria-label={null} size="small" />}
+          {open && <Up aria-hidden="true" aria-label={null} size="small" />}
         </PrintHide>
         <PrintOnly>
           {!open && <Text size="xsmall">(hidden)</Text>}
