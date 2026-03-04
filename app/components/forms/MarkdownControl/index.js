@@ -52,50 +52,69 @@ const Preview = styled((p) => <Box {...p} />)`
   min-height: ${MIN_TEXTAREA_HEIGHT}px;
 `;
 
-const MDButton = styled((p) => (
-  <Button
-    plain
-    as="div"
-    tabindex="0"
-    role="button"
-    {...p}
-  />
-))`
+const MDButton = styled(React.forwardRef((p, ref) => (
+  <Button plain ref={ref} {...p} />
+)))`
   min-width: 30px;
   min-height: 30px;
   text-align: center;
   padding: 4px 7px;
-  &:hover {
-    background-color: ${({ disabled }) => disabled ? 'transparent' : palette('light', 2)};
+  &:hover, &:focus-visible {
+    background-color: #fff;
+  }
+  &:focus-visible {
+    outline: 1px solid #0065BD;
+  }
+  &:focus {
+    box-shadow: none;
   }
 `;
 const ViewButton = styled((p) => (
-  <Button
-    plain
-    {...p}
-  />
+  <Button plain {...p} />
 ))`
   background: none;
   border-bottom: 3px solid;
   border-bottom-color: ${({ active }) => active ? palette('primary', 1) : 'transparent'};
   color: ${({ active }) => active ? palette('primary', 1) : palette('text', 1)};
-  &:hover {
+  &:hover, &:focus-visible {
     border-bottom-color: ${({ active }) => active ? palette('primary', 0) : palette('text', 1)};
     color: ${({ active }) => active ? palette('primary', 1) : palette('text', 1)};
+  }
+  &:focus-visible {
+    outline: 1px solid #0065BD;
+  }
+  &:focus {
+    box-shadow: none;
   }
 `;
 const MDButtonText = styled((p) => (
   <Text weight="bold" size="medium" {...p} />
-))`
-  position: relative;
-  top: -1px;
-`;
+))``;
+
+const MD_BUTTONS_COUNT = 7;
 
 function MarkdownControl(props) {
   const { value, theme } = props;
   const intl = useIntl();
   const textareaRef = useRef(null);
+  const mdButtonRefs = useRef([]);
   const [view, setView] = useState('write');
+  const [mdButtonIndex, setMdButtonIndex] = useState(0);
+
+  const handleKeyDown = (e) => {
+    let newIndex;
+    if (e.key === 'ArrowRight') {
+      newIndex = (mdButtonIndex + 1) % MD_BUTTONS_COUNT;
+    } else if (e.key === 'ArrowLeft') {
+      newIndex = (mdButtonIndex - 1 + MD_BUTTONS_COUNT) % MD_BUTTONS_COUNT;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    setMdButtonIndex(newIndex);
+    const ref = mdButtonRefs.current[newIndex];
+    if (ref) ref.focus();
+  };
   // const [hasFocus, setHasFocus] = useState(false);
   useEffect(() => {
     if (textareaRef.current) {
@@ -190,11 +209,21 @@ function MarkdownControl(props) {
               />
             </Box>
           </Box>
-          <Box direction="row" align="center" gap="hair" justify="end">
+          <Box
+            direction="row"
+            align="center"
+            gap="hair"
+            justify="end"
+            role="toolbar"
+            aria-label="Markdown text formatting"
+            onKeyDown={handleKeyDown}
+          >
             <MDButton
               title={intl.formatMessage(messages.buttonTitleHeading2)}
               aria-label={intl.formatMessage(messages.buttonTitleHeading2)}
               disabled={mdDisabled}
+              tabIndex={mdButtonIndex === 0 ? 0 : -1}
+              ref={(el) => { mdButtonRefs.current[0] = el; }}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
                   textareaRef.current.trigger('h2');
@@ -206,6 +235,8 @@ function MarkdownControl(props) {
             <MDButton
               title={intl.formatMessage(messages.buttonTitleHeading3)}
               aria-label={intl.formatMessage(messages.buttonTitleHeading3)}
+              tabIndex={mdButtonIndex === 1 ? 0 : -1}
+              ref={(el) => { mdButtonRefs.current[1] = el; }}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -218,50 +249,88 @@ function MarkdownControl(props) {
             <MDButton
               title={intl.formatMessage(messages.buttonTitleBold)}
               aria-label={intl.formatMessage(messages.buttonTitleBold)}
+              tabIndex={mdButtonIndex === 2 ? 0 : -1}
+              ref={(el) => { mdButtonRefs.current[2] = el; }}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
                   textareaRef.current.trigger('bold');
                 }
               }}
-              icon={<Bold size="xsmall" aria-hidden="true" aria-label={null} />}
+              icon={(
+                <Bold
+                  size="xsmall"
+                  aria-hidden="true"
+                  aria-label={null}
+                  color="text"
+                />
+              )}
             />
             <MDButton
               title={intl.formatMessage(messages.buttonTitleItalic)}
               aria-label={intl.formatMessage(messages.buttonTitleItalic)}
+              ref={(el) => { mdButtonRefs.current[3] = el; }}
+              tabIndex={mdButtonIndex === 3 ? 0 : -1}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
                   textareaRef.current.trigger('italic');
                 }
               }}
-              icon={<Italic size="xsmall" aria-hidden="true" aria-label={null} />}
+              icon={(
+                <Italic
+                  size="xsmall"
+                  aria-hidden="true"
+                  aria-label={null}
+                  color="text"
+                />
+              )}
             />
             <MDButton
               title={intl.formatMessage(messages.buttonTitleLink)}
               aria-label={intl.formatMessage(messages.buttonTitleLink)}
+              tabIndex={mdButtonIndex === 4 ? 0 : -1}
+              ref={(el) => { mdButtonRefs.current[4] = el; }}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
                   textareaRef.current.trigger('link');
                 }
               }}
-              icon={<LinkIcon size="18px" aria-hidden="true" aria-label={null} />}
+              icon={(
+                <LinkIcon
+                  size="xsmall"
+                  aria-hidden="true"
+                  aria-label={null}
+                  color="text"
+                />
+              )}
             />
             <MDButton
               title={intl.formatMessage(messages.buttonTitleUnorderedList)}
               aria-label={intl.formatMessage(messages.buttonTitleUnorderedList)}
+              tabIndex={mdButtonIndex === 5 ? 0 : -1}
+              ref={(el) => { mdButtonRefs.current[5] = el; }}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
                   textareaRef.current.trigger('unordered-list');
                 }
               }}
-              icon={<List size="xsmall" aria-hidden="true" aria-label={null} />}
+              icon={(
+                <List
+                  size="xsmall"
+                  aria-hidden="true"
+                  aria-label={null}
+                  color="text"
+                />
+              )}
             />
             <MDButton
               title={intl.formatMessage(messages.buttonTitleOrderedList)}
               aria-label={intl.formatMessage(messages.buttonTitleOrderedList)}
+              tabIndex={mdButtonIndex === 6 ? 0 : -1}
+              ref={(el) => { mdButtonRefs.current[6] = el; }}
               disabled={mdDisabled}
               onClick={() => {
                 if (!mdDisabled && textareaRef.current) {
@@ -271,7 +340,7 @@ function MarkdownControl(props) {
             >
               <MDButtonText
                 size="xxsmall"
-                style={{ top: '-2px' }}
+                style={{ position: 'relative', top: '-1px' }}
                 aria-hidden="true"
               >
                 123
