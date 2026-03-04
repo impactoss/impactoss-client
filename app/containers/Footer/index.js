@@ -134,7 +134,7 @@ const Footer = ({
                     <LogoItemLink
                       key={i}
                       href={intl.formatMessage(messages.agencies[`url${i + 1}`])}
-                      title={intl.formatMessage(messages.agencies[`title${i + 1}`])}
+                      title={`${intl.formatMessage(messages.agencies[`title${i + 1}`])} (opens in new tab)`}
                       target="_blank"
                     >
                       <Logo isAgency src={src} alt={intl.formatMessage(messages.agencies[`title${i + 1}`])} />
@@ -158,7 +158,7 @@ const Footer = ({
               <Box>
                 <LogoItemLink
                   href={intl.formatMessage(messages.project.url)}
-                  title={intl.formatMessage(messages.project.anchor)}
+                  title={`${intl.formatMessage(messages.project.anchor)} (opens in new tab)`}
                   target="_blank"
                 >
                   <Logo src={theme.media.impactossLogo} alt={intl.formatMessage(messages.project.anchor)} />
