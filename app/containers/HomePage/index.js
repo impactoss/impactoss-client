@@ -67,6 +67,7 @@ const GraphicHome = styled(NormalImg)`
 `;
 
 const SectionTop = styled.div`
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,10 +76,14 @@ const SectionTop = styled.div`
   color: ${palette('homeIntro', 0)};
   text-align: center;
   min-height: 400px;
-  /* border: 1px solid red; */
+  /* border: 1px solid yellow; */
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
-    min-height: auto;
-    min-height: calc(100vh - ${({ theme }) => theme.sizes.header.banner.height + theme.sizes.header.nav.height}px - 200px);
+    min-height: 444px;
+    /* min-height: calc(100vh - ${({ theme }) => theme.sizes.header.banner.height + theme.sizes.header.nav.height}px - 200px); */
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    min-height: 555px;
+    /* min-height: calc(100vh - ${({ theme }) => theme.sizes.header.banner.height + theme.sizes.header.nav.height}px - 200px); */
   }
   @media print {
     background-color: transparent;
@@ -88,7 +93,7 @@ const SectionTop = styled.div`
   }
 `;
 
-const SectionTopInner = styled((p) => <Box pad={{ horizontal: 'small', top: 'medium' }} {...p} />)`
+const SectionTopInner = styled((p) => <Box pad={{ horizontal: 'small', top: 'xsmall' }} {...p} />)`
   width: 100%;
   position: relative;
   /* border: 1px solid blue; */
@@ -117,6 +122,7 @@ const BackgroundImageSection = styled((p) => <Box {...p} />)`
 
 const CirclesContainer = styled.div`
   position: absolute;
+  /* border: 1px solid red; */
   top: -8%;
   bottom: 50%;
   left: 50%;
@@ -129,11 +135,8 @@ const CirclesContainer = styled.div`
     bottom: 42%;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
-    top: 2%;
+    top: -10%;
     bottom: 40%;
-  }
-  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
-    top: -5%;
   }
 `;
 
@@ -254,7 +257,7 @@ const CIRCLES = [
     id: 2, size: 6, minSize: 30, x: 10, y: 25,
   },
   {
-    id: 3, size: 11, minSize: 50, x: 21, y: 42,
+    id: 3, size: 11, minSize: 55, x: 21, y: 42,
   },
   {
     id: 1, size: 8, minSize: 40, x: 31, y: 23,
