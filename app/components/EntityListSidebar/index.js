@@ -402,6 +402,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
                         onShowForm={this.onShowForm}
                         formOptions={formOptions && (
                           <EntityListForm
+                            groupLabelId={`sidebar-option-${activeOption.group}-${activeOption.optionId}`}
                             model={formModel}
                             activeOptionId={activeOption.optionId}
                             formOptions={formOptions}

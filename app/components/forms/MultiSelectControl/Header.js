@@ -33,7 +33,7 @@ const Title = styled.div`
 
 const Header = (props) => (
   <Styled>
-    <Title>
+    <Title id={props.id}>
       {props.title}
     </Title>
     {props.onCancel
@@ -45,7 +45,8 @@ const Header = (props) => (
 );
 
 Header.propTypes = {
-  onCancel: PropTypes.func,
+  id: PropTypes.string,
   title: PropTypes.string,
+  onCancel: PropTypes.func,
 };
 export default Header;

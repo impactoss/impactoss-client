@@ -62,7 +62,15 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
 
   render() {
     const {
-      model, onSubmit, onCancel, buttons, formOptions, activeOptionId, showCancelButton, intl,
+      groupLabelId,
+      model,
+      onSubmit,
+      onCancel,
+      buttons,
+      formOptions,
+      activeOptionId,
+      showCancelButton,
+      intl,
     } = this.props;
     let formTitle;
     if (formOptions.message) {
@@ -116,6 +124,7 @@ class EntityListForm extends React.Component { // eslint-disable-line react/pref
                         this.props.onSelect();
                       }}
                       buttons={buttons}
+                      groupLabelId={groupLabelId}
                     />
                   )
                   }
@@ -138,6 +147,7 @@ EntityListForm.propTypes = {
   onCancel: PropTypes.func,
   buttons: PropTypes.array,
   activeOptionId: PropTypes.string,
+  groupLabelId: PropTypes.string,
   showCancelButton: PropTypes.bool,
   intl: PropTypes.object.isRequired,
 };

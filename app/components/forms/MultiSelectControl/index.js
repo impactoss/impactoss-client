@@ -6,6 +6,7 @@ import { Map, List, fromJS } from 'immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { FormattedMessage } from 'react-intl';
+import { titleToId } from 'utils/string';
 
 import ButtonFactory from 'components/buttons/ButtonFactory';
 import TagSearch from 'components/TagSearch';
@@ -346,6 +347,7 @@ class MultiSelectControl extends React.Component {
 
     options = this.filterOptions(options, this.props, this.state);
     const filteredOptionsSelected = options.filter((option) => option.get('checked') || this.isOptionIndeterminate(option));
+    const headerTitleId = `multi-select-header-title-${titleToId(this.props.title)}`;
     return (
       <div
         role="dialog"
@@ -355,6 +357,7 @@ class MultiSelectControl extends React.Component {
         <Header
           title={this.props.title}
           onCancel={this.props.onCancel}
+          id={headerTitleId}
         />
         <ControlMain
           search={this.props.search}
@@ -410,6 +413,7 @@ class MultiSelectControl extends React.Component {
             )
           }
           <OptionList
+            groupLabelId={this.props.groupLabelId || headerTitleId}
             options={options}
             groups={this.props.groups}
             onCheckboxChange={(checkedState, option) => {
@@ -485,6 +489,7 @@ MultiSelectControl.propTypes = {
   tagFilterGroups: PropTypes.array,
   searchAttributes: PropTypes.array,
   placeholderMessageId: PropTypes.string,
+  groupLabelId: PropTypes.string,
 };
 
 MultiSelectControl.defaultProps = {

@@ -113,7 +113,9 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
             option.get('active') ? messages.groupOptionSelect.hide : messages.groupOptionSelect.show,
           )}
         >
-          <Label>
+          <Label
+            id={`sidebar-option-${groupId}-${option.get('id')}`}
+          >
             {option.get('message')
               ? appMessage(intl, option.get('message'))
               : option.get('label')
