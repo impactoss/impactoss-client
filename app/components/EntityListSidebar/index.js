@@ -93,20 +93,6 @@ const SidebarWrapper = styled.div`
 
 const STATE_INITIAL = {
   activeOption: null,
-  expandedGroups: {
-    frameworks: true,
-    taxonomies: true,
-    taxonomies_1: true,
-    taxonomies_2: true,
-    taxonomies_3: true,
-    taxonomies_4: true,
-    taxonomies_5: true,
-    taxonomies_6: true,
-    taxonomies_7: true,
-    connectedTaxonomies: true,
-    connections: true,
-    attributes: true,
-  },
   visible: false,
   viewport: null,
 };
@@ -181,17 +167,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   onHideForm = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.hideForm();
-  };
-
-  onToggleGroup = (groupId, expanded) => {
-    this.setState((prevState) => {
-      const expandedGroups = { ...prevState.expandedGroups };
-      expandedGroups[groupId] = expanded;
-      return ({
-        expandedGroups,
-        activeOption: null,
-      });
-    });
   };
 
   hideForm = () => {
@@ -425,8 +400,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
                       <EntityListSidebarGroups
                         groups={fromJS(panelGroups)}
                         onShowForm={this.onShowForm}
-                        onToggleGroup={this.onToggleGroup}
-                        expanded={this.state.expandedGroups}
                         formOptions={formOptions && (
                           <EntityListForm
                             model={formModel}
