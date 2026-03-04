@@ -94,6 +94,14 @@ const render = (messages) => {
             <Router
               history={history}
               routes={rootRoute}
+              onUpdate={() => {
+                const state = store.getState();
+                const pathname = state.getIn(['route', 'locationBeforeTransitions', 'pathname']);
+                const pathnamePrevious = state.getIn(['route', 'locationBeforeTransitions', 'pathnamePrevious']);
+                if (pathname !== pathnamePrevious) {
+                  document.body.focus();
+                }
+              }}
             />
           </Grommet>
         </StyleSheetManager>
