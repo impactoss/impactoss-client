@@ -67,7 +67,6 @@ const GraphicHome = styled(NormalImg)`
 `;
 
 const SectionTop = styled.div`
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -290,7 +289,7 @@ export function HomePage({ onPageLink, theme, intl }) {
             fill="vertical"
             flex={{ grow: 1 }}
           >
-            <CirclesContainer>
+            <CirclesContainer aria-hidden="true">
               {CIRCLES.map((c) => (
                 <Circle key={c.id} {...c}>
                   <IconWrap>
@@ -308,8 +307,9 @@ export function HomePage({ onPageLink, theme, intl }) {
             <GraphicHomeWrapper
               hasBrand={SHOW_BRAND_ON_HOME}
               showPattern={SHOW_HEADER_PATTERN_HOME_GRAPHIC}
+              aria-hidden="true"
             >
-              <GraphicHome src={theme.media.graphicHome} alt={intl.formatMessage(appMessages.app.title)} />
+              <GraphicHome src={theme.media.graphicHome} alt="" />
             </GraphicHomeWrapper>
             { !SHOW_HOME_TITLE && theme.media.titleHome
               && <GraphicHome src={theme.media.titleHome} alt={appTitle} />
@@ -343,10 +343,11 @@ export function HomePage({ onPageLink, theme, intl }) {
             </Box>
           </SectionTopInner>
         </SectionTop>
-        <BackgroundImageSection>
+        <BackgroundImageSection aria-hidden="true">
           <Image
             src={theme.media.graphicHomeSection}
             fit="contain"
+            alt=""
           />
         </BackgroundImageSection>
         <Section align="center">
