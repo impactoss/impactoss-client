@@ -126,7 +126,12 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
-        <Styled className={`content-${CONTENT_PAGE}`} ref={this.scrollContainerRef}>
+        <Styled
+          id="main-content"
+          role="main"
+          className={`content-${CONTENT_PAGE}`}
+          ref={this.scrollContainerRef}
+        >
           <Container isNarrow={!isManager}>
             <ContentHeader
               title={page ? page.getIn(['attributes', 'title']) : 'Page'}

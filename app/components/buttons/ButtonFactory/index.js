@@ -60,7 +60,6 @@ const ButtonFactory = ({ button, whiteBG }) => {
           strong
           type={button.submit ? 'submit' : 'button'}
           title={button.title || intl.formatMessage(appMessages.buttons.add)}
-          aria-label={button.title || intl.formatMessage(appMessages.buttons.add)}
           disabled={button.disabled}
           aria-disabled={button.disabled || null}
           aria-describedby={button.describedby || null}

@@ -212,7 +212,12 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
     }
     return (
       <ContainerWrapperSidebar hasSidebar ref={this.ScrollContainer}>
-        <Container ref={this.ScrollReference} noPaddingBottom role="main">
+        <Container
+          ref={this.ScrollReference}
+          noPaddingBottom
+          role="main"
+          id="main-content"
+        >
           <StyledContent>
             <ContentHeader
               type={CONTENT_LIST}
@@ -255,7 +260,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                     resultsId="entity-list-main"
                   />
                   <SkipContent
-                    href="#filter-options"
+                    href="#sidebar-filter-edit-options"
                     title={intl.formatMessage(appMessages.screenreader[
                       isManager ? 'skipToListFilterEdit' : 'skipToListFilter'])}
                   >

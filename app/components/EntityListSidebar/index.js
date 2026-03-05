@@ -344,7 +344,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     }
     return (
       <Styled
-        id="filter-options"
+        id="sidebar-filter-edit-options"
         role="region"
         aria-label={
           canEdit ? 'List filter and edit options' : 'List filter options'
@@ -369,6 +369,25 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
               onClick={this.onHideSidebar}
             >
               <Sidebar onClick={(evt) => evt.stopPropagation()}>
+                <SkipContent
+                  href="#main-content"
+                  title={
+                    intl.formatMessage(
+                      appMessages.screenreader[canEdit ? 'skipSidebarFilterEdit' : 'skipSidebarFilter'],
+                    )
+                  }
+                  onClick={() => {
+                    if (activePanel === EDIT_PANEL) {
+                      this.setState({ activeOption: null });
+                    }
+                    if (activePanel === FILTERS_PANEL) {
+                      this.hideForm(false);
+                      this.hideSidebar();
+                    }
+                  }}
+                >
+                  <FormattedMessage {...appMessages.screenreader.skipSidebarFilter} />
+                </SkipContent>
                 <ScrollableWrapper>
                   <SidebarHeader hasButtons={canEdit}>
                     {canEdit && (
@@ -457,21 +476,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             </SidebarWrapper>
           )
         }
-        <SkipContent
-          href="#main-content"
-          title={intl.formatMessage(appMessages.screenreader.skipBackToContent)}
-          onClick={() => {
-            if (activePanel === EDIT_PANEL) {
-              this.setState({ activeOption: null });
-            }
-            if (activePanel === FILTERS_PANEL) {
-              this.hideForm(false);
-              this.hideSidebar();
-            }
-          }}
-        >
-          <FormattedMessage {...appMessages.screenreader.skipBackToContent} />
-        </SkipContent>
       </Styled>
     );
   }

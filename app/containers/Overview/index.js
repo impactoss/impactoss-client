@@ -23,19 +23,16 @@ import {
 } from 'containers/App/selectors';
 import { ABOUT_PAGE_ID, FEATURES } from 'themes/config';
 import { ROUTES, CONTENT_LIST } from 'containers/App/constants';
-import appMessages from 'containers/App/messages';
 
 import Footer from 'containers/Footer';
 // components
 import ContainerWrapperSidebar from 'components/styled/Container/ContainerWrapperSidebar';
 import Container from 'components/styled/Container';
-import ScreenReaderHide from 'components/styled/ScreenReaderHide';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
 import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
-import SkipContent from 'components/styled/SkipContent';
 import A from 'components/styled/A';
 import Description from 'components/styled/Description';
 
@@ -161,8 +158,19 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
+        {!dataReady && <EntityListSidebarLoading responsiveSmall />}
+        {dataReady && (
+          <TaxonomySidebar
+            taxonomies={taxonomies}
+            frameworkId={frameworkId}
+            frameworks={frameworks}
+            onTaxonomyLink={onTaxonomyLink}
+            onTaxonomyOver={this.onTaxonomyMouseOver}
+            active={this.state.mouseOverTaxonomyDiagram}
+          />
+        )}
         <ContainerWrapperSidebar hasSidebar sidebarResponsiveSmall>
-          <Container role="main">
+          <Container role="main" id="main-content">
             <ContentHeader
               type={CONTENT_LIST}
               supTitle={intl.formatMessage(messages.supTitle)}
@@ -172,14 +180,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
               <Description>
                 {description}
               </Description>
-              {FEATURES.measures && (
-                <SkipContent
-                  href="#sidebar-taxonomy-options"
-                  title={intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
-                >
-                  <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
-                </SkipContent>
-              )}
             </div>
             {!dataReady && <Loading />}
             {dataReady && allFrameworks.size > 1 && (
@@ -221,19 +221,6 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
           </Container>
           <Footer hasBorder />
         </ContainerWrapperSidebar>
-        {!dataReady && <EntityListSidebarLoading responsiveSmall />}
-        {dataReady && (
-          <ScreenReaderHide>
-            <TaxonomySidebar
-              taxonomies={taxonomies}
-              frameworkId={frameworkId}
-              frameworks={frameworks}
-              onTaxonomyLink={onTaxonomyLink}
-              onTaxonomyOver={this.onTaxonomyMouseOver}
-              active={this.state.mouseOverTaxonomyDiagram}
-            />
-          </ScreenReaderHide>
-        )}
       </div>
     );
   }

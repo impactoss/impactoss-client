@@ -26,8 +26,11 @@ const CategoryListBody = styled.div`
 `;
 const GroupHeaderLink = styled(Link)`
   color: ${palette('link', 2)};
-  &:hover {
+  &:hover, &:focus-visible {
     color: ${palette('linkHover', 2)};
+  }
+  &:focus-visible {
+    text-decoration: underline;
   }
 `;
 
@@ -84,12 +87,14 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
         recLabel = intl.formatMessage(appMessages.entities[`recommendations_${fwId}`].plural);
       }
       attributes.push({
+        id: 'recommendations',
         query: 'recommendations',
         label: recLabel,
       });
       // indirectly associated/inferred actions
       if (FEATURES.measures && !tagsMeasures) {
         attributes.push({
+          id: 'measures',
           via: intl.formatMessage(appMessages.entities.connected),
           query: 'measures',
           label: intl.formatMessage(appMessages.entities.measures.plural),
@@ -99,6 +104,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     // directly associated measures
     if (FEATURES.measures && tagsMeasures) {
       attributes.push({
+        id: 'measures',
         query: 'measures',
         label: intl.formatMessage(appMessages.entities.measures.plural),
       });
@@ -114,7 +120,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     sortOrder,
     onSort,
     userOnly,
-    isGrouped,
+    isGroupedByParent,
     intl,
   }) => {
     const sortOptionActive = getSortOption(sortOptions, sortBy, 'query');
@@ -134,9 +140,10 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     // category title column
     const columns = [
       {
+        id: 'title',
         type: 'title',
         header: intl.formatMessage(appMessages.entities.taxonomies[taxonomy.get('id')].single),
-        by: isGrouped && intl.formatMessage(
+        by: isGroupedByParent && intl.formatMessage(
           appMessages.labels.groupedByTaxonomy,
           {
             tax: intl.formatMessage(
@@ -177,6 +184,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
           }
         }
         return {
+          id: attribute.label,
           header: attribute.label,
           via: attribute.via,
           active: columnActive,
@@ -262,6 +270,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     // category title column
     const columns = [
       {
+        id: 'title',
         type: 'title',
         width: (userOnly || !taxonomy || countAttributes.length === 0) ? 100 : TITLE_COL_RATIO * 100,
       },
@@ -269,14 +278,16 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
     // add columns for associated recs and measures
     return (userOnly || !taxonomy)
       ? columns
-      : columns.concat(
-        countAttributes.map((attribute) => ({
+      : [
+        ...columns,
+        ...countAttributes.map((attribute) => ({
+          id: attribute.entity,
           type: 'count',
           width: ((1 - TITLE_COL_RATIO) / countAttributes.length) * 100,
           maxCount: this.getCategoryMaxCount(categoryGroups, attribute),
           attribute,
         })),
-      );
+      ];
   };
 
   render() {
@@ -294,7 +305,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       intl,
       isCategoryAdmin,
     } = this.props;
-
+    const isGroupedByParent = categoryGroups.size > 0 && !!taxonomy.get('parent');
     const headerColumns = this.getListHeaderColumns({
       taxonomy,
       frameworkId,
@@ -303,7 +314,7 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       sortOrder,
       onSort,
       userOnly,
-      isGrouped: categoryGroups.size > 0 && !!taxonomy.get('parent'),
+      isGroupedByParent,
       frameworks,
       intl,
     });
@@ -313,46 +324,58 @@ class CategoryListItems extends React.PureComponent { // eslint-disable-line rea
       categoryGroups,
       userOnly,
     });
-
     return (
       <Styled>
         <CategoryListHeader columns={headerColumns} />
         <CategoryListBody>
-          {categoryGroups.valueSeq().toArray().map((group) => {
-            if (group.get('categories') && group.get('categories').size > 0) {
-              return (group.get('totalAssociations') > 0 || isCategoryAdmin)
-                ? (
-                  <span key={group.get('id')}>
-                    {group.get('type') === 'categories'
-                      && group.get('categories').size > 0
-                      && (
-                        <GroupHeaderLink to={`/category/${group.get('id')}`}>
+          <span
+            role="group"
+            aria-label={isGroupedByParent
+              ? `${intl.formatMessage(appMessages.entities.taxonomies[taxonomy.get('id')].plural)} by ${intl.formatMessage(appMessages.entities.taxonomies[taxonomy.getIn(['parent', 'id'])].single)}`
+              : intl.formatMessage(appMessages.entities.taxonomies[taxonomy.get('id')].plural)}
+          >
+            {categoryGroups.valueSeq().toArray().map((group) => {
+              if (group.get('categories') && group.get('categories').size > 0) {
+                return (group.get('totalAssociations') > 0 || isCategoryAdmin)
+                  ? (
+                    <span
+                      key={group.get('id')}
+                      role={isGroupedByParent ? 'group' : null}
+                      aria-label={isGroupedByParent
+                        ? `${intl.formatMessage(appMessages.entities.taxonomies[taxonomy.get('id')].plural)} for ${getCategoryTitle(group)}`
+                        : null}
+                    >
+                      {isGroupedByParent && (
+                        <GroupHeaderLink
+                          to={`/category/${group.get('id')}`}
+                          title={`${intl.formatMessage(appMessages.entities.taxonomies[group.getIn(['attributes', 'taxonomy_id'])].single)}: ${getCategoryTitle(group)}`}
+                        >
                           <GroupHeader>
                             {getCategoryTitle(group)}
                           </GroupHeader>
                         </GroupHeaderLink>
-                      )
-                    }
-                    {group.get('categories').map(
-                      (cat) => (cat.get('totalAssociations') > 0 || isCategoryAdmin)
-                        ? (
-                          <CategoryListItem
-                            key={cat.get('id')}
-                            category={cat}
-                            columns={columns}
-                            onPageLink={onPageLink}
-                            frameworks={frameworks}
-                            frameworkId={frameworkId}
-                          />
-                        )
-                        : null,
-                    )}
-                  </span>
-                )
-                : null;
-            }
-            return null;
-          })}
+                      )}
+                      {group.get('categories').map(
+                        (cat) => (cat.get('totalAssociations') > 0 || isCategoryAdmin)
+                          ? (
+                            <CategoryListItem
+                              key={cat.get('id')}
+                              category={cat}
+                              columns={columns}
+                              onPageLink={onPageLink}
+                              frameworks={frameworks}
+                              frameworkId={frameworkId}
+                            />
+                          )
+                          : null,
+                      )}
+                    </span>
+                  )
+                  : null;
+              }
+              return null;
+            })}
+          </span>
         </CategoryListBody>
       </Styled>
     );

@@ -279,7 +279,7 @@ export function HomePage({ onPageLink, theme, intl }) {
           { name: 'description', content: intl.formatMessage(messages.metaDescription) },
         ]}
       />
-      <main>
+      <main id="main-content">
         <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
           <SectionTopInner
             hasBrand={SHOW_BRAND_ON_HOME}

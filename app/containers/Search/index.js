@@ -253,7 +253,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
           ]}
         />
         <ContainerWrapper>
-          <Container role="main">
+          <Container role="main" id="main-content">
             <Content>
               <ContentHeader
                 type={CONTENT_LIST}
