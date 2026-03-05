@@ -68,7 +68,7 @@ export function TaxonomyPreview({
                   title={title}
                   description={description}
                   explore={explore}
-                  ariaLabel={`${explore}: ${title} - ${description}`}
+                  ariaLabel={`${explore}: ${title}`}
                   basis={`1/${row.size}`}
                   taxonomy={taxonomy}
                   onClick={(e) => {

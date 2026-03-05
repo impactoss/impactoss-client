@@ -378,6 +378,7 @@ export function HomePage({ onPageLink, theme, intl }) {
                   graphicSrc={theme.media.teaserCategories}
                   isHome
                   basis={isMinSize(size, 'small') ? '1/2' : '1'}
+                  headingLevel={3}
                 />
                 <CardTeaser
                   path={ROUTES.RECOMMENDATIONS}
@@ -391,6 +392,7 @@ export function HomePage({ onPageLink, theme, intl }) {
                   explore={intl.formatMessage(messages.cardLinkRecommendations)}
                   graphicSrc={theme.media.teaserRecommendations}
                   isHome
+                  headingLevel={3}
                 />
               </Box>
             </nav>
