@@ -12,6 +12,7 @@ const Styled = styled.span`
   font-size: 0.85em;
   letter-spacing: 0.75px;
   display: inline-block;
+  margin: 0;
   @media print {
     font-size: ${(props) => props.theme.sizes.print.smaller};
   }
@@ -19,10 +20,10 @@ const Styled = styled.span`
 
 class SupTitle extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const { icon, title } = this.props;
+    const { icon, title, as } = this.props;
 
     return (
-      <Styled>
+      <Styled as={as}>
         { icon
           && <Icon name={icon} text textLeft />
         }
@@ -35,6 +36,7 @@ class SupTitle extends React.PureComponent { // eslint-disable-line react/prefer
 SupTitle.propTypes = {
   title: PropTypes.string.isRequired,
   icon: PropTypes.string,
+  as: PropTypes.string,
 };
 
 export default SupTitle;

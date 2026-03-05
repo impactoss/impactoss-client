@@ -149,6 +149,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
                     <SupTitle
                       title={intl.formatMessage(messages.title)}
                       id="taxonomy-sidebar-title"
+                      as="h2"
                     />
                     { this.state.viewport < VIEWPORTS.SMALL
                     && (

@@ -411,7 +411,10 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
                       </>
                     )}
                     {!canEdit && (
-                      <SupTitle title={intl.formatMessage(messages.header.filter)} />
+                      <SupTitle
+                        as="h2"
+                        title={intl.formatMessage(messages.header.filter)}
+                      />
                     )}
                     { this.state.viewport < VIEWPORTS.LARGE && (
                       <ToggleHide onClick={this.onHideSidebar}>
