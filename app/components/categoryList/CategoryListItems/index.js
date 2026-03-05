@@ -34,7 +34,8 @@ const GroupHeaderLink = styled(Link)`
   }
 `;
 
-const GroupHeader = styled.h6`
+const GroupHeader = styled.div`
+  line-height: 1.25;
   font-weight: normal;
   margin-top: 6px;
   margin-bottom: 3px;

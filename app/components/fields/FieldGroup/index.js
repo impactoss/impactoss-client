@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
@@ -10,48 +10,48 @@ import FieldGroupLabel from 'components/fields/FieldGroupLabel';
 import GroupIcon from 'components/fields/GroupIcon';
 import GroupLabel from 'components/fields/GroupLabel';
 
-class FieldGroup extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  render() {
-    const {
-      group,
-      seamless,
-      aside,
-      bottom,
-    } = this.props;
+const FieldGroup = ({
+  group,
+  seamless,
+  aside,
+  bottom,
+}) => {
+  const groupTitleId = useId();
+  return (
+    <FieldGroupWrapper
+      groupType={group.type}
+      seamless={seamless}
+      aside={aside}
+      bottom={bottom}
+      role={group.label ? 'group' : null}
+      aria-labelledby={group.label ? groupTitleId : null}
+    >
+      {group.label && (
+        <FieldGroupLabel basic={group.type === 'smartTaxonomy'}>
+          <GroupLabel id={groupTitleId}>
+            <FormattedMessage {...group.label} />
+          </GroupLabel>
+          {group.icon && (
+            <GroupIcon>
+              <Icon name={group.icon} />
+            </GroupIcon>
+          )}
+        </FieldGroupLabel>
+      )}
+      {group.fields.map(
+        (field, i) => field
+          ? (
+            <FieldFactory
+              key={i}
+              field={Object.assign({}, field, { aside })}
+            />
+          )
+          : null,
+      )}
+    </FieldGroupWrapper>
+  );
+};
 
-    return (
-      <FieldGroupWrapper
-        groupType={group.type}
-        seamless={seamless}
-        aside={aside}
-        bottom={bottom}
-      >
-        {group.label && (
-          <FieldGroupLabel basic={group.type === 'smartTaxonomy'}>
-            <GroupLabel>
-              <FormattedMessage {...group.label} />
-            </GroupLabel>
-            {group.icon && (
-              <GroupIcon>
-                <Icon name={group.icon} />
-              </GroupIcon>
-            )}
-          </FieldGroupLabel>
-        )}
-        {group.fields.map(
-          (field, i) => field
-            ? (
-              <FieldFactory
-                key={i}
-                field={Object.assign({}, field, { aside: this.props.aside })}
-              />
-            )
-            : null,
-        )}
-      </FieldGroupWrapper>
-    );
-  }
-}
 FieldGroup.propTypes = {
   group: PropTypes.object.isRequired,
   seamless: PropTypes.bool,

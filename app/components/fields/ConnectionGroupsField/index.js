@@ -38,7 +38,7 @@ class ConnectionGroupsField extends React.PureComponent { // eslint-disable-line
     );
 
     return (
-      <StyledFieldWrap>
+      <StyledFieldWrap role="group" aria-label={label}>
         <ConnectionLabelWrap>
           <ConnectionLabel>
             {label}

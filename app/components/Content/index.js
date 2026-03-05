@@ -10,7 +10,7 @@ const Content = React.forwardRef((props, ref) => (
     <Container
       inModal={props.inModal}
       role={props.inModal ? null : 'main'}
-      is={props.inModal ? null : 'main-content'}
+      id={props.inModal ? null : 'main-content'}
     >
       {props.children}
     </Container>

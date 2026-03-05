@@ -30,9 +30,9 @@ class TaxonomyField extends React.PureComponent { // eslint-disable-line react/p
   render() {
     const { field } = this.props;
     return (
-      <StyledFieldWrap>
+      <StyledFieldWrap role="group" aria-labelledby={`list-label-${field.id}`}>
         <ListLabelWrap>
-          <ListLabel>
+          <ListLabel id={`list-label-${field.id}`}>
             <FormattedMessage {...field.label} />
           </ListLabel>
           {field.entityType

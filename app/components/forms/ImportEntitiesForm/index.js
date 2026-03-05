@@ -71,7 +71,7 @@ const DocumentWrapEdit = styled(DocumentWrap)`
   padding: 1em 0.75em;
 `;
 
-const FormTitle = styled.h2`
+const FormTitle = styled.h1`
   padding-top: 0;
   margin-top: 0;
 `;
@@ -109,7 +109,7 @@ const HintList = styled.ul`
   margin: 10px 0;
 `;
 
-const HintTitle = styled.h6`
+const HintTitle = styled.div`
   margin: 0;
   font-weight: normal;
 `;

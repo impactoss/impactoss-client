@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-const ListLabel = styled.h4`
+const ListLabel = styled.div`
   display: table-cell;
   vertical-align: middle;
   font-weight: 500;
