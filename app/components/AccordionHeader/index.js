@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Text } from 'grommet';
+import { Box, Heading, Text } from 'grommet';
 import { Up, Down } from 'grommet-icons';
 import styled from 'styled-components';
 
@@ -19,22 +19,27 @@ const StyledBox = styled((p) => (
   border-bottom: 1px solid;
 `;
 
-const StyledText = styled((p) => (
-  <Text {...p} />
+const StyledHeading = styled((p) => (
+  <Heading {...p} />
 ))`
-  font-weight: ${({ level }) => level === 1 ? 500 : 400};
+  font-size: 1.1em;
+  line-height: 1.1em;
+  margin: 0;
 `;
 
 function AccordionHeader({ title, open, level = 1 }) {
   // prettier-ignore
   return (
     <StyledBox>
-      <Box
-        margin={{ vertical: 'xsmall' }}
-      >
-        <StyledText level={level}>
+      <Box>
+        <StyledHeading
+          responsive={false}
+          level={2}
+          margin={{ vertical: 'xsmall' }}
+          style={level === 2 ? { fontWeight: 400 } : {}}
+        >
           {title}
-        </StyledText>
+        </StyledHeading>
       </Box>
       <Box margin={{ left: 'auto' }}>
         <PrintHide>

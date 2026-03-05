@@ -23,16 +23,16 @@ const FieldGroup = ({
       seamless={seamless}
       aside={aside}
       bottom={bottom}
-      role={group.label ? 'group' : null}
+      as={group.label ? 'section' : 'div'}
       aria-labelledby={group.label ? groupTitleId : null}
     >
       {group.label && (
         <FieldGroupLabel basic={group.type === 'smartTaxonomy'}>
-          <GroupLabel id={groupTitleId}>
+          <GroupLabel id={groupTitleId} as="h2">
             <FormattedMessage {...group.label} />
           </GroupLabel>
           {group.icon && (
-            <GroupIcon>
+            <GroupIcon aria-hidden="true">
               <Icon name={group.icon} />
             </GroupIcon>
           )}

@@ -373,8 +373,14 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                                 >
                                                   <Box direction="row" gap="small" align="center" justify="between">
                                                     <Box direction="row" gap="xsmall" pad={{ vertical: 'xsmall' }}>
-                                                      <Text size="large">{count}</Text>
-                                                      <Text size="large">{title}</Text>
+                                                      <Text
+                                                        as="h2"
+                                                        size="large"
+                                                        weight="600"
+                                                        style={{ margin: 0 }}
+                                                      >
+                                                        {`${count} ${title}`}
+                                                      </Text>
                                                     </Box>
                                                     {otherTargets && active && (
                                                       <FormUp size="medium" color="text" aria-hidden="true" aria-label={null} />
