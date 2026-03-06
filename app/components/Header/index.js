@@ -103,6 +103,7 @@ const NavSecondary = styled(PrintHide)`
   width: 100%;
   z-index: 99999;
   background-color: ${palette('headerNavPages', 0)};
+  overflow-y: auto;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     background-color: transparent;
     position: relative;
@@ -112,6 +113,7 @@ const NavSecondary = styled(PrintHide)`
     right: auto;
     z-index: 300;
     display: block;
+    overflow-y: visible;
   }
 `;
 const ShowSecondary = styled(Button)`

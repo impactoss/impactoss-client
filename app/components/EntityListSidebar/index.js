@@ -101,10 +101,12 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   constructor() {
     super();
     this.state = STATE_INITIAL;
+    this.setWrapperRef = this.setWrapperRef.bind(this);
   }
 
   UNSAFE_componentWillMount() {
     this.setState(STATE_INITIAL);
+    document.addEventListener('keydown', this.handleKeyDown);
   }
 
   componentDidMount() {
@@ -147,6 +149,32 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
+    document.removeEventListener('keydown', this.handleKeyDown);
+  }
+
+  handleKeyDown = (event) => {
+    if (event.key === 'Escape' && this.state.viewport < VIEWPORTS.LARGE) {
+      this.hideSidebar();
+    }
+    if (event.key === 'Tab' && this.state.viewport < VIEWPORTS.LARGE && this.wrapperRef) {
+      const focusable = this.wrapperRef.querySelectorAll(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  };
+
+  setWrapperRef(node) {
+    this.wrapperRef = node;
   }
 
   onShowForm = (option) => {
@@ -156,12 +184,20 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   onShowSidebar = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ visible: true });
+    const main = document.getElementById('main-content');
+    if (main && this.state.viewport < VIEWPORTS.LARGE) {
+      main.setAttribute('inert', '');
+    }
   };
 
   onHideSidebar = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.hideForm();
     this.hideSidebar();
+    const main = document.getElementById('main-content');
+    if (main) {
+      main.removeAttribute('inert');
+    }
   };
 
   onHideForm = (evt) => {
@@ -345,7 +381,8 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     return (
       <Styled
         id="sidebar-filter-edit-options"
-        role="region"
+        role={this.state.viewport < VIEWPORTS.LARGE ? 'dialog' : 'region'}
+        ref={this.setWrapperRef}
         aria-label={
           canEdit ? 'List filter and edit options' : 'List filter options'
         }
