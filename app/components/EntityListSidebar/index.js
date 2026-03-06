@@ -369,27 +369,34 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
               onClick={this.onHideSidebar}
             >
               <Sidebar onClick={(evt) => evt.stopPropagation()}>
-                <SkipContent
-                  href="#main-content"
-                  title={
-                    intl.formatMessage(
-                      appMessages.screenreader[canEdit ? 'skipSidebarFilterEdit' : 'skipSidebarFilter'],
-                    )
-                  }
-                  onClick={() => {
-                    if (activePanel === EDIT_PANEL) {
-                      this.setState({ activeOption: null });
+                {this.state.viewport >= VIEWPORTS.LARGE && (
+                  <SkipContent
+                    href="#main-content"
+                    title={
+                      intl.formatMessage(
+                        appMessages.screenreader[canEdit ? 'skipSidebarFilterEdit' : 'skipSidebarFilter'],
+                      )
                     }
-                    if (activePanel === FILTERS_PANEL) {
-                      this.hideForm(false);
-                      this.hideSidebar();
-                    }
-                  }}
-                >
-                  <FormattedMessage {...appMessages.screenreader.skipSidebarFilter} />
-                </SkipContent>
+                    onClick={() => {
+                      if (activePanel === EDIT_PANEL) {
+                        this.setState({ activeOption: null });
+                      }
+                      if (activePanel === FILTERS_PANEL) {
+                        this.hideForm(false);
+                        this.hideSidebar();
+                      }
+                    }}
+                  >
+                    <FormattedMessage {...appMessages.screenreader.skipSidebarFilter} />
+                  </SkipContent>
+                )}
                 <ScrollableWrapper>
                   <SidebarHeader hasButtons={canEdit}>
+                    { this.state.viewport < VIEWPORTS.LARGE && (
+                      <ToggleHide onClick={this.onHideSidebar}>
+                        <Icon name="close" />
+                      </ToggleHide>
+                    )}
                     {canEdit && (
                       <>
                         <ButtonToggle
@@ -415,11 +422,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
                         as="h2"
                         title={intl.formatMessage(messages.header.filter)}
                       />
-                    )}
-                    { this.state.viewport < VIEWPORTS.LARGE && (
-                      <ToggleHide onClick={this.onHideSidebar}>
-                        <Icon name="close" />
-                      </ToggleHide>
                     )}
                   </SidebarHeader>
                   <div>

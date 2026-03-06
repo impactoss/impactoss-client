@@ -136,13 +136,15 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
         { (this.state.visible || this.state.viewport >= VIEWPORTS.SMALL)
           && (
             <Sidebar responsiveSmall>
-              <SkipContent
-                href="#main-content"
-                title={intl.formatMessage(appMessages.screenreader.skipSidebar)}
-                onClick={this.onHideSidebar}
-              >
-                <FormattedMessage {...appMessages.screenreader.skipSidebar} />
-              </SkipContent>
+              {this.state.viewport >= VIEWPORTS.SMALL && (
+                <SkipContent
+                  href="#main-content"
+                  title={intl.formatMessage(appMessages.screenreader.skipSidebar)}
+                  onClick={this.onHideSidebar}
+                >
+                  <FormattedMessage {...appMessages.screenreader.skipSidebar} />
+                </SkipContent>
+              )}
               <Scrollable>
                 <Component as="nav" aria-labelledby="taxonomy-sidebar-title">
                   <SidebarHeader responsiveSmall>
