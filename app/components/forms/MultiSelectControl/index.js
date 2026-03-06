@@ -335,6 +335,16 @@ class MultiSelectControl extends React.Component {
     />
   );
 
+  getSelectAllLabel = (optionCount, selectedCount) => {
+    const selectedState = this.getSelectedState(selectedCount, selectedCount === optionCount);
+    if (selectedState === CHECKBOX_STATES.CHECKED) {
+      return `Unselect all (all ${selectedCount} selected)`;
+    }
+    if (selectedState === CHECKBOX_STATES.INDETERMINATE) {
+      return `Select all (${selectedCount} of ${optionCount} selected)`;
+    }
+    return `Select all ${optionCount} options`;
+  };
 
   // TODO intl
   render() {
@@ -397,16 +407,14 @@ class MultiSelectControl extends React.Component {
                   <Checkbox
                     id="select-all-multiselect"
                     checked={this.getSelectedState(filteredOptionsSelected.size, filteredOptionsSelected.size === options.size)}
-                    onChange={(checkedState) => this.props.onChange(this.getAllSelectedValues(checkedState, options))
+                    onChange={
+                      (checkedState) => this.props.onChange(this.getAllSelectedValues(checkedState, options))
                     }
                   />
                 </CheckboxWrap>
                 <LabelWrap>
                   <Label htmlFor="select-all-multiselect">
-                    {filteredOptionsSelected.size > 0
-                      ? `${filteredOptionsSelected.size} option(s) selected`
-                      : 'Options'
-                    }
+                    {this.getSelectAllLabel(options.size, filteredOptionsSelected.size)}
                   </Label>
                 </LabelWrap>
               </SelectAll>

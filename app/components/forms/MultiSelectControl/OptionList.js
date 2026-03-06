@@ -21,11 +21,14 @@ const ListWrapper = styled.div`
   border-top: 1px solid ${palette('light', 1)};
 `;
 
-const OptionsWrapper = styled.div`
+const OptionsWrapper = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: table;
   width: 100%;
 `;
-const OptionWrapper = styled.div`
+const OptionWrapper = styled.li`
   display: table-row;
   width: 100%;
   line-height: 1.3;
