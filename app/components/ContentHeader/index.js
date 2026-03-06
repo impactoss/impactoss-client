@@ -4,7 +4,11 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import {
-  CONTENT_LIST, CONTENT_SINGLE, CONTENT_PAGE, CONTENT_MODAL,
+  CONTENT_LIST,
+  CONTENT_SINGLE,
+  CONTENT_PAGE,
+  CONTENT_MODAL,
+  CONTENT_EDIT,
 } from 'containers/App/constants';
 
 import SupTitle from 'components/SupTitle';
@@ -104,6 +108,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
     switch (type) {
       case CONTENT_PAGE:
       case CONTENT_LIST:
+      case CONTENT_EDIT:
         return (<TitleLarge>{title}</TitleLarge>);
       case CONTENT_MODAL:
       case CONTENT_SINGLE:
@@ -130,7 +135,6 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
       buttons,
       subTitle,
     } = this.props;
-
     return (
       <Styled
         hasBottomBorder={type === CONTENT_PAGE || type === CONTENT_MODAL}

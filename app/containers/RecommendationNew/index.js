@@ -30,7 +30,7 @@ import { hasNewError } from 'utils/entity-form';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_EDIT } from 'containers/App/constants';
 import { USER_ROLES, DEFAULT_FRAMEWORK, FEATURES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -275,7 +275,7 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                 }}
                 scrollContainer={this.scrollContainer.current}
                 headerTitle={intl.formatMessage(messages.pageTitle, { type })}
-                headerType={CONTENT_SINGLE}
+                headerType={CONTENT_EDIT}
                 headerIcon={fwSpecified ? `recommendations_${frameworkId}` : 'recommendations'}
               />
             )

@@ -35,7 +35,7 @@ import { getMetaField } from 'utils/fields';
 import { qe } from 'utils/quasi-equals';
 import { lowerCase } from 'utils/string';
 
-import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_EDIT } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -310,7 +310,7 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                 }}
                 scrollContainer={this.scrollContainer.current}
                 headerTitle={intl.formatMessage(messages.pageTitle, { type })}
-                headerType={CONTENT_SINGLE}
+                headerType={CONTENT_EDIT}
                 headerIcon={frameworkId ? `recommendations_${frameworkId}` : 'recommendations'}
               />
             )

@@ -36,7 +36,7 @@ import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl
 import validateDateAfterDate from 'components/forms/validators/validate-date-after-date';
 import validateRequired from 'components/forms/validators/validate-required';
 
-import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_EDIT } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -271,7 +271,7 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                 }}
                 scrollContainer={this.scrollContainer.current}
                 haderTitle={intl.formatMessage(messages.pageTitle)}
-                haderType={CONTENT_SINGLE}
+                haderType={CONTENT_EDIT}
                 haderIcon="indicators"
               />
             )

@@ -35,7 +35,7 @@ import {
   canUserSeeDraftContent,
 } from 'utils/permissions';
 
-import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_EDIT } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
 
 import {
@@ -238,7 +238,7 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                 }}
                 scrollContainer={this.scrollContainer.current}
                 headerTitle={pageTitle}
-                headerType={CONTENT_SINGLE}
+                headerType={CONTENT_EDIT}
                 headerIcon="reports"
               />
             )
