@@ -39,7 +39,9 @@ import { makeActiveEditOptions } from './editOptionsFactory';
 
 import messages from './messages';
 
-const Styled = styled(PrintHide)``;
+const Styled = styled(PrintHide)`
+  pointer-events: none;
+`;
 // const Main = styled.div``;
 const ScrollableWrapper = styled(Scrollable)`
   background-color: ${palette('aside', 0)};
@@ -65,6 +67,7 @@ const ToggleShow = styled(ButtonDefault)`
   box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
   font-size: 0.85em;
   width: 100%;
+  pointer-events: all;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 0.85em;
     padding: 0.75em 1em;
@@ -85,10 +88,20 @@ const ToggleHide = styled(Button)`
 //   color: ${palette('linkHover', 3)};
 // }
 const SidebarWrapper = styled.div`
-  ${(props) => props.sidebarAbsolute
-    ? 'position: absolute;width: 100%;top: 0;bottom: 0;left: 0;right: 0;background-color: rgba(0,0,0,0.2); z-index: 98;'
-    : ''
-}
+  pointer-events: all;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0,0,0,0.2);
+  z-index: 98;
+  @media (min-width: ${(props) => props.theme.breakpoints.large}) {
+    position: static;
+    background-color: transparent;
+    z-index: auto;
+  }
 `;
 
 const STATE_INITIAL = {
@@ -194,10 +207,6 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.hideForm();
     this.hideSidebar();
-    const main = document.getElementById('main-content');
-    if (main) {
-      main.removeAttribute('inert');
-    }
   };
 
   onHideForm = (evt) => {
@@ -211,6 +220,10 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
 
   hideSidebar = () => {
     this.setState({ visible: false });
+    const main = document.getElementById('main-content');
+    if (main) {
+      main.removeAttribute('inert');
+    }
   };
 
   getSidebarButtons = (intl) =>
@@ -399,12 +412,9 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
             </ToggleShow>
           )
         }
-        { (this.state.visible || this.state.viewport === VIEWPORTS.LARGE)
+        { (this.state.visible || this.state.viewport >= VIEWPORTS.LARGE)
           && (
-            <SidebarWrapper
-              sidebarAbsolute={this.state.viewport < VIEWPORTS.LARGE}
-              onClick={this.onHideSidebar}
-            >
+            <SidebarWrapper onClick={this.onHideSidebar}>
               <Sidebar onClick={(evt) => evt.stopPropagation()}>
                 {this.state.viewport >= VIEWPORTS.LARGE && (
                   <SkipContent
