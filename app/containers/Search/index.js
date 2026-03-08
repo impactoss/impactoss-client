@@ -290,7 +290,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       />
                     </Description>
                   )}
-                  <EntityListSearch>
+                  <EntityListSearch role="search">
                     <TagSearch
                       filters={[]}
                       placeholder={intl.formatMessage(messages.placeholder)}

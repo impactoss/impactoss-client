@@ -65,6 +65,7 @@ const LogoItemLink = styled(A)`
 const Logo = styled(NormalImg)`
   height: ${({ isAgency }) => isAgency ? 42 : 50}px;
   margin-top: ${({ isAgency }) => isAgency ? 4 : 0}px;
+  max-width: 100%;
   @media (min-width: ${({ theme }) => theme.breakpoints.medium}) {
     height: ${({ isAgency }) => isAgency ? 45 : 55}px;
     margin-top: ${({ isAgency }) => isAgency ? 5 : 0}px;

@@ -234,7 +234,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                 <PrintHintKey>
                   <FormattedMessage {...messages.printHintKey} />
                 </PrintHintKey>
-                <EntityListSearch>
+                <EntityListSearch role="search" aria-label={`Filter ${entityTitle.plural}`}>
                   <TagSearch
                     filters={currentFilters(
                       {

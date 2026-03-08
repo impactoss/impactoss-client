@@ -291,7 +291,10 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
               }
               {dataReady && (
                 <div>
-                  <EntityListSearch>
+                  <EntityListSearch
+                    role="search"
+                    aria-label={`Filter ${intl.formatMessage(messages.supTitle)}`}
+                  >
                     <TagSearch
                       filters={filtered
                         ? [{
