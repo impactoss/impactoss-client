@@ -11,7 +11,10 @@ import A from 'components/styled/A';
 import qe from 'utils/quasi-equals';
 import { isMaxSize } from 'utils/responsive';
 
-import { selectEntitiesWhere } from 'containers/App/selectors';
+import {
+  selectEntitiesWhere,
+  selectIsSignedIn,
+} from 'containers/App/selectors';
 
 import NormalImg from 'components/Img';
 import Container from 'components/styled/Container';
@@ -101,6 +104,7 @@ const Footer = ({
   pages,
   fill,
   hasBorder,
+  isUserSignedIn,
 }) => {
   const intl = useIntl();
   const size = useContext(ResponsiveContext);
@@ -188,6 +192,17 @@ const Footer = ({
                   align={isMobile ? 'start' : 'end'}
                   role="navigation"
                 >
+                  {isUserSignedIn && (
+                    <FooterLink
+                      onClick={(evt) => {
+                        if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                        onPageLink(ROUTES.BOOKMARKS);
+                      }}
+                      href={ROUTES.BOOKMARKS}
+                    >
+                      <FormattedMessage {...appMessages.nav.bookmarks} />
+                    </FooterLink>
+                  )}
                   <FooterLink
                     onClick={(evt) => {
                       if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -246,6 +261,7 @@ Footer.propTypes = {
   pages: PropTypes.object,
   fill: PropTypes.bool,
   hasBorder: PropTypes.bool,
+  isUserSignedIn: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -253,6 +269,7 @@ const mapStateToProps = (state) => ({
     path: 'pages',
     where: { draft: false },
   }),
+  isUserSignedIn: selectIsSignedIn(state),
 });
 function mapDispatchToProps(dispatch) {
   return {
