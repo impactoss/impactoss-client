@@ -395,11 +395,17 @@ export default function createRoutes(store) {
       path: ROUTES.RECOMMENDATIONS,
       name: 'recommendationList',
       getComponent(nextState, cb) {
-        const importModules = Promise.all([import('containers/RecommendationList')]);
+        const importModules = Promise.all([
+          import('containers/RecommendationImport/reducer'),
+          import('containers/RecommendationImport/sagas'),
+          import('containers/RecommendationList'),
+        ]);
 
         const renderRoute = loadModule(cb);
 
-        importModules.then(([component]) => {
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('recommendationImport', reducer.default);
+          injectSagas(sagas.default);
           renderRoute(component);
         });
 
@@ -427,28 +433,24 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     },
-    {
-      path: `${ROUTES.RECOMMENDATIONS}${ROUTES.IMPORT}`,
-      name: 'recommendationImport',
-      onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/RecommendationImport/reducer'),
-          import('containers/RecommendationImport/sagas'),
-          import('containers/RecommendationImport'),
-        ]);
-
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('recommendationImport', reducer.default);
-          injectSagas(sagas.default);
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    },
+    // {
+    //   path: `${ROUTES.RECOMMENDATIONS}${ROUTES.IMPORT}`,
+    //   name: 'recommendationImport',
+    //   onEnter: redirectIfNotPermitted(USER_ROLES.MANAGER.value),
+    //   getComponent(nextState, cb) {
+    //     const importModules = Promise.all([
+    //       import('containers/RecommendationImport'),
+    //     ]);
+    //
+    //     const renderRoute = loadModule(cb);
+    //
+    //     importModules.then(([reducer, sagas, component]) => {
+    //       renderRoute(component);
+    //     });
+    //
+    //     importModules.catch(errorLoading);
+    //   },
+    // },
     {
       path: `${ROUTES.RECOMMENDATIONS}${ROUTES.ID}`,
       name: 'recommendationView',

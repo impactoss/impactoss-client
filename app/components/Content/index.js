@@ -6,11 +6,23 @@ import Container from 'components/styled/Container';
 import ContainerWrapper from 'components/styled/Container/ContainerWrapper';
 
 const Content = React.forwardRef((props, ref) => (
-  <ContainerWrapper ref={ref}>
+  <ContainerWrapper
+    ref={ref}
+    onClick={props.onClickOutside ? (e) => {
+      if (e.target === e.currentTarget) {
+        props.onClickOutside();
+      }
+    } : undefined}
+  >
     <Container
       inModal={props.inModal}
       role={props.inModal ? null : 'main'}
       id={props.inModal ? null : 'main-content'}
+      onClick={props.onClickOutside ? (e) => {
+        if (e.target === e.currentTarget) {
+          props.onClickOutside();
+        }
+      } : undefined}
     >
       {props.children}
     </Container>
@@ -23,6 +35,7 @@ const Content = React.forwardRef((props, ref) => (
 Content.propTypes = {
   children: PropTypes.node,
   inModal: PropTypes.bool,
+  onClickOutside: PropTypes.func,
 };
 
 export default Content;

@@ -94,6 +94,7 @@ const ProgressText = styled.div`
 `;
 const STATE_INITIAL = {
   downloadActive: false,
+  importActive: false,
 };
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor() {
@@ -113,8 +114,16 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     this.setState({ downloadActive: true });
   };
 
+  onImportClick = () => {
+    this.setState({ importActive: true });
+  };
+
   onDownloadDismiss = () => {
     this.setState({ downloadActive: false });
+  };
+
+  onImportDismiss = () => {
+    this.setState({ importActive: false });
   };
 
   getMessageForType = (type) => {
@@ -192,6 +201,19 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         },
       );
     }
+    if (config.import) {
+      header.actionsAdmin = header.actionsAdmin.map(
+        (action) => {
+          if (action.type === 'import') {
+            return ({
+              ...action,
+              onClick: () => this.onImportClick(),
+            });
+          }
+          return action;
+        },
+      );
+    }
     return (
       <div>
         {config.downloadCSV && this.state.downloadActive && (
@@ -216,6 +238,23 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               onClose={() => this.onDownloadDismiss()}
               frameworks={this.props.frameworks}
               hasUserRole={this.props.hasUserRole}
+            />
+          </ReactModal>
+        )}
+        {config.import && this.state.importActive && this.props.importComponent && (
+          <ReactModal
+            isOpen
+            contentLabel="Import from CSV"
+            className="import-csv-modal"
+            overlayClassName="import-csv-modal-overlay"
+            onRequestClose={() => this.onImportDismiss()}
+            style={{
+              overlay: { zIndex: 99999999 },
+            }}
+            appElement={document.getElementById('app')}
+          >
+            <this.props.importComponent
+              handleCancel={() => this.onImportDismiss()}
             />
           </ReactModal>
         )}
@@ -415,6 +454,7 @@ EntityList.propTypes = {
   showSidebar: PropTypes.bool,
   canUserAdministerCategories: PropTypes.bool,
   globalSettings: PropTypes.object,
+  importComponent: PropTypes.func,
   intl: PropTypes.object.isRequired,
 };
 

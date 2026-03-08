@@ -29,6 +29,7 @@ export const CONFIG = {
   serverPath: 'indicators',
   clientPath: 'indicators',
   downloadCSV: true,
+  import: true,
   search: ['title', 'reference'],
   sorting: [
     {

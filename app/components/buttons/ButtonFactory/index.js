@@ -185,6 +185,7 @@ const ButtonFactory = ({ button, whiteBG }) => {
       );
     case 'simple':
     case 'text':
+    case 'import':
     case 'delete':
     default:
       return (

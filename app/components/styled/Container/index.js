@@ -5,6 +5,8 @@ const Container = styled.div`
   flex: ${(props) => props.inModal ? '0 1 auto' : '1'};
   margin-right: auto;
   margin-left: auto;
+  margin-top: ${(props) => props.inModal ? 20 : 0}px;
+  margin-bottom: ${(props) => props.inModal ? 20 : 0}px;
   width: 100%;
   max-width: 100%;
   padding-bottom: ${(props) => props.noPaddingBottom || props.inModal ? 0 : '3em'};
@@ -12,6 +14,8 @@ const Container = styled.div`
   padding-right: ${(props) => props.inModal ? 6 : 12}px;
   background-color: ${(props) => props.inModal ? palette('light', 0) : 'transparent'};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    margin-top: ${(props) => props.inModal ? 60 : 0}px;
+    margin-bottom: ${(props) => props.inModal ? 60 : 0}px;
     padding-right: 12px;
     padding-left: 12px;
   }

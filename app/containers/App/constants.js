@@ -149,5 +149,4 @@ export const ROUTES = {
   ID: '/:id',
   NEW: '/new',
   EDIT: '/edit',
-  IMPORT: '/import',
 };

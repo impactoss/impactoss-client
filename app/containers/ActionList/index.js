@@ -24,6 +24,7 @@ import appMessages from 'containers/App/messages';
 import { ROUTES } from 'containers/App/constants';
 
 import EntityList from 'containers/EntityList';
+import ActionImport from 'containers/ActionImport';
 import { CONFIG, DEPENDENCIES } from './constants';
 import { selectConnections, selectMeasures, selectConnectedTaxonomies } from './selectors';
 
@@ -81,10 +82,9 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
     }
     if (isManager) {
       headerOptions.actionsAdmin.push({
-        type: 'text',
+        type: 'import',
         title: intl.formatMessage(appMessages.buttons.import),
         buttonTitle: intl.formatMessage(appMessages.buttons.importTitle, { type: intl.formatMessage(appMessages.entities.measures.plural) }),
-        onClick: () => this.props.handleImport(),
       });
       headerOptions.actionsAdmin.push({
         type: 'add',
@@ -120,6 +120,7 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
             plural: intl.formatMessage(appMessages.entities.measures.plural),
           }}
           locationQuery={fromJS(location.query)}
+          importComponent={ActionImport}
         />
       </div>
     );
@@ -129,7 +130,6 @@ export class ActionList extends React.PureComponent { // eslint-disable-line rea
 ActionList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleNew: PropTypes.func,
-  handleImport: PropTypes.func,
   dataReady: PropTypes.bool,
   isManager: PropTypes.bool,
   location: PropTypes.object,
@@ -159,9 +159,6 @@ function mapDispatchToProps(dispatch) {
     },
     handleNew: () => {
       dispatch(updatePath(`${ROUTES.MEASURES}${ROUTES.NEW}`, { replace: true }));
-    },
-    handleImport: () => {
-      dispatch(updatePath(`${ROUTES.MEASURES}${ROUTES.IMPORT}`));
     },
   };
 }

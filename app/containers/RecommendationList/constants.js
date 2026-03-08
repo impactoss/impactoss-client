@@ -28,6 +28,7 @@ export const CONFIG = {
   clientPath: 'recommendations',
   search: ['reference', 'title', 'description'],
   downloadCSV: true,
+  import: true,
   sorting: [
     {
       attribute: 'id', // proxy for created at

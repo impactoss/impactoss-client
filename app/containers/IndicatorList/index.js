@@ -20,8 +20,8 @@ import {
 } from 'containers/App/selectors';
 import appMessages from 'containers/App/messages';
 import { ROUTES } from 'containers/App/constants';
-
 import EntityList from 'containers/EntityList';
+import IndicatorImport from 'containers/IndicatorImport';
 import { CONFIG, DEPENDENCIES } from './constants';
 import { selectConnections, selectIndicators, selectConnectedTaxonomies } from './selectors';
 
@@ -72,9 +72,9 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
     }
     if (isManager) {
       headerOptions.actionsAdmin.push({
-        type: 'text',
+        type: 'import',
         title: intl.formatMessage(appMessages.buttons.import),
-        onClick: () => this.props.handleImport(),
+        buttonTitle: intl.formatMessage(appMessages.buttons.importTitle, { type: intl.formatMessage(appMessages.entities.indicators.plural) }),
       });
       headerOptions.actionsAdmin.push({
         type: 'add',
@@ -110,6 +110,7 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
             plural: intl.formatMessage(appMessages.entities.indicators.plural),
           }}
           locationQuery={fromJS(this.props.location.query)}
+          importComponent={IndicatorImport}
         />
       </div>
     );
@@ -119,7 +120,6 @@ export class IndicatorList extends React.PureComponent { // eslint-disable-line 
 IndicatorList.propTypes = {
   loadEntitiesIfNeeded: PropTypes.func,
   handleNew: PropTypes.func,
-  handleImport: PropTypes.func,
   dataReady: PropTypes.bool,
   entities: PropTypes.instanceOf(List).isRequired,
   connections: PropTypes.instanceOf(Map),
@@ -147,9 +147,6 @@ function mapDispatchToProps(dispatch) {
     },
     handleNew: () => {
       dispatch(updatePath(`${ROUTES.INDICATORS}${ROUTES.NEW}`, { replace: true }));
-    },
-    handleImport: () => {
-      dispatch(updatePath(`${ROUTES.INDICATORS}${ROUTES.IMPORT}`));
     },
   };
 }

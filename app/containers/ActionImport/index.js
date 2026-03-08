@@ -7,14 +7,12 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import HelmetCanonical from 'components/HelmetCanonical';
 import { injectIntl } from 'react-intl';
 
 import { format, parse } from 'date-fns';
 
 import { fromJS } from 'immutable';
 
-import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
 import {
   API,
   USER_ROLES,
@@ -29,7 +27,6 @@ import qe from 'utils/quasi-equals';
 
 import {
   redirectIfNotPermitted,
-  updatePath,
   loadEntitiesIfNeeded,
   resetProgress,
   saveError,
@@ -42,8 +39,6 @@ import {
   selectCategories,
 } from 'containers/App/selectors';
 
-import Content from 'components/Content';
-import ContentHeader from 'components/ContentHeader';
 import ImportEntitiesForm from 'components/forms/ImportEntitiesForm';
 import validateDateFormat from 'components/forms/validators/validate-date-format';
 
@@ -135,45 +130,23 @@ function ActionImport({
   );
 
   return (
-    <div>
-      <HelmetCanonical
-        title={`${intl.formatMessage(messages.pageTitle)}`}
-        meta={[
-          {
-            name: 'description',
-            content: intl.formatMessage(messages.metaDescription),
-          },
-        ]}
-      />
-      <Content>
-        <ContentHeader
-          title={intl.formatMessage(messages.pageTitle)}
-          type={CONTENT_SINGLE}
-          icon="measures"
-          buttons={[{
-            type: 'cancel',
-            onClick: handleCancel,
-          }]}
-        />
-        <ImportEntitiesForm
-          typeLabel={typeLabel}
-          fieldModel="import"
-          formData={FORM_INITIAL}
-          handleSubmit={(formData) => {
-            handleSubmit(formData, connections, categories);
-          }}
-          handleCancel={handleCancel}
-          resetProgress={onResetProgress}
-          errors={errors}
-          success={success}
-          progress={progress}
-          template={{
-            filename: `${intl.formatMessage(messages.filename, { type: lowerCase(typeLabel) })}`,
-            data: getImportFields({ fields, relationshipFields }, intl.formatMessage),
-          }}
-        />
-      </Content>
-    </div>
+    <ImportEntitiesForm
+      typeLabel={typeLabel}
+      fieldModel="import"
+      formData={FORM_INITIAL}
+      handleSubmit={(formData) => {
+        handleSubmit(formData, connections, categories);
+      }}
+      handleCancel={handleCancel}
+      resetProgress={onResetProgress}
+      errors={errors}
+      success={success}
+      progress={progress}
+      template={{
+        filename: `${intl.formatMessage(messages.filename, { type: lowerCase(typeLabel) })}`,
+        data: getImportFields({ fields, relationshipFields }, intl.formatMessage),
+      }}
+    />
   );
 }
 
@@ -417,9 +390,6 @@ function mapDispatchToProps(dispatch) {
           });
         });
       }
-    },
-    handleCancel: () => {
-      dispatch(updatePath(ROUTES.MEASURES));
     },
   };
 }
