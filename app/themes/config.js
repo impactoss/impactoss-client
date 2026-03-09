@@ -98,6 +98,7 @@ export const FOOTER = {
     2, // disclaimer
     3, // privacy
     4, // a11y
+    5, // terms
   ],
 };
 
