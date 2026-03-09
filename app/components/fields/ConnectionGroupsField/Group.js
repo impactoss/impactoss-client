@@ -22,13 +22,15 @@ const GroupHeaderLink = styled(Link)`
   }
 `;
 
-const GroupHeader = styled.h6`
+const GroupHeader = styled.div`
   font-weight: normal;
   margin-top: 5px;
   margin-bottom: 5px;
+  font-size: 0.9em;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     margin-top: 40px;
     margin-bottom: 10px;
+    font-size: 1em;
   }
 `;
 
@@ -42,12 +44,12 @@ class Group extends React.PureComponent { // eslint-disable-line react/prefer-st
   render() {
     const { field, group } = this.props;
     const size = group.get(field.entityPath) ? group.get(field.entityPath).size : 0;
-
+    const groupHeader = getCategoryTitle(group);
     return (
-      <div>
+      <div role="group" aria-label={groupHeader}>
         <GroupHeaderLink to={`/category/${group.get('id')}`}>
           <GroupHeader>
-            {getCategoryTitle(group)}
+            {groupHeader}
           </GroupHeader>
         </GroupHeaderLink>
         <EntityListItems

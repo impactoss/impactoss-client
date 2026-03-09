@@ -19,24 +19,32 @@ const StyledBox = styled((p) => (
   border-bottom: 1px solid;
 `;
 
+const StyledHeading = styled((p) => (
+  <Heading {...p} />
+))`
+  font-size: 1.1em;
+  line-height: 1.1em;
+  margin: 0;
+`;
+
 function AccordionHeader({ title, open, level = 1 }) {
   // prettier-ignore
   return (
     <StyledBox>
       <Box>
-        <Heading
+        <StyledHeading
           responsive={false}
-          level={6}
+          level={2}
           margin={{ vertical: 'xsmall' }}
           style={level === 2 ? { fontWeight: 400 } : {}}
         >
           {title}
-        </Heading>
+        </StyledHeading>
       </Box>
       <Box margin={{ left: 'auto' }}>
         <PrintHide>
-          {!open && <Down size="small" />}
-          {open && <Up size="small" />}
+          {!open && <Down aria-hidden="true" aria-label={null} size="small" />}
+          {open && <Up aria-hidden="true" aria-label={null} size="small" />}
         </PrintHide>
         <PrintOnly>
           {!open && <Text size="xsmall">(hidden)</Text>}

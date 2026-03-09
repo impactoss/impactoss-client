@@ -40,7 +40,7 @@ const CardLink = styled((p) => <Button plain as="a" fill="vertical" {...p} />)`
 const TitleWrap = styled((p) => <Box align="center" {...p} />)`
   color: ${({ colors }) => colors ? colors[0] : 'auto'};
 `;
-const Title = styled((p) => <Text {...p} />)``;
+const Title = styled(({ headingLevel, ...p }) => <Text as={`h${headingLevel}`} {...p} />)``;
 const Description = styled((p) => <Text {...p} />)``;
 const ExploreButton = styled(ButtonHero)`
   background-color: ${({ colors }) => colors ? colors[0] : 'auto'};
@@ -86,6 +86,7 @@ export function CardTeaser({
   basis = '1/2',
   colors,
   ariaLabel,
+  headingLevel = 2,
 }) {
   // const size = useContext(ResponsiveContext);
   return (
@@ -96,10 +97,10 @@ export function CardTeaser({
           onClick={onClick}
           isHome={isHome}
           hasIcon={!!icon}
-          aria-label={ariaLabel || `${title}: ${description}`}
+          aria-label={ariaLabel || null}
         >
-          <ScreenReaderHide>
-            {icon && (
+          {icon && (
+            <ScreenReaderHide>
               <IconAnchor align="center">
                 <IconWrap
                   color={colors && colors[0]}
@@ -113,63 +114,66 @@ export function CardTeaser({
                   />
                 </IconWrap>
               </IconAnchor>
-            )}
-            <Box
-              align="center"
-              fill={isHome && 'vertical'}
-              gap="medium"
-            >
-              {graphicSrc && (
-                <Box
-                  margin={{ top: 'small' }}
-                  style={{ aspectRatio: '1 / 1', width: '55%' }}
-                  flex={{ shrink: 0 }}
-                >
+            </ScreenReaderHide>
+          )}
+          <Box
+            align="center"
+            fill={isHome && 'vertical'}
+            gap="medium"
+          >
+            {graphicSrc && (
+              <Box
+                margin={{ top: 'small' }}
+                style={{ aspectRatio: '1 / 1', width: '55%' }}
+                flex={{ shrink: 0 }}
+              >
+                <ScreenReaderHide>
                   <Graphic
                     src={graphicSrc}
                     alt=""
                     role="presentation"
                   />
-                </Box>
-              )}
-              <Box
-                justify="between"
-                align="center"
-                fill={isHome && 'vertical'}
-              >
-                <Box gap="small">
-                  <TitleWrap
-                    gap="none"
-                    flex={{ shrink: 0 }}
-                    colors={colors}
+                </ScreenReaderHide>
+              </Box>
+            )}
+            <Box
+              justify="between"
+              align="center"
+              fill={isHome && 'vertical'}
+            >
+              <Box gap="small">
+                <TitleWrap
+                  gap="none"
+                  flex={{ shrink: 0 }}
+                  colors={colors}
+                >
+                  <Title
+                    size={isHome ? 'xlarge' : 'large'}
+                    weight={isHome ? 400 : 600}
+                    headingLevel={headingLevel}
                   >
-                    <Title
-                      size={isHome ? 'xlarge' : 'large'}
-                      weight={isHome ? 400 : 600}
-                    >
-                      {title}
-                    </Title>
-                  </TitleWrap>
-                  {description && (
-                    <Description>
-                      {description}
-                    </Description>
-                  )}
-                </Box>
-                {explore && (
-                  <Box
-                    margin={{ top: 'medium', bottom: 'small' }}
-                    pad="none"
-                    align="center"
-                  >
-                    <ExploreButton as="div" colors={colors}>
-                      <ExploreText>{explore}</ExploreText>
-                    </ExploreButton>
-                  </Box>
+                    {title}
+                  </Title>
+                </TitleWrap>
+                {description && (
+                  <Description>
+                    {description}
+                  </Description>
                 )}
               </Box>
+              {explore && (
+                <Box
+                  margin={{ top: 'medium', bottom: 'small' }}
+                  pad="none"
+                  align="center"
+                >
+                  <ExploreButton as="div" colors={colors}>
+                    <ExploreText>{explore}</ExploreText>
+                  </ExploreButton>
+                </Box>
+              )}
             </Box>
-          </ScreenReaderHide>
+          </Box>
         </CardLink>
       </CardWrapper>
     </Styled>
@@ -187,6 +191,7 @@ CardTeaser.propTypes = {
   basis: PropTypes.string,
   icon: PropTypes.string,
   ariaLabel: PropTypes.string,
+  headingLevel: PropTypes.number,
   isHome: PropTypes.bool,
   // teaserImage: PropTypes.string,
 };

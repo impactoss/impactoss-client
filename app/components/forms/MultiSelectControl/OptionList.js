@@ -21,11 +21,14 @@ const ListWrapper = styled.div`
   border-top: 1px solid ${palette('light', 1)};
 `;
 
-const OptionsWrapper = styled.div`
+const OptionsWrapper = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: table;
   width: 100%;
 `;
-const OptionWrapper = styled.div`
+const OptionWrapper = styled.li`
   display: table-row;
   width: 100%;
   line-height: 1.3;
@@ -174,15 +177,22 @@ class OptionList extends React.PureComponent {
 
     return (
       <Styled aria-live="polite">
-        <ListWrapper id="option-list">
+        <ListWrapper
+          id="option-list"
+          role={this.props.groupLabelId ? 'group' : null}
+          aria-labelledby={this.props.groupLabelId || null}
+        >
           {groups && groups.toList().map((group, gid) => (
             <GroupWrapper key={gid}>
               { group.get('title') && (
-                <GroupTitle>
+                <GroupTitle id={`option-list-group-title-${gid}`}>
                   { group.get('title') }
                 </GroupTitle>
               )}
-              <OptionsWrapper>
+              <OptionsWrapper
+                role={group.get('title') ? 'group' : null}
+                aria-labelledby={group.get('title') ? `option-list-group-title-${gid}` : null}
+              >
                 { group.get('options') && group.get('options').map((option, i) => {
                   const checked = option.get('checked');
                   const isIndeterminate = option.get('isIndeterminate');
@@ -291,6 +301,7 @@ OptionList.propTypes = {
   groups: PropTypes.object,
   onCheckboxChange: PropTypes.func,
   secondary: PropTypes.bool,
+  groupLabelId: PropTypes.string,
 };
 
 export default OptionList;

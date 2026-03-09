@@ -44,43 +44,52 @@ const Label = styled.div`
   width: 99%;
 `;
 const IconWrapper = styled.div`
-  color: ${palette('light', 3)};
   vertical-align: middle;
-  padding: 0 5px;
-  display: table-cell;
-  width: 35px;
+  width: 24px;
+  height: 24px;
+  text-align: center;
+  position: relative;
+  top: 1px;
 `;
 const Dot = styled.div`
   background-color: ${(props) => palette(props.palette, props.pIndex)};
   display: block;
   border: 1px solid;
   border-color: ${(props) => props.active ? 'white' : 'transparent'};
-  border-radius: ${(props) => props.round ? 999 : 3}px;
-  width: 1em;
-  height: 1em;
+  border-radius: ${(props) => props.round ? 999 : 5}px;
 `;
 const DotWrapper = styled.div`
-  padding: ${(props) => props.small ? '0px 6px' : '5px'};
-  width: 26px;
+  padding: 5px;
   display: table-cell;
   vertical-align: middle;
 `;
 
+const renderDot = (groupId, option) => {
+  const color = option.get('color') || option.get('id');
+  const active = option.get('active');
+  switch (groupId) {
+    case 'taxonomies':
+    case 'connectedTaxonomies':
+      return (
+        <Dot
+          palette="taxonomies"
+          pIndex={parseInt(color, 10)}
+          active={active}
+        >
+          <IconWrapper>
+            <Icon name={`taxonomy_small_${color}`} color="white" size="16px" />
+          </IconWrapper>
+        </Dot>
+      );
+    case 'frameworks':
+      return (<Dot palette={color} pIndex={0} active={active} />);
+    case 'connections':
+      return (<Dot palette={color} pIndex={0} round active={active} />);
+    default:
+      return null;
+  }
+};
 class EntityListSidebarOption extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  renderDot = (groupId, color, active) => {
-    switch (groupId) {
-      case 'taxonomies':
-      case 'connectedTaxonomies':
-        return (<Dot palette="taxonomies" pIndex={parseInt(color, 10)} active={active} />);
-      case 'frameworks':
-        return (<Dot palette={color} pIndex={0} active={active} />);
-      case 'connections':
-        return (<Dot palette={color} pIndex={0} round active={active} />);
-      default:
-        return null;
-    }
-  };
-
   render() {
     const {
       option, onShowForm, groupId, groupType, formOptions, intl,
@@ -104,30 +113,17 @@ class EntityListSidebarOption extends React.PureComponent { // eslint-disable-li
             option.get('active') ? messages.groupOptionSelect.hide : messages.groupOptionSelect.show,
           )}
         >
-          <Label>
+          <Label
+            id={`sidebar-option-${groupId}-${option.get('id')}`}
+          >
             {option.get('message')
               ? appMessage(intl, option.get('message'))
               : option.get('label')
             }
           </Label>
-          {option.get('icon')
-            && (
-              <IconWrapper>
-                <Icon name={option.get('icon')} />
-              </IconWrapper>
-            )
-          }
-          {(!option.get('nested') || option.get('nested') === false) && (
-            <DotWrapper>
-              {
-                this.renderDot(
-                  groupType || groupId,
-                  option.get('color') || option.get('id'),
-                  option.get('active'),
-                )
-              }
-            </DotWrapper>
-          )}
+          <DotWrapper>
+            {renderDot(groupType || groupId, option)}
+          </DotWrapper>
         </Styled>
         {option.get('active') && formOptions}
       </div>

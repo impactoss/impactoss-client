@@ -290,7 +290,17 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                     : null;
                 }
                 return (
-                  <ListEntitiesGroup key={index}>
+                  <ListEntitiesGroup
+                    key={index}
+                    role={groupSelectValue && entityGroup.get('label') ? 'group' : null}
+                    aria-label={groupSelectValue && entityGroup.get('label')
+                      ? intl.formatMessage(messages.groupHeaderTitle, {
+                        label: entityGroup.get('label'),
+                        type: groupTaxonomyTitle,
+                      })
+                      : null
+                    }
+                  >
                     {groupSelectValue && entityGroup.get('label') && (
                       <EntityListGroupHeader
                         group={entityGroup}
@@ -300,7 +310,17 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
                     )}
                     {entityGroup.get('entityGroups') && entityGroup.get('entityGroups').toList().map(
                       (entitySubGroup, j) => (
-                        <ListEntitiesSubGroup key={j}>
+                        <ListEntitiesSubGroup
+                          key={j}
+                          role="group"
+                          aria-label={intl.formatMessage(
+                            messages.groupHeaderTitle,
+                            {
+                              label: entitySubGroup.get('label'),
+                              type: subgroupTaxonomyTitle,
+                            },
+                          )}
+                        >
                           {subgroupSelectValue && entitySubGroup.get('label') && (
                             <EntityListGroupHeader
                               group={entitySubGroup}

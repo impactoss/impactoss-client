@@ -43,7 +43,7 @@ import { lowerCase } from 'utils/string';
 
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
-import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_EDIT } from 'containers/App/constants';
 import { CATEGORY_ADMIN_MIN_ROLE } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -359,7 +359,7 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                 }}
                 scrollContainer={this.scrollContainer.current}
                 headerTitle={pageTitle}
-                headerType={CONTENT_SINGLE}
+                headerType={CONTENT_EDIT}
                 headerIcon="categories"
               />
             )

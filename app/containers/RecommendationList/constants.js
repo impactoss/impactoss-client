@@ -26,8 +26,9 @@ export const DEPENDENCIES = [
 export const CONFIG = {
   serverPath: 'recommendations',
   clientPath: 'recommendations',
-  search: ['reference', 'title', 'description', 'response'],
+  search: ['reference', 'title', 'description'],
   downloadCSV: true,
+  import: true,
   sorting: [
     {
       attribute: 'id', // proxy for created at

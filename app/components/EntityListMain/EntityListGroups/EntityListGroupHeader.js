@@ -1,17 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl } from 'react-intl';
 
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-import ScreenReaderHide from 'components/styled/ScreenReaderHide';
-import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
-
 import Link from 'containers/Link';
 import { ROUTES } from 'containers/App/constants';
-
-import messages from './messages';
 
 const ListEntitiesGroupHeaderWrapper = styled.div`
 padding: ${({ separated }) => separated ? '5px 0 10px' : '0'};
@@ -33,21 +27,25 @@ const ListEntitiesGroupHeaderLink = styled(Link)`
   }
 `;
 
-const ListEntitiesGroupHeader = styled.h3`
+const ListEntitiesGroupHeader = styled.h2`
   margin-top: 15px;
   margin-bottom: 5px;
+  font-size: 1.3em;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     margin-top: 30px;
     margin-bottom: 8px;
+    font-size: 1.9em;
   }
 `;
-const ListEntitiesSubgroupHeader = styled.h5`
+const ListEntitiesSubgroupHeader = styled.h3`
   font-weight: normal;
   margin-top: 5px;
   margin-bottom: 5px;
+      font-size: 1em;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     margin-top: 20px;
     margin-bottom: 8px;
+    font-size: 1.25em;
   }
 `;
 const Divider = styled.div`
@@ -59,9 +57,7 @@ const Divider = styled.div`
 `;
 export class EntityListGroupHeader extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const {
-      group, level, expanded, groupTypeTitle, intl,
-    } = this.props;
+    const { group, level, expanded } = this.props;
 
     if (group.get('id') === 'without') {
       return level === 1
@@ -83,15 +79,7 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
           to={`${ROUTES.CATEGORIES}/${group.get('id')}`}
         >
           <ListEntitiesGroupHeader>
-            <ScreenReaderOnly>
-              {intl.formatMessage(messages.groupHeaderTitle, {
-                label: group.get('label'),
-                type: groupTypeTitle,
-              })}
-            </ScreenReaderOnly>
-            <ScreenReaderHide>
-              {group.get('label')}
-            </ScreenReaderHide>
+            {group.get('label')}
           </ListEntitiesGroupHeader>
         </ListEntitiesGroupHeaderLink>
       )
@@ -99,21 +87,9 @@ export class EntityListGroupHeader extends React.PureComponent { // eslint-disab
         <ListEntitiesGroupHeaderWrapper>
           <ListEntitiesGroupHeaderLink
             to={`${ROUTES.CATEGORIES}/${group.get('id')}`}
-            title={intl.formatMessage(
-              messages.subgroupHeaderTitle,
-              { label: group.get('label'), type: groupTypeTitle },
-            )}
           >
             <ListEntitiesSubgroupHeader>
-              <ScreenReaderOnly>
-                {intl.formatMessage(messages.subgroupHeaderTitle, {
-                  label: group.get('label'),
-                  type: groupTypeTitle,
-                })}
-              </ScreenReaderOnly>
-              <ScreenReaderHide>
-                {group.get('label')}
-              </ScreenReaderHide>
+              {group.get('label')}
             </ListEntitiesSubgroupHeader>
           </ListEntitiesGroupHeaderLink>
           {expanded && <Divider />}
@@ -125,8 +101,6 @@ EntityListGroupHeader.propTypes = {
   group: PropTypes.object,
   level: PropTypes.number,
   expanded: PropTypes.bool,
-  groupTypeTitle: PropTypes.string,
-  intl: PropTypes.object.isRequired,
 };
 
-export default injectIntl(EntityListGroupHeader);
+export default EntityListGroupHeader;

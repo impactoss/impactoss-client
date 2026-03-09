@@ -29,6 +29,7 @@ export const CONFIG = {
   clientPath: 'actions',
   types: 'measures',
   downloadCSV: true,
+  import: true,
   search: ['title', 'reference'],
   sorting: [
     {

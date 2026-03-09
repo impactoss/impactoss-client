@@ -1778,8 +1778,16 @@ export default defineMessages({
       id: 'app.containers.App.screenreader.skipToContent',
       defaultMessage: 'Skip to content',
     },
-    skipBackToContent: {
-      id: 'app.containers.App.screenreader.skipBackToContent',
+    skipSidebar: {
+      id: 'app.containers.App.screenreader.skipSidebar',
+      defaultMessage: 'Skip back to content',
+    },
+    skipSidebarFilter: {
+      id: 'app.containers.App.screenreader.skipSidebarFilter',
+      defaultMessage: 'Skip back to content',
+    },
+    skipSidebarFilterEdit: {
+      id: 'app.containers.App.screenreader.skipSidebarFilterEdit',
       defaultMessage: 'Skip back to content',
     },
     skipToListFilter: {
@@ -1789,10 +1797,6 @@ export default defineMessages({
     skipToListFilterEdit: {
       id: 'app.containers.App.screenreader.skipToListFilterEdit',
       defaultMessage: 'Skip to list filter and batch edit options',
-    },
-    skipToCategorySelect: {
-      id: 'app.containers.App.screenreader.skipToCategorySelect',
-      defaultMessage: 'Skip to category group options',
     },
   },
 });

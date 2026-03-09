@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 
 import Icon from 'components/Icon';
-import ScreenReaderHide from 'components/styled/ScreenReaderHide';
 import appMessages from 'containers/App/messages';
 
 import ButtonDefaultWithIcon from '../ButtonDefaultWithIcon';
@@ -26,14 +25,12 @@ const ButtonFactory = ({ button, whiteBG }) => {
           onClick={button.onClick && (() => button.onClick())}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
-          title={button.buttonTitle || title}
-          aria-label={button.buttonTitle || title}
+          title={button.buttonTitle || null}
+          aria-label={button.buttonTitle || null}
           aria-disabled={button.disabled || null}
           aria-describedby={button.describedby || null}
         >
-          <ScreenReaderHide>
-            {title}
-          </ScreenReaderHide>
+          {title}
         </ButtonDefault>
       );
     case 'formPrimary':
@@ -42,14 +39,12 @@ const ButtonFactory = ({ button, whiteBG }) => {
           onClick={button.onClick && (() => button.onClick())}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
-          title={button.buttonTitle || title}
-          aria-label={button.buttonTitle || title}
+          title={button.buttonTitle || null}
+          aria-label={button.buttonTitle || null}
           aria-disabled={button.disabled || null}
           aria-describedby={button.describedby || null}
         >
-          <ScreenReaderHide>
-            {title}
-          </ScreenReaderHide>
+          {title}
         </ButtonSubmit>
       );
     case 'add':
@@ -60,7 +55,6 @@ const ButtonFactory = ({ button, whiteBG }) => {
           strong
           type={button.submit ? 'submit' : 'button'}
           title={button.title || intl.formatMessage(appMessages.buttons.add)}
-          aria-label={button.title || intl.formatMessage(appMessages.buttons.add)}
           disabled={button.disabled}
           aria-disabled={button.disabled || null}
           aria-describedby={button.describedby || null}
@@ -88,12 +82,12 @@ const ButtonFactory = ({ button, whiteBG }) => {
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
-          title={button.buttonTitle || title}
-          aria-label={button.buttonTitle || title}
+          title={button.buttonTitle || null}
+          aria-label={button.buttonTitle || null}
           aria-disabled={button.disabled || null}
           aria-describedby={button.describedby || null}
         >
-          <ScreenReaderHide>{title}</ScreenReaderHide>
+          {title}
         </ButtonFlat>
       );
     case 'cancel':
@@ -103,12 +97,12 @@ const ButtonFactory = ({ button, whiteBG }) => {
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
-          title={button.buttonTitle || title}
-          aria-label={button.buttonTitle || title}
+          title={button.buttonTitle || null}
+          aria-label={button.buttonTitle || null}
           aria-disabled={button.disabled || null}
           aria-describedby={button.describedby || null}
         >
-          <ScreenReaderHide>{title}</ScreenReaderHide>
+          {title}
         </ButtonFlat>
       );
     case 'edit':
@@ -118,12 +112,12 @@ const ButtonFactory = ({ button, whiteBG }) => {
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
-          title={button.buttonTitle || title}
-          aria-label={button.buttonTitle || title}
+          title={button.buttonTitle || null}
+          aria-label={button.buttonTitle || null}
           aria-disabled={button.disabled || null}
           aria-describedby={button.describedby || null}
         >
-          <ScreenReaderHide>{title}</ScreenReaderHide>
+          {title}
         </ButtonFlat>
       );
     case 'close':
@@ -148,13 +142,13 @@ const ButtonFactory = ({ button, whiteBG }) => {
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
-          title={button.buttonTitle || title}
-          aria-label={button.buttonTitle || title}
+          title={button.buttonTitle || null}
+          aria-label={button.buttonTitle || null}
           aria-disabled={button.disabled || null}
           aria-describedby={button.describedby || null}
           inForm
         >
-          <ScreenReaderHide>{title}</ScreenReaderHide>
+          {title}
         </ButtonFlat>
       );
     case 'textPrimary':
@@ -164,12 +158,12 @@ const ButtonFactory = ({ button, whiteBG }) => {
           primary
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
-          title={button.buttonTitle || title}
-          aria-label={button.buttonTitle || title}
+          title={button.buttonTitle || null}
+          aria-label={button.buttonTitle || null}
           aria-disabled={button.disabled || null}
           aria-describedby={button.describedby || null}
         >
-          <ScreenReaderHide>{title}</ScreenReaderHide>
+          {title}
         </ButtonFlat>
       );
     case 'bookmarker':
@@ -191,6 +185,7 @@ const ButtonFactory = ({ button, whiteBG }) => {
       );
     case 'simple':
     case 'text':
+    case 'import':
     case 'delete':
     default:
       return (
@@ -198,12 +193,12 @@ const ButtonFactory = ({ button, whiteBG }) => {
           onClick={() => button.onClick()}
           type={button.submit ? 'submit' : 'button'}
           disabled={button.disabled}
-          title={button.buttonTitle || title}
-          aria-label={button.buttonTitle || title}
+          title={button.buttonTitle || null}
+          aria-label={button.buttonTitle || null}
           aria-disabled={button.disabled || null}
           aria-describedby={button.describedby || null}
         >
-          <ScreenReaderHide>{title}</ScreenReaderHide>
+          {title}
         </ButtonFlat>
       );
   }

@@ -33,22 +33,16 @@ const Styled = styled((p) => <ColumnHeader {...p} />)`
   vertical-align: middle;
 `;
 const LabelWrap = styled.div`
-  display: table-cell;
   padding-right: 4px;
-  position: relative;
-  top: 2px;
-  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
-    padding-left: 0px;
-  }
+  flex: 1;
+  min-width: 0;
 `;
 const CheckboxWrap = styled(PrintHide)`
-  display: table-cell;
-  text-align: center;
-  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 20px;
-  position: relative;
-  top: 1px;
-  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     width: 43px;
   }
 `;
@@ -59,15 +53,20 @@ const Label = styled.label`
   vertical-align: middle;
 `;
 const Wrapper = styled.div`
-  display: table;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   width: 100%;
 `;
 const SelectWrapper = styled.div`
-  display: table-cell;
-  text-align: right;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
   padding-right: 2px;
-  position: relative;
-  top: 2px;
+  flex-shrink: 0;
+  @media (max-width: ${(props) => props.theme.breakpoints.small}) {
+    justify-content: flex-end;
+  }
 `;
 
 const SelectAll = styled(A)`

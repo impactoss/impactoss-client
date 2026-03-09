@@ -192,6 +192,7 @@ const GlobalStyle = createGlobalStyle`
     border-radius: 4px;
   }
 
+  .import-csv-modal,
   .download-csv-modal {
     z-index:105;
     max-width: none !important;
@@ -199,6 +200,7 @@ const GlobalStyle = createGlobalStyle`
 
   .overlay-modal,
   .global-settings-modal,
+  .import-csv-modal,
   .download-csv-modal,
   .new-entity-modal {
     position: absolute;
@@ -219,6 +221,7 @@ const GlobalStyle = createGlobalStyle`
     .overlay-modal,
     .global-settings-modal,
     .download-csv-modal,
+    .import-csv-modal,
     .new-entity-modal {
       padding: 20px;
       top: 40px;
@@ -228,6 +231,7 @@ const GlobalStyle = createGlobalStyle`
     }
   }
 
+  .import-csv-modal,
   .download-csv-modal,
   .overlay-modal-overlay,
   .global-settings-modal-overlay,

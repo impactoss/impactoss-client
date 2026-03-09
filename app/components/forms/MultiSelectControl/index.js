@@ -6,6 +6,7 @@ import { Map, List, fromJS } from 'immutable';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 import { FormattedMessage } from 'react-intl';
+import { titleToId } from 'utils/string';
 
 import ButtonFactory from 'components/buttons/ButtonFactory';
 import TagSearch from 'components/TagSearch';
@@ -31,7 +32,17 @@ import messages from './messages';
 const ButtonGroup = styled.div`
   float: ${(props) => props.left ? 'left' : 'right'}
 `;
-// const ControlWrapper = styled.div``;
+const Styled = styled.div`
+  overflow-y: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    overflow-y: visible;
+  }
+`;
 
 const ChangeHint = styled.div`
   position: absolute;
@@ -53,28 +64,29 @@ const ChangeHintHighlighted = styled.span`
 `;
 
 const ControlMain = styled.div`
-  position: absolute;
-  top: 80px;
-  bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
-  left: 0;
-  right: 0;
-  overflow-y: auto;
-  padding:0;
   padding-bottom: ${(props) => props.hasChangeNote ? '50px' : '0px'};
   border-top: 1px solid ${palette('primary', 4)};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    position: absolute;
+    top: 80px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    padding:0;
+    bottom: ${(props) => props.hasFooter ? '50px' : '0px'};
+    overflow-y: auto;
     top: 80px;
   }
 `;
 const ControlFooter = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   background-color: ${palette('background', 1)};
   box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.2);
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     height: 50px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
   }
 `;
 
@@ -165,6 +177,21 @@ class MultiSelectControl extends React.Component {
   handleKeyDown = (event) => {
     if (event.key === 'Escape') {
       this.props.onCancel();
+    }
+    if (event.key === 'Tab' && this.wrapperRef) {
+      const focusable = this.wrapperRef.querySelectorAll(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
   };
 
@@ -334,6 +361,16 @@ class MultiSelectControl extends React.Component {
     />
   );
 
+  getSelectAllLabel = (optionCount, selectedCount) => {
+    const selectedState = this.getSelectedState(selectedCount, selectedCount === optionCount);
+    if (selectedState === CHECKBOX_STATES.CHECKED) {
+      return `Unselect all (all ${selectedCount} selected)`;
+    }
+    if (selectedState === CHECKBOX_STATES.INDETERMINATE) {
+      return `Select all (${selectedCount} of ${optionCount} selected)`;
+    }
+    return `Select all ${optionCount} options`;
+  };
 
   // TODO intl
   render() {
@@ -346,15 +383,18 @@ class MultiSelectControl extends React.Component {
 
     options = this.filterOptions(options, this.props, this.state);
     const filteredOptionsSelected = options.filter((option) => option.get('checked') || this.isOptionIndeterminate(option));
+    const headerTitleId = `multi-select-header-title-${titleToId(this.props.title)}`;
     return (
-      <div
+      <Styled
         role="dialog"
         ref={this.setWrapperRef}
         aria-label={this.props.title}
+        hasFooter={this.props.buttons}
       >
         <Header
           title={this.props.title}
           onCancel={this.props.onCancel}
+          id={headerTitleId}
         />
         <ControlMain
           search={this.props.search}
@@ -394,22 +434,21 @@ class MultiSelectControl extends React.Component {
                   <Checkbox
                     id="select-all-multiselect"
                     checked={this.getSelectedState(filteredOptionsSelected.size, filteredOptionsSelected.size === options.size)}
-                    onChange={(checkedState) => this.props.onChange(this.getAllSelectedValues(checkedState, options))
+                    onChange={
+                      (checkedState) => this.props.onChange(this.getAllSelectedValues(checkedState, options))
                     }
                   />
                 </CheckboxWrap>
                 <LabelWrap>
                   <Label htmlFor="select-all-multiselect">
-                    {filteredOptionsSelected.size > 0
-                      ? `${filteredOptionsSelected.size} option(s) selected`
-                      : 'Options'
-                    }
+                    {this.getSelectAllLabel(options.size, filteredOptionsSelected.size)}
                   </Label>
                 </LabelWrap>
               </SelectAll>
             )
           }
           <OptionList
+            groupLabelId={this.props.groupLabelId || headerTitleId}
             options={options}
             groups={this.props.groups}
             onCheckboxChange={(checkedState, option) => {
@@ -460,7 +499,7 @@ class MultiSelectControl extends React.Component {
             </ControlFooter>
           )
         }
-      </div>
+      </Styled>
     );
   }
 }
@@ -485,6 +524,7 @@ MultiSelectControl.propTypes = {
   tagFilterGroups: PropTypes.array,
   searchAttributes: PropTypes.array,
   placeholderMessageId: PropTypes.string,
+  groupLabelId: PropTypes.string,
 };
 
 MultiSelectControl.defaultProps = {

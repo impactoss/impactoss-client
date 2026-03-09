@@ -76,6 +76,7 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
           <Box direction="row" align="center" gap="xsmall" margin={{ top: 'small' }}>
             <CircleInformation
               aria-hidden="true"
+              aria-label={null}
               style={{ transform: 'rotate(180deg)' }}
               size="xxsmall"
               color="error"
@@ -212,6 +213,7 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
                                 {valid && (
                                   <StatusGood
                                     aria-hidden="true"
+                                    aria-label={null}
                                     size="xxsmall"
                                     color="success"
                                   />

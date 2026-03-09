@@ -10,6 +10,7 @@ function getTextColor(pIndex) {
   return palette('text', 2);
 }
 const ButtonTagFilter = styled(Button)`
+  white-space: nowrap;
   color: ${({ pIndex }) => getTextColor(pIndex)};
   background-color: ${(props) => palette(props.palette, props.pIndex || 0)};
   padding: 1px 6px;

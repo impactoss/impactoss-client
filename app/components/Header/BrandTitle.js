@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
-export default styled.h1`
+export default styled.div`
   margin: 0;
   padding-left: 10px;
+  font-weight: 700;
   /* text-transform: uppercase; */
   font-family: ${(props) => props.theme.fonts.title};
   font-size: ${(props) => props.theme.sizes.header.text.titleMobile};

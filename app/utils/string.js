@@ -104,3 +104,7 @@ export const truncateText = (text, limit, keepWords = true) => {
 };
 
 export const startsWith = (str, searchString) => str.substr(0, searchString.length) === searchString;
+
+export const titleToId = (str) => deburr(toLower(str))
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/(^-|-$)/g, '');

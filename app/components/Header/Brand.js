@@ -15,6 +15,7 @@ export default styled.a`
     color: ${palette('headerBrandHover', 0)};
   }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
+    z-index: 301;
     padding-right: 46px;
     height: ${(props) => props.theme.sizes.header.banner.height}px;
   }

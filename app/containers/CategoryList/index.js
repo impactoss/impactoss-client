@@ -30,7 +30,6 @@ import appMessages from 'containers/App/messages';
 import ContainerWrapperSidebar from 'components/styled/Container/ContainerWrapperSidebar';
 import Container from 'components/styled/Container';
 import Content from 'components/styled/Content';
-import SkipContent from 'components/styled/SkipContent';
 import Loading from 'components/Loading';
 
 import ContentHeader from 'components/ContentHeader';
@@ -155,8 +154,21 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
             { name: 'description', content: intl.formatMessage(messages.metaDescription) },
           ]}
         />
+        {!dataReady && <EntityListSidebarLoading responsiveSmall />}
+        {taxonomies
+          && frameworks
+          && typeof reference !== 'undefined'
+          && (
+            <TaxonomySidebar
+              taxonomies={taxonomies}
+              active={reference}
+              frameworkId={frameworkId}
+              frameworks={frameworks}
+              onTaxonomyLink={onTaxonomyLink}
+            />
+          )}
         <ContainerWrapperSidebar hasSidebar sidebarResponsiveSmall>
-          <Container>
+          <Container role="main" id="main-content">
             <Content>
               <ContentHeader
                 type={CONTENT_LIST}
@@ -165,20 +177,8 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 title={contentTitle}
                 buttons={buttons}
               />
-              <div style={{ position: 'relative' }}>
-                {contentDescription
-                  && <Description>{contentDescription}</Description>
-                }
-                <SkipContent
-                  href="#sidebar-taxonomy-options"
-                  title={this.props.intl.formatMessage(appMessages.screenreader.skipToCategorySelect)}
-                >
-                  <FormattedMessage {...appMessages.screenreader.skipToCategorySelect} />
-                </SkipContent>
-              </div>
-              {!dataReady
-                && <Loading />
-              }
+              {contentDescription && <Description>{contentDescription}</Description>}
+              {!dataReady && <Loading />}
               {dataReady && taxonomy
                 && (
                   <CategoryListItems
@@ -222,19 +222,6 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
           </Container>
           <Footer hasBorder />
         </ContainerWrapperSidebar>
-        {!dataReady && <EntityListSidebarLoading responsiveSmall />}
-        {taxonomies
-          && frameworks
-          && typeof reference !== 'undefined'
-          && (
-            <TaxonomySidebar
-              taxonomies={taxonomies}
-              active={reference}
-              frameworkId={frameworkId}
-              frameworks={frameworks}
-              onTaxonomyLink={onTaxonomyLink}
-            />
-          )}
       </div>
     );
   }

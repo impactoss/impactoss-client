@@ -88,6 +88,7 @@ export const EDIT_PANEL = 'edit';
 
 export const CONTENT_LIST = 'list';
 export const CONTENT_SINGLE = 'single';
+export const CONTENT_EDIT = 'edit';
 export const CONTENT_PAGE = 'page';
 export const CONTENT_MODAL = 'modal';
 
@@ -148,5 +149,4 @@ export const ROUTES = {
   ID: '/:id',
   NEW: '/new',
   EDIT: '/edit',
-  IMPORT: '/import',
 };

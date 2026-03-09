@@ -64,10 +64,12 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
   constructor() {
     super();
     this.state = STATE_INITIAL;
+    this.setWrapperRef = this.setWrapperRef.bind(this);
   }
 
   UNSAFE_componentWillMount() {
     this.setState(STATE_INITIAL);
+    document.addEventListener('keydown', this.handleKeyDown);
   }
 
   componentDidMount() {
@@ -77,15 +79,49 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
+    document.removeEventListener('keydown', this.handleKeyDown);
+  }
+
+  handleKeyDown = (event) => {
+    if (event.key === 'Escape' && this.state.viewport < VIEWPORTS.SMALL) {
+      this.onShowSidebar();
+    }
+    if (event.key === 'Tab' && this.state.viewport < VIEWPORTS.SMALL && this.wrapperRef) {
+      const focusable = this.wrapperRef.querySelectorAll(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  };
+
+  setWrapperRef(node) {
+    this.wrapperRef = node;
   }
 
   onShowSidebar = () => {
     this.setState({ visible: true });
+    const main = document.getElementById('main-content');
+    if (main && this.state.viewport < VIEWPORTS.SMALL) {
+      main.setAttribute('inert', '');
+    }
   };
 
   onHideSidebar = () => {
     // if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     this.setState({ visible: false });
+    const main = document.getElementById('main-content');
+    if (main) {
+      main.removeAttribute('inert');
+    }
   };
 
   resize = () => {
@@ -125,23 +161,37 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
       frameworks,
     );
     return (
-      <PrintHide id="sidebar-taxonomy-options">
+      <PrintHide>
         { (!this.state.visible && this.state.viewport < VIEWPORTS.SMALL)
           && (
-            <ToggleShow id="sidebar-taxonomy-options" onClick={this.onShowSidebar}>
+            <ToggleShow onClick={this.onShowSidebar}>
               <FormattedMessage {...messages.show} />
             </ToggleShow>
           )
         }
         { (this.state.visible || this.state.viewport >= VIEWPORTS.SMALL)
           && (
-            <Sidebar responsiveSmall>
+            <Sidebar
+              responsiveSmall
+              role={this.state.viewport < VIEWPORTS.SMALL ? 'dialog' : 'region'}
+              ref={this.setWrapperRef}
+            >
+              {this.state.viewport >= VIEWPORTS.SMALL && (
+                <SkipContent
+                  href="#main-content"
+                  title={intl.formatMessage(appMessages.screenreader.skipSidebar)}
+                  onClick={this.onHideSidebar}
+                >
+                  <FormattedMessage {...appMessages.screenreader.skipSidebar} />
+                </SkipContent>
+              )}
               <Scrollable>
                 <Component as="nav" aria-labelledby="taxonomy-sidebar-title">
                   <SidebarHeader responsiveSmall>
                     <SupTitle
                       title={intl.formatMessage(messages.title)}
                       id="taxonomy-sidebar-title"
+                      as="h2"
                     />
                     { this.state.viewport < VIEWPORTS.SMALL
                     && (
@@ -202,13 +252,6 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
                   ))}
                 </Component>
               </Scrollable>
-              <SkipContent
-                href="#main-content"
-                title={intl.formatMessage(appMessages.screenreader.skipBackToContent)}
-                onClick={this.onHideSidebar}
-              >
-                <FormattedMessage {...appMessages.screenreader.skipBackToContent} />
-              </SkipContent>
             </Sidebar>
           )
         }

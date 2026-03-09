@@ -61,7 +61,7 @@ import {
 
 import messages from './messages';
 
-const Main = styled.div`
+const Content = styled.div`
   position: ${(props) => (props.isHome && !SHOW_HEADER_SHADOW_ON_HOME) ? 'relative' : 'absolute'};
   top: ${(props) => {
     if (props.isHome && !SHOW_HOME_MAIN_NAV) {
@@ -293,9 +293,9 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           onShowSettings={() => onShowSettings(true)}
           hasSettings={dataReady && hasSettings}
         />
-        <Main isHome={isHome} role="main" id="main-content">
+        <Content isHome={isHome}>
           {React.Children.toArray(children)}
-        </Main>
+        </Content>
         {newEntityModal
           && (
             <ReactModal

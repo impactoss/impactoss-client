@@ -10,7 +10,7 @@ const Aside = styled(Main)`
   }
   @media print {
     width: ${({ bottom }) => !bottom ? '30%' : '100%'};
-    border-right-style: 'none';
+    border-right-style: none;
     display: ${({ bottom }) => !bottom ? 'table-cell' : 'block'};
   }
 `;

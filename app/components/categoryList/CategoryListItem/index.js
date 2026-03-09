@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { injectIntl } from 'react-intl';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
@@ -9,9 +9,10 @@ import { ROUTES } from 'containers/App/constants';
 import {
   IS_CURRENT_STATUSES,
   IS_ARCHIVE_STATUSES,
+  PUBLISH_STATUSES,
   CURRENT_TAXONOMY_IDS,
 } from 'themes/config';
-
+import appMessage from 'utils/app-message';
 import { qe } from 'utils/quasi-equals';
 import appMessages from 'containers/App/messages';
 
@@ -166,13 +167,15 @@ const Reference = styled.span`
 `;
 
 class CategoryListItem extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  renderSimpleBar = (col, total, multiple) => (
+  renderSimpleBar = ({
+    maxCount, entityPalette, total, multiple,
+  }) => (
     <Bar
-      length={(total / col.maxCount) * 100}
-      palette={col.attribute.entity}
+      length={(total / maxCount) * 100}
+      palette={entityPalette}
       multiple={multiple}
     >
-      <Count palette={col.attribute.entity} multiple={multiple}>
+      <Count palette={entityPalette} multiple={multiple}>
         {total}
       </Count>
     </Bar>
@@ -210,86 +213,141 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
   //   );
   // };
 
-  renderCountColumn = (col, category, frameworks, frameworkId) => {
-    if (!col.attribute) {
-      return null;
-    }
-    const fwSet = frameworkId && frameworkId !== 'all';
-    const countsByFramework = col.attribute.frameworkIds;
-    const connected = col.attribute.entity === 'measures';
-    if (countsByFramework) {
-      const total = category[col.attribute.totalByFw];
-      // const accepted = category[col.attribute.acceptedByFw];
-      if (!fwSet) {
+  renderCountColumn = ({
+    col,
+    total,
+    totalCount,
+    frameworkInfo,
+    // totalByFramework,
+  }) => {
+    if (col.attribute.frameworkIds) {
+      if (frameworkInfo) {
         return (
           <div>
-            {col.attribute.frameworkIds.map((id) => {
-              const framework = frameworks.find((fw) => qe(fw.get('id'), id));
-              if (!framework) {
-                return null;
-              }
-              // const hasResponse = !connected && framework.getIn(['attributes', 'has_response']);
-              const multipleFWs = col.attribute.frameworkIds.length > 1;
-              const totalCount = (total && total[id]) || 0;
-              if (totalCount === 0) {
-                return null;
-              }
-              return (
-                <div key={id}>
-                  {multipleFWs && (
-                    <FrameworkLabel>
-                      {connected && (<span>&nbsp;</span>)}
-                      {!connected && appMessages.entities[`recommendations_${id}`] && (
-                        <FormattedMessage {...appMessages.entities[`recommendations_${id}`].plural} />
-                      )}
-                    </FrameworkLabel>
-                  )}
-                  <BarWrap multiple={multipleFWs}>
-                    {this.renderSimpleBar(
-                      col,
-                      totalCount,
-                      multipleFWs, // multiple,
+            {Object.keys(frameworkInfo).map((id) => {
+              const {
+                connected,
+                multipleFWs,
+                frameworkLabel,
+              } = frameworkInfo[id];
+              if (frameworkInfo[id].totalCount) {
+                return (
+                  <div key={id}>
+                    {multipleFWs && (
+                      <FrameworkLabel>
+                        {connected && (<span>&nbsp;</span>)}
+                        {!connected && (<span>{frameworkLabel}</span>)}
+                      </FrameworkLabel>
                     )}
-                  </BarWrap>
-                </div>
-              );
+                    <BarWrap multiple={multipleFWs}>
+                      {this.renderSimpleBar({
+                        maxCount: col.maxCount,
+                        entityPalette: col.attribute.entity,
+                        total: frameworkInfo[id].totalCount,
+                        multiple: multipleFWs, // multiple,
+                      })}
+                    </BarWrap>
+                  </div>
+                );
+              }
+              return null;
             })}
           </div>
         );
-      } if (fwSet) {
+      }
+      return totalCount
+        ? (
+          <BarWrap>
+            {this.renderSimpleBar({
+              maxCount: col.maxCount,
+              entityPalette: col.attribute.entity,
+              total: totalCount,
+            })}
+          </BarWrap>
+        )
+        : null;
+    }
+    return totalCount
+      ? (
+        <BarWrap>
+          {this.renderSimpleBar({
+            maxCount: col.maxCount,
+            entityPalette: col.attribute.entity,
+            total,
+          })}
+        </BarWrap>
+      )
+      : null;
+  };
+
+  getCountColumnInfo = (col, category, frameworks, frameworkId, intl) => {
+    // const info = {};
+    if (!col.attribute) {
+      return null;
+    }
+    const countsByFramework = col.attribute.frameworkIds;
+    if (countsByFramework) {
+      const connected = col.attribute.entity === 'measures';
+      const totalByFramework = category[col.attribute.totalByFw];
+      // const accepted = category[col.attribute.acceptedByFw];
+      const fwSet = frameworkId && frameworkId !== 'all';
+      if (!fwSet) {
+        const frameworkInfo = col.attribute.frameworkIds.reduce(
+          (memo, id) => {
+            const framework = frameworks.find((fw) => qe(fw.get('id'), id));
+            if (!framework) {
+              return memo;
+            }
+            const totalCount = (total && total[id]) || 0;
+            const multipleFWs = col.attribute.frameworkIds.length > 1;
+            return {
+              ...memo,
+              [id]: {
+                multipleFWs,
+                connected,
+                totalCount,
+                frameworkLabel: connected && multipleFWs
+                  ? null
+                  : intl.formatMessage(appMessages.entities[`recommendations_${id}`].plural),
+              },
+            };
+          },
+          {},
+        );
+        return {
+          col,
+          frameworkInfo,
+          totalByFramework,
+          totalCount: totalByFramework && totalByFramework.reduce(
+            (memo, fwCount) => memo + fwCount,
+            0,
+          ),
+        };
+      }
+      if (fwSet) {
         const id = frameworkId;
         const framework = frameworks.find((fw) => qe(fw.get('id'), id));
-        if (!framework || !total[id]) {
+        if (!framework) {
           return null;
         }
-        const totalCount = (total && total[id]) || 0;
-        if (totalCount === 0) {
-          return null;
-        }
-        return (
-          <div>
-            <BarWrap>
-              {this.renderSimpleBar(col, (total && total[id]) || 0)}
-            </BarWrap>
-          </div>
-        );
+        const totalCount = (totalByFramework && totalByFramework[id]) || 0;
+        return {
+          col,
+          totalCount,
+        };
       }
     }
     const total = category[col.attribute.total];
-    if (total === 0) {
-      return null;
-    }
-    return (
-      <BarWrap>
-        {this.renderSimpleBar(col, total)}
-      </BarWrap>
-    );
-    // return null;
+    return {
+      col,
+      total,
+      totalCount: total,
+    };
   };
 
   render() {
     const {
-      category, columns, onPageLink, frameworks, frameworkId,
+      category, columns, onPageLink, frameworks, frameworkId, intl,
     } = this.props;
     const reference = category.getIn(['attributes', 'reference'])
       && category.getIn(['attributes', 'reference']).trim() !== ''
@@ -305,10 +363,69 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
         && !category.getIn(['attributes', 'is_current']),
       is_archive: category.getIn(['attributes', 'is_archive']),
     };
-
+    const columnInfos = columns.reduce((memo, col) => {
+      if (col.type === 'count') {
+        const info = this.getCountColumnInfo(col, category.toJS(), frameworks, frameworkId, intl);
+        return info
+          ? {
+            ...memo,
+            [col.id]: info,
+          }
+          : memo;
+      }
+      return memo;
+    }, {});
+    const ariaDescription = columnInfos && Object.values(columnInfos).reduce(
+      (memo, info) => {
+        if (
+          info
+          && info.col
+          && info.col.attribute
+          && info.col.attribute.entity
+          && appMessages.entities[info.col.attribute.entity]
+        ) {
+          const colDescription = `${info.totalCount} ${intl.formatMessage(
+            appMessages.entities[info.col.attribute.entity][info.totalCount === 1 ? 'single' : 'plural'],
+          )}`;
+          return memo
+            ? `${memo}, ${colDescription}`
+            : colDescription;
+        }
+        return memo;
+      },
+      null,
+    );
+    let status = [];
+    if (catItem.is_not_current) {
+      const option = IS_CURRENT_STATUSES.find((o) => qe(o.value, 'false'));
+      status = option && option.message
+        ? [...status, appMessage(intl, option.message)]
+        : status;
+    }
+    if (catItem.is_archive) {
+      const option = IS_ARCHIVE_STATUSES.find((o) => qe(o.value, 'true'));
+      status = option && option.message
+        ? [...status, appMessage(intl, option.message)]
+        : status;
+    }
+    if (catItem.draft) {
+      const option = PUBLISH_STATUSES.find((o) => qe(o.value, 'true'));
+      status = option && option.message
+        ? [...status, appMessage(intl, option.message)]
+        : status;
+    }
+    let { title } = catItem;
+    if (status.length > 0) {
+      title = `${title} (${status.join(', ')})`;
+    }
+    const ariaLabel = ariaDescription
+      ? `${title} - ${ariaDescription}`
+      : title;
     return (
       <Styled
         onClick={() => onPageLink(`${ROUTES.CATEGORIES}/${catItem.id}`)}
+        title={catItem.title}
+        aria-label={ariaLabel}
       >
         <TableWrap>
           {
@@ -338,15 +455,16 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
                 )}
                 {col.type === 'title' && (
                   <Title>
-                    { catItem.reference
+                    {catItem.reference
                       && <Reference>{catItem.reference}</Reference>
                     }
                     {catItem.title}
                   </Title>
                 )}
                 {col.type === 'count'
-                  && this.renderCountColumn(col, category.toJS(), frameworks, frameworkId)
-                }
+                  && columnInfos
+                  && columnInfos[col.id]
+                  && this.renderCountColumn(columnInfos[col.id])}
               </Column>
             ))
           }
@@ -355,14 +473,14 @@ class CategoryListItem extends React.PureComponent { // eslint-disable-line reac
     );
   }
 }
-//           {this.renderColumnContent(col, category)}
 
 CategoryListItem.propTypes = {
   category: PropTypes.object,
   frameworks: PropTypes.object,
+  intl: PropTypes.object,
   columns: PropTypes.array,
   onPageLink: PropTypes.func,
   frameworkId: PropTypes.string,
 };
 
-export default CategoryListItem;
+export default injectIntl(CategoryListItem);

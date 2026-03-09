@@ -11,7 +11,10 @@ import A from 'components/styled/A';
 import qe from 'utils/quasi-equals';
 import { isMaxSize } from 'utils/responsive';
 
-import { selectEntitiesWhere } from 'containers/App/selectors';
+import {
+  selectEntitiesWhere,
+  selectIsSignedIn,
+} from 'containers/App/selectors';
 
 import NormalImg from 'components/Img';
 import Container from 'components/styled/Container';
@@ -65,6 +68,7 @@ const LogoItemLink = styled(A)`
 const Logo = styled(NormalImg)`
   height: ${({ isAgency }) => isAgency ? 42 : 50}px;
   margin-top: ${({ isAgency }) => isAgency ? 4 : 0}px;
+  max-width: 100%;
   @media (min-width: ${({ theme }) => theme.breakpoints.medium}) {
     height: ${({ isAgency }) => isAgency ? 45 : 55}px;
     margin-top: ${({ isAgency }) => isAgency ? 5 : 0}px;
@@ -100,12 +104,13 @@ const Footer = ({
   pages,
   fill,
   hasBorder,
+  isUserSignedIn,
 }) => {
   const intl = useIntl();
   const size = useContext(ResponsiveContext);
   const isMobile = isMaxSize(size, 'xsmall');
   return (
-    <FooterMain>
+    <FooterMain as="footer">
       <Container noPaddingBottom>
         <Wrapper fill={fill}>
           <Box
@@ -134,7 +139,7 @@ const Footer = ({
                     <LogoItemLink
                       key={i}
                       href={intl.formatMessage(messages.agencies[`url${i + 1}`])}
-                      title={intl.formatMessage(messages.agencies[`title${i + 1}`])}
+                      title={`${intl.formatMessage(messages.agencies[`title${i + 1}`])} (opens in new tab)`}
                       target="_blank"
                     >
                       <Logo isAgency src={src} alt={intl.formatMessage(messages.agencies[`title${i + 1}`])} />
@@ -158,7 +163,7 @@ const Footer = ({
               <Box>
                 <LogoItemLink
                   href={intl.formatMessage(messages.project.url)}
-                  title={intl.formatMessage(messages.project.anchor)}
+                  title={`${intl.formatMessage(messages.project.anchor)} (opens in new tab)`}
                   target="_blank"
                 >
                   <Logo src={theme.media.impactossLogo} alt={intl.formatMessage(messages.project.anchor)} />
@@ -185,7 +190,28 @@ const Footer = ({
                   direction={isMobile ? 'column' : 'row'}
                   gap="small"
                   align={isMobile ? 'start' : 'end'}
+                  role="navigation"
                 >
+                  {isUserSignedIn && (
+                    <FooterLink
+                      onClick={(evt) => {
+                        if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                        onPageLink(ROUTES.BOOKMARKS);
+                      }}
+                      href={ROUTES.BOOKMARKS}
+                    >
+                      <FormattedMessage {...appMessages.nav.bookmarks} />
+                    </FooterLink>
+                  )}
+                  <FooterLink
+                    onClick={(evt) => {
+                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                      onPageLink(ROUTES.SEARCH);
+                    }}
+                    href={ROUTES.SEARCH}
+                  >
+                    <FormattedMessage {...appMessages.nav.search} />
+                  </FooterLink>
                   {pages.size > 0 && FOOTER.INTERNAL_LINKS && FOOTER.INTERNAL_LINKS.map((pageId) => {
                     const page = pages.find((p) => qe(p.get('id'), pageId));
                     return page
@@ -235,6 +261,7 @@ Footer.propTypes = {
   pages: PropTypes.object,
   fill: PropTypes.bool,
   hasBorder: PropTypes.bool,
+  isUserSignedIn: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
@@ -242,6 +269,7 @@ const mapStateToProps = (state) => ({
     path: 'pages',
     where: { draft: false },
   }),
+  isUserSignedIn: selectIsSignedIn(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

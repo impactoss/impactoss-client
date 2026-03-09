@@ -87,7 +87,8 @@ export const SHOW_HOME_CLAIM = false;
 export const SHOW_HEADER_SHADOW_ON_HOME = true;
 export const SHOW_HOME_MAIN_NAV = true;
 export const SHOW_BRAND_ON_HOME = true;
-export const HOME_GRAPHIC_WIDTH = 1200;
+export const HOME_GRAPHIC_WIDTH = 110;
+export const HOME_GRAPHIC_WIDTH_XS = 60;
 
 
 // show footer logo section

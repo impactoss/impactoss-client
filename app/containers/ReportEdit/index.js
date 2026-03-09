@@ -40,7 +40,7 @@ import {
 import qe from 'utils/quasi-equals';
 import { lowerCase } from 'utils/string';
 
-import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_EDIT } from 'containers/App/constants';
 import { CONTRIBUTOR_MIN_ROLE_ASSIGNED, IS_ARCHIVE_STATUSES } from 'themes/config';
 import appMessages from 'containers/App/messages';
 
@@ -267,7 +267,7 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                 }}
                 scrollContainer={this.scrollContainer.current}
                 headerTitle={pageTitle}
-                headerType={CONTENT_SINGLE}
+                headerType={CONTENT_EDIT}
                 headerIcon="reports"
               />
             )

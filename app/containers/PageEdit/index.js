@@ -30,7 +30,7 @@ import { hasNewError } from 'utils/entity-form';
 import { canUserDeleteEntities } from 'utils/permissions';
 import { lowerCase } from 'utils/string';
 
-import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_EDIT } from 'containers/App/constants';
 import { USER_ROLES } from 'themes/config';
 
 import {
@@ -189,7 +189,7 @@ export class PageEdit extends React.Component { // eslint-disable-line react/pre
                 }}
                 scrollContainer={this.scrollContainer.current}
                 headerTitle={intl.formatMessage(messages.pageTitle)}
-                headerType={CONTENT_SINGLE}
+                headerType={CONTENT_EDIT}
               />
             )
           }

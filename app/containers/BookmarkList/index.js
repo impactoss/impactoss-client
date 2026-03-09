@@ -278,7 +278,7 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
           )
         }
         <ContainerWrapperSidebar hasSidebar={hasSidebar} sidebarResponsiveSmall>
-          <Container>
+          <Container role="main" id="main-content">
             <Content>
               <ContentHeader
                 type={CONTENT_LIST}
@@ -291,7 +291,10 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
               }
               {dataReady && (
                 <div>
-                  <EntityListSearch>
+                  <EntityListSearch
+                    role="search"
+                    aria-label={`Filter ${intl.formatMessage(messages.supTitle)}`}
+                  >
                     <TagSearch
                       filters={filtered
                         ? [{

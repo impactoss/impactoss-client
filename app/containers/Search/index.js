@@ -253,7 +253,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
           ]}
         />
         <ContainerWrapper>
-          <Container>
+          <Container role="main" id="main-content">
             <Content>
               <ContentHeader
                 type={CONTENT_LIST}
@@ -290,7 +290,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       />
                     </Description>
                   )}
-                  <EntityListSearch>
+                  <EntityListSearch role="search">
                     <TagSearch
                       filters={[]}
                       placeholder={intl.formatMessage(messages.placeholder)}
@@ -373,14 +373,20 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                                 >
                                                   <Box direction="row" gap="small" align="center" justify="between">
                                                     <Box direction="row" gap="xsmall" pad={{ vertical: 'xsmall' }}>
-                                                      <Text size="large">{count}</Text>
-                                                      <Text size="large">{title}</Text>
+                                                      <Text
+                                                        as="h2"
+                                                        size="large"
+                                                        weight="600"
+                                                        style={{ margin: 0 }}
+                                                      >
+                                                        {`${count} ${title}`}
+                                                      </Text>
                                                     </Box>
                                                     {otherTargets && active && (
-                                                      <FormUp size="medium" color="text" aria-hidden="true" />
+                                                      <FormUp size="medium" color="text" aria-hidden="true" aria-label={null} />
                                                     )}
                                                     {otherTargets && !active && (
-                                                      <FormDown size="medium" color="text" aria-hidden="true" />
+                                                      <FormDown size="medium" color="text" aria-hidden="true" aria-label={null} />
                                                     )}
                                                   </Box>
                                                 </Target>

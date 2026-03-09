@@ -53,7 +53,7 @@ import {
   selectCanUserAdministerCategories,
 } from 'containers/App/selectors';
 
-import { ROUTES, CONTENT_SINGLE } from 'containers/App/constants';
+import { ROUTES, CONTENT_EDIT } from 'containers/App/constants';
 import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
 
 import Messages from 'components/Messages';
@@ -265,7 +265,7 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 }}
                 scrollContainer={this.scrollContainer.current}
                 headerTitle={intl.formatMessage(messages.pageTitle)}
-                headerType={CONTENT_SINGLE}
+                headerType={CONTENT_EDIT}
                 headerIcon="users"
               />
             )

@@ -4,7 +4,11 @@ import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import {
-  CONTENT_LIST, CONTENT_SINGLE, CONTENT_PAGE, CONTENT_MODAL,
+  CONTENT_LIST,
+  CONTENT_SINGLE,
+  CONTENT_PAGE,
+  CONTENT_MODAL,
+  CONTENT_EDIT,
 } from 'containers/App/constants';
 
 import SupTitle from 'components/SupTitle';
@@ -104,6 +108,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
     switch (type) {
       case CONTENT_PAGE:
       case CONTENT_LIST:
+      case CONTENT_EDIT:
         return (<TitleLarge>{title}</TitleLarge>);
       case CONTENT_MODAL:
       case CONTENT_SINGLE:
@@ -130,7 +135,6 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
       buttons,
       subTitle,
     } = this.props;
-
     return (
       <Styled
         hasBottomBorder={type === CONTENT_PAGE || type === CONTENT_MODAL}
@@ -138,7 +142,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
       >
         {buttons && (
           <VisibleMobile>
-            <ButtonGroup>
+            <ButtonGroup role="toolbar" aria-label="Page or form actions">
               {
                 buttons.map((button, i) => button && (
                   <TableCellInner key={i}>
@@ -159,7 +163,7 @@ class ContentHeader extends React.PureComponent { // eslint-disable-line react/p
             </TableCell>
             {buttons && (
               <TableCell hiddenMobile>
-                <ButtonGroup>
+                <ButtonGroup role="toolbar" aria-label="Page or form actions">
                   {
                     buttons.map((button, i) => (
                       <TableCellInner key={i}>

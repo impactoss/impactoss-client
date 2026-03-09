@@ -104,7 +104,7 @@ class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line
     const {
       icon, title, onClick, iconRight, fullWidth, disabled, inactive, align, strong, border, outline, ...rest
     } = this.props;
-
+    const buttonTitle = this.renderButtonTitle(title);
     return (
       <Button
         onClick={onClick}
@@ -113,7 +113,8 @@ class ButtonDefaultWithIcon extends React.PureComponent { // eslint-disable-line
         inactive={inactive}
         align={align}
         strong={strong}
-        title={this.renderButtonTitle(title)}
+        title={buttonTitle}
+        aria-label={buttonTitle}
         border={border}
         outline={outline}
         {...rest}

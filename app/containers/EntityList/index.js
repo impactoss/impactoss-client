@@ -94,6 +94,7 @@ const ProgressText = styled.div`
 `;
 const STATE_INITIAL = {
   downloadActive: false,
+  importActive: false,
 };
 export class EntityList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor() {
@@ -113,8 +114,16 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
     this.setState({ downloadActive: true });
   };
 
+  onImportClick = () => {
+    this.setState({ importActive: true });
+  };
+
   onDownloadDismiss = () => {
     this.setState({ downloadActive: false });
+  };
+
+  onImportDismiss = () => {
+    this.setState({ importActive: false });
   };
 
   getMessageForType = (type) => {
@@ -192,6 +201,19 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
         },
       );
     }
+    if (config.import) {
+      header.actionsAdmin = header.actionsAdmin.map(
+        (action) => {
+          if (action.type === 'import') {
+            return ({
+              ...action,
+              onClick: () => this.onImportClick(),
+            });
+          }
+          return action;
+        },
+      );
+    }
     return (
       <div>
         {config.downloadCSV && this.state.downloadActive && (
@@ -218,6 +240,56 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
               hasUserRole={this.props.hasUserRole}
             />
           </ReactModal>
+        )}
+        {config.import && this.state.importActive && this.props.importComponent && (
+          <ReactModal
+            isOpen
+            contentLabel="Import from CSV"
+            className="import-csv-modal"
+            overlayClassName="import-csv-modal-overlay"
+            onRequestClose={() => this.onImportDismiss()}
+            style={{
+              overlay: { zIndex: 99999999 },
+            }}
+            appElement={document.getElementById('app')}
+          >
+            <this.props.importComponent
+              handleCancel={() => this.onImportDismiss()}
+            />
+          </ReactModal>
+        )}
+        {!this.props.dataReady && <EntityListSidebarLoading />}
+        {this.props.dataReady && this.props.showSidebar && !printing && (
+          <EntityListSidebar
+            listUpdating={progress !== null && progress >= 0 && progress < 100}
+            entities={entities}
+            taxonomies={this.props.taxonomies}
+            frameworks={this.props.frameworks}
+            connections={this.props.connections}
+            connectedTaxonomies={this.props.connectedTaxonomies}
+            entityIdsSelected={
+              entityIdsSelected.size === entityIdsSelectedFiltered.size
+                ? entityIdsSelected
+                : entityIdsSelectedFiltered
+            }
+            config={this.props.config}
+            locationQuery={this.props.locationQuery}
+            canEdit={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
+            hasUserRole={this.props.hasUserRole}
+            activePanel={this.props.activePanel}
+            onPanelSelect={this.props.onPanelSelect}
+            onCreateOption={this.props.onCreateOption}
+            canCreateCategories={this.props.canUserAdministerCategories}
+            onUpdate={
+              (associations, activeEditOption) => this.props.handleEditSubmit(
+                associations,
+                activeEditOption,
+                this.props.entityIdsSelected,
+                viewDomain.get('errors'),
+                this.props.connections,
+              )}
+            globalSettings={globalSettings}
+          />
         )}
         <EntityListMain
           listUpdating={progress !== null && progress >= 0 && progress < 100}
@@ -259,39 +331,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
           onDismissError={this.props.onDismissError}
           onDismissAllErrors={onDismissAllErrors}
         />
-        {!this.props.dataReady && <EntityListSidebarLoading />}
-        {this.props.dataReady && this.props.showSidebar && !printing && (
-          <EntityListSidebar
-            listUpdating={progress !== null && progress >= 0 && progress < 100}
-            entities={entities}
-            taxonomies={this.props.taxonomies}
-            frameworks={this.props.frameworks}
-            connections={this.props.connections}
-            connectedTaxonomies={this.props.connectedTaxonomies}
-            entityIdsSelected={
-              entityIdsSelected.size === entityIdsSelectedFiltered.size
-                ? entityIdsSelected
-                : entityIdsSelectedFiltered
-            }
-            config={this.props.config}
-            locationQuery={this.props.locationQuery}
-            canEdit={canEdit && this.props.hasUserRole[USER_ROLES.MANAGER.value]}
-            hasUserRole={this.props.hasUserRole}
-            activePanel={this.props.activePanel}
-            onPanelSelect={this.props.onPanelSelect}
-            onCreateOption={this.props.onCreateOption}
-            canCreateCategories={this.props.canUserAdministerCategories}
-            onUpdate={
-              (associations, activeEditOption) => this.props.handleEditSubmit(
-                associations,
-                activeEditOption,
-                this.props.entityIdsSelected,
-                viewDomain.get('errors'),
-                this.props.connections,
-              )}
-            globalSettings={globalSettings}
-          />
-        )}
         {(progress !== null && progress < 100)
           && (
             <Progress>
@@ -415,6 +454,7 @@ EntityList.propTypes = {
   showSidebar: PropTypes.bool,
   canUserAdministerCategories: PropTypes.bool,
   globalSettings: PropTypes.object,
+  importComponent: PropTypes.func,
   intl: PropTypes.object.isRequired,
 };
 
