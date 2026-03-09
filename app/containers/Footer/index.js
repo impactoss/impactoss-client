@@ -281,7 +281,7 @@ const Footer = ({
                 <FormattedMessage {...messages.govLinkAnchor} />
               </FooterLink>
               <FooterVersion>
-                {`${intl.formatMessage(appMessages.app.title)}: v${VERSION}`}
+                {`${intl.formatMessage(appMessages.app.title)} ${intl.formatMessage(appMessages.app.claim)}: IMPACT OSS v${VERSION}`}
               </FooterVersion>
             </FooterLinks>
           </Lower>
