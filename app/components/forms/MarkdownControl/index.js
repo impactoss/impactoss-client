@@ -6,7 +6,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { palette } from 'styled-theme';
 import styled, { withTheme } from 'styled-components';
 import { Box, Text, Button } from 'grommet';
-
 import {
   Bold,
   Italic,
@@ -14,13 +13,17 @@ import {
   List,
 } from 'grommet-icons';
 
+import TurndownService from 'turndown';
+import DOMPurify from 'dompurify';
 import TextareaMarkdown from 'textarea-markdown-editor';
+
 import MarkdownField from 'components/fields/MarkdownField';
 import InfoOverlay from 'components/InfoOverlay';
 import A from 'components/styled/A';
 import messages from './messages';
 
 const MIN_TEXTAREA_HEIGHT = 320;
+const MAX_TEXTAREA_HEIGHT = 640;
 
 const MarkdownHint = styled.div`
   text-align: right;
@@ -42,6 +45,8 @@ const StyledTextareaMarkdown = styled(
   color: ${palette('text', 0)};
   min-height: ${MIN_TEXTAREA_HEIGHT}px;
   resize: "none";
+  max-height: ${MAX_TEXTAREA_HEIGHT}px;
+  overflow-y: auto;
 `;
 const Preview = styled((p) => <Box {...p} />)`
   background-color: ${palette('background', 0)};
@@ -50,6 +55,8 @@ const Preview = styled((p) => <Box {...p} />)`
   padding: 0.7em;
   color: ${palette('text', 0)};
   min-height: ${MIN_TEXTAREA_HEIGHT}px;
+  max-height: ${MAX_TEXTAREA_HEIGHT}px;
+  overflow-y: auto;
 `;
 
 const MDButton = styled(React.forwardRef((p, ref) => (
@@ -93,12 +100,133 @@ const MDButtonText = styled((p) => (
 
 const MD_BUTTONS_COUNT = 7;
 
+
+const turndownService = new TurndownService({
+  headingStyle: 'atx',
+  bulletListMarker: '-',
+});
+
+// custom rule to ignore <b> tags that are styled to be NOT bold (Google Doc issue)
+turndownService.addRule(
+  'nonBoldB', {
+    filter: (node) => (
+      node.nodeName === 'B'
+      && node.getAttribute('style')
+      && node.getAttribute('style').includes('font-weight:normal')
+    ),
+    replacement: (content) => content, // don't wrap in **
+  },
+);
+// custom rule to catch span tags with inline bold styling (Google Doc issue)
+turndownService.addRule('boldSpan', {
+  filter: (node) => {
+    if (node.nodeName !== 'SPAN') return false;
+    const style = node.getAttribute('style') ? node.getAttribute('style').toLowerCase() : '';
+    return style.includes('font-weight:bold') || style.includes('font-weight:700') || style.includes('font-weight:600');
+  },
+  replacement: (content) => `**${content}**`,
+});
+// custom rule to catch span tags with inline italic styling (Google Doc issue)
+turndownService.addRule('italicSpan', {
+  filter: (node) => {
+    if (node.nodeName !== 'SPAN') return false;
+    const style = node.getAttribute('style') ? node.getAttribute('style').toLowerCase() : '';
+    return style.includes('font-style:italic');
+  },
+  replacement: (content) => `_${content}_`,
+});
+
+// from https://github.com/alphagov/paste-html-to-govspeak/pull/42/files
+turndownService.addRule('removeWordListBullets', {
+  filter: (node) => {
+    if (node.nodeName.toLowerCase() === 'span') {
+      const style = node.getAttribute('style');
+      return style ? style.match(/mso-list:ignore/i) : false;
+    }
+    return false;
+  },
+  replacement: () => '',
+});
+
+// from https://github.com/alphagov/paste-html-to-govspeak/pull/42/files
+turndownService.addRule('addWordListItem', {
+  filter: (node) => {
+    if (node.nodeName.toLowerCase() !== 'p') {
+      return false;
+    }
+
+    return node.className.match(/msolistparagraphcxsp/i);
+  },
+  replacement: (content, node, options) => {
+    // the first item in a list (nested or otherwise) has first in the class
+    // name
+    let prefix = node.className.match(/first/i) ? '\n\n' : '';
+
+    const getLevel = (element) => {
+      const style = element.getAttribute('style');
+      const levelMatch = style ? style.match(/level(\d+)/) : null;
+      return levelMatch ? parseInt(levelMatch[1], 10) : 0;
+    };
+    // we can determine the nesting of a list by a mso-list style attribute
+    // with a level
+    const nodeLevel = getLevel(node);
+    /* eslint-disable no-plusplus */
+    for (let i = 1; i < nodeLevel; i++) {
+      prefix += options.listIndent;
+    }
+    /* eslint-enable no-plusplus */
+
+    // the last item in a list has last in the class name
+    const suffix = node.className.match(/last/i) ? '\n\n' : '\n';
+
+    let listMarker = options.bulletListMarker;
+    const markerElement = node.querySelector('span[style="mso-list:Ignore"]');
+
+    // assume the presence of a period in a marker is an indicator of an
+    // ordered list
+    if (markerElement && markerElement.textContent.match(/\./)) {
+      let item = 1;
+      let potentialListItem = node.previousElementSibling;
+      // loop through previous siblings to count list items
+      while (potentialListItem && potentialListItem.className.match(/msolistparagraphcxsp/i)) {
+        const itemLevel = getLevel(potentialListItem);
+
+        // if we encounter the lists parent we've reached the end of counting
+        if (itemLevel < nodeLevel) {
+          break;
+        }
+
+        // if on same level increment the list items
+        if (nodeLevel === itemLevel) {
+          item += 1;
+        }
+
+        potentialListItem = potentialListItem.previousElementSibling;
+      }
+
+      listMarker = `${item}.`;
+    }
+
+    return `${prefix}${listMarker} ${content.trim()}${suffix}`;
+  },
+});
+
+turndownService.addRule('linkNoTitle', {
+  filter: 'a',
+  replacement: (content, node) => {
+    const href = node.getAttribute('href');
+    if (!href) return content;
+    return `[${content}](${href})`;
+  },
+});
+
 function MarkdownControl(props) {
-  const { value, theme } = props;
+  const { value, theme, onChange } = props;
   const intl = useIntl();
   const textareaRef = useRef(null);
   const mdButtonRefs = useRef([]);
   const [view, setView] = useState('write');
+  const [scrollTop, setScrollTop] = useState(0);
   const [mdButtonIndex, setMdButtonIndex] = useState(0);
 
   const handleKeyDown = (e) => {
@@ -120,10 +248,14 @@ function MarkdownControl(props) {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${Math.max(textareaRef.current.scrollHeight + 20, MIN_TEXTAREA_HEIGHT)}px`;
+      textareaRef.current.scrollTop = scrollTop;
     }
-    // has textarea focus?
-    // setHasFocus(document.activeElement === textareaRef.current);
   });
+  useEffect(() => {
+    if (textareaRef.current && textareaRef.current.scrollTop !== scrollTop) {
+      textareaRef.current.scrollTop = scrollTop;
+    }
+  }, [scrollTop]);
   const mdDisabled = view !== 'write';
   return (
     <Box>
@@ -363,6 +495,40 @@ function MarkdownControl(props) {
               linkTextPlaceholder: 'link-title',
               linkUrlPlaceholder: 'https://link-url.ext',
               enableIndentExtension: false,
+            }}
+            commands={[
+              {
+                name: 'strike-through',
+                shortcut: ['command+shift+x', 'ctrl+shift+x'],
+                shortcutPreventDefault: true,
+                enable: false,
+              },
+            ]}
+            onScroll={(e) => {
+              setScrollTop((e.target && e.target.scrollTop) || 0);
+            }}
+            onChange={(e) => {
+              onChange(e);
+              requestAnimationFrame(() => {
+                const scroll = textareaRef.current && textareaRef.current.scrollTop;
+                if (scroll !== scrollTop) {
+                  if (scroll !== 0) {
+                    setScrollTop(scroll);
+                  } else {
+                    setScrollTop(scrollTop);
+                  }
+                }
+              });
+            }}
+            onPaste={(e) => {
+              const html = e.clipboardData.getData('text/html');
+              if (html) {
+                e.preventDefault();
+                const cleanHtml = DOMPurify.sanitize(html);
+                const markdown = turndownService.turndown(cleanHtml);
+                document.execCommand('insertText', false, markdown);
+                // wait until re-rendered
+              }
             }}
             {...props}
           />
