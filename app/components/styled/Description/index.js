@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const Description = styled.p`
+const Description = styled.div`
   margin-bottom: 1.5em;
   font-size: 1em;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {

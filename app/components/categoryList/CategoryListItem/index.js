@@ -56,6 +56,9 @@ const BarWrap = styled.div`
   vertical-align: middle;
   font-size: 0px;
   padding: ${({ multiple }) => multiple ? '4px 6px' : '10px 6px'};
+  @media (min-width: ${(props) => props.theme.breakpoints.xsmall}) {
+    padding-left: 20px;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding-top: ${({ multiple }) => multiple ? 0 : 10}px;
     padding-bottom: ${({ multiple }) => multiple ? 8 : 10}px;
@@ -96,16 +99,24 @@ const Bar = styled.div`
   }
 `;
 const Count = styled.div`
-  display: none;
   position: absolute;
+  font-size: ${({ theme }) => theme.sizes.text.smaller};
   line-height: ${({ multiple }) => multiple ? 8 : 16}px;
   left: 0;
   bottom: 100%;
   padding: 2px 0;
   color: ${(props) => palette(props.palette, 0)};
   white-space: nowrap;
+  @media print, (min-width: ${(props) => props.theme.breakpoints.xsmall}) {
+    font-size: ${({ theme, multiple }) => multiple ? theme.sizes.text.smaller : theme.sizes.text.small};
+    font-weight: bold;
+    text-align: right;
+    padding: 0 5px 0 0;
+    right: 100%;
+    bottom: auto;
+    left: auto;
+  }
   @media print, (min-width: ${(props) => props.theme.breakpoints.small}) {
-    display: block;
     font-size: ${({ theme, multiple }) => multiple ? theme.sizes.text.default : theme.sizes.text.aaLargeBold};
     font-weight: bold;
     text-align: right;

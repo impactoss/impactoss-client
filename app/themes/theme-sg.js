@@ -78,18 +78,18 @@ theme.media = {
 theme.gutter = 20;
 
 export const BREAKPOINTS = {
-  xsmall: {
+  xxsmall: {
     min: 0,
-    max: 768, // inclusive
+    max: 580, // inclusive
     name: 'mobile',
     index: 0,
   },
-  // ms: {
-  //   min: 420, // exclusive
-  //   max: 720,
-  //   name: 'mobile (landscape)',
-  //   index: 1,
-  // },
+  xsmall: {
+    min: 580, // exclusive
+    max: 720,
+    name: 'mobile (landscape)',
+    index: 1,
+  },
   small: {
     min: 768, // exclusive
     max: 992,
@@ -117,6 +117,7 @@ export const BREAKPOINTS = {
 };
 
 theme.breakpoints = {
+  xxsmall: `${BREAKPOINTS.xsmall.min + 1}px`, // min
   xsmall: `${BREAKPOINTS.xsmall.min + 1}px`, // min
   small: `${BREAKPOINTS.small.min + 1}px`, // min
   medium: `${BREAKPOINTS.medium.min + 1}px`, // min
@@ -162,7 +163,7 @@ const dark = coolorsToHex('https://coolors.co/333e48-333e48-333e48-6a7076-6a7076
 // 2:  gray 1 (gray pattern)
 // 3:  gray 2 (icons light)
 // 4:  gray 3 (dark lines)
-const light = coolorsToHex('https://coolors.co/f2f3f4-dfe2e3-d0d4d6-cdd6d6-c7d1d1');
+const light = coolorsToHex('https://coolors.co/f2f3f4-dfe2e3-d0d4d6-cdd6d6-c4cbcb');
 // ga7076
 // other palettes
 // 0: AA on light[0] and on error[3]
@@ -391,7 +392,7 @@ theme.sizes = {
   text: {
     aaLargeBold: '19px',
     aaLarge: '24px',
-    mainListItem: '20px',
+    mainListItem: '18px',
     nestedListItem: '16px',
     listItemTop: '13px',
     listItemBottom: '12px',
@@ -431,8 +432,8 @@ theme.sizes = {
   },
   mainListItem: {
     paddingHorizontal: 15,
-    paddingTop: 12,
-    paddingBottom: 12,
+    paddingTop: 18,
+    paddingBottom: 20,
   },
   header: {
     banner: {
@@ -541,6 +542,9 @@ theme.global = {
     height: 1.42857,
   },
   breakpoints: { // grommet assumes upper width
+    xxsmall: {
+      value: BREAKPOINTS.xxsmall.max,
+    },
     xsmall: {
       value: BREAKPOINTS.xsmall.max,
     },

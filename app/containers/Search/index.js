@@ -79,7 +79,6 @@ const Target = styled(Button)`
   text-align: left;
   color: ${palette('asideListGroup', 0)};
   background-color: ${palette('light', 1)};
-  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.1);
   &:hover {
     color: ${palette('text', 0)};
     background-color: ${palette('light', 2)};
@@ -375,7 +374,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                                     <Box direction="row" gap="xsmall" pad={{ vertical: 'xsmall' }}>
                                                       <Text
                                                         as="h2"
-                                                        size="large"
+                                                        size="medium"
                                                         weight="600"
                                                         style={{ margin: 0 }}
                                                       >

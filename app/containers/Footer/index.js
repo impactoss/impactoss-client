@@ -9,7 +9,7 @@ import { updatePath } from 'containers/App/actions';
 import A from 'components/styled/A';
 
 import qe from 'utils/quasi-equals';
-import { isMaxSize } from 'utils/responsive';
+import { isMaxSize, isMinSize } from 'utils/responsive';
 
 import {
   selectEntitiesWhere,
@@ -38,8 +38,26 @@ const FooterMain = styled.div`
   }
 `;
 
+const Upper = styled(
+  (p) => (
+    <Box
+      justify="between"
+      align="start"
+      responsive={false}
+      {...p}
+    />
+  ),
+)``;
+const Lower = styled(
+  (p) => (
+    <Box
+      {...p}
+    />
+  ),
+)``;
+
 const FooterLinks = styled(
-  (p) => <Box align="start" border="top" {...p} />,
+  (p) => <Box align="start" {...p} />,
 )`
   @media print {
     display: none !important;
@@ -97,13 +115,18 @@ const Wrapper = styled((p) => <Box margin={{ bottom: 'large' }} {...p} />)`
 
 const FooterNote = styled((p) => <Text size="xxxsmall" {...p} />)``;
 const FooterVersion = styled((p) => <Text size="xxxsmall" {...p} />)``;
+const Divider = styled.span`
+  @media (min-width: ${({ theme }) => theme.breakpoints.xsmall}) {
+    border-right: 1px solid rgba(0, 0, 0, 0.33);
+    height: 20px;
+  }
+`;
 
 const Footer = ({
   theme,
   onPageLink,
   pages,
   fill,
-  hasBorder,
   isUserSignedIn,
 }) => {
   const intl = useIntl();
@@ -113,16 +136,18 @@ const Footer = ({
     <FooterMain as="footer">
       <Container noPaddingBottom>
         <Wrapper fill={fill}>
-          <Box
+          <Upper
             direction={isMobile ? 'column' : 'row'}
-            justify="between"
-            border={hasBorder ? 'top' : false}
-            align="start"
-            pad={{ vertical: 'ml', bottom: 'medium' }}
+            border={!isMobile ? 'bottom' : false}
+            pad={{
+              top: 'medium',
+            }}
           >
             <Box
               gap="small"
-              pad={{ bottom: isMobile ? 'medium' : 'none' }}
+              pad={{ vertical: 'medium' }}
+              border={isMobile ? 'bottom' : false}
+              fill={isMobile ? 'horizontal' : false}
             >
               <Box>
                 <FooterNote>
@@ -150,8 +175,8 @@ const Footer = ({
             </Box>
             <Box
               gap="small"
-              border={isMobile ? 'top' : false}
-              pad={isMobile ? { top: 'medium' } : 'none'}
+              border={isMobile ? 'bottom' : false}
+              pad={{ vertical: 'medium' }}
               align={isMobile ? 'start' : 'end'}
               fill={isMobile ? 'horizontal' : false}
             >
@@ -170,8 +195,8 @@ const Footer = ({
                 </LogoItemLink>
               </Box>
             </Box>
-          </Box>
-          <Box gap={isMobile ? 'medium' : 'xsmall'}>
+          </Upper>
+          <Lower gap={isMobile ? 'medium' : 'xsmall'}>
             {pages && (
               <FooterLinks
                 direction={isMobile ? 'column' : 'row'}
@@ -179,18 +204,26 @@ const Footer = ({
                 gap={isMobile ? 'small' : 'none'}
                 pad={{ top: isMobile ? 'medium' : 'small' }}
               >
-                <FooterLink
-                  target="_blank"
-                  href={`mailto:${intl.formatMessage(messages.contact.email)}`}
-                  title={intl.formatMessage(messages.contactUs)}
-                >
-                  <FormattedMessage {...messages.contactUs} />
-                </FooterLink>
                 <Box
                   direction={isMobile ? 'column' : 'row'}
                   gap="small"
                   align={isMobile ? 'start' : 'end'}
                   role="navigation"
+                >
+                  <FooterLink
+                    target="_blank"
+                    href={`mailto:${intl.formatMessage(messages.contact.email)}`}
+                    title={intl.formatMessage(messages.contactUs)}
+                  >
+                    <FormattedMessage {...messages.contactUs} />
+                  </FooterLink>
+                </Box>
+                <Box
+                  direction={isMobile ? 'column' : 'row'}
+                  gap="small"
+                  align={isMobile ? 'start' : 'end'}
+                  role="navigation"
+                  responsive={false}
                 >
                   {isUserSignedIn && (
                     <FooterLink
@@ -212,6 +245,7 @@ const Footer = ({
                   >
                     <FormattedMessage {...appMessages.nav.search} />
                   </FooterLink>
+                  {isMinSize(size, 'small') && (<Divider />)}
                   {pages.size > 0 && FOOTER.INTERNAL_LINKS && FOOTER.INTERNAL_LINKS.map((pageId) => {
                     const page = pages.find((p) => qe(p.get('id'), pageId));
                     return page
@@ -229,25 +263,28 @@ const Footer = ({
                       )
                       : null;
                   })}
-                  <FooterLink
-                    target="_blank"
-                    href={`${intl.formatMessage(messages.govLinkHref)}`}
-                    title={intl.formatMessage(messages.govLinkAnchor)}
-                  >
-                    <FormattedMessage {...messages.govLinkAnchor} />
-                  </FooterLink>
                 </Box>
               </FooterLinks>
             )}
-            <Box
+            <FooterLinks
               border={isMobile ? 'top' : false}
-              pad={isMobile ? { top: 'medium' } : 'none'}
+              direction={isMobile ? 'column' : 'row'}
+              justify={isMobile ? 'end' : 'between'}
+              gap={isMobile ? 'small' : 'none'}
+              pad={{ top: isMobile ? 'medium' : 'xxsmall' }}
             >
+              <FooterLink
+                target="_blank"
+                href={`${intl.formatMessage(messages.govLinkHref)}`}
+                title={intl.formatMessage(messages.govLinkAnchor)}
+              >
+                <FormattedMessage {...messages.govLinkAnchor} />
+              </FooterLink>
               <FooterVersion>
                 {`${intl.formatMessage(appMessages.app.title)}: v${VERSION}`}
               </FooterVersion>
-            </Box>
-          </Box>
+            </FooterLinks>
+          </Lower>
         </Wrapper>
       </Container>
     </FooterMain>
@@ -260,7 +297,7 @@ Footer.propTypes = {
   onPageLink: PropTypes.func.isRequired,
   pages: PropTypes.object,
   fill: PropTypes.bool,
-  hasBorder: PropTypes.bool,
+  // hasBorder: PropTypes.bool,
   isUserSignedIn: PropTypes.bool,
 };
 

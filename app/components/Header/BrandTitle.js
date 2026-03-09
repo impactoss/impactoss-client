@@ -8,7 +8,7 @@ export default styled.div`
   /* text-transform: uppercase; */
   font-family: ${(props) => props.theme.fonts.title};
   font-size: ${(props) => props.theme.sizes.header.text.titleMobile};
-  line-height: ${(props) => props.theme.sizes.header.banner.heightMobile}px;
+  line-height: ${(props) => props.theme.sizes.header.text.titleMobile}px;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     padding: 0px 5px;
     font-size: ${(props) => props.theme.sizes.header.text.title};

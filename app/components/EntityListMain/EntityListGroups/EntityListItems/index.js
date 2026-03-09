@@ -8,7 +8,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
   render() {
     const { entities, skipGroupTargetId } = this.props;
     return (
-      <div>
+      <div style={{ marginTop: '15px' }}>
         {entities.map((entity, index, list) => {
           let skipTargetId = null;
           if (list.size > index + 1) {

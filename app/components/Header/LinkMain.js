@@ -18,7 +18,7 @@ export default styled(Link)`
   font-size: 0.8em;
   padding: ${(props) => props.theme.sizes.header.mainNavItem.padding.mobile};
   height: ${(props) => props.theme.sizes.header.nav.heightMobile - 1}px;
-  border-left: 1px solid ${({ active }) => active ? palette('primary', 0) : palette('text', 0)};
+  border-left: 1px solid ${({ active }) => active ? palette('primary', 0) : palette('light', 1)};
   /* &:first-child {
     border-left-width: 0;
   } */

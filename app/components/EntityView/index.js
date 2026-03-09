@@ -53,19 +53,11 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
 
   render() {
     const { fields, seamless } = this.props;
-    const hasBodyFields = fields.body
-      && (
-        (
-          fields.body.main
-          && fields.body.main[0]
-          && fields.body.main[0].fields
-        )
-        || (
-          fields.body.aside
-          && fields.body.aside[0]
-          && fields.body.aside[0].fields
-        )
-      );
+    const hasBodyMainFields = fields.body.main
+      && fields.body.main.some((f) => !!f && f.fields && f.fields.some((ff) => !!ff));
+    const hasBodyAsideFields = fields.body.aside
+      && fields.body.aside.some((f) => !!f && f.fields && f.fields.some((ff) => !!ff));
+    const hasBodyFields = hasBodyMainFields || hasBodyAsideFields;
     return (
       <div>
         <ViewWrapper seamless={seamless}>
@@ -89,7 +81,7 @@ class EntityView extends React.PureComponent { // eslint-disable-line react/pref
           {hasBodyFields && (
             <ViewPanel>
               <ViewPanelInside>
-                {fields.body.main
+                {hasBodyMainFields
                   && this.renderMain(
                     fields.body.main,
                     !!fields.body.aside,

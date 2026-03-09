@@ -5,9 +5,9 @@ const ReferenceLarge = styled.div`
   font-weight: bold;
   margin: 0 0 -3px 0;
   color: ${palette('text', 1)};
-  font-size: 1.1em;
+  font-size: 0.9em;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
-    font-size: 1.5em;
+    font-size: 1.2em;
   }
 `;
 

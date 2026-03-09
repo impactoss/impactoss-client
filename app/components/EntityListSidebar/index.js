@@ -169,7 +169,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     if (event.key === 'Escape' && this.state.viewport < VIEWPORTS.LARGE) {
       this.hideSidebar();
     }
-    if (event.key === 'Tab' && this.state.viewport < VIEWPORTS.LARGE && this.wrapperRef) {
+    if (event.key === 'Tab' && this.state.viewport < VIEWPORTS.LARGE && this.wrapperRef && this.state.visible) {
       const focusable = this.wrapperRef.querySelectorAll(
         'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
       );

@@ -19,8 +19,9 @@ import EntityListItemMainBottom from './EntityListItemMainBottom';
 
 const Styled = styled((p) => <Component {...p} />)`
   position: relative;
-  padding-left: 0;
+  padding-left: 5px;
   box-shadow: ${({ isConnection }) => isConnection ? '0px 0px 6px 0px rgba(0,0,0,0.2)' : 'none'};
+  margin: ${({ isConnection }) => isConnection ? '6px 0' : 'none'};
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-left: ${(props) => (!props.theme.sizes || props.isManager)
     ? 0
@@ -36,8 +37,8 @@ const Styled = styled((p) => <Component {...p} />)`
 const Wrapper = styled((p) => <Component {...p} />)`
   position: relative;
   padding-right: 6px;
-  padding-top: 4px;
-  padding-bottom: 6px;
+  padding-top: 8px;
+  padding-bottom: 12px;
   box-shadow: ${({ isConnection }) => isConnection ? '0px 0px 6px 0px rgba(0,0,0,0.2)' : 'none'};
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-right: ${(props) => (!props.theme.sizes)
@@ -77,10 +78,10 @@ const EntityListItemMainTopWrap = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  padding-top: 4px;
+  padding-top: 8px;
   padding-right: 6px;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
-    padding-top: ${(props) => props.theme.sizes && props.theme.sizes.mainListItem.paddingTop}px;
+    padding-top: 15px;
     padding-right: ${(props) => (!props.theme.sizes)
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal

@@ -91,7 +91,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     }
   }
 
-  getHeaderMainFields = (entity, isManager, parentTaxonomy) => {
+  getHeaderMainFields = (entity, isManager) => {
     const groups = [];
     groups.push(
       { // fieldGroup
@@ -103,13 +103,13 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
       },
     );
     // include parent link
-    if (entity.get('category') && parentTaxonomy) {
-      groups.push({
-        label: appMessages.entities.taxonomies.parent,
-        icon: 'categories',
-        fields: [getEntityLinkField(entity.get('category'), '/category', '', getEntityTitle(parentTaxonomy))],
-      });
-    }
+    // if (entity.get('category') && parentTaxonomy) {
+    //   groups.push({
+    //     label: appMessages.entities.taxonomies.parent,
+    //     icon: 'categories',
+    //     fields: [getEntityLinkField(entity.get('category'), '/category', '', getEntityTitle(parentTaxonomy))],
+    //   });
+    // }
     return groups;
   };
 
@@ -251,7 +251,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
     return fields;
   };
 
-  getBodyAsideFields = (entity, isManager, childTaxonomies) => {
+  getBodyAsideFields = (entity, isManager, childTaxonomies, parentTaxonomy) => {
     const fields = [];
     // include children links
     if (childTaxonomies && hasTaxonomyCategories(childTaxonomies)) {
@@ -259,6 +259,13 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         label: appMessages.entities.taxonomies.children,
         icon: 'categories',
         fields: getTaxonomyFields(childTaxonomies, true),
+      });
+    }
+    if (entity.get('category') && parentTaxonomy) {
+      fields.push({
+        label: appMessages.entities.taxonomies.parent,
+        icon: 'categories',
+        fields: [getEntityLinkField(entity.get('category'), '/category', '', getEntityTitle(parentTaxonomy))],
       });
     }
     const showLink = entity.getIn(['attributes', 'url'])
@@ -378,7 +385,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
               <EntityView
                 fields={{
                   header: {
-                    main: this.getHeaderMainFields(viewEntity, isManager, parentTaxonomy),
+                    main: this.getHeaderMainFields(viewEntity, isManager),
                     aside: this.getHeaderAsideFields(viewEntity, isManager, intl),
                   },
                   body: {
@@ -398,6 +405,7 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
                       viewEntity,
                       isManager,
                       childTaxonomies,
+                      parentTaxonomy,
                     ),
                   },
                 }}

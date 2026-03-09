@@ -8,6 +8,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage, injectIntl } from 'react-intl';
+import ReactMarkdown from 'react-markdown';
+import rehypeExternalLinks from 'rehype-external-links';
 
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
@@ -150,6 +152,27 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
         ),
       },
     );
+
+    const rendered = Array.isArray(description)
+      ? description.map((part, i) => (
+        typeof part === 'string'
+          ? (
+            <ReactMarkdown
+              key={i}
+              rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
+            >
+              {part}
+            </ReactMarkdown>
+          )
+          : <React.Fragment key={i}>{part}</React.Fragment>
+      ))
+      : (
+        <ReactMarkdown
+          rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
+        >
+          {description}
+        </ReactMarkdown>
+      );
     return (
       <div>
         <HelmetCanonical
@@ -178,7 +201,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             />
             <div style={{ position: 'relative' }}>
               <Description>
-                {description}
+                {rendered}
               </Description>
             </div>
             {!dataReady && <Loading />}

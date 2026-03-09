@@ -10,14 +10,14 @@ const Container = styled.div`
   width: 100%;
   max-width: 100%;
   padding-bottom: ${(props) => props.noPaddingBottom || props.inModal ? 0 : '3em'};
-  padding-left: ${(props) => props.inModal ? 6 : 12}px;
-  padding-right: ${(props) => props.inModal ? 6 : 12}px;
+  padding-left: ${(props) => props.inModal ? 10 : 18}px;
+  padding-right: ${(props) => props.inModal ? 10 : 18}px;
   background-color: ${(props) => props.inModal ? palette('light', 0) : 'transparent'};
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     margin-top: ${(props) => props.inModal ? 60 : 0}px;
     margin-bottom: ${(props) => props.inModal ? 60 : 0}px;
-    padding-right: 12px;
-    padding-left: 12px;
+    padding-right: 18px;
+    padding-left: 18px;
   }
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     max-width: ${(props) => props.isNarrow ? '960' : (parseInt(props.theme.breakpoints.large, 10) - 30)}px;

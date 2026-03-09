@@ -23,7 +23,7 @@ const SmartGroup = styled.div`
   border-right-color: ${palette('light', 3)};
 `;
 const Group = styled.div`
-  display: inline-block;
+  display: inline;
   margin-right: 2px;
 `;
 const IconWrap = styled.div`

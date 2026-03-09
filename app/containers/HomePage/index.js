@@ -92,9 +92,16 @@ const SectionTop = styled.div`
   }
 `;
 
-const SectionTopInner = styled((p) => <Box pad={{ horizontal: 'small', top: 'xsmall' }} {...p} />)`
+const SectionTopInner = styled((p) => <Box responsive={false} pad={{ horizontal: 'small', top: 'xsmall' }} {...p} />)`
   width: 100%;
   position: relative;
+  max-width: 96%;
+  @media (min-width: ${(props) => props.theme.breakpoints.xsmall}) {
+    max-width: 80%;
+  }
+  @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
+    max-width: 680px;
+  }
   /* border: 1px solid blue; */
   /* padding-bottom: 140px; */
 `;
@@ -107,7 +114,11 @@ const Section = styled((p) => <Box {...p} />)`
     padding-top: 60px;
   }
 `;
-const SectionInner = styled((p) => <Box pad={{ horizontal: 'small' }} {...p} />)`
+const SectionInner = styled((p) => <Box responsive={false} pad={{ horizontal: 'small' }} {...p} />)`
+  max-width: 96%;
+  @media (min-width: ${(props) => props.theme.breakpoints.xsmall}) {
+    max-width: 90%;
+  }
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
     max-width: 800px;
   }
@@ -235,7 +246,7 @@ const SectionDescription = styled(Text)`
   font-size: 0.8;
   margin-left: auto;
   margin-right: auto;
-  line-height: 1;
+  line-height: 1.3;
   @media (min-width: ${(props) => props.theme.breakpoints.small}) {
     font-size: 0.9;
   }
@@ -365,7 +376,7 @@ export function HomePage({ onPageLink, theme, intl }) {
               </Box>
             </Box>
             <nav aria-label="Explore the tracker">
-              <Box gap="ms" direction={isMinSize(size, 'small') ? 'row' : 'column'}>
+              <Box gap="ms" direction={isMinSize(size, 'xsmall') ? 'row' : 'column'}>
                 <CardTeaser
                   path={ROUTES.OVERVIEW}
                   onClick={(evt) => {
@@ -377,7 +388,7 @@ export function HomePage({ onPageLink, theme, intl }) {
                   explore={intl.formatMessage(messages.cardLinkOverview)}
                   graphicSrc={theme.media.teaserCategories}
                   isHome
-                  basis={isMinSize(size, 'small') ? '1/2' : '1'}
+                  basis={isMinSize(size, 'xsmall') ? '1/2' : '1'}
                   headingLevel={3}
                 />
                 <CardTeaser

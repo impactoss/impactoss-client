@@ -543,7 +543,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                       />
                     )}
                     {SHOW_HEADER_TITLE && (
-                      <BrandText>
+                      <BrandText gap={isMinSize(size, 'small') ? 'xxsmall' : undefined}>
                         <BrandTitle>
                           <FormattedMessage {...appMessages.app.title} />
                         </BrandTitle>
