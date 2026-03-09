@@ -770,7 +770,7 @@ export const getFormField = ({
   type,
   prohibitedValues,
   showErrorsAsHints,
-  maxLength = 10000,
+  maxLength = 20000,
   ...props
 }) => {
   const field = {

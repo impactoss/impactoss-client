@@ -164,28 +164,6 @@ const GlobalStyle = createGlobalStyle`
     font-weight: 500;
   }
 
-  .content-page {
-    .react-markdown {
-      p {
-        &:first-child{
-          font-size: 1.2em;
-          color: #6A7880;
-        }
-      }
-    }
-  }
-  @media (min-width: 769px) {
-    .content-page {
-      .react-markdown {
-        p {
-          &:first-child{
-            font-size: 1.5em;
-            padding-bottom: 20px;
-          }
-        }
-      }
-    }
-  }
   .formatted-message-remarkable code {
     background-color: #f2f3f4;
     padding: 2px 4px;
