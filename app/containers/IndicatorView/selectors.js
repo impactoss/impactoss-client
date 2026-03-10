@@ -4,7 +4,6 @@ import { Map } from 'immutable';
 import {
   selectReady,
   selectEntity,
-  selectEntities,
   selectMeasureConnections,
   selectRecommendationConnections,
   selectFWRecommendations,
@@ -18,6 +17,10 @@ import {
   selectRecommendationCategoriesByRecommendation,
   selectRecommendationIndicatorsByRecommendation,
   selectRecommendationIndicatorsByIndicator,
+  selectCategories,
+  selectUsers,
+  selectProgressReports,
+  selectDueDates,
 } from 'containers/App/selectors';
 
 import {
@@ -33,7 +36,7 @@ import { DEPENDENCIES } from './constants';
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'indicators', id }),
-  (state) => selectEntities(state, 'users'),
+  selectUsers,
   (entity, users) => entitySetSingles(entity, [
     {
       related: users,
@@ -72,11 +75,11 @@ const selectMeasuresAssociated = createSelector(
 export const selectMeasures = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectMeasuresAssociated,
-  (state) => selectMeasureConnections(state),
+  selectMeasureConnections,
   selectRecommendationMeasuresByMeasure,
   selectMeasureCategoriesByMeasure,
   selectMeasureIndicatorsByMeasure,
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   (
     ready,
     measures,
@@ -158,8 +161,8 @@ export const selectRecommendations = createSelector(
   selectRecommendationMeasuresByRecommendation,
   selectRecommendationCategoriesByRecommendation,
   selectRecommendationIndicatorsByRecommendation,
-  (state) => selectEntities(state, 'categories'),
-  (state) => selectFrameworks(state),
+  selectCategories,
+  selectFrameworks,
   (
     ready,
     recommendations,
@@ -205,9 +208,9 @@ export const selectRecommendations = createSelector(
 // all connected reports
 export const selectReports = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'progress_reports'),
-  (state) => selectEntities(state, 'due_dates'),
-  (state) => selectEntities(state, 'users'),
+  selectProgressReports,
+  selectDueDates,
+  selectUsers,
   (id, reports, dates, users) => {
     const filtered = reports.filter(
       (report) => qe(
@@ -243,9 +246,9 @@ export const selectReports = createSelector(
   },
 );
 
-export const selectDueDates = createSelector(
+export const selectIndicatorDueDates = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'due_dates'),
+  selectDueDates,
   (id, dates) => dates && sortEntities(
     dates.filter(
       (date) => qe(

@@ -1,10 +1,11 @@
 import { createSelector } from 'reselect';
 
 import {
-  selectEntities,
   selectFWTaxonomiesSorted,
   selectRecommendationsCategorised,
   selectFrameworks,
+  selectCategories,
+  selectFrameworkTaxonomies,
 } from 'containers/App/selectors';
 
 import { prepareTaxonomiesMultiple } from 'utils/entities';
@@ -13,8 +14,8 @@ import { qe } from 'utils/quasi-equals';
 export const selectDomain = (state) => state.get('measureNew');
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectFWTaxonomiesSorted(state),
-  (state) => selectEntities(state, 'categories'),
+  selectFWTaxonomiesSorted,
+  selectCategories,
   (taxonomies, categories) => prepareTaxonomiesMultiple(
     taxonomies,
     categories,
@@ -25,9 +26,9 @@ export const selectConnectedTaxonomies = createSelector(
 
 export const selectRecommendationsByFw = createSelector(
   (state, id) => id, // taxonomy id
-  (state) => selectEntities(state, 'framework_taxonomies'),
-  (state) => selectRecommendationsCategorised(state),
-  (state) => selectFrameworks(state),
+  selectFrameworkTaxonomies,
+  selectRecommendationsCategorised,
+  selectFrameworks,
   (id, fwTaxonomies, entities, frameworks) => {
     if (!fwTaxonomies || !entities) {
       return null;

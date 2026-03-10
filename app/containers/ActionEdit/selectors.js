@@ -2,7 +2,6 @@ import { createSelector } from 'reselect';
 
 import {
   selectEntity,
-  selectEntities,
   selectRecommendationsCategorised,
   selectFWTaxonomiesSorted,
   selectFWIndicators,
@@ -10,6 +9,8 @@ import {
   selectRecommendationMeasuresByMeasure,
   selectMeasureIndicatorsByMeasure,
   selectMeasureCategoriesByMeasure,
+  selectCategories,
+  selectUsers,
 } from 'containers/App/selectors';
 
 import {
@@ -24,13 +25,13 @@ export const selectDomain = (state) => state.get('measureEdit');
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'measures', id }),
-  (state) => selectEntities(state, 'users'),
+  selectUsers,
   (entity, users) => entitySetUser(entity, users),
 );
 export const selectTaxonomies = createSelector(
   (state, id) => id,
   selectFWTaxonomiesSorted,
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   selectMeasureCategoriesByMeasure,
   (
     id,
@@ -48,8 +49,8 @@ export const selectTaxonomies = createSelector(
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectFWTaxonomiesSorted(state),
-  (state) => selectEntities(state, 'categories'),
+  selectFWTaxonomiesSorted,
+  selectCategories,
   (taxonomies, categories) => prepareTaxonomiesMultiple(
     taxonomies,
     categories,

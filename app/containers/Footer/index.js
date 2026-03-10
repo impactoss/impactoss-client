@@ -12,7 +12,7 @@ import qe from 'utils/quasi-equals';
 import { isMaxSize, isMinSize } from 'utils/responsive';
 
 import {
-  selectEntitiesWhere,
+  selectPublishedPages,
   selectIsSignedIn,
 } from 'containers/App/selectors';
 
@@ -302,10 +302,7 @@ Footer.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  pages: selectEntitiesWhere(state, {
-    path: 'pages',
-    where: { draft: false },
-  }),
+  pages: selectPublishedPages(state),
   isUserSignedIn: selectIsSignedIn(state),
 });
 function mapDispatchToProps(dispatch) {

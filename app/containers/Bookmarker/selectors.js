@@ -1,9 +1,9 @@
 import { createSelector } from 'reselect';
-import { selectEntities, selectLocation } from 'containers/App/selectors';
+import { selectLocation, selectBookmarks } from 'containers/App/selectors';
 import { getBookmarkForLocation } from 'utils/bookmark';
 
 export const selectBookmarkForLocation = createSelector(
-  (state) => selectEntities(state, 'bookmarks'),
-  (state) => selectLocation(state),
+  selectBookmarks,
+  selectLocation,
   (bookmarks, location) => getBookmarkForLocation(location, bookmarks),
 );

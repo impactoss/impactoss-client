@@ -67,7 +67,7 @@ import {
   selectMeasures,
   selectRecommendations,
   selectReports,
-  selectDueDates,
+  selectIndicatorDueDates,
 } from './selectors';
 
 import { DEPENDENCIES } from './constants';
@@ -385,7 +385,7 @@ const mapStateToProps = (state, props) => ({
   recommendationsByFw: selectRecommendations(state, props.params.id),
   recommendationTaxonomies: selectRecommendationTaxonomies(state),
   reports: selectReports(state, props.params.id),
-  dates: selectDueDates(state, props.params.id),
+  dates: selectIndicatorDueDates(state, props.params.id),
   measureConnections: selectMeasureConnections(state),
   recommendationConnections: selectRecommendationConnections(state),
   queryMessages: selectQueryMessages(state),

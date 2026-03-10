@@ -3,11 +3,14 @@ import { List } from 'immutable';
 
 import {
   selectEntity,
-  selectEntities,
   selectFWTaxonomiesSorted,
   selectTaxonomies,
   selectRecommendationsCategorised,
   selectMeasuresCategorised,
+  selectCategories,
+  selectFrameworkTaxonomies,
+  selectUserRoles,
+  selectUsers,
 } from 'containers/App/selectors';
 
 import { USER_ROLES } from 'themes/config';
@@ -22,7 +25,7 @@ export const selectDomain = (state) => state.get('categoryNew');
 
 export const selectParentOptions = createSelector(
   (state, id) => selectEntity(state, { path: 'taxonomies', id }),
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   selectTaxonomies,
   (taxonomy, categories, taxonomies) => {
     if (taxonomy && taxonomies && categories) {
@@ -65,9 +68,9 @@ export const selectParentTaxonomy = createSelector(
 
 
 // all users of role manager
-export const selectUsers = createSelector(
-  (state) => selectEntities(state, 'users'),
-  (state) => selectEntities(state, 'user_roles'),
+export const selectCategoryUsers = createSelector(
+  selectUsers,
+  selectUserRoles,
   (entities, associations) => usersByMinimumRole(
     entities,
     associations,
@@ -76,8 +79,8 @@ export const selectUsers = createSelector(
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectFWTaxonomiesSorted(state),
-  (state) => selectEntities(state, 'categories'),
+  selectFWTaxonomiesSorted,
+  selectCategories,
   (taxonomies, categories) => prepareTaxonomiesMultiple(
     taxonomies,
     categories,
@@ -103,8 +106,8 @@ const selectIsParentTaxonomy = createSelector(
 
 export const selectRecommendationsByFw = createSelector(
   (state, id) => id, // taxonomy id
-  (state) => selectEntities(state, 'framework_taxonomies'),
-  (state) => selectRecommendationsCategorised(state),
+  selectFrameworkTaxonomies,
+  selectRecommendationsCategorised,
   selectIsParentTaxonomy,
   (id, fwTaxonomies, entities, isParent) => {
     if (isParent || !fwTaxonomies || !entities) {
@@ -134,7 +137,7 @@ export const selectRecommendationsByFw = createSelector(
 );
 
 export const selectMeasures = createSelector(
-  (state) => selectMeasuresCategorised(state),
+  selectMeasuresCategorised,
   selectIsParentTaxonomy,
   (entities, isParent) => isParent
     ? null

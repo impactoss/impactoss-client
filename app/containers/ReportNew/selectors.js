@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 
 import {
   selectEntity,
-  selectEntities,
+  selectDueDates,
 } from 'containers/App/selectors';
 
 import { qe } from 'utils/quasi-equals';
@@ -13,7 +13,7 @@ export const selectDomain = (state) => state.get('reportNew');
 
 export const selectIndicator = createSelector(
   (state, id) => selectEntity(state, { path: 'indicators', id }),
-  (state) => selectEntities(state, 'due_dates'),
+  selectDueDates,
   (indicator, dates) => indicator && indicator.set(
     'dates',
     sortEntities(

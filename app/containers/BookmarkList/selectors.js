@@ -20,7 +20,7 @@ export const selectTypeQuery = createSelector(
 // 1. selectEntitiesWhere filters by attribute
 // 2. selectEntitiesSearchQuery filters by keyword
 // 3. selectUsers
-export const selectBookmarks = createSelector(
+export const selectViewBookmarks = createSelector(
   (state, locationQuery) => selectEntitiesSearchQuery(state, {
     path: 'bookmarks',
     searchAttributes: ['title'],

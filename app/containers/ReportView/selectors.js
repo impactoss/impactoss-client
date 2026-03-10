@@ -2,7 +2,8 @@ import { createSelector } from 'reselect';
 
 import {
   selectEntity,
-  selectEntities,
+  selectUsers,
+  selectDueDates,
   selectFWIndicators,
 } from 'containers/App/selectors';
 
@@ -12,9 +13,9 @@ import {
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'progress_reports', id }),
-  (state) => selectEntities(state, 'users'),
+  selectUsers,
   selectFWIndicators,
-  (state) => selectEntities(state, 'due_dates'),
+  selectDueDates,
   (entity, users, indicators, dates) => entitySetSingles(entity, [
     {
       related: users,

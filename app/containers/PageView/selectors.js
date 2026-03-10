@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 
 import {
   selectEntity,
-  selectEntities,
+  selectUsers,
 } from 'containers/App/selectors';
 
 import {
@@ -11,6 +11,6 @@ import {
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'pages', id }),
-  (state) => selectEntities(state, 'users'),
+  selectUsers,
   (entity, users) => entitySetUser(entity, users),
 );

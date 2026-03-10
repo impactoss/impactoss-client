@@ -62,7 +62,7 @@ import EntityForm from 'containers/EntityForm';
 
 import {
   selectDomain,
-  selectUsers,
+  selectIndicatorUsers,
   selectConnectedTaxonomies,
   selectRecommendationsByFw,
 } from './selectors';
@@ -311,7 +311,7 @@ const mapStateToProps = (state) => ({
   measures: selectMeasuresCategorised(state),
   recommendationsByFw: selectRecommendationsByFw(state),
   // all users, listing connection if any
-  users: selectUsers(state),
+  users: selectIndicatorUsers(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
   existingReferences: selectIndicatorReferences(state),
 });

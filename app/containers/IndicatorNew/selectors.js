@@ -1,10 +1,13 @@
 import { createSelector } from 'reselect';
 
 import {
-  selectEntities,
+  selectFrameworkTaxonomies,
   selectFWTaxonomiesSorted,
   selectRecommendationsCategorised,
   selectFrameworks,
+  selectCategories,
+  selectUsers,
+  selectUserRoles,
 } from 'containers/App/selectors';
 import { CONTRIBUTOR_MIN_ROLE_ASSIGNED } from 'themes/config';
 
@@ -17,9 +20,9 @@ import { qe } from 'utils/quasi-equals';
 export const selectDomain = (state) => state.get('indicatorNew');
 
 // all users of role contributor
-export const selectUsers = createSelector(
-  (state) => selectEntities(state, 'users'),
-  (state) => selectEntities(state, 'user_roles'),
+export const selectIndicatorUsers = createSelector(
+  selectUsers,
+  selectUserRoles,
   (entities, associations) => usersByMinimumRole(
     entities,
     associations,
@@ -28,8 +31,8 @@ export const selectUsers = createSelector(
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectFWTaxonomiesSorted(state),
-  (state) => selectEntities(state, 'categories'),
+  selectFWTaxonomiesSorted,
+  selectCategories,
   (taxonomies, categories) => prepareTaxonomiesMultiple(
     taxonomies,
     categories,
@@ -39,9 +42,9 @@ export const selectConnectedTaxonomies = createSelector(
 
 export const selectRecommendationsByFw = createSelector(
   (state, id) => id, // taxonomy id
-  (state) => selectEntities(state, 'framework_taxonomies'),
-  (state) => selectRecommendationsCategorised(state),
-  (state) => selectFrameworks(state),
+  selectFrameworkTaxonomies,
+  selectRecommendationsCategorised,
+  selectFrameworks,
   (id, fwTaxonomies, entities, frameworks) => {
     if (!fwTaxonomies || !entities) {
       return null;

@@ -4,7 +4,6 @@ import { Map } from 'immutable';
 import {
   selectReady,
   selectEntity,
-  selectEntities,
   selectRecommendationConnections,
   selectIndicatorConnections,
   selectFWTaxonomiesSorted,
@@ -19,6 +18,8 @@ import {
   selectMeasureIndicatorsByMeasure,
   selectMeasureIndicatorsByIndicator,
   selectMeasureCategoriesByMeasure,
+  selectCategories,
+  selectUsers,
 } from 'containers/App/selectors';
 
 import {
@@ -32,15 +33,15 @@ import { DEPENDENCIES } from './constants';
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'measures', id }),
-  (state) => selectEntities(state, 'users'),
+  selectUsers,
   (entity, users) => entitySetUser(entity, users),
 );
 
 // TODO optimise use selectMeasureCategoriesByMeasure
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  (state) => selectFWTaxonomiesSorted(state),
-  (state) => selectEntities(state, 'categories'),
+  selectFWTaxonomiesSorted,
+  selectCategories,
   selectMeasureCategoriesByMeasure,
   (id, taxonomies, categories, associations) => prepareTaxonomiesAssociated(
     taxonomies,
@@ -81,8 +82,8 @@ export const selectRecommendations = createSelector(
   selectRecommendationMeasuresByRecommendation,
   selectRecommendationCategoriesByRecommendation,
   selectRecommendationIndicatorsByRecommendation,
-  (state) => selectEntities(state, 'categories'),
-  (state) => selectFrameworks(state),
+  selectCategories,
+  selectFrameworks,
   (
     ready,
     recommendations,
@@ -151,7 +152,7 @@ const selectIndicatorsAssociated = createSelector(
 export const selectIndicators = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectIndicatorsAssociated,
-  (state) => selectIndicatorConnections(state),
+  selectIndicatorConnections,
   selectMeasureIndicatorsByIndicator,
   selectRecommendationIndicatorsByIndicator,
   (
