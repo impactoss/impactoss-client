@@ -22,7 +22,7 @@ const SERVER_ENDPOINTS = {
 export const SERVER_ENDPOINT = SERVER_ENDPOINTS[SERVER];
 // used for redirect and canonical tag
 
-export const CLIENT_URL = 'https://uat.humanrights.govt.nz';
+export const CLIENT_URL = 'https://humanrights.govt.nz';
 export const IS_PROD = SERVER === 'production';
 export const IS_TEST = SERVER === 'UAT';
 // const IS_DEV = SERVER === 'development';
