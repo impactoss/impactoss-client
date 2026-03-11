@@ -84,6 +84,7 @@ module.exports = require('./webpack.base.babel')({
         minifyURLs: true,
       },
       inject: true,
+      noindex: process.env.SERVER !== 'production',
     }),
 
     new GitRevisionPlugin({
@@ -97,7 +98,14 @@ module.exports = require('./webpack.base.babel')({
       minRatio: 0.8,
     }),
 
-    new CopyPlugin({ patterns: [{ from: 'app/robots.txt', to: 'robots.txt' }] }),
+    new CopyPlugin({
+      patterns: [{
+        from: process.env.SERVER === 'production'
+          ? 'app/robots-allow.txt'
+          : 'app/robots-disallow.txt',
+        to: 'robots.txt',
+      }],
+    }),
 
     /*
     // Put it in the end to capture all the HtmlWebpackPlugin's
