@@ -71,6 +71,7 @@ module.exports = require('./webpack.base.babel')({
     // Minify and optimize the index.html
     new HtmlWebpackPlugin({
       template: 'app/index.html',
+      meta: process.env.SERVER === 'production' ? {} : { robots: 'noindex' },
       minify: {
         removeComments: true,
         collapseWhitespace: true,
@@ -84,7 +85,6 @@ module.exports = require('./webpack.base.babel')({
         minifyURLs: true,
       },
       inject: true,
-      noindex: process.env.SERVER !== 'production',
     }),
 
     new GitRevisionPlugin({
