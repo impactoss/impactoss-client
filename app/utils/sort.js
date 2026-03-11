@@ -96,9 +96,9 @@ export const getEntitySortComparator = (valueA, valueB, sortOrder, type) => {
       // if equal go to next word else compare
       if (wordA !== wordB) {
         // check for undefined (ie shorter phrase wins)
-        if (wordA && !wordB) {
+        if (wordA === undefined && wordB !== undefined) {
           result = -1;
-        } else if (!wordA && wordB) {
+        } else if (wordB === undefined && wordA !== undefined) {
           result = 1;
         } else {
           // check for words with numbers
