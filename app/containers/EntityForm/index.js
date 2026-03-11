@@ -466,6 +466,8 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       <div>
         <Formik
           initialValues={formData}
+          validateOnChange={false}
+          validateOnBlur
           onSubmit={(values) => handleSubmit(values)}
         >
           {({
@@ -571,7 +573,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                             <ButtonCancel type="button" onClick={handleCancel}>
                               <FormattedMessage {...appMessages.buttons.cancel} />
                             </ButtonCancel>
-                            {submitDisabled && (
+                            {submitDisabled && !saving && (
                               <ScreenReaderOnly id="submit-disabled-hint">
                                 The form is missing required input data or has validation errors
                               </ScreenReaderOnly>
@@ -580,7 +582,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                               type="submit"
                               disabled={submitDisabled}
                               aria-disabled={submitDisabled ? 'true' : undefined}
-                              aria-describedby={submitDisabled ? 'submit-disabled-hint' : undefined}
+                              aria-describedby={submitDisabled && !saving ? 'submit-disabled-hint' : undefined}
                             >
                               <FormattedMessage {...appMessages.buttons.save} />
                             </ButtonSubmit>
