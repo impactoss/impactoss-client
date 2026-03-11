@@ -10,6 +10,9 @@ import HelmetCanonical from 'components/HelmetCanonical';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { fromJS } from 'immutable';
+import ReactMarkdown from 'react-markdown';
+import rehypeExternalLinks from 'rehype-external-links';
+
 import { getDefaultTaxonomy } from 'utils/taxonomies';
 
 // containers
@@ -118,6 +121,26 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
     const reference = taxonomy && taxonomy.get('id');
     const contentTitle = (taxonomy && typeof reference !== 'undefined') ? this.getTaxTitle(reference) : '';
     const contentDescription = (taxonomy && typeof reference !== 'undefined') && this.getTaxDescription(reference);
+    const renderedDescription = Array.isArray(contentDescription)
+      ? contentDescription.map((part, i) => (
+        typeof part === 'string'
+          ? (
+            <ReactMarkdown
+              key={i}
+              rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
+            >
+              {part}
+            </ReactMarkdown>
+          )
+          : <React.Fragment key={i}>{part}</React.Fragment>
+      ))
+      : (
+        <ReactMarkdown
+          rehypePlugins={[[rehypeExternalLinks, { target: '_blank' }]]}
+        >
+          {contentDescription}
+        </ReactMarkdown>
+      );
     const buttons = [];
     if (dataReady) {
       buttons.push({
@@ -177,7 +200,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
                 title={contentTitle}
                 buttons={buttons}
               />
-              {contentDescription && <Description>{contentDescription}</Description>}
+              {contentDescription && <Description>{renderedDescription}</Description>}
               {!dataReady && <Loading />}
               {dataReady && taxonomy
                 && (

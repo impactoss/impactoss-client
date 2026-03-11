@@ -99,7 +99,11 @@ const render = (messages) => {
                 const pathname = state.getIn(['route', 'locationBeforeTransitions', 'pathname']);
                 const pathnamePrevious = state.getIn(['route', 'locationBeforeTransitions', 'pathnamePrevious']);
                 if (pathname !== pathnamePrevious) {
-                  document.body.focus();
+                  const firstFocusable = Array.from(
+                    document.querySelectorAll('a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])'),
+                  ).find((el) => el.offsetParent !== null);
+
+                  firstFocusable?.focus();
                 }
               }}
             />
