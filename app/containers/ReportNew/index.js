@@ -178,7 +178,6 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
     const canUserPublish = dataReady && canUserPublishReports(highestRole);
 
     const pageTitle = intl.formatMessage(messages.pageTitle, { indicatorReference });
-
     return (
       <div>
         <HelmetCanonical
@@ -191,24 +190,15 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
           ]}
         />
         <Content ref={this.scrollContainer}>
-          { !canUserPublish && !this.state.draftNoteDismissed && dataReady && !saveError && !!submitValid
-            && (
-              <Messages
-                type="info"
-                message={intl.formatMessage(messages.draftNote)}
-                onDismiss={this.dismissDraftNote}
-              />
-            )
-          }
-          {saveError
-            && (
-              <Messages
-                type="error"
-                messages={saveError.messages}
-                onDismiss={this.props.onServerErrorDismiss}
-              />
-            )
-          }
+          <Messages
+            type="info"
+            message={!canUserPublish
+              && !this.state.draftNoteDismissed
+              && dataReady
+              && !saveError
+              && !!submitValid ? intl.formatMessage(messages.draftNote) : null}
+            onDismiss={this.dismissDraftNote}
+          />
           {(saveSending || !dataReady)
             && <Loading />
           }
@@ -240,6 +230,8 @@ export class ReportNew extends React.PureComponent { // eslint-disable-line reac
                 headerTitle={pageTitle}
                 headerType={CONTENT_EDIT}
                 headerIcon="reports"
+                errorMessages={saveError ? saveError.messages : null}
+                onServerErrorDismiss={saveError ? this.props.onServerErrorDismiss : undefined}
               />
             )
           }

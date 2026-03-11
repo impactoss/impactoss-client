@@ -97,74 +97,71 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
 
   render() {
     const {
-      type, message, messageKey, messages, onDismiss, preMessage, details,
+      type,
+      message,
+      messageKey,
+      messages,
+      onDismiss,
+      preMessage,
+      details,
+      withoutAriaLive,
     } = this.props;
-
-    return !(message || messageKey || messages)
-      ? null
-      : (
-        <Styled
-          role={type === 'error' ? 'alert' : 'status'}
-          palette={type}
-          details={details}
-          withoutShadow={details}
-          spaceMessage={this.props.spaceMessage}
-        >
-          <MessageWrapper details={details}>
-            { type === 'error' && preMessage
-            && (
-              <PreMessage>
-                <strong>
-                  <FormattedMessage {...componentMessages.preBold} />
-                </strong>
-                <FormattedMessage {...componentMessages.preAdditional} />
-              </PreMessage>
-            )
-            }
-            { message
-            && (
-              <Message
-                palette={type}
-                details={details}
-                dismiss={!!onDismiss}
-              >
-                {this.translateMessages(message)}
-              </Message>
-            )
-            }
-            { messageKey
-            && (
-              <div>
-                <FormattedMessage
-                  values={this.props.messageArgs}
-                  {...appMessages.messages[messageKey]}
-                />
-              </div>
-            )
-            }
-            { messages && messages.map((m, i) => (
-              <Message
-                key={i}
-                palette={type}
-                details={details}
-                dismiss={!!onDismiss}
-              >
-                {this.translateMessages(m)}
-              </Message>
-            ))}
-            { onDismiss && details
-            && (
-              <DismissWrapperDetails>
-                <Dismiss onClick={onDismiss}>
-                  <Icon name="removeLarge" />
-                </Dismiss>
-              </DismissWrapperDetails>
-            )
-            }
-          </MessageWrapper>
-          { onDismiss && !details
-          && (
-            <DismissWrapper>
+    if (!(message || messageKey || messages)) {
+      return <div aria-live="polite" />;
+    }
+    let role;
+    let ariaLive;
+    if (!withoutAriaLive) {
+      role = type === 'error' ? 'alert' : 'status';
+      ariaLive = type === 'error' ? 'assertive' : 'polite';
+    }
+    return (
+      <Styled
+        role={role}
+        aria-live={ariaLive}
+        palette={type}
+        details={details}
+        withoutShadow={details}
+        spaceMessage={this.props.spaceMessage}
+      >
+        <MessageWrapper details={details}>
+          {type === 'error' && preMessage && (
+            <PreMessage>
+              <strong>
+                <FormattedMessage {...componentMessages.preBold} />
+              </strong>
+              <FormattedMessage {...componentMessages.preAdditional} />
+            </PreMessage>
+          )}
+          {message && (
+            <Message
+              palette={type}
+              details={details}
+              dismiss={!!onDismiss}
+            >
+              {this.translateMessages(message)}
+            </Message>
+          )}
+          {messageKey && (
+            <div>
+              <FormattedMessage
+                values={this.props.messageArgs}
+                {...appMessages.messages[messageKey]}
+              />
+            </div>
+          )}
+          {messages && messages.map((m, i) => (
+            <Message
+              key={i}
+              palette={type}
+              details={details}
+              dismiss={!!onDismiss}
+            >
+              {this.translateMessages(m)}
+            </Message>
+          ))}
+          {onDismiss && details && (
+            <DismissWrapperDetails>
               <Dismiss
                 onClick={onDismiss}
                 aria-label="Dismiss message"
@@ -172,11 +169,22 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
               >
                 <Icon name="removeLarge" />
               </Dismiss>
-            </DismissWrapper>
-          )
-          }
-        </Styled>
-      );
+            </DismissWrapperDetails>
+          )}
+        </MessageWrapper>
+        {onDismiss && !details && (
+          <DismissWrapper>
+            <Dismiss
+              onClick={onDismiss}
+              aria-label="Dismiss message"
+              title="Dismiss message"
+            >
+              <Icon name="removeLarge" />
+            </Dismiss>
+          </DismissWrapper>
+        )}
+      </Styled>
+    );
   }
 }
 
@@ -190,6 +198,7 @@ Messages.propTypes = {
   spaceMessage: PropTypes.bool,
   preMessage: PropTypes.bool,
   details: PropTypes.bool,
+  withoutAriaLive: PropTypes.bool,
   autoDismiss: PropTypes.number,
   intl: PropTypes.object.isRequired,
 };

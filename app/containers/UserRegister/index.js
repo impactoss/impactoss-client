@@ -75,15 +75,17 @@ export class UserRegister extends React.PureComponent { // eslint-disable-line r
         />
         <ContentNarrow>
           <ContentHeader title={intl.formatMessage(messages.pageTitle)} />
-          {!IS_PROD && <Messages type="info" messageKey="registeringServer" messageArgs={{ server: SERVER }} />}
-          {this.props.queryMessages.info && (
-            <Messages
-              type="info"
-              onDismiss={this.props.onDismissQueryMessages}
-              messageKey={this.props.queryMessages.info}
-            />
-          )}
-          {registerError && <Messages type="error" messages={registerError.messages} />}
+          <Messages
+            type="info"
+            messageKey={!IS_PROD ? 'registeringServer' : null}
+            messageArgs={{ server: SERVER }}
+          />
+          <Messages
+            type="info"
+            onDismiss={this.props.onDismissQueryMessages}
+            messageKey={this.props.queryMessages.info || null}
+          />
+          <Messages type="error" messages={registerError ? registerError.messages : null} />
           {registerSending && <Loading />}
           <>
             <AuthForm

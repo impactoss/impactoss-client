@@ -22,6 +22,7 @@ import appMessages from 'containers/App/messages';
 
 import Icon from 'components/Icon';
 import FieldFactory from 'components/fields/FieldFactory';
+import Messages from 'components/Messages';
 
 import Button from 'components/buttons/Button';
 import ButtonCancel from 'components/buttons/ButtonCancel';
@@ -178,14 +179,19 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       const modifiedField = field.modifyFieldAttributes
         ? field.modifyFieldAttributes(field, form.values)
         : field;
+      const ariaDescribedBy = [
+        field.hint ? `${field.id}-hint` : null,
+        `${formikField.name}-error`,
+      ].filter(Boolean).join(' ') || undefined;
 
       fieldProps = {
         ...modifiedField,
         onChange: formikField.onChange,
         onBlur: formikField.onBlur,
         value: formikField.value,
-        'aria-invalid': (meta.touched && meta.error) ? 'true' : null,
-        'aria-required': (field.validators && !!field.validators.required) ? 'true' : null,
+        'aria-invalid': (meta.touched && meta.error) ? 'true' : undefined,
+        'aria-required': (field.validators && !!field.validators.required) || undefined,
+        'aria-describedby': ariaDescribedBy,
       };
     }
     return fieldProps;
@@ -308,9 +314,9 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
             </FieldLabel>
           )
         }
-        { field.hint
-          && <Hint>{field.hint}</Hint>
-        }
+        {field.hint && (
+          <Hint id={`${field.id}-hint`}>{field.hint}</Hint>
+        )}
         { field.controlType !== 'checkbox' && formField }
       </FormFieldWrap>
     );
@@ -351,6 +357,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
               >
                 {({ field: formikField, form, meta }) => {
                   const fieldProps = this.getFieldProps(field, form, formikField, meta);
+                  const hasError = meta.touched && meta.error;
                   return (
                     <Field id={`field-${field.id}`} labelledGroup={!!field.label}>
                       {this.renderFormField(
@@ -360,15 +367,19 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                         scrollContainer,
                         form,
                       )}
-                      {meta.touched && meta.error && (
-                        <ErrorWrapper>
+                      <ErrorWrapper
+                        id={`${formikField.name}-error`}
+                        role="alert"
+                        aria-live="assertive"
+                      >
+                        {hasError && (
                           <ErrorMessage
                             className="errors"
                             name={formikField.name}
                             show={(fieldValue) => fieldValue.touched || !fieldValue.pristine}
                           />
-                        </ErrorWrapper>
-                      )}
+                        )}
+                      </ErrorWrapper>
                     </Field>
                   );
                 }
@@ -447,12 +458,16 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
       headerTitle,
       headerType,
       headerIcon,
+      errorMessages,
+      onServerErrorDismiss,
     } = this.props;
     const hasEntityNewModal = !!newEntityModal;
     return (
       <div>
         <Formik
           initialValues={formData}
+          validateOnChange={false}
+          validateOnBlur
           onSubmit={(values) => handleSubmit(values)}
         >
           {({
@@ -479,6 +494,11 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                     ]}
                   />
                 )}
+                <Messages
+                  type="error"
+                  messages={errorMessages || null}
+                  onDismiss={onServerErrorDismiss}
+                />
                 <FormWrapper withoutShadow={inModal} hasMarginBottom={!inModal}>
                   <StyledForm aria-label={headerTitle}>
                     <FormBody>
@@ -553,7 +573,7 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                             <ButtonCancel type="button" onClick={handleCancel}>
                               <FormattedMessage {...appMessages.buttons.cancel} />
                             </ButtonCancel>
-                            {submitDisabled && (
+                            {submitDisabled && !saving && (
                               <ScreenReaderOnly id="submit-disabled-hint">
                                 The form is missing required input data or has validation errors
                               </ScreenReaderOnly>
@@ -561,8 +581,8 @@ class EntityForm extends React.Component { // eslint-disable-line react/prefer-s
                             <ButtonSubmit
                               type="submit"
                               disabled={submitDisabled}
-                              aria-disabled={submitDisabled ? 'true' : null}
-                              aria-describedby={submitDisabled ? 'submit-disabled-hint' : null}
+                              aria-disabled={submitDisabled ? 'true' : undefined}
+                              aria-describedby={submitDisabled && !saving ? 'submit-disabled-hint' : undefined}
                             >
                               <FormattedMessage {...appMessages.buttons.save} />
                             </ButtonSubmit>
@@ -600,6 +620,8 @@ EntityForm.propTypes = {
   headerType: PropTypes.string,
   headerTitle: PropTypes.string,
   headerIcon: PropTypes.string,
+  errorMessages: PropTypes.array,
+  onServerErrorDismiss: PropTypes.func,
 };
 EntityForm.defaultProps = {
   saving: false,

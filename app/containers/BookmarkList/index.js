@@ -38,6 +38,7 @@ import Content from 'components/styled/Content';
 import EntityListHeader from 'components/EntityListMain/EntityListGroups/EntityListHeader';
 import EntityListItemWrapper from 'components/EntityListMain/EntityListGroups/EntityListItems/EntityListItemWrapper';
 import PrintHide from 'components/styled/PrintHide';
+import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 import Footer from 'containers/Footer';
 
 import {
@@ -309,9 +310,20 @@ export class BookmarkList extends React.PureComponent { // eslint-disable-line r
                       onSearch={onSearch}
                       onClear={() => onClear(['search'])}
                       showHint={false}
+                      resultsId="bookmark-results"
                     />
                   </EntityListSearch>
-                  <ListWrapper>
+                  <ListWrapper id="bookmark-results">
+                    <ScreenReaderOnly aria-live="polite" role="status">
+                      {allBookmarks.size === 0
+                        && intl.formatMessage(messages.noBookmarks)}
+                      {allBookmarks.size > 0 && bookmarksFiltered.size === 0
+                        && intl.formatMessage(messages.noResults)}
+                      {bookmarksFiltered.size > 0
+                        && `${bookmarksFiltered.size} ${bookmarksFiltered.size === 1
+                          ? intl.formatMessage(messages.single)
+                          : intl.formatMessage(messages.plural)}`}
+                    </ScreenReaderOnly>
                     {(allBookmarks.size === 0) && (
                       <ListHint>
                         <FormattedMessage {...messages.noBookmarks} />

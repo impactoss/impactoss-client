@@ -104,22 +104,25 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
     } = this.props;
     return (
       <Styled expanded={expandNo > 0}>
-        { error && error.map((updateError, i) => (
-          <Messages
-            key={i}
-            type="error"
-            messages={
-              updateError
-                .getIn(['error', 'messages'])
-                .map((msg) => this.transformMessage(updateError.get('type'), msg, intl))
-                .valueSeq()
-                .toArray()
-            }
-            onDismiss={() => this.props.onDismissError(updateError.get('key'))}
-            preMessage={false}
-            details
-          />
-        ))}
+        <div aria-live="polite">
+          {error && error.map((updateError, i) => (
+            <Messages
+              key={i}
+              withoutAriaLive
+              type="error"
+              messages={
+                updateError
+                  .getIn(['error', 'messages'])
+                  .map((msg) => this.transformMessage(updateError.get('type'), msg, intl))
+                  .valueSeq()
+                  .toArray()
+              }
+              onDismiss={() => this.props.onDismissError(updateError.get('key'))}
+              preMessage={false}
+              details
+            />
+          ))}
+        </div>
         <Item error={error}>
           <MainWrapper expandable={entity.get('expandable')}>
             <MainInnerWrapper isManager={isManager}>

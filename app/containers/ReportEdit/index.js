@@ -59,7 +59,6 @@ import {
   selectSessionUserId,
 } from 'containers/App/selectors';
 
-import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import EntityForm from 'containers/EntityForm';
@@ -207,6 +206,13 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
         indicatorReference: viewEntity.getIn(['attributes', 'indicator_id']),
       });
     }
+    let errorMessages = null;
+    if (saveError) {
+      errorMessages = saveError.messages;
+    }
+    if (deleteError) {
+      errorMessages = deleteError.messages;
+    }
     return (
       <div>
         <HelmetCanonical
@@ -216,18 +222,6 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
           ]}
         />
         <Content ref={this.scrollContainer}>
-          {saveError
-            && (
-              <Messages
-                type="error"
-                messages={saveError.messages}
-                onDismiss={this.props.onServerErrorDismiss}
-              />
-            )
-          }
-          {deleteError
-            && <Messages type="error" messages={deleteError.messages} />
-          }
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
           }
@@ -269,6 +263,8 @@ export class ReportEdit extends React.PureComponent { // eslint-disable-line rea
                 headerTitle={pageTitle}
                 headerType={CONTENT_EDIT}
                 headerIcon="reports"
+                errorMessages={errorMessages}
+                onServerErrorDismiss={saveError ? this.props.onServerErrorDismiss : undefined}
               />
             )
           }

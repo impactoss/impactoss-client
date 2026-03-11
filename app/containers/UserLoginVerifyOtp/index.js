@@ -95,18 +95,14 @@ export class UserLoginVerifyOtp extends React.PureComponent { // eslint-disable-
         <ContentNarrow>
           <ContentHeader title={title} />
           <Description>{description}</Description>
-          {(authError) && (
-            <Messages
-              type="error"
-              messages={authError.messages}
-            />
-          )}
-          {(resendError) && (
-            <Messages
-              type="error"
-              messages={resendError.messages}
-            />
-          )}
+          <Messages
+            type="error"
+            messages={authError ? authError.messages : null}
+          />
+          <Messages
+            type="error"
+            messages={resendError ? resendError.messages : null}
+          />
           {(authSending || resendSending) && (
             <Loading />
           )}

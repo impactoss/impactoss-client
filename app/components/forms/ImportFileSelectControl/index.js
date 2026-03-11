@@ -111,18 +111,19 @@ class ImportFileSelectControl extends React.PureComponent { // eslint-disable-li
   };
 
   render() {
-    const { intl } = this.props;
+    const { intl, disabled } = this.props;
     return (
       <Styled>
-        {(this.state.errors.length > 0)
-          && (
-            <Messages
-              type="error"
-              messages={[intl.formatMessage(messages.fileSelectError)].concat(this.state.errors.map((err) => `Code: "${err.code}", Message: "${err.message}"`))}
-              onDismiss={this.onDismissErrors}
-            />
-          )
-        }
+        <Messages
+          type="error"
+          messages={this.state.errors.length > 0
+            ? [intl.formatMessage(messages.fileSelectError)].concat(
+              this.state.errors.map((err) => `Code: "${err.code}", Message: "${err.message}"`),
+            )
+            : null
+          }
+          onDismiss={this.onDismissErrors}
+        />
         {this.props.value && (this.state.errors.length === 0)
           && (
             <div>
@@ -134,11 +135,12 @@ class ImportFileSelectControl extends React.PureComponent { // eslint-disable-li
                   onClick={this.handleRemove}
                   aria-label={`Remove file ${this.props.value.file.name}`}
                   title="Remove file"
+                  disabled={disabled}
                 >
                   <Icon name="removeLarge" />
                 </Remove>
               </DocumentWrapEdit>
-              <ImportButton type="submit" primary>
+              <ImportButton type="submit" primary disabled={disabled}>
                 {this.props.value.rows.length === 1
                   && <FormattedMessage {...messages.import.single} values={{ total: this.props.value.rows.length }} />
                 }
@@ -168,6 +170,7 @@ class ImportFileSelectControl extends React.PureComponent { // eslint-disable-li
                   title={intl.formatMessage(messages.selectFile)}
                   aria-label={intl.formatMessage(messages.selectFile)}
                   icon="add"
+                  disabled={disabled}
                 />
               )}
             </CsvReaderHandler>
@@ -179,6 +182,7 @@ class ImportFileSelectControl extends React.PureComponent { // eslint-disable-li
 
 ImportFileSelectControl.propTypes = {
   onChange: PropTypes.func,
+  disabled: PropTypes.bool,
   value: PropTypes.object,
   as: PropTypes.string,
   accept: PropTypes.string,

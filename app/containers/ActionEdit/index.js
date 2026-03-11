@@ -57,7 +57,6 @@ import {
   selectMeasureReferences,
 } from 'containers/App/selectors';
 
-import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import EntityForm from 'containers/EntityForm';
@@ -251,7 +250,13 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
     const {
       saveSending, saveError, deleteSending, deleteError,
     } = viewDomain.get('page').toJS();
-
+    let errorMessages = null;
+    if (saveError) {
+      errorMessages = saveError.messages;
+    }
+    if (deleteError) {
+      errorMessages = deleteError.messages;
+    }
     return (
       <div>
         <HelmetCanonical
@@ -261,18 +266,6 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
           ]}
         />
         <Content ref={this.scrollContainer}>
-          {saveError
-            && (
-              <Messages
-                type="error"
-                messages={saveError.messages}
-                onDismiss={this.props.onServerErrorDismiss}
-              />
-            )
-          }
-          {deleteError
-            && <Messages type="error" messages={deleteError.messages} />
-          }
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
           }
@@ -326,6 +319,8 @@ export class ActionEdit extends React.Component { // eslint-disable-line react/p
                 headerTitle={intl.formatMessage(messages.pageTitle)}
                 headerType={CONTENT_EDIT}
                 headerIcon="measures"
+                errorMessages={errorMessages}
+                onServerErrorDismiss={saveError ? this.props.onServerErrorDismiss : undefined}
               />
             )
           }

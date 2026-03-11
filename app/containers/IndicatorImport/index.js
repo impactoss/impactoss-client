@@ -368,6 +368,7 @@ function mapDispatchToProps(dispatch) {
               data: invalidItem,
               messages: [`Row ${invalidItem.row}: Invalid connection attribute for ${invalidItem.relField}: '${invalidItem.id}'`],
               name: 'Invalid connection',
+              type: 'client-error',
             };
             dispatch(saveError(
               error,

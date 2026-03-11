@@ -37,7 +37,6 @@ import appMessages from 'containers/App/messages';
 import { getCheckedValuesFromOptions } from 'components/forms/MultiSelectControl';
 
 import Content from 'components/Content';
-import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import EntityForm from 'containers/EntityForm';
 
@@ -135,15 +134,6 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
           ref={this.scrollContainer}
           inModal={inModal}
         >
-          {saveError
-            && (
-              <Messages
-                type="error"
-                messages={saveError.messages}
-                onDismiss={this.props.onServerErrorDismiss}
-              />
-            )
-          }
           {(saveSending)
             && <Loading />
           }
@@ -182,6 +172,8 @@ export class EntityNew extends React.PureComponent { // eslint-disable-line reac
             headerTitle={pageTitle}
             headerType={CONTENT_MODAL}
             headerIcon={icon}
+            errorMessages={saveError ? saveError.messages : null}
+            onServerErrorDismiss={saveError ? this.props.onServerErrorDismiss : undefined}
           />
           {saveSending
             && <Loading />

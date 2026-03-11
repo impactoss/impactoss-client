@@ -297,19 +297,15 @@ export class IndicatorView extends React.PureComponent { // eslint-disable-line 
               type={lowerCase(intl.formatMessage(appMessages.entities.indicators.single))}
             />
           )}
-          {this.props.queryMessages.info && appMessages.entities[this.props.queryMessages.infotype]
-            && (
-              <Messages
-                spaceMessage
-                type="success"
-                onDismiss={this.props.onDismissQueryMessages}
-                messageKey={this.props.queryMessages.info}
-                messageArgs={{
-                  entityType: intl.formatMessage(appMessages.entities[this.props.queryMessages.infotype].single),
-                }}
-              />
-            )
-          }
+          <Messages
+            spaceMessage
+            type="success"
+            onDismiss={this.props.onDismissQueryMessages}
+            messageKey={this.props.queryMessages.info && appMessages.entities[this.props.queryMessages.infotype] ? this.props.queryMessages.info : null}
+            messageArgs={{
+              entityType: intl.formatMessage(appMessages.entities[this.props.queryMessages.infotype].single),
+            }}
+          />
           { !dataReady
             && <Loading />
           }

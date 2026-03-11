@@ -45,6 +45,7 @@ import Container from 'components/styled/Container';
 import A from 'components/styled/A';
 import Content from 'components/styled/Content';
 import Description from 'components/styled/Description';
+import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 
 import Footer from 'containers/Footer';
 
@@ -289,142 +290,157 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                       />
                     </Description>
                   )}
-                  <EntityListSearch role="search">
-                    <TagSearch
-                      filters={[]}
-                      placeholder={intl.formatMessage(messages.placeholder)}
-                      searchQuery={location.query.search || ''}
-                      onSearch={onSearch}
-                      onClear={() => onClear(['search'])}
-                      focusOnMount
-                      resultsId="search-results"
-                      onSkipToResults={() => {
-                        this.focusResults();
-                      }}
-                      searchAttributes={compileSearchAttributes(CONFIG)}
-                    />
-                  </EntityListSearch>
-                  <ListWrapper
-                    id="search-results"
-                    ref={(el) => { this.searchResults = el; }}
-                    tabindex="0"
-                  >
-                    {!isQueryMinLength && hasEntry && !hasResults && (
-                      <ListHint>
-                        <FormattedMessage {...messages.hints.minLength} />
-                      </ListHint>
-                    )}
-                    {noResults && !noEntry && (
-                      <ListHint>
-                        <FormattedMessage {...messages.hints.noResults} />
-                      </ListHint>
-                    )}
-                    {hasResults && (
-                      <Box>
+                  <div role="search">
+                    <EntityListSearch>
+                      <TagSearch
+                        filters={[]}
+                        placeholder={intl.formatMessage(messages.placeholder)}
+                        searchQuery={location.query.search || ''}
+                        onSearch={onSearch}
+                        onClear={() => onClear(['search'])}
+                        focusOnMount
+                        resultsId="search-results"
+                        onSkipToResults={() => {
+                          this.focusResults();
+                        }}
+                        searchAttributes={compileSearchAttributes(CONFIG)}
+                      />
+                    </EntityListSearch>
+                    <ListWrapper
+                      id="search-results"
+                      ref={(el) => { this.searchResults = el; }}
+                      tabindex="0"
+                    >
+                      <ScreenReaderOnly aria-live="polite" role="status">
+                        {!isQueryMinLength && hasEntry && !hasResults
+                          && intl.formatMessage(messages.hints.minLength)}
+                        {noResults && !noEntry
+                          && intl.formatMessage(messages.hints.noResults)}
+                        {hasResults
+                          && `${intl.formatMessage(
+                            messages.hints.resultsFound,
+                            { count: countResults },
+                          )} ${countTargets > 1 ? intl.formatMessage(
+                            messages.hints.hasCountTargets,
+                          ) : ''}`}
+                      </ScreenReaderOnly>
+                      {!isQueryMinLength && hasEntry && !hasResults && (
                         <ListHint>
-                          <Text>
-                            {`${intl.formatMessage(messages.hints.resultsFound, { count: countResults })}`}
-                            {countTargets > 1
-                              && ` ${intl.formatMessage(messages.hints.hasCountTargets)}`
-                            }
-                          </Text>
+                          <FormattedMessage {...messages.hints.minLength} />
                         </ListHint>
-                        {entities.map(
-                          (group, id) => {
-                            const hasGroupResults = group.get('targets').some(
-                              (target) => target.get('results') && target.get('results').size > 0,
-                            );
-                            if (hasGroupResults) {
-                              return (
-                                <Box key={id} margin={{ vertical: 'medium' }}>
-                                  {group.get('group') !== 'entities' && (
-                                    <Box margin={{ bottom: 'xsmall' }}>
-                                      <Text size="small">
-                                        <FormattedMessage {...messages.groups[group.get('group')]} />
-                                      </Text>
-                                    </Box>
-                                  )}
-                                  <Box>
-                                    {group.get('targets') && group.get('targets').valueSeq().map(
-                                      (target) => {
-                                        const hasTargetResults = target.get('results') && target.get('results').size > 0;
-                                        if (hasTargetResults) {
-                                          const count = target.get('results').size;
-                                          const title = this.getTargetTitle(target, count === 1, this.props.intl);
-                                          const otherTargets = countTargets > 1;
-                                          const active = qe(target.get('path'), activeTargetPath) || !otherTargets;
-                                          return (
-                                            <Box key={target.get('path')}>
-                                              <Box gap="xsmall">
-                                                <Target
-                                                  id={`search-target-btn-${target.get('path')}`}
-                                                  onClick={(evt) => {
-                                                    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-                                                    if (active) {
-                                                      this.props.onTargetSelect('');
-                                                    } else {
-                                                      this.props.onTargetSelect(target.get('path'));
-                                                    }
-                                                  }}
-                                                  active={active}
-                                                  disabled={!otherTargets}
-                                                  aria-expanded={otherTargets ? active : null}
-                                                >
-                                                  <Box direction="row" gap="small" align="center" justify="between">
-                                                    <Box direction="row" gap="xsmall" pad={{ vertical: 'xsmall' }}>
-                                                      <Text
-                                                        as="h2"
-                                                        size="medium"
-                                                        weight={600}
-                                                        style={{ margin: 0 }}
-                                                      >
-                                                        {`${count} ${title}`}
-                                                      </Text>
-                                                    </Box>
-                                                    {otherTargets && active && (
-                                                      <FormUp size="medium" color="text" aria-hidden="true" aria-label={null} />
-                                                    )}
-                                                    {otherTargets && !active && (
-                                                      <FormDown size="medium" color="text" aria-hidden="true" aria-label={null} />
-                                                    )}
-                                                  </Box>
-                                                </Target>
-                                              </Box>
-                                              {
-                                                (active || !otherTargets) && (
-                                                  <Box
-                                                    role="region"
-                                                    aria-labelledby={`search-target-btn-${target.get('path')}`}
-                                                    margin={{ bottom: 'large' }}
-                                                    gap="xsmall"
-                                                  >
-                                                    {target.get('results').toList().map((entity, key) => (
-                                                      <EntityListItem
-                                                        key={key}
-                                                        entity={entity}
-                                                        entityPath={target.get('clientPath') || target.get('path')}
-                                                        onEntityClick={onEntityClick}
-                                                      />
-                                                    ))}
-                                                  </Box>
-                                                )
-                                              }
-                                            </Box>
-                                          );
-                                        }
-                                        return null;
-                                      },
-                                    )}
-                                  </Box>
-                                </Box>
+                      )}
+                      {noResults && !noEntry && (
+                        <ListHint>
+                          <FormattedMessage {...messages.hints.noResults} />
+                        </ListHint>
+                      )}
+                      {hasResults && (
+                        <Box>
+                          <ListHint>
+                            <Text>
+                              {`${intl.formatMessage(messages.hints.resultsFound, { count: countResults })}`}
+                              {countTargets > 1
+                                && ` ${intl.formatMessage(messages.hints.hasCountTargets)}`
+                              }
+                            </Text>
+                          </ListHint>
+                          {entities.map(
+                            (group, id) => {
+                              const hasGroupResults = group.get('targets').some(
+                                (target) => target.get('results') && target.get('results').size > 0,
                               );
-                            }
-                            return null;
-                          },
-                        )}
-                      </Box>
-                    )}
-                  </ListWrapper>
+                              if (hasGroupResults) {
+                                return (
+                                  <Box key={id} margin={{ vertical: 'medium' }}>
+                                    {group.get('group') !== 'entities' && (
+                                      <Box margin={{ bottom: 'xsmall' }}>
+                                        <Text size="small">
+                                          <FormattedMessage {...messages.groups[group.get('group')]} />
+                                        </Text>
+                                      </Box>
+                                    )}
+                                    <Box>
+                                      {group.get('targets') && group.get('targets').valueSeq().map(
+                                        (target) => {
+                                          const hasTargetResults = target.get('results') && target.get('results').size > 0;
+                                          if (hasTargetResults) {
+                                            const count = target.get('results').size;
+                                            const title = this.getTargetTitle(target, count === 1, this.props.intl);
+                                            const otherTargets = countTargets > 1;
+                                            const active = qe(target.get('path'), activeTargetPath) || !otherTargets;
+                                            return (
+                                              <Box key={target.get('path')}>
+                                                <Box gap="xsmall">
+                                                  <Target
+                                                    id={`search-target-btn-${target.get('path')}`}
+                                                    onClick={(evt) => {
+                                                      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+                                                      if (active) {
+                                                        this.props.onTargetSelect('');
+                                                      } else {
+                                                        this.props.onTargetSelect(target.get('path'));
+                                                      }
+                                                    }}
+                                                    active={active}
+                                                    disabled={!otherTargets}
+                                                    aria-expanded={otherTargets ? active : null}
+                                                  >
+                                                    <Box direction="row" gap="small" align="center" justify="between">
+                                                      <Box direction="row" gap="xsmall" pad={{ vertical: 'xsmall' }}>
+                                                        <Text
+                                                          as="h2"
+                                                          size="medium"
+                                                          weight={600}
+                                                          style={{ margin: 0 }}
+                                                        >
+                                                          {`${count} ${title}`}
+                                                        </Text>
+                                                      </Box>
+                                                      {otherTargets && active && (
+                                                        <FormUp size="medium" color="text" aria-hidden="true" aria-label={null} />
+                                                      )}
+                                                      {otherTargets && !active && (
+                                                        <FormDown size="medium" color="text" aria-hidden="true" aria-label={null} />
+                                                      )}
+                                                    </Box>
+                                                  </Target>
+                                                </Box>
+                                                {
+                                                  (active || !otherTargets) && (
+                                                    <Box
+                                                      role="region"
+                                                      aria-labelledby={`search-target-btn-${target.get('path')}`}
+                                                      margin={{ bottom: 'large' }}
+                                                      gap="xsmall"
+                                                    >
+                                                      {target.get('results').toList().map((entity, key) => (
+                                                        <EntityListItem
+                                                          key={key}
+                                                          entity={entity}
+                                                          entityPath={target.get('clientPath') || target.get('path')}
+                                                          onEntityClick={onEntityClick}
+                                                        />
+                                                      ))}
+                                                    </Box>
+                                                  )
+                                                }
+                                              </Box>
+                                            );
+                                          }
+                                          return null;
+                                        },
+                                      )}
+                                    </Box>
+                                  </Box>
+                                );
+                              }
+                              return null;
+                            },
+                          )}
+                        </Box>
+                      )}
+                    </ListWrapper>
+                  </div>
                 </div>
               )}
             </Content>

@@ -51,9 +51,7 @@ export class UserPassword extends React.PureComponent { // eslint-disable-line r
           <ContentHeader
             title={intl.formatMessage(messages.pageTitle)}
           />
-          {passwordError
-            && <Messages type="error" messages={passwordError.messages} />
-          }
+          <Messages type="error" messages={passwordError ? passwordError.messages : null} />
           {passwordSending
             && <Loading />
           }

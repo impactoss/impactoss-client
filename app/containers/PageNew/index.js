@@ -35,7 +35,6 @@ import {
   selectReadyForAuthCheck,
 } from 'containers/App/selectors';
 
-import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import EntityForm from 'containers/EntityForm';
@@ -114,15 +113,6 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
           ]}
         />
         <Content ref={this.scrollContainer}>
-          {saveError
-            && (
-              <Messages
-                type="error"
-                messages={saveError.messages}
-                onDismiss={this.props.onServerErrorDismiss}
-              />
-            )
-          }
           {(saveSending || !dataReady)
             && <Loading />
           }
@@ -145,6 +135,8 @@ export class PageNew extends React.PureComponent { // eslint-disable-line react/
                 scrollContainer={this.scrollContainer.current}
                 headerTitle={intl.formatMessage(messages.pageTitle)}
                 headerType={CONTENT_EDIT}
+                errorMessages={saveError ? saveError.messages : null}
+                onServerErrorDismiss={saveError ? this.props.onServerErrorDismiss : undefined}
               />
             )
           }
