@@ -85,13 +85,29 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
     ],
   }]);
 
-  getBodyMainFields = (entity) => ([{
-    fields: [getMarkdownField(entity, 'content', false)],
-  }]);
+  getBodyMainFields = (entity, isManager) => {
+    let groups = [];
+    groups = [
+      ...groups,
+      {
+        fields: [getMarkdownField(entity, 'content', false)],
+      },
+    ];
+    if (!isManager) {
+      groups = [
+        ...groups,
+        {
+          fields: [getMetaField(entity)],
+          borderTop: true,
+        },
+      ];
+    }
+    return groups;
+  };
 
   getFields = (entity, isManager) => ({
     body: {
-      main: this.getBodyMainFields(entity),
+      main: this.getBodyMainFields(entity, isManager),
       aside: isManager
         ? this.getBodyAsideFields(entity)
         : null,

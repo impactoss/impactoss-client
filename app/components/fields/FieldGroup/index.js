@@ -25,6 +25,7 @@ const FieldGroup = ({
       bottom={bottom}
       as={group.label ? 'section' : 'div'}
       aria-labelledby={group.label ? groupTitleId : null}
+      borderTop={group.borderTop}
     >
       {group.label && (
         <FieldGroupLabel basic={group.type === 'smartTaxonomy'}>

@@ -3,6 +3,8 @@ import { palette } from 'styled-theme';
 
 const FieldGroupWrapper = styled.div`
   background-color: ${(props) => props.groupType === 'dark' ? palette('light', 0) : 'transparent'};
+  border-top: ${(props) => props.borderTop ? '1px solid' : 0};
+  border-top-color: ${palette('light', 1)};
   border-bottom: ${(props) => props.groupType === 'smartTaxonomy' ? '1px solid' : 0};
   border-bottom-color: ${palette('light', 1)};
   padding: ${(props) => props.seamless ? '15px 15px 10px 0' : '15px'};
