@@ -375,7 +375,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                                       <Text
                                                         as="h2"
                                                         size="medium"
-                                                        weight="600"
+                                                        weight={600}
                                                         style={{ margin: 0 }}
                                                       >
                                                         {`${count} ${title}`}
