@@ -16,7 +16,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { qe } from 'utils/quasi-equals';
 
 import { loadEntitiesIfNeeded, openBookmark } from 'containers/App/actions';
-import { selectReady, selectEntities } from 'containers/App/selectors';
+import { selectReady, selectBookmarks } from 'containers/App/selectors';
 import { FEATURES } from 'themes/config';
 import { CONTENT_LIST, VIEWPORTS } from 'containers/App/constants';
 import appMessages from 'containers/App/messages';
@@ -48,7 +48,7 @@ import {
 } from './actions';
 
 import { DEPENDENCIES, CONFIG } from './constants';
-import { selectBookmarks, selectTypeQuery } from './selectors';
+import { selectViewBookmarks, selectTypeQuery } from './selectors';
 import messages from './messages';
 
 const ScrollableWrapper = styled(Scrollable)`
@@ -383,9 +383,9 @@ BookmarkList.propTypes = {
 
 const mapStateToProps = (state, props) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
-  bookmarksForSearch: selectBookmarks(state, fromJS(props.location.query)),
+  bookmarksForSearch: selectViewBookmarks(state, fromJS(props.location.query)),
   activeType: selectTypeQuery(state),
-  allBookmarks: selectEntities(state, 'bookmarks'),
+  allBookmarks: selectBookmarks(state),
 });
 function mapDispatchToProps(dispatch) {
   return {

@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 import { Map } from 'immutable';
 
 import {
-  selectEntities,
+  selectFrameworkTaxonomies,
   selectIndicatorsSearchQuery,
   selectWithoutQuery,
   selectConnectionQuery,
@@ -20,7 +20,12 @@ import {
   selectMeasureCategoriesByMeasure,
   selectMeasureIndicatorsByIndicator,
   selectRecommendationIndicatorsByIndicator,
+  selectProgressReports,
+  selectDueDates,
   selectUsers,
+  selectCategories,
+  selectMeasureCategories,
+  selectRecommendationCategories,
 } from 'containers/App/selectors';
 
 import {
@@ -61,7 +66,7 @@ export const selectConnections = createSelector(
   selectConnectionsMeasures,
   selectFWRecommendations,
   selectRecommendationCategoriesByRecommendation,
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   selectUsers,
   (
     ready,
@@ -87,15 +92,18 @@ export const selectConnections = createSelector(
   },
 );
 
+// TODO optimise: use pre-grouped selectors (selectMeasureCategoriesByCategory,
+// selectRecommendationCategoriesByCategory) instead of filtering the full
+// association tables with nested .filter()/.groupBy()
 export const selectConnectedTaxonomies = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
-  (state) => selectConnections(state),
-  (state) => selectFWTaxonomiesSorted(state),
-  (state) => selectEntities(state, 'categories'),
-  (state) => selectEntities(state, 'measure_categories'),
-  (state) => selectEntities(state, 'recommendation_categories'),
-  (state) => selectFrameworks(state),
-  (state) => selectEntities(state, 'framework_taxonomies'),
+  selectConnections,
+  selectFWTaxonomiesSorted,
+  selectCategories,
+  selectMeasureCategories,
+  selectRecommendationCategories,
+  selectFrameworks,
+  selectFrameworkTaxonomies,
   (
     ready,
     connections,
@@ -190,12 +198,15 @@ const selectIndicatorsNestedQ = (state, locationQuery) =>
     locationQuery,
   });
 
+// TODO optimise: pre-group recommendations by framework_id outside .map()
+// to avoid repeated .groupBy() per entity
+// TODO optimise: skip .set() for entities without associations to preserve referential equality
 // nest connected recommendation ids
 // nest connected recommendation ids byfw
 const selectIndicatorsNestedWithRecs = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectIndicatorsNestedQ,
-  (state) => selectConnections(state),
+  selectConnections,
   selectRecommendationIndicatorsByIndicator,
   (ready, entities, connections, associationsGrouped) => {
     if (ready && connections.get('recommendations')) {
@@ -230,11 +241,11 @@ const selectIndicatorsNestedWithRecs = createSelector(
   },
 );
 
-
+// TODO optimise: skip .set() for entities without associations to preserve referential equality
 const selectIndicatorsNestedWithMeasures = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectIndicatorsNestedWithRecs,
-  (state) => selectConnections(state),
+  selectConnections,
   selectMeasureIndicatorsByIndicator,
   (ready, entities, connections, associationsGrouped) => {
     if (ready && connections.get('measures')) {
@@ -248,12 +259,16 @@ const selectIndicatorsNestedWithMeasures = createSelector(
     return entities;
   },
 );
+
+// TODO optimise: heavy selector — nested .filter() inside .map() is O(indicators × reports/dueDates/users)
+// consider pre-grouping progressReports, dueDates by indicator_id before the .map()
+// consider using a lookup map for users by id instead of .find() per entity
 const selectIndicatorsNested = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectIndicatorsNestedWithMeasures,
-  (state) => selectEntities(state, 'progress_reports'),
-  (state) => selectEntities(state, 'due_dates'),
-  (state) => selectEntities(state, 'users'),
+  selectProgressReports,
+  selectDueDates,
+  selectUsers,
   (
     ready,
     entities,
@@ -304,7 +319,7 @@ const selectIndicatorsNested = createSelector(
 );
 const selectIndicatorsWithout = createSelector(
   selectIndicatorsNested,
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   selectWithoutQuery,
   (entities, categories, query) => query
     ? filterEntitiesWithoutAssociation(entities, categories, query)
@@ -332,11 +347,15 @@ const selectIndicatorsByConnectedCategories = createSelector(
     ? filterEntitiesByConnectedCategories(entities, connections, query)
     : entities,
 );
+
+// TODO optimise: heavy selector — .filter() inside .map() is heavy
+// dueDates and reports are already nested on entities from selectIndicatorsNested
+// so this selector re-filters the same data — consider reusing the nested values instead
 const selectIndicatorsExpandables = createSelector(
   (state) => selectReady(state, { path: DEPENDENCIES }),
   selectIndicatorsByConnectedCategories,
-  (state) => selectEntities(state, 'progress_reports'),
-  (state) => selectEntities(state, 'due_dates'),
+  selectProgressReports,
+  selectDueDates,
   selectExpandQuery,
   (ready, entities, reports, dueDates, expandNo) => !ready
     ? entities

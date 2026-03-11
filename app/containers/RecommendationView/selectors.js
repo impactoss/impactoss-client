@@ -4,7 +4,8 @@ import { createSelector } from 'reselect';
 import {
   // selectReady,
   selectEntity,
-  selectEntities,
+  selectUsers,
+  selectCategories,
   // selectMeasureConnections,
   selectTaxonomiesSorted,
   // selectIndicatorConnections,
@@ -17,11 +18,14 @@ import {
   // selectRecommendationIndicatorsByIndicator,
   // selectRecommendationIndicatorsByRecommendation,
   // selectRecommendationMeasuresByRecommendation,
+  selectRecommendationCategoriesByRecommendation,
 } from 'containers/App/selectors';
+
+import { qe } from 'utils/quasi-equals';
 
 import {
   entitySetUser,
-  prepareTaxonomiesIsAssociated,
+  filterTaxonomies,
   // getEntityCategories,
 } from 'utils/entities';
 
@@ -29,24 +33,56 @@ import {
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'recommendations', id }),
-  (state) => selectEntities(state, 'users'),
+  selectUsers,
   (entity, users) => entitySetUser(entity, users),
 );
 
-// TODO optimise use selectRecommendationCategoriesByRecommendation
 export const selectTaxonomies = createSelector(
   (state, id) => id,
-  (state) => selectTaxonomiesSorted(state),
-  (state) => selectEntities(state, 'categories'),
-  (state) => selectEntities(state, 'recommendation_categories'),
-  (id, taxonomies, categories, associations) => prepareTaxonomiesIsAssociated(
-    taxonomies,
-    categories,
-    associations,
-    'tags_recommendations',
-    'recommendation_id',
-    id,
-  ),
+  selectTaxonomiesSorted,
+  selectCategories,
+  selectRecommendationCategoriesByRecommendation,
+  (id, taxonomies, categories, associationsGrouped) => {
+    if (!taxonomies || !categories || !associationsGrouped) return null;
+    const associatedCategoryIds = associationsGrouped.get(parseInt(id, 10));
+    const filteredTaxonomies = filterTaxonomies(
+      taxonomies,
+      'tags_recommendations',
+      true,
+    ).map(
+      (tax) => tax.set('tags', tax.getIn(['attributes', 'tags_recommendations'])),
+    );
+    return filteredTaxonomies.map(
+      (tax) => {
+        const childTax = taxonomies.find(
+          (potential) => qe(potential.getIn(['attributes', 'parent_id']), tax.get('id')),
+        );
+        return tax.set(
+          'categories',
+          categories.filter(
+            (cat) => qe(cat.getIn(['attributes', 'taxonomy_id']), tax.get('id')),
+          ).filter(
+            (cat) => {
+              if (
+                associatedCategoryIds
+                && associatedCategoryIds.some((catId) => qe(catId, cat.get('id')))
+              ) {
+                return true;
+              }
+              return childTax && categories.filter(
+                (childCat) => qe(childCat.getIn(['attributes', 'taxonomy_id']), childTax.get('id')),
+              ).filter(
+                (childCat) => qe(childCat.getIn(['attributes', 'parent_id']), cat.get('id')),
+              ).some(
+                (child) => associatedCategoryIds
+                  && associatedCategoryIds.some((catId) => qe(catId, child.get('id'))),
+              );
+            },
+          ),
+        );
+      },
+    );
+  },
 );
 
 // const selectMeasureAssociations = createSelector(
@@ -78,7 +114,7 @@ export const selectTaxonomies = createSelector(
 //   selectRecommendationMeasuresByMeasure,
 //   selectMeasureCategoriesByMeasure,
 //   selectMeasureIndicatorsByMeasure,
-//   (state) => selectEntities(state, 'categories'),
+//   selectCategories,
 //   (
 //     ready,
 //     measures,

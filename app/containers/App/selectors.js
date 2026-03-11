@@ -39,6 +39,30 @@ const getRoute = (state) => state.get('route');
 const getGlobal = (state) => state.get('global');
 const getGlobalRequested = (state) => state.getIn(['global', 'requested']);
 
+export const selectCategories = (state) => selectEntitiesAll(state).get(API.CATEGORIES);
+const selectRecommendationsRaw = (state) => selectEntitiesAll(state).get(API.RECOMMENDATIONS);
+export const selectTaxonomiesRaw = (state) => selectEntitiesAll(state).get(API.TAXONOMIES);
+export const selectFrameworkTaxonomies = (state) => selectEntitiesAll(state).get(API.FRAMEWORK_TAXONOMIES);
+export const selectRecommendationCategories = (state) => selectEntitiesAll(state).get(API.RECOMMENDATION_CATEGORIES);
+export const selectRoles = (state) => selectEntitiesAll(state).get(API.ROLES);
+export const selectPages = (state) => selectEntitiesAll(state).get(API.PAGES);
+export const selectBookmarks = (state) => selectEntitiesAll(state).get(API.BOOKMARKS);
+export const selectUserRoles = (state) => selectEntitiesAll(state).get(API.USER_ROLES);
+export const selectFrameworks = (state) => selectEntitiesAll(state).get(API.FRAMEWORKS);
+export const selectUsers = (state) => selectEntitiesAll(state).get(API.USERS);
+
+
+export const selectIndicators = (state) => selectEntitiesAll(state).get('indicators');
+export const selectMeasures = (state) => selectEntitiesAll(state).get('measures');
+export const selectMeasureCategories = (state) => selectEntitiesAll(state).get('measure_categories');
+export const selectMeasureIndicators = (state) => selectEntitiesAll(state).get('measure_indicators');
+export const selectRecommendationMeasures = (state) => selectEntitiesAll(state).get('recommendation_measures');
+export const selectRecommendationIndicators = (state) => selectEntitiesAll(state).get('recommendation_indicators');
+export const selectUserCategories = (state) => selectEntitiesAll(state).get('user_categories');
+export const selectProgressReports = (state) => selectEntitiesAll(state).get('progress_reports');
+export const selectDueDates = (state) => selectEntitiesAll(state).get('due_dates');
+
+
 export const selectNewEntityModal = createSelector(
   getGlobal,
   (globalState) => globalState.get('newEntityModal'),
@@ -102,17 +126,18 @@ export const selectIsSigningIn = createSelector(
 
 // const makeSessionUserRoles = () => selectSessionUserRoles;
 export const selectSessionUserRoles = createSelector(
-  (state) => state,
+  selectUserRoles,
   selectIsSignedIn,
   selectSessionUserId,
-  (state, isSignedIn, sessionUserId) => isSignedIn && sessionUserId
-    ? selectEntitiesWhere(state, {
-      path: 'user_roles',
-      where: { user_id: sessionUserId },
-    })
-      .map((role) => role.getIn(['attributes', 'role_id']))
-      .toList()
-    : Map(),
+  (userRoles, isSignedIn, sessionUserId) => {
+    if (isSignedIn && sessionUserId && userRoles) {
+      return userRoles
+        .filter((role) => qe(role.getIn(['attributes', 'user_id']), sessionUserId))
+        .map((role) => role.getIn(['attributes', 'role_id']))
+        .toList();
+    }
+    return Map();
+  },
 );
 
 
@@ -331,14 +356,17 @@ export const selectSettingsFromQuery = createSelector(
 
 const selectEntitiesAll = (state) => state.getIn(['global', 'entities']);
 
-export const selectEntities = (state, path) => {
+const selectEntities = (state, path) => {
   const entities = selectEntitiesAll(state);
   return entities.get(path);
 };
 
-export const selectFrameworks = (state) => selectEntities(state, 'frameworks');
-
-export const selectUsers = (state) => selectEntities(state, 'users');
+export const selectPublishedPages = createSelector(
+  selectPages,
+  (pages) => pages
+    ? filterEntitiesByAttributes(pages, { draft: false })
+    : pages,
+);
 
 // use for testing single framework configuration
 // && entities.filter((fw) => fw.get('id') === '1')
@@ -380,21 +408,154 @@ export const selectActiveFrameworks = createSelector(
   },
 );
 
+export const selectRecommendationCategoriesByRecommendation = createSelector(
+  selectRecommendationCategories,
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'recommendation_id']),
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'category_id']),
+      ),
+    ),
+);
+export const selectRecommendationCategoriesByCategory = createSelector(
+  selectRecommendationCategories,
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'category_id']),
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'recommendation_id']),
+      ),
+    ),
+);
+export const selectRecommendationMeasuresByRecommendation = createSelector(
+  selectRecommendationMeasures,
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'recommendation_id']),
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'measure_id']),
+      ),
+    ),
+);
+export const selectRecommendationMeasuresByMeasure = createSelector(
+  selectRecommendationMeasures,
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'measure_id']),
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'recommendation_id']),
+      ),
+    ),
+);
+export const selectRecommendationIndicatorsByRecommendation = createSelector(
+  selectRecommendationIndicators,
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'recommendation_id']),
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'indicator_id']),
+      ),
+    ),
+);
+export const selectRecommendationIndicatorsByIndicator = createSelector(
+  selectRecommendationIndicators,
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'indicator_id']),
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'recommendation_id']),
+      ),
+    ),
+);
+export const selectMeasureIndicatorsByMeasure = createSelector(
+  selectMeasureIndicators,
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'measure_id']),
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'indicator_id']),
+      ),
+    ),
+);
+export const selectMeasureIndicatorsByIndicator = createSelector(
+  selectMeasureIndicators,
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'indicator_id']),
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'measure_id']),
+      ),
+    ),
+);
+export const selectMeasureCategoriesByMeasure = createSelector(
+  selectMeasureCategories,
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'measure_id']),
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'category_id']),
+      ),
+    ),
+);
+export const selectMeasureCategoriesByCategory = createSelector(
+  selectMeasureCategories,
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'category_id']),
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'measure_id']),
+      ),
+    ),
+);
+export const selectUserCategoriesByUser = createSelector(
+  selectUserCategories,
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'user_id']),
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'category_id']),
+      ),
+    ),
+);
+export const selectUserCategoriesByCategory = createSelector(
+  selectUserCategories,
+  (entities) => entities
+    && entities.groupBy(
+      (entity) => entity.getIn(['attributes', 'category_id']),
+    ).map(
+      (group) => group.map(
+        (entity) => entity.getIn(['attributes', 'user_id']),
+      ),
+    ),
+);
+
 export const selectRecommendationReferences = createSelector(
-  (state) => selectEntities(state, 'recommendations'),
+  selectRecommendationsRaw,
   (entities) => entities && entities.map((e) => e.getIn(['attributes', 'reference'])).toList().toArray(),
 );
 export const selectMeasureReferences = createSelector(
-  (state) => selectEntities(state, 'measures'),
+  selectMeasures,
   (entities) => entities && entities.map((e) => e.getIn(['attributes', 'reference'])).toList().toArray(),
 );
 export const selectIndicatorReferences = createSelector(
-  (state) => selectEntities(state, 'indicators'),
+  selectIndicators,
   (entities) => entities && entities.map((e) => e.getIn(['attributes', 'reference'])).toList().toArray(),
 );
 
 export const selectFWRecommendations = createSelector(
-  (state) => selectEntities(state, 'recommendations'),
+  selectRecommendationsRaw,
   selectCurrentFrameworkId,
   selectCurrentFramework,
   (entities, frameworkId, framework) => {
@@ -425,28 +586,20 @@ export const selectFWRecommendations = createSelector(
 );
 // returns measures not associated or associated with current framework
 export const selectFWMeasures = createSelector(
-  (state) => selectEntities(state, 'measures'),
+  selectMeasures,
   selectFrameworkQuery,
   selectFWRecommendations,
-  (state) => selectEntities(state, 'recommendation_measures'),
+  selectRecommendationMeasuresByMeasure,
   selectIsUserManager,
-  (entities, framework, recs, recMeasures, isManager) => {
-    if (entities && recs && recMeasures) {
+  (entities, framework, recs, recMeasuresGrouped, isManager) => {
+    if (entities && recs && recMeasuresGrouped) {
       if (framework && framework !== 'all') {
         return entities.filter(
           (measure) => {
-            const recIds = recMeasures.filter(
-              (rm) => qe(
-                rm.getIn(['attributes', 'measure_id']),
-                measure.get('id'),
-              ),
-            ).map(
-              (rm) => rm.getIn(['attributes', 'recommendation_id']),
-            );
-            return (isManager && recIds.size === 0) || recIds.some(
-              (id) => !!recs.find(
-                (rec) => qe(rec.get('id'), id),
-              ),
+            const recIds = recMeasuresGrouped.get(parseInt(measure.get('id'), 10));
+            if (!recIds || recIds.size === 0) return isManager;
+            return recIds.some(
+              (id) => !!recs.get(id.toString()),
             );
           },
         );
@@ -459,51 +612,32 @@ export const selectFWMeasures = createSelector(
 
 // get indicators for current framework
 export const selectFWIndicators = createSelector(
-  (state) => selectEntities(state, 'indicators'),
+  selectIndicators,
   selectCurrentFrameworkId,
   selectFWRecommendations,
   selectFWMeasures,
-  (state) => selectEntities(state, 'recommendation_indicators'),
-  (state) => selectEntities(state, 'measure_indicators'),
-  (entities, frameworkId, recs, measures, recIndicators, measureIndicators) => {
+  selectRecommendationIndicatorsByIndicator,
+  selectMeasureIndicatorsByIndicator,
+  (entities, frameworkId, recs, measures, recIndicatorsGrouped, measureIndicatorsGrouped) => {
     if (
       recs
       && measures
-      && recIndicators
-      && measureIndicators
+      && recIndicatorsGrouped
+      && measureIndicatorsGrouped
       && frameworkId
       && frameworkId !== 'all'
     ) {
       return entities.filter(
         (indicator) => {
-          const recIds = recIndicators.filter(
-            (ri) => qe(
-              ri.getIn(['attributes', 'indicator_id']),
-              indicator.get('id'),
-            ),
-          ).map(
-            (ri) => ri.getIn(['attributes', 'recommendation_id']),
-          );
-          const measureIds = measureIndicators.filter(
-            (mi) => qe(
-              mi.getIn(['attributes', 'indicator_id']),
-              indicator.get('id'),
-            ),
-          ).map(
-            (mi) => mi.getIn(['attributes', 'measure_id']),
-          );
-          // consider includes instead of !!find
+          const recIds = recIndicatorsGrouped.get(parseInt(indicator.get('id'), 10));
+          const measureIds = measureIndicatorsGrouped.get(parseInt(indicator.get('id'), 10));
           return (
-            recIds.size === 0
-            && measureIds.size === 0
-          ) || recIds.some(
-            (id) => !!recs.find(
-              (rec) => qe(rec.get('id'), id),
-            ),
-          ) || measureIds.some(
-            (id) => !!measures.find(
-              (m) => qe(m.get('id'), id),
-            ),
+            (!recIds || recIds.size === 0)
+            && (!measureIds || measureIds.size === 0)
+          ) || (
+            recIds && recIds.some((id) => !!recs.get(id.toString()))
+          ) || (
+            measureIds && measureIds.some((id) => !!measures.get(id.toString()))
           );
         },
       );
@@ -524,8 +658,8 @@ export const selectFWEntitiesAll = createSelector(
 );
 
 export const selectTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
-  (state) => selectEntities(state, 'framework_taxonomies'),
+  selectTaxonomiesRaw,
+  selectFrameworkTaxonomies,
   (taxonomies, fwTaxonomies) => taxonomies
     && fwTaxonomies
     && taxonomies.map(
@@ -569,9 +703,9 @@ export const selectTaxonomies = createSelector(
 );
 
 export const selectFWTaxonomies = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
-  (state) => selectEntities(state, 'framework_taxonomies'),
-  (state) => selectEntities(state, 'categories'),
+  selectTaxonomiesRaw,
+  selectFrameworkTaxonomies,
+  selectCategories,
   selectCurrentFrameworkId,
   (taxonomies, fwTaxonomies, categories, frameworkId) => taxonomies
     && fwTaxonomies
@@ -634,9 +768,6 @@ export const selectFWTaxonomiesSorted = createSelector(
     && sortEntities(taxonomies, 'asc', 'priority', null, false),
 );
 
-// select all categories
-export const selectCategories = (state) => selectEntities(state, API.CATEGORIES);
-
 export const selectEntity = createSelector(
   (state, { path }) => selectEntities(state, path),
   (state, { id }) => id,
@@ -644,7 +775,7 @@ export const selectEntity = createSelector(
 );
 export const selectTaxonomy = createSelector(
   (state, id) => id,
-  (state) => selectTaxonomies(state),
+  selectTaxonomies,
   (id, entities) => id && entities.get(id.toString()),
 );
 
@@ -754,7 +885,7 @@ export const selectIndicatorsSearchQuery = createSelector(
 );
 
 export const selectUserConnections = createSelector(
-  (state) => selectEntities(state, 'roles'),
+  selectRoles,
   (roles) => Map().set('roles', roles),
 );
 
@@ -784,8 +915,8 @@ export const selectMeasureConnections = createSelector(
 
 export const selectMeasureTaxonomies = createSelector(
   (state, args) => args ? args.includeParents : true,
-  (state) => selectFWTaxonomiesSorted(state),
-  (state) => selectEntities(state, 'categories'),
+  selectFWTaxonomiesSorted,
+  selectCategories,
   (includeParents, taxonomies, categories) => prepareTaxonomies(
     taxonomies,
     categories,
@@ -796,8 +927,8 @@ export const selectMeasureTaxonomies = createSelector(
 
 export const selectRecommendationTaxonomies = createSelector(
   (state, args) => args ? args.includeParents : true,
-  (state) => selectFWTaxonomiesSorted(state),
-  (state) => selectEntities(state, 'categories'),
+  selectFWTaxonomiesSorted,
+  selectCategories,
   (includeParents, taxonomies, categories) => prepareTaxonomies(
     taxonomies,
     categories,
@@ -806,8 +937,8 @@ export const selectRecommendationTaxonomies = createSelector(
   ),
 );
 export const selectAllTaxonomiesWithCategories = createSelector(
-  (state) => selectEntities(state, 'taxonomies'),
-  (state) => selectEntities(state, 'categories'),
+  selectTaxonomiesRaw,
+  selectCategories,
   (taxonomies, categories) => sortEntities(
     taxonomies,
     'asc',
@@ -828,146 +959,13 @@ export const selectAllTaxonomiesWithCategories = createSelector(
 );
 
 export const selectUserTaxonomies = createSelector(
-  (state) => selectFWTaxonomiesSorted(state),
-  (state) => selectEntities(state, 'categories'),
+  selectFWTaxonomiesSorted,
+  selectCategories,
   (taxonomies, categories) => prepareTaxonomies(
     taxonomies,
     categories,
     'tags_users',
   ),
-);
-
-export const selectRecommendationCategoriesByRecommendation = createSelector(
-  (state) => selectEntities(state, 'recommendation_categories'),
-  (entities) => entities
-    && entities.groupBy(
-      (entity) => entity.getIn(['attributes', 'recommendation_id']),
-    ).map(
-      (group) => group.map(
-        (entity) => entity.getIn(['attributes', 'category_id']),
-      ),
-    ),
-);
-export const selectRecommendationCategoriesByCategory = createSelector(
-  (state) => selectEntities(state, 'recommendation_categories'),
-  (entities) => entities
-    && entities.groupBy(
-      (entity) => entity.getIn(['attributes', 'category_id']),
-    ).map(
-      (group) => group.map(
-        (entity) => entity.getIn(['attributes', 'recommendation_id']),
-      ),
-    ),
-);
-export const selectRecommendationMeasuresByRecommendation = createSelector(
-  (state) => selectEntities(state, 'recommendation_measures'),
-  (entities) => entities
-    && entities.groupBy(
-      (entity) => entity.getIn(['attributes', 'recommendation_id']),
-    ).map(
-      (group) => group.map(
-        (entity) => entity.getIn(['attributes', 'measure_id']),
-      ),
-    ),
-);
-export const selectRecommendationMeasuresByMeasure = createSelector(
-  (state) => selectEntities(state, 'recommendation_measures'),
-  (entities) => entities
-    && entities.groupBy(
-      (entity) => entity.getIn(['attributes', 'measure_id']),
-    ).map(
-      (group) => group.map(
-        (entity) => entity.getIn(['attributes', 'recommendation_id']),
-      ),
-    ),
-);
-export const selectRecommendationIndicatorsByRecommendation = createSelector(
-  (state) => selectEntities(state, 'recommendation_indicators'),
-  (entities) => entities
-    && entities.groupBy(
-      (entity) => entity.getIn(['attributes', 'recommendation_id']),
-    ).map(
-      (group) => group.map(
-        (entity) => entity.getIn(['attributes', 'indicator_id']),
-      ),
-    ),
-);
-export const selectRecommendationIndicatorsByIndicator = createSelector(
-  (state) => selectEntities(state, 'recommendation_indicators'),
-  (entities) => entities
-    && entities.groupBy(
-      (entity) => entity.getIn(['attributes', 'indicator_id']),
-    ).map(
-      (group) => group.map(
-        (entity) => entity.getIn(['attributes', 'recommendation_id']),
-      ),
-    ),
-);
-export const selectMeasureIndicatorsByMeasure = createSelector(
-  (state) => selectEntities(state, 'measure_indicators'),
-  (entities) => entities
-    && entities.groupBy(
-      (entity) => entity.getIn(['attributes', 'measure_id']),
-    ).map(
-      (group) => group.map(
-        (entity) => entity.getIn(['attributes', 'indicator_id']),
-      ),
-    ),
-);
-export const selectMeasureIndicatorsByIndicator = createSelector(
-  (state) => selectEntities(state, 'measure_indicators'),
-  (entities) => entities
-    && entities.groupBy(
-      (entity) => entity.getIn(['attributes', 'indicator_id']),
-    ).map(
-      (group) => group.map(
-        (entity) => entity.getIn(['attributes', 'measure_id']),
-      ),
-    ),
-);
-export const selectMeasureCategoriesByMeasure = createSelector(
-  (state) => selectEntities(state, 'measure_categories'),
-  (entities) => entities
-    && entities.groupBy(
-      (entity) => entity.getIn(['attributes', 'measure_id']),
-    ).map(
-      (group) => group.map(
-        (entity) => entity.getIn(['attributes', 'category_id']),
-      ),
-    ),
-);
-export const selectMeasureCategoriesByCategory = createSelector(
-  (state) => selectEntities(state, 'measure_categories'),
-  (entities) => entities
-    && entities.groupBy(
-      (entity) => entity.getIn(['attributes', 'category_id']),
-    ).map(
-      (group) => group.map(
-        (entity) => entity.getIn(['attributes', 'measure_id']),
-      ),
-    ),
-);
-export const selectUserCategoriesByUser = createSelector(
-  (state) => selectEntities(state, 'user_categories'),
-  (entities) => entities
-    && entities.groupBy(
-      (entity) => entity.getIn(['attributes', 'user_id']),
-    ).map(
-      (group) => group.map(
-        (entity) => entity.getIn(['attributes', 'category_id']),
-      ),
-    ),
-);
-export const selectUserCategoriesByCategory = createSelector(
-  (state) => selectEntities(state, 'user_categories'),
-  (entities) => entities
-    && entities.groupBy(
-      (entity) => entity.getIn(['attributes', 'category_id']),
-    ).map(
-      (group) => group.map(
-        (entity) => entity.getIn(['attributes', 'user_id']),
-      ),
-    ),
 );
 
 // get recommendations with category ids
@@ -1006,7 +1004,7 @@ export const selectViewRecommendationFrameworkId = createSelector(
 );
 
 // export const selectCategoriesByParent = createSelector(
-//   (state) => selectEntities(state, 'categories'),
+//   selectCategories,
 //   (categories) => categories && categories.map(
 //     (cat) => categories.filter(
 //       (child) => qe(

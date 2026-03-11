@@ -67,7 +67,7 @@ import {
   selectDomain,
   selectViewEntity,
   selectTaxonomies,
-  selectRoles,
+  selectEntityRoles,
 } from './selectors';
 
 import { save } from './actions';
@@ -306,7 +306,7 @@ const mapStateToProps = (state, props) => ({
   authReady: selectReadyForAuthCheck(state),
   viewEntity: selectViewEntity(state, props.params.id),
   taxonomies: selectTaxonomies(state, props.params.id),
-  roles: selectRoles(state, props.params.id),
+  roles: selectEntityRoles(state, props.params.id),
   sessionUserId: selectSessionUserId(state),
   canUserAdministerCategories: selectCanUserAdministerCategories(state),
 });

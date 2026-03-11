@@ -65,7 +65,7 @@ import { getEntityTitle } from 'utils/entities';
 
 import {
   selectDomain,
-  selectUsers,
+  selectCategoryUsers,
   selectConnectedTaxonomies,
   selectParentOptions,
   selectParentTaxonomy,
@@ -356,7 +356,7 @@ const mapStateToProps = (state, props) => ({
   taxonomy: selectTaxonomy(state, props.params.id),
   parentOptions: selectParentOptions(state, props.params.id),
   parentTaxonomy: selectParentTaxonomy(state, props.params.id),
-  users: selectUsers(state),
+  users: selectCategoryUsers(state),
   measures: selectMeasures(state),
   recommendationsByFw: selectRecommendationsByFw(state, props.params.id),
   connectedTaxonomies: selectConnectedTaxonomies(state),

@@ -44,12 +44,12 @@ import {
 } from 'containers/App/actions';
 
 import {
-  selectEntities,
   selectReady,
   selectReadyForAuthCheck,
   selectMeasureTaxonomies,
   selectMeasureReferences,
   selectCanUserAdministerCategories,
+  selectIndicators,
 } from 'containers/App/selectors';
 
 import Messages from 'components/Messages';
@@ -307,7 +307,7 @@ const mapStateToProps = (state) => ({
   authReady: selectReadyForAuthCheck(state),
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   taxonomies: selectMeasureTaxonomies(state),
-  indicators: selectEntities(state, 'indicators'),
+  indicators: selectIndicators(state),
   recommendationsByFw: selectRecommendationsByFw(state),
   connectedTaxonomies: selectConnectedTaxonomies(state),
   existingReferences: selectMeasureReferences(state),

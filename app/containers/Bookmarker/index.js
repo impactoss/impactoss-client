@@ -9,7 +9,7 @@ import { getBookmarkForSaving, generateBookmarkTitle } from 'utils/bookmark';
 import {
   loadEntitiesIfNeeded, deleteEntity, saveEntity, newEntity,
 } from 'containers/App/actions';
-import { selectReady, selectLocation, selectEntities } from 'containers/App/selectors';
+import { selectReady, selectLocation, selectBookmarks } from 'containers/App/selectors';
 import Icon from 'components/Icon';
 import ButtonFlatIconOnly from 'components/buttons/ButtonFlatIconOnly';
 
@@ -147,7 +147,7 @@ Bookmarker.propTypes = {
 const mapStateToProps = (state) => ({
   dataReady: selectReady(state, { path: DEPENDENCIES }),
   bookmark: selectBookmarkForLocation(state),
-  bookmarks: selectEntities(state, 'bookmarks'),
+  bookmarks: selectBookmarks(state),
   location: selectLocation(state),
 });
 function mapDispatchToProps(dispatch) {

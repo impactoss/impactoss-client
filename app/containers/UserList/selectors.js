@@ -2,13 +2,15 @@ import { createSelector } from 'reselect';
 import { Map } from 'immutable';
 
 import {
-  selectEntities,
   selectEntitiesSearchQuery,
   selectWithoutQuery,
   selectConnectionQuery,
   selectCategoryQuery,
   selectSortByQuery,
   selectSortOrderQuery,
+  selectUserCategories,
+  selectUserRoles,
+  selectCategories,
 } from 'containers/App/selectors';
 import { USER_ROLES } from 'themes/config';
 
@@ -28,8 +30,8 @@ const selectUsersNested = createSelector(
     searchAttributes: CONFIG.search || ['name'],
     locationQuery,
   }),
-  (state) => selectEntities(state, 'user_categories'),
-  (state) => selectEntities(state, 'user_roles'),
+  selectUserCategories,
+  selectUserRoles,
   (entities, entityCategories, entityRoles) => entities.map(
     (entity) => {
       const entityRoleIds = entityRoles.filter(
@@ -68,7 +70,7 @@ const selectUsersNested = createSelector(
 );
 const selectUsersWithout = createSelector(
   selectUsersNested,
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   selectWithoutQuery,
   (entities, categories, query) => query
     ? filterEntitiesWithoutAssociation(entities, categories, query)

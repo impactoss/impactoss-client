@@ -4,13 +4,14 @@ import { CONTRIBUTOR_MIN_ROLE_ASSIGNED } from 'themes/config';
 
 import {
   selectEntity,
-  selectEntities,
   selectMeasuresCategorised,
   selectRecommendationsCategorised,
   selectFWTaxonomiesSorted,
   selectFrameworks,
   selectMeasureIndicatorsByIndicator,
   selectRecommendationIndicatorsByIndicator,
+  selectCategories,
+  selectUserRoles,
 } from 'containers/App/selectors';
 
 import {
@@ -29,7 +30,7 @@ export const selectDomain = (state) => state.get('indicatorEdit');
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'indicators', id }),
-  (state) => selectEntities(state, 'users'),
+  selectUsers,
   (entity, users) => entitySetUser(entity, users),
 );
 
@@ -46,8 +47,8 @@ export const selectMeasures = createSelector(
 
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectFWTaxonomiesSorted(state),
-  (state) => selectEntities(state, 'categories'),
+  selectFWTaxonomiesSorted,
+  selectCategories,
   (taxonomies, categories) => prepareTaxonomiesMultiple(
     taxonomies,
     categories,
@@ -57,9 +58,9 @@ export const selectConnectedTaxonomies = createSelector(
 
 export const selectRecommendationsByFw = createSelector(
   (state, id) => id,
-  (state) => selectRecommendationsCategorised(state),
+  selectRecommendationsCategorised,
   selectRecommendationIndicatorsByIndicator,
-  (state) => selectFrameworks(state),
+  selectFrameworks,
   (id, recs, associations, frameworks) => {
     const filtered = recs.filter(
       (r) => {
@@ -83,8 +84,8 @@ export const selectRecommendationsByFw = createSelector(
 );
 
 export const selectUsers = createSelector(
-  (state) => selectEntities(state, 'users'),
-  (state) => selectEntities(state, 'user_roles'),
+  selectUsers,
+  selectUserRoles,
   (entities, associations) => usersByMinimumRole(
     entities,
     associations,

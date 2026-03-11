@@ -4,7 +4,7 @@ import { Map } from 'immutable';
 import {
   selectReady,
   selectEntity,
-  selectEntities,
+  selectUsers,
   selectRecommendationConnections,
   // selectMeasureConnections,
   selectTaxonomiesSorted,
@@ -62,7 +62,7 @@ const hasSiblings = (entity, categories) => {
 
 export const selectViewEntity = createSelector(
   selectCategory,
-  (state) => selectEntities(state, 'users'),
+  selectUsers,
   selectTaxonomiesSorted,
   selectCategories,
   (entity, users, taxonomies, categories) => entity
@@ -118,7 +118,7 @@ export const selectParentTaxonomy = createSelector(
 export const selectChildTaxonomies = createSelector(
   selectCategory,
   selectTaxonomiesSorted,
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   selectSettingsFromQuery,
   (entity, taxonomies, categories, settingsFromQuery) => {
     if (entity && taxonomies) {
@@ -197,8 +197,8 @@ export const selectRecommendations = createSelector(
   // selectRecommendationMeasuresByRecommendation,
   selectRecommendationCategoriesByRecommendation,
   // selectRecommendationIndicatorsByRecommendation,
-  (state) => selectEntities(state, 'categories'),
-  (state) => selectFrameworks(state),
+  selectCategories,
+  selectFrameworks,
   (
     ready,
     recommendations,
@@ -288,7 +288,7 @@ export const selectChildRecommendations = createSelector(
   selectRecommendationConnections,
   // selectRecommendationMeasuresByRecommendation,
   selectRecommendationCategoriesByRecommendation,
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   (
     recommendationsByTaxCat,
     connections,
@@ -359,7 +359,7 @@ export const selectChildRecommendations = createSelector(
 //   selectRecommendationMeasuresByMeasure,
 //   selectMeasureCategoriesByMeasure,
 //   selectMeasureIndicatorsByMeasure,
-//   (state) => selectEntities(state, 'categories'),
+//   selectCategories,
 //   (
 //     ready,
 //     measures,
@@ -460,7 +460,7 @@ export const selectChildRecommendations = createSelector(
 //   selectRecommendationMeasuresByMeasure,
 //   selectMeasureCategoriesByMeasure,
 //   selectMeasureIndicatorsByMeasure,
-//   (state) => selectEntities(state, 'categories'),
+//   selectCategories,
 //   (
 //     measuresByTaxCat,
 //     connections,
@@ -498,7 +498,7 @@ export const selectChildRecommendations = createSelector(
 
 export const selectTaxonomiesWithCategories = createSelector(
   selectTaxonomiesSorted,
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   (taxonomies, categories) => taxonomies.map((tax) => tax.set(
     'categories',
     categories.filter(

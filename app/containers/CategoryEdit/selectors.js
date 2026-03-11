@@ -3,11 +3,14 @@ import { List } from 'immutable';
 
 import {
   selectEntity,
-  selectEntities,
   selectMeasuresCategorised,
   selectRecommendationsCategorised,
   selectFWTaxonomiesSorted,
   selectTaxonomies,
+  selectCategories,
+  selectFrameworkTaxonomies,
+  selectUsers,
+  selectUserRoles,
 } from 'containers/App/selectors';
 
 import { CATEGORY_MANAGER_MIN_ROLE } from 'themes/config';
@@ -24,14 +27,14 @@ export const selectDomain = (state) => state.get('categoryEdit');
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
-  (state) => selectEntities(state, 'users'),
-  (state) => selectFWTaxonomiesSorted(state),
+  selectUsers,
+  selectFWTaxonomiesSorted,
   (entity, users, taxonomies) => prepareCategory(entity, users, taxonomies),
 );
 
 export const selectParentOptions = createSelector(
   (state, id) => selectEntity(state, { path: 'categories', id }),
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   selectTaxonomies,
   (entity, categories, taxonomies) => {
     if (entity && taxonomies && categories) {
@@ -111,9 +114,9 @@ const selectIsParentTaxonomy = createSelector(
 );
 
 
-export const selectUsers = createSelector(
-  (state) => selectEntities(state, 'users'),
-  (state) => selectEntities(state, 'user_roles'),
+export const selectCategoryUsers = createSelector(
+  selectUsers,
+  selectUserRoles,
   (entities, associations) => usersByMinimumRole(
     entities,
     associations,
@@ -137,7 +140,7 @@ export const selectMeasures = createSelector(
 export const selectRecommendationsByFw = createSelector(
   (state, id) => id,
   (state, id) => selectEntity(state, { path: 'categories', id }),
-  (state) => selectEntities(state, 'framework_taxonomies'),
+  selectFrameworkTaxonomies,
   selectRecommendationsCategorised,
   selectIsParentTaxonomy,
   (id, category, fwTaxonomies, entities, isParent) => {
@@ -169,8 +172,8 @@ export const selectRecommendationsByFw = createSelector(
 );
 
 export const selectConnectedTaxonomies = createSelector(
-  (state) => selectFWTaxonomiesSorted(state),
-  (state) => selectEntities(state, 'categories'),
+  selectFWTaxonomiesSorted,
+  selectCategories,
   (taxonomies, categories) => prepareTaxonomiesMultiple(
     taxonomies,
     categories,

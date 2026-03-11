@@ -2,7 +2,10 @@ import { createSelector } from 'reselect';
 
 import {
   selectEntity,
-  selectEntities,
+  selectUsers,
+  selectUserRoles,
+  selectRoles,
+  selectCategories,
   selectTaxonomiesSorted,
   selectUserCategoriesByUser,
 } from 'containers/App/selectors';
@@ -17,9 +20,9 @@ export const selectDomain = (state) => state.get('userEdit');
 
 export const selectViewEntity = createSelector(
   (state, id) => selectEntity(state, { path: 'users', id }),
-  (state) => selectEntities(state, 'users'),
-  (state) => selectEntities(state, 'user_roles'),
-  (state) => selectEntities(state, 'roles'),
+  selectUsers,
+  selectUserRoles,
+  selectRoles,
   (entity, users, userRoles, roles) => entity
     && users
     && userRoles
@@ -51,7 +54,7 @@ export const selectViewEntity = createSelector(
 export const selectTaxonomies = createSelector(
   (state, id) => id,
   selectTaxonomiesSorted,
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   selectUserCategoriesByUser,
   (id, taxonomies, categories, associations) => prepareTaxonomiesAssociated(
     taxonomies,
@@ -62,10 +65,10 @@ export const selectTaxonomies = createSelector(
   ),
 );
 
-export const selectRoles = createSelector(
+export const selectEntityRoles = createSelector(
   (state, id) => id,
-  (state) => selectEntities(state, 'roles'),
-  (state) => selectEntities(state, 'user_roles'),
+  selectRoles,
+  selectUserRoles,
   (id, roles, userRoles) => roles && roles.map(
     (role) => {
       const filteredAssociations = userRoles.filter(

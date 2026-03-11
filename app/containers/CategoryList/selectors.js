@@ -4,7 +4,7 @@ import { Map } from 'immutable';
 import { CURRENT_TAXONOMY_IDS } from 'themes/config';
 
 import {
-  selectEntities,
+  selectCategories,
   selectSortByQuery,
   selectSortOrderQuery,
   selectFWTaxonomiesSorted,
@@ -23,7 +23,7 @@ import { TAXONOMY_DEFAULT, SORT_OPTIONS } from './constants';
 
 export const selectTaxonomy = createSelector(
   (state, { id }) => id,
-  (state) => selectFWTaxonomiesSorted(state),
+  selectFWTaxonomiesSorted,
   (taxonomyId, taxonomies) => {
     if (!taxonomies || taxonomies.size === 0) return null;
     const id = typeof taxonomyId !== 'undefined' ? taxonomyId : TAXONOMY_DEFAULT;
@@ -257,7 +257,7 @@ const selectCategoryCountGroups = createSelector(
   selectTaxonomy,
   selectRecommendations,
   // selectMeasures,
-  (state) => selectEntities(state, 'categories'),
+  selectCategories,
   selectSettingsFromQuery,
   (taxonomy, recommendations, categories, settingsFromQuery) => {
     if (taxonomy && recommendations && categories) {
