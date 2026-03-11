@@ -271,12 +271,16 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
       ? `${pageTitle} ${getEntityReference(viewEntity)}: ${getEntityTitleTruncated(viewEntity)}`
       : `${pageTitle} ${this.props.params.id}`;
 
+    let metaDescription = intl.formatMessage(messages.metaDescription);
+    if (viewEntity) {
+      metaDescription = `${viewEntity.getIn(['attributes', 'title'])} ${viewEntity.getIn(['attributes', 'description']) || ''}`;
+    }
     return (
       <div>
         <HelmetCanonical
           title={metaTitle}
           meta={[
-            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: metaDescription },
           ]}
         />
         <Content>

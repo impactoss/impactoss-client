@@ -12,6 +12,7 @@ import { injectIntl } from 'react-intl';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
+
 import {
   loadEntitiesIfNeeded,
   updatePath,
@@ -42,7 +43,7 @@ import {
 } from 'utils/fields';
 
 import { scrollToTop } from 'utils/scroll-to-component';
-import { lowerCase } from 'utils/string';
+import { lowerCase, truncateText } from 'utils/string';
 
 import appMessages from 'containers/App/messages';
 import messages from './messages';
@@ -134,12 +135,20 @@ export class PageView extends React.PureComponent { // eslint-disable-line react
       }
     }
 
+    let metaDescription = intl.formatMessage(messages.metaDescription);
+    if (page) {
+      metaDescription = page.getIn(['attributes', 'title']);
+      if (page.getIn(['attributes', 'content'])) {
+        metaDescription = `${truncateText(page.getIn(['attributes', 'content']), 150)}`;
+      }
+    }
+
     return (
       <div>
         <HelmetCanonical
           title={page ? page.getIn(['attributes', 'title']) : `${intl.formatMessage(messages.pageTitle)}: ${this.props.params.id}`}
           meta={[
-            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
+            { name: 'description', content: metaDescription },
           ]}
         />
         <Styled

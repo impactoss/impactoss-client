@@ -287,7 +287,10 @@ export function HomePage({ onPageLink, theme, intl }) {
       <HelmetCanonical
         title={intl.formatMessage(messages.pageTitle)}
         meta={[
-          { name: 'description', content: intl.formatMessage(messages.metaDescription) },
+          {
+            name: 'description',
+            content: `${intl.formatMessage(appMessages.app.titleHome)} - ${intl.formatMessage(messages.intro)}`,
+          },
         ]}
       />
       <main id="main-content">

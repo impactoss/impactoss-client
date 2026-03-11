@@ -178,7 +178,10 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
         <HelmetCanonical
           title={intl.formatMessage(messages.supTitle)}
           meta={[
-            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
+            {
+              name: 'description',
+              content: description,
+            },
           ]}
         />
         {!dataReady && <EntityListSidebarLoading responsiveSmall />}

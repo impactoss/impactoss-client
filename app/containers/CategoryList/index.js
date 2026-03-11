@@ -174,7 +174,10 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
         <HelmetCanonical
           title={`${intl.formatMessage(messages.supTitle)}: ${contentTitle}`}
           meta={[
-            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
+            {
+              name: 'description',
+              content: contentDescription,
+            },
           ]}
         />
         {!dataReady && <EntityListSidebarLoading responsiveSmall />}

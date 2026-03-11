@@ -355,13 +355,19 @@ export class CategoryView extends React.PureComponent { // eslint-disable-line r
         ? `${pageTitle} ${ref}: ${getEntityTitleTruncated(viewEntity)}`
         : `${pageTitle}: ${getEntityTitleTruncated(viewEntity)}`;
     }
-
+    let metaDescription = intl.formatMessage(messages.metaDescription);
+    if (viewEntity) {
+      metaDescription = `${viewEntity.getIn(['attributes', 'title'])} - ${viewEntity.getIn(['attributes', 'description']) || ''}`;
+    }
     return (
       <div>
         <HelmetCanonical
           title={metaTitle}
           meta={[
-            { name: 'description', content: intl.formatMessage(messages.metaDescription) },
+            {
+              name: 'description',
+              content: metaDescription,
+            },
           ]}
         />
         <Content>
