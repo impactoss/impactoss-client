@@ -38,6 +38,7 @@ import { groupEntities } from './group-entities';
 import messages from './messages';
 
 const EntityListSearch = styled.div`
+  position: relative;
   padding-bottom: 1em;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
     padding-bottom: 2em;
