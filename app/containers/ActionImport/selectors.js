@@ -21,7 +21,10 @@ export const selectSuccess = createSelector(
 
 export const selectProgress = createSelector(
   selectPage,
-  (pageState) => pageState.get('sending') && pageState.get('sending').size > 0
-    ? ((pageState.get('success').size + pageState.get('errors').size) / pageState.get('sending').size) * 100
-    : null,
+  (pageState) => {
+    const sending = pageState.get('sending');
+    if (!sending || sending.size === 0) return null;
+    const errors = pageState.get('errors').filter((e) => e.error.type !== 'client-error');
+    return ((pageState.get('success').size + errors.size) / sending.size) * 100;
+  },
 );

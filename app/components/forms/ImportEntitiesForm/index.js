@@ -160,7 +160,6 @@ function ImportEntitiesForm({
   };
 
   const { id, ...props } = getControlProps(field);
-
   return (
     <Formik
       initialValues={formData}
@@ -201,31 +200,29 @@ function ImportEntitiesForm({
                       <Intro>
                         <FormattedMessage {...messages.introduction} />
                       </Intro>
-                      {progress === null && (
-                        <Hint>
-                          <HintTitle>
-                            <FormattedMessage {...messages.hintTitle} />
-                          </HintTitle>
-                          <HintList>
-                            <li>
-                              <FormattedMessage {...messages.templateHint} />
-                              <CsvDownload>
-                                <CsvDownloadHandler
-                                  data={asArray(template.data)}
-                                  filename={template.filename}
-                                  className="ioss-csv-downloader"
-                                >
-                                  <FormattedMessage {...messages.templateHintDownloadLink} />
-                                </CsvDownloadHandler>
-                              </CsvDownload>
-                            </li>
-                            <li>
-                              <FormattedMessage {...messages.formatHint} />
-                            </li>
-                          </HintList>
-                        </Hint>
-                      )}
-                      {progress === null && template.data && (
+                      <Hint>
+                        <HintTitle>
+                          <FormattedMessage {...messages.hintTitle} />
+                        </HintTitle>
+                        <HintList>
+                          <li>
+                            <FormattedMessage {...messages.templateHint} />
+                            <CsvDownload>
+                              <CsvDownloadHandler
+                                data={asArray(template.data)}
+                                filename={template.filename}
+                                className="ioss-csv-downloader"
+                              >
+                                <FormattedMessage {...messages.templateHintDownloadLink} />
+                              </CsvDownloadHandler>
+                            </CsvDownload>
+                          </li>
+                          <li>
+                            <FormattedMessage {...messages.formatHint} />
+                          </li>
+                        </HintList>
+                      </Hint>
+                      {template.data && (
                         <Box margin={{ vertical: 'small' }}>
                           <Accordion
                             activePanels={actives}
@@ -273,7 +270,7 @@ function ImportEntitiesForm({
                       )}
                       <Field noPadding>
                         <FormFieldWrap>
-                          <div>
+                          <div style={{ marginBottom: '20px' }}>
                             <FormikField name={field.name}>
                               {({ field: formikField, form }) =>
                                 (
@@ -283,6 +280,7 @@ function ImportEntitiesForm({
                                     accept=".csv, text/csv"
                                     value={formikField.value}
                                     onChange={(file) => form.setFieldValue(field.name, file)}
+                                    disabled={progress !== null}
                                     {...props}
                                   />
                                 )
@@ -302,64 +300,70 @@ function ImportEntitiesForm({
                                   </Importing>
                                 </DocumentWrapEdit>
                               )}
-                              {progress >= 100 && (
-                                <div>
-                                  {(errors.size > 0 && success.size === 0) && (
-                                    <Messages
-                                      type="error"
-                                      message={intl.formatMessage(messages.allErrors)}
-                                    />
-                                  )}
-                                  {(errors.size > 0 && success.size > 0) && (
-                                    <Messages
-                                      type="error"
-                                      message={intl.formatMessage(messages.someErrors, {
-                                        successNo: success.size,
-                                        rowNo: errors.size + success.size,
-                                      })}
-                                    />
-                                  )}
-                                  {(errors.size === 0) && (
-                                    <Messages
-                                      type="success"
-                                      message={intl.formatMessage(messages.success, {
-                                        rowNo: success.size,
-                                      })}
-                                    />
-                                  )}
-                                </div>
-                              )}
-                              {(errors.size > 0) && (
-                                <RowErrors>
-                                  <FormattedMessage {...messages.rowErrorHint} />
-                                  <Messages
-                                    type="error"
-                                    details
-                                    preMessage={false}
-                                    messages={
-                                      errors
-                                        .sortBy((error) => error && error.data && error.data.saveRef)
-                                        .reduce((memo, error) => error.error.messages
-                                          ? memo.concat(map(error.error.messages, (message) => error.data.saveRef
-                                            ? [`Row ${error.data.saveRef}:`, message]
-                                            : message))
-                                          : memo,
-                                        [])
-                                    }
-                                  />
-                                </RowErrors>
-                              )}
-                              {(errors.size > 0 && progress >= 100) && (
-                                <ErrorHint>
-                                  <ErrorHintTitle>
-                                    <FormattedMessage {...messages.errorHintTitle} />
-                                  </ErrorHintTitle>
-                                  <ErrorHintText>
-                                    <FormattedMessage {...messages.errorHintText} />
-                                  </ErrorHintText>
-                                </ErrorHint>
-                              )}
                             </div>
+                          )}
+                          <div aria-live="polite">
+                            {progress >= 100 && (
+                              <div>
+                                {(errors.size > 0 && success.size === 0) && (
+                                  <Messages
+                                    withoutAriaLive
+                                    type="error"
+                                    message={intl.formatMessage(messages.allErrors)}
+                                  />
+                                )}
+                                {(errors.size > 0 && success.size > 0) && (
+                                  <Messages
+                                    withoutAriaLive
+                                    type="error"
+                                    message={intl.formatMessage(messages.someErrors, {
+                                      successNo: success.size,
+                                      rowNo: errors.size + success.size,
+                                    })}
+                                  />
+                                )}
+                                {(errors.size === 0) && (
+                                  <Messages
+                                    withoutAriaLive
+                                    type="success"
+                                    message={intl.formatMessage(messages.success, {
+                                      rowNo: success.size,
+                                    })}
+                                  />
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          {errors.size > 0 && progress >= 100 && (
+                            <RowErrors>
+                              <FormattedMessage {...messages.rowErrorHint} />
+                              <Messages
+                                withoutAriaLive
+                                type="error"
+                                details
+                                preMessage={false}
+                                messages={
+                                  errors
+                                    .sortBy((error) => error && error.data && error.data.saveRef)
+                                    .reduce((memo, error) => error.error.messages
+                                      ? memo.concat(map(error.error.messages, (message) => error.data.saveRef
+                                        ? [`Row ${error.data.saveRef}:`, message]
+                                        : message))
+                                      : memo,
+                                    [])
+                                }
+                              />
+                            </RowErrors>
+                          )}
+                          {errors.size > 0 && progress >= 100 && (
+                            <ErrorHint>
+                              <ErrorHintTitle>
+                                <FormattedMessage {...messages.errorHintTitle} />
+                              </ErrorHintTitle>
+                              <ErrorHintText>
+                                <FormattedMessage {...messages.errorHintText} />
+                              </ErrorHintText>
+                            </ErrorHint>
                           )}
                         </FormFieldWrap>
                       </Field>

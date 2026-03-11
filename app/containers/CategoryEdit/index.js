@@ -63,7 +63,6 @@ import {
   selectSessionUserHighestRoleId,
 } from 'containers/App/selectors';
 
-import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import EntityForm from 'containers/EntityForm';
@@ -287,7 +286,13 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
         taxonomy: this.getTaxTitle(viewEntity.getIn(['taxonomy', 'id'])),
       });
     }
-
+    let errorMessages = null;
+    if (saveError) {
+      errorMessages = saveError.messages;
+    }
+    if (deleteError) {
+      errorMessages = deleteError.messages;
+    }
     return (
       <div>
         <HelmetCanonical
@@ -297,21 +302,6 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
           ]}
         />
         <Content ref={this.scrollContainer}>
-          {saveError
-            && (
-              <Messages
-                type="error"
-                messages={saveError.messages}
-                onDismiss={this.props.onServerErrorDismiss}
-              />
-            )
-          }
-          {deleteError
-            && <Messages type="error" messages={deleteError.messages} />
-          }
-          {(saveSending || deleteSending || !dataReady)
-            && <Loading />
-          }
           {!viewEntity && dataReady && !saveError && !deleteSending && (
             <NotFoundEntity
               id={this.props.params.id}
@@ -361,6 +351,8 @@ export class CategoryEdit extends React.PureComponent { // eslint-disable-line r
                 headerTitle={pageTitle}
                 headerType={CONTENT_EDIT}
                 headerIcon="categories"
+                errorMessages={errorMessages}
+                onServerErrorDismiss={saveError ? this.props.onServerErrorDismiss : undefined}
               />
             )
           }

@@ -57,7 +57,6 @@ import {
   selectCanUserAdministerCategories,
 } from 'containers/App/selectors';
 
-import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import EntityForm from 'containers/EntityForm';
@@ -234,7 +233,13 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
     // console.log('render', this.scrollContainer.current)
     // console.log('render', this.scrollContainer.current && this.scrollContainer.current.getBoundingClientRect)
 
-
+    let errorMessages = null;
+    if (saveError) {
+      errorMessages = saveError.messages;
+    }
+    if (deleteError) {
+      errorMessages = deleteError.messages;
+    }
     return (
       <div>
         <HelmetCanonical
@@ -244,18 +249,6 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
           ]}
         />
         <Content ref={this.scrollContainer}>
-          {saveError
-            && (
-              <Messages
-                type="error"
-                messages={saveError.messages}
-                onDismiss={this.props.onServerErrorDismiss}
-              />
-            )
-          }
-          {deleteError
-            && <Messages type="error" messages={deleteError.messages} />
-          }
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
           }
@@ -312,6 +305,8 @@ export class RecommendationEdit extends React.PureComponent { // eslint-disable-
                 headerTitle={intl.formatMessage(messages.pageTitle, { type })}
                 headerType={CONTENT_EDIT}
                 headerIcon={frameworkId ? `recommendations_${frameworkId}` : 'recommendations'}
+                errorMessages={errorMessages}
+                onServerErrorDismiss={saveError ? this.props.onServerErrorDismiss : undefined}
               />
             )
           }

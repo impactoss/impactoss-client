@@ -52,7 +52,6 @@ import {
   selectIndicators,
 } from 'containers/App/selectors';
 
-import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import EntityForm from 'containers/EntityForm';
@@ -226,15 +225,6 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
           ]}
         />
         <Content ref={this.scrollContainer}>
-          {saveError
-            && (
-              <Messages
-                type="error"
-                messages={saveError.messages}
-                onDismiss={this.props.onServerErrorDismiss}
-              />
-            )
-          }
           {(saveSending || !dataReady)
             && <Loading />
           }
@@ -271,6 +261,8 @@ export class ActionNew extends React.PureComponent { // eslint-disable-line reac
                 headerTitle={intl.formatMessage(messages.pageTitle)}
                 headerType={CONTENT_EDIT}
                 headerIcon="measures"
+                errorMessages={saveError ? saveError.messages : null}
+                onServerErrorDismiss={saveError ? this.props.onServerErrorDismiss : undefined}
               />
             )
           }

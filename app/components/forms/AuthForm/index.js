@@ -67,26 +67,28 @@ const Hint = styled.div`
 
 
 class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  renderError = (name) => (
-    <ErrorWrapper id={`${name}-error`} role="alert">
-      <ErrorMessage
-        name={name}
-        show="touched"
-        component={(props) => (
-          <Box direction="row" align="center" gap="xsmall" margin={{ top: 'small' }}>
-            <CircleInformation
-              aria-hidden="true"
-              aria-label={null}
-              style={{ transform: 'rotate(180deg)' }}
-              size="xxsmall"
-              color="error"
-            />
-            <Text size="xsmall" color="error">
-              {props.children}
-            </Text>
-          </Box>
-        )}
-      />
+  renderError = ({ name, hasError }) => (
+    <ErrorWrapper id={`${name}-error`} role="alert" aria-live="assertive">
+      {hasError && (
+        <ErrorMessage
+          name={name}
+          show="touched"
+          component={(props) => (
+            <Box direction="row" align="center" gap="xsmall" margin={{ top: 'small' }}>
+              <CircleInformation
+                aria-hidden="true"
+                aria-label={null}
+                style={{ transform: 'rotate(180deg)' }}
+                size="xxsmall"
+                color="error"
+              />
+              <Text size="xsmall" color="error">
+                {props.children}
+              </Text>
+            </Box>
+          )}
+        />
+      )}
     </ErrorWrapper>
   );
 
@@ -147,11 +149,9 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
                     if (fieldConfig.hint) {
                       describedBy.push(`${field.name}-hint`);
                     }
-                    if (hasError) {
-                      describedBy.push(`${field.name}-error`);
-                    }
+                    describedBy.push(`${field.name}-error`);
                   }
-                  const describedByAttr = describedBy.length > 0 && describedBy.join(' ');
+                  const describedByAttr = describedBy.length > 0 ? describedBy.join(' ') : undefined;
 
                   return (
                     <Field>
@@ -164,15 +164,14 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
                       {this.renderField({
                         ...fieldConfig,
                         ...field,
-                        'aria-required': isRequired ? 'true' : 'false',
-                        'aria-invalid': hasError ? 'true' : 'false',
+                        'aria-required': isRequired || undefined,
+                        'aria-invalid': hasError ? 'true' : undefined,
                         'aria-describedby': describedByAttr,
                       })}
-                      {meta.touched
-                        && meta.error
-                        && !fieldConfig.showErrorsAsHints
-                        && this.renderError(field.name)
-                      }
+                      {this.renderError({
+                        name: field.name,
+                        hasError: meta.touched && meta.error && !fieldConfig.showErrorsAsHints,
+                      })}
                       {fieldConfig.showErrorsAsHints
                         && fieldConfig.errorMessages
                         && fieldConfig.validators && (

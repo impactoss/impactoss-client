@@ -54,7 +54,6 @@ import {
   selectCanUserAdministerCategories,
 } from 'containers/App/selectors';
 
-import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import EntityForm from 'containers/EntityForm';
@@ -228,15 +227,6 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
           ]}
         />
         <Content ref={this.scrollContainer}>
-          {saveError
-            && (
-              <Messages
-                type="error"
-                messages={saveError.messages}
-                onDismiss={this.props.onServerErrorDismiss}
-              />
-            )
-          }
           {(saveSending || !dataReady)
             && <Loading />
           }
@@ -277,6 +267,8 @@ export class RecommendationNew extends React.PureComponent { // eslint-disable-l
                 headerTitle={intl.formatMessage(messages.pageTitle, { type })}
                 headerType={CONTENT_EDIT}
                 headerIcon={fwSpecified ? `recommendations_${frameworkId}` : 'recommendations'}
+                errorMessages={saveError ? saveError.messages : null}
+                onServerErrorDismiss={saveError ? this.props.onServerErrorDismiss : undefined}
               />
             )
           }

@@ -181,17 +181,12 @@ class UploadControl extends React.Component { // eslint-disable-line react/prefe
             </DocumentWrapEdit>
           )
         }
-        {
-          this.state.error
-          && (
-            <Messages
-              type="error"
-              onDismiss={this.reset}
-              message={intl.formatMessage(messages.uploadError)}
-              preMessage={false}
-            />
-          )
-        }
+        <Messages
+          type="error"
+          onDismiss={this.reset}
+          message={this.state.error ? intl.formatMessage(messages.uploadError) : null}
+          preMessage={false}
+        />
       </Styled>
     );
   }

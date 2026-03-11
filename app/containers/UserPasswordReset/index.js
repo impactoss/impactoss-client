@@ -50,9 +50,7 @@ export class UserPasswordReset extends React.PureComponent { // eslint-disable-l
           <ContentHeader
             title={intl.formatMessage(messages.pageTitle)}
           />
-          {resetError
-            && <Messages type="error" messages={resetError.messages} />
-          }
+          <Messages type="error" messages={resetError ? resetError.messages : null} />
           {resetSending
             && <Loading />
           }

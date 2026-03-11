@@ -8,6 +8,7 @@ import { Map, List } from 'immutable';
 
 // import { isEqual } from 'lodash/lang';
 import { PARAMS } from 'containers/App/constants';
+import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 
 import Messages from 'components/Messages';
 
@@ -212,6 +213,17 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
     const errorsWithoutEntities = errors && errors.filter((error, id) => !entities.find((entity) => entity.get('id') === id));
     return (
       <div>
+        <ScreenReaderOnly aria-live="polite" role="status">
+          {entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery)
+            && (!errors || errors.size === 0)
+            && intl.formatMessage(messages.listEmptyAfterQuery)}
+          {entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery)
+            && errorsWithoutEntities && errorsWithoutEntities.size > 0
+            && errors && errors.size > 0
+            && intl.formatMessage(messages.listEmptyAfterQueryAndErrors)}
+          {entityIdsOnPage.size > 0
+            && `List contains ${entities.size} items`}
+        </ScreenReaderOnly>
         <EntityListHeader
           selectedTotal={entityIdsSelected.toSet().size}
           pageTotal={entityIdsOnPage.toSet().size}
@@ -238,22 +250,28 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
           }}
         />
         <ListEntitiesMain id="entity-list-main">
-          {entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0)
+          {entityIdsOnPage.size === 0
+            && this.hasLocationQueryFilters(locationQuery)
+            && (!errors || errors.size === 0)
             && (
               <ListEntitiesEmpty>
                 <FormattedMessage {...messages.listEmptyAfterQuery} />
               </ListEntitiesEmpty>
             )
           }
-          {entityIdsOnPage.size === 0 && !this.hasLocationQueryFilters(locationQuery) && (!errors || errors.size === 0)
+          {entityIdsOnPage.size === 0
+            && !this.hasLocationQueryFilters(locationQuery)
+            && (!errors || errors.size === 0)
             && (
               <ListEntitiesEmpty>
                 <FormattedMessage {...messages.listEmpty} />
               </ListEntitiesEmpty>
             )
           }
-          {entityIdsOnPage.size === 0 && this.hasLocationQueryFilters(locationQuery)
-            && errorsWithoutEntities && errorsWithoutEntities.size > 0
+          {entityIdsOnPage.size === 0
+            && this.hasLocationQueryFilters(locationQuery)
+            && errorsWithoutEntities
+            && errorsWithoutEntities.size > 0
             && errors && errors.size > 0
             && (
               <ListEntitiesEmpty>
@@ -261,24 +279,27 @@ export class EntityListGroups extends React.PureComponent { // eslint-disable-li
               </ListEntitiesEmpty>
             )
           }
-          {errorsWithoutEntities && errorsWithoutEntities.size > 0 && !this.hasLocationQueryFilters(locationQuery)
-            && errorsWithoutEntities.map((entityErrors, entityId) => (
-              entityErrors.map((updateError, i) => (
-                <Messages
-                  key={i}
-                  type="error"
-                  messages={updateError
-                    .getIn(['error', 'messages'])
-                    .map((msg) => this.transformMessage(msg, entityId, intl))
-                    .valueSeq()
-                    .toArray()
-                  }
-                  onDismiss={() => this.props.onDismissError(updateError.get('key'))}
-                  preMessage={false}
-                />
-              ))
-            )).toList()
-          }
+          <div aria-live="polite">
+            {errorsWithoutEntities && errorsWithoutEntities.size > 0 && !this.hasLocationQueryFilters(locationQuery)
+              && errorsWithoutEntities.map((entityErrors, entityId) => (
+                entityErrors.map((updateError, i) => (
+                  <Messages
+                    key={i}
+                    withoutAriaLive
+                    type="error"
+                    messages={updateError
+                      .getIn(['error', 'messages'])
+                      .map((msg) => this.transformMessage(msg, entityId, intl))
+                      .valueSeq()
+                      .toArray()
+                    }
+                    onDismiss={() => this.props.onDismissError(updateError.get('key'))}
+                    preMessage={false}
+                  />
+                ))
+              )).toList()
+            }
+          </div>
           {entityGroupsPaged.size > 0 && (
             <div>
               {entityGroupsPaged.map((entityGroup, index, list) => {

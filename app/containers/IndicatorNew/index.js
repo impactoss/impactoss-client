@@ -55,7 +55,6 @@ import {
   selectIndicatorReferences,
 } from 'containers/App/selectors';
 
-import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import EntityForm from 'containers/EntityForm';
@@ -240,15 +239,6 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
           ]}
         />
         <Content ref={this.scrollContainer}>
-          {saveError
-            && (
-              <Messages
-                type="error"
-                messages={saveError.messages}
-                onDismiss={this.props.onServerErrorDismiss}
-              />
-            )
-          }
           {(saveSending || !dataReady)
             && <Loading />
           }
@@ -273,6 +263,8 @@ export class IndicatorNew extends React.PureComponent { // eslint-disable-line r
                 haderTitle={intl.formatMessage(messages.pageTitle)}
                 haderType={CONTENT_EDIT}
                 haderIcon="indicators"
+                errorMessages={saveError ? saveError.messages : null}
+                onServerErrorDismiss={saveError ? this.props.onServerErrorDismiss : undefined}
               />
             )
           }

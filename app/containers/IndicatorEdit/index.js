@@ -63,7 +63,6 @@ import {
   selectIndicatorReferences,
 } from 'containers/App/selectors';
 
-import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import EntityForm from 'containers/EntityForm';
@@ -270,6 +269,13 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
     const {
       saveSending, saveError, deleteSending, deleteError,
     } = viewDomain.get('page').toJS();
+    let errorMessages = null;
+    if (saveError) {
+      errorMessages = saveError.messages;
+    }
+    if (deleteError) {
+      errorMessages = deleteError.messages;
+    }
     return (
       <div>
         <HelmetCanonical
@@ -279,18 +285,6 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
           ]}
         />
         <Content ref={this.scrollContainer}>
-          {saveError
-            && (
-              <Messages
-                type="error"
-                messages={saveError.messages}
-                onDismiss={this.props.onServerErrorDismiss}
-              />
-            )
-          }
-          {deleteError
-            && <Messages type="error" messages={deleteError.messages} />
-          }
           {(saveSending || deleteSending || !dataReady)
             && <Loading />
           }
@@ -332,6 +326,8 @@ export class IndicatorEdit extends React.Component { // eslint-disable-line reac
                 headerTitle={intl.formatMessage(messages.pageTitle)}
                 headerType={CONTENT_EDIT}
                 headerIcon="indicators"
+                errorMessages={errorMessages}
+                onServerErrorDismiss={saveError ? this.props.onServerErrorDismiss : undefined}
               />
             )
           }

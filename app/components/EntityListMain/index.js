@@ -230,11 +230,11 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
             />
             {!dataReady && <Loading />}
             {dataReady && (
-              <ListEntities>
+              <ListEntities role="search">
                 <PrintHintKey>
                   <FormattedMessage {...messages.printHintKey} />
                 </PrintHintKey>
-                <EntityListSearch role="search" aria-label={`Filter ${entityTitle.plural}`}>
+                <EntityListSearch aria-label={`Filter ${entityTitle.plural}`}>
                   <TagSearch
                     filters={currentFilters(
                       {

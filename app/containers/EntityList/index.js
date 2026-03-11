@@ -353,51 +353,55 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             </Progress>
           )
         }
-        {(viewDomain.get('errors').size > 0 && progress >= 100)
-          && (
-            <Progress error>
-              <Messages
-                type="error"
-                message={
-                  intl.formatMessage(
-                    messages.updatesFailed,
-                    {
-                      errorNo: viewDomain.get('errors').size,
-                      types:
-                        intl.formatMessage(messages[
-                          `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
-                        ]),
-                    },
-                  )
-                }
-                onDismiss={this.props.resetProgress}
-                preMessage={false}
-              />
-            </Progress>
-          )
-        }
-        {(viewDomain.get('errors').size === 0 && progress >= 100)
-          && (
-            <Progress error>
-              <Messages
-                type="success"
-                message={
-                  intl.formatMessage(
-                    this.getMessageForType(
-                      progressTypes.size === 1 ? progressTypes.first() : 'save',
-                      viewDomain.get('success').size,
-                    ),
-                    {
-                      successNo: viewDomain.get('success').size,
-                    },
-                  )
-                }
-                onDismiss={this.props.resetProgress}
-                autoDismiss={2000}
-              />
-            </Progress>
-          )
-        }
+        <div aria-live="polite">
+          {(viewDomain.get('errors').size > 0 && progress >= 100)
+            && (
+              <Progress error>
+                <Messages
+                  type="error"
+                  withoutAriaLive
+                  message={
+                    intl.formatMessage(
+                      messages.updatesFailed,
+                      {
+                        errorNo: viewDomain.get('errors').size,
+                        types:
+                          intl.formatMessage(messages[
+                            `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
+                          ]),
+                      },
+                    )
+                  }
+                  onDismiss={this.props.resetProgress}
+                  preMessage={false}
+                />
+              </Progress>
+            )
+          }
+          {(viewDomain.get('errors').size === 0 && progress >= 100)
+            && (
+              <Progress error>
+                <Messages
+                  type="success"
+                  withoutAriaLive
+                  message={
+                    intl.formatMessage(
+                      this.getMessageForType(
+                        progressTypes.size === 1 ? progressTypes.first() : 'save',
+                        viewDomain.get('success').size,
+                      ),
+                      {
+                        successNo: viewDomain.get('success').size,
+                      },
+                    )
+                  }
+                  onDismiss={this.props.resetProgress}
+                  autoDismiss={2000}
+                />
+              </Progress>
+            )
+          }
+        </div>
       </div>
     );
   }

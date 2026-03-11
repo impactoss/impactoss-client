@@ -85,32 +85,22 @@ export class UserLogin extends React.PureComponent { // eslint-disable-line reac
           <ContentHeader
             title={intl.formatMessage(messages.pageTitle)}
           />
-          {!IS_PROD && (
-            <Messages
-              type="info"
-              messageKey="signingInServer"
-              messageArgs={{ server: SERVER }}
-              spaceMessage
-            />
-          )}
-          {queryMessages.info
-            && (
-              <Messages
-                type="info"
-                onDismiss={onDismissQueryMessages}
-                messageKey={queryMessages.info}
-                spaceMessage
-              />
-            )
-          }
-          {authError
-            && (
-              <Messages
-                type="error"
-                messages={authError.messages}
-              />
-            )
-          }
+          <Messages
+            type="info"
+            messageKey={!IS_PROD ? 'signingInServer' : null}
+            messageArgs={{ server: SERVER }}
+            spaceMessage
+          />
+          <Messages
+            type="info"
+            onDismiss={onDismissQueryMessages}
+            messageKey={queryMessages.info || null}
+            spaceMessage
+          />
+          <Messages
+            type="error"
+            messages={authError ? authError.messages : null}
+          />
           {!ENABLE_AZURE && authSending
             && <Loading />
           }

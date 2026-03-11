@@ -56,7 +56,6 @@ import {
 import { ROUTES, CONTENT_EDIT } from 'containers/App/constants';
 import { USER_ROLES, ENABLE_AZURE } from 'themes/config';
 
-import Messages from 'components/Messages';
 import Loading from 'components/Loading';
 import Content from 'components/Content';
 import EntityForm from 'containers/EntityForm';
@@ -201,7 +200,10 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
     const { saveSending, saveError } = viewDomain.get('page').toJS();
 
     const editableRoles = this.getEditableUserRoles(roles, sessionUserHighestRoleId);
-
+    let errorMessages = null;
+    if (saveError) {
+      errorMessages = saveError.messages;
+    }
     return (
       <div>
         <HelmetCanonical
@@ -211,15 +213,6 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
           ]}
         />
         <Content ref={this.scrollContainer}>
-          {saveError
-            && (
-              <Messages
-                type="error"
-                messages={saveError.messages}
-                onDismiss={this.props.onServerErrorDismiss}
-              />
-            )
-          }
           {(saveSending || !dataReady)
             && <Loading />
           }
@@ -267,6 +260,8 @@ export class UserEdit extends React.PureComponent { // eslint-disable-line react
                 headerTitle={intl.formatMessage(messages.pageTitle)}
                 headerType={CONTENT_EDIT}
                 headerIcon="users"
+                errorMessages={errorMessages}
+                onServerErrorDismiss={saveError ? this.props.onServerErrorDismiss : undefined}
               />
             )
           }

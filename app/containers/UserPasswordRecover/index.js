@@ -57,9 +57,7 @@ export class UserPasswordRecover extends React.PureComponent { // eslint-disable
           <ContentHeader
             title={intl.formatMessage(messages.pageTitle)}
           />
-          {error
-            && <Messages type="error" messages={error.messages} />
-          }
+          <Messages type="error" messages={error ? error.messages : null} />
           {sending
             && <Loading />
           }
