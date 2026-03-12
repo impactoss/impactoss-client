@@ -7,10 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import {
-  Box,
-  Text,
-} from 'grommet';
+import { Box, Text } from 'grommet';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 

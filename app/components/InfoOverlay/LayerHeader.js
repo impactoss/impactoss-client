@@ -1,9 +1,7 @@
 import React from 'react';
 
 import styled from 'styled-components';
-import {
-  Box,
-} from 'grommet';
+import { Box } from 'grommet';
 
 const LayerHeader = styled((p) => (
   <Box

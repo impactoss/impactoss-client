@@ -273,7 +273,7 @@ export class RecommendationView extends React.PureComponent { // eslint-disable-
 
     let metaDescription = intl.formatMessage(messages.metaDescription);
     if (viewEntity) {
-      metaDescription = `${viewEntity.getIn(['attributes', 'title'])} ${viewEntity.getIn(['attributes', 'description']) || ''}`;
+      metaDescription = `${viewEntity.getIn(['attributes', 'title'])} - ${viewEntity.getIn(['attributes', 'description']) || ''}`;
     }
     return (
       <div>
