@@ -55,7 +55,7 @@ import { updateSort } from './actions';
 const UsersOnly = styled.h4`
   margin-top: 4em;
 `;
-const Description = styled.p`
+const Description = styled.div`
   margin-bottom: 2em;
   font-size: 1em;
   @media print {

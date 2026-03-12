@@ -17,6 +17,7 @@ import { FILTER_FORM_MODEL, INITIAL_FORM } from './constants';
 import { setFilter } from './actions';
 
 const Styled = styled((p) => <ContainerWrapperSidebar hasSidebar {...p} />)`
+  position: fixed;
   z-index: ${(props) => props.sidebarResponsiveLarge ? 99 : 101};
   background-color: rgba(0,0,0,0.2);
   @media (min-width: ${(props) => props.theme.breakpoints.medium}) {
