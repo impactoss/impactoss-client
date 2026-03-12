@@ -15,13 +15,16 @@ function Img({
   src,
   alt,
   className,
+  ...p
 }) {
+  const isArray = Array.isArray(src);
   return (
     <img
       className={className}
-      src={src[0]}
-      srcSet={generateSrcSet(src)}
+      src={isArray ? src[0] : src}
+      srcSet={isArray && src.length > 1 ? generateSrcSet(src) : undefined}
       alt={alt}
+      {...p}
     />
   );
 }

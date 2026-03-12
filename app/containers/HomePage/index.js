@@ -14,7 +14,7 @@ import rehypeExternalLinks from 'rehype-external-links';
 import styled, { withTheme } from 'styled-components';
 import { palette } from 'styled-theme';
 import {
-  Box, Text, ResponsiveContext, Image,
+  Box, Text, ResponsiveContext,
 } from 'grommet';
 
 import { isMinSize } from 'utils/responsive';
@@ -358,10 +358,10 @@ export function HomePage({ onPageLink, theme, intl }) {
           </SectionTopInner>
         </SectionTop>
         <BackgroundImageSection aria-hidden="true">
-          <Image
+          <NormalImg
             src={theme.media.graphicHomeSection}
-            fit="contain"
             alt=""
+            style={{ width: '100%', height: 'auto' }}
           />
         </BackgroundImageSection>
         <Section align="center">
