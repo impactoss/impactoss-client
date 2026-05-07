@@ -108,20 +108,28 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
   }
 
   onShowSidebar = () => {
-    this.setState({ visible: true });
-    const main = document.getElementById('main-content');
-    if (main && this.state.viewport < VIEWPORTS.SMALL) {
-      main.setAttribute('inert', '');
+    this.setState({ visible: true }, () => {
+      if (this.wrapperRef) {
+        const firstFocusable = this.wrapperRef.querySelector('button, [href], h2');
+        if (firstFocusable) firstFocusable.focus();
+      }
+    });
+    if (this.state.viewport < VIEWPORTS.SMALL) {
+      const wrapper = document.getElementById('main-container-wrapper');
+      const header = document.getElementById('header');
+      if (wrapper) wrapper.setAttribute('inert', '');
+      if (header) header.setAttribute('inert', '');
     }
   };
 
   onHideSidebar = () => {
-    // if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    this.setState({ visible: false });
-    const main = document.getElementById('main-content');
-    if (main) {
-      main.removeAttribute('inert');
-    }
+    this.setState({ visible: false }, () => {
+      if (this.toggleRef) this.toggleRef.focus();
+    });
+    const wrapper = document.getElementById('main-container-wrapper');
+    const header = document.getElementById('header');
+    if (wrapper) wrapper.removeAttribute('inert');
+    if (header) header.removeAttribute('inert');
   };
 
   resize = () => {
@@ -164,7 +172,10 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
       <PrintHide>
         { (!this.state.visible && this.state.viewport < VIEWPORTS.SMALL)
           && (
-            <ToggleShow onClick={this.onShowSidebar}>
+            <ToggleShow
+              ref={(el) => { this.toggleRef = el; }}
+              onClick={this.onShowSidebar}
+            >
               <FormattedMessage {...messages.show} />
             </ToggleShow>
           )
@@ -174,7 +185,13 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
             <Sidebar
               responsiveSmall
               role={this.state.viewport < VIEWPORTS.SMALL ? 'dialog' : 'region'}
+              aria-modal={this.state.viewport < VIEWPORTS.SMALL ? 'true' : undefined}
               ref={this.setWrapperRef}
+              style={
+                this.state.visible && this.state.viewport < VIEWPORTS.LARGE ? {
+                  position: 'fixed',
+                  zIndex: 111111,
+                } : {}}
             >
               {this.state.viewport >= VIEWPORTS.SMALL && (
                 <SkipContent

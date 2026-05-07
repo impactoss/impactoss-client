@@ -195,7 +195,7 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
             active={this.state.mouseOverTaxonomyDiagram}
           />
         )}
-        <ContainerWrapperSidebar hasSidebar sidebarResponsiveSmall>
+        <ContainerWrapperSidebar id="main-container-wrapper" hasSidebar sidebarResponsiveSmall>
           <Container role="main" id="main-content">
             <ContentHeader
               type={CONTENT_LIST}

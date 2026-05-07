@@ -196,10 +196,17 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
 
   onShowSidebar = (evt) => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    this.setState({ visible: true });
-    const main = document.getElementById('main-content');
-    if (main && this.state.viewport < VIEWPORTS.LARGE) {
-      main.setAttribute('inert', '');
+    this.setState({ visible: true }, () => {
+      if (this.wrapperRef) {
+        const firstFocusable = this.wrapperRef.querySelector('button, [href], h2');
+        if (firstFocusable) firstFocusable.focus();
+      }
+    });
+    if (this.state.viewport < VIEWPORTS.LARGE) {
+      const wrapper = document.getElementById('main-container-wrapper');
+      const header = document.getElementById('header');
+      if (wrapper) wrapper.setAttribute('inert', '');
+      if (header) header.setAttribute('inert', '');
     }
   };
 
@@ -219,11 +226,13 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
   };
 
   hideSidebar = () => {
-    this.setState({ visible: false });
-    const main = document.getElementById('main-content');
-    if (main) {
-      main.removeAttribute('inert');
-    }
+    this.setState({ visible: false }, () => {
+      if (this.toggleRef) this.toggleRef.focus();
+    });
+    const wrapper = document.getElementById('main-container-wrapper');
+    const header = document.getElementById('header');
+    if (wrapper) wrapper.removeAttribute('inert');
+    if (header) header.removeAttribute('inert');
   };
 
   getSidebarButtons = (intl) =>
@@ -394,15 +403,13 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
     return (
       <Styled
         id="sidebar-filter-edit-options"
-        role={this.state.viewport < VIEWPORTS.LARGE ? 'dialog' : 'region'}
-        ref={this.setWrapperRef}
-        aria-label={
-          canEdit ? 'List filter and edit options' : 'List filter options'
-        }
       >
         { (!this.state.visible && this.state.viewport < VIEWPORTS.LARGE)
           && (
-            <ToggleShow onClick={this.onShowSidebar}>
+            <ToggleShow
+              ref={(el) => { this.toggleRef = el; }}
+              onClick={this.onShowSidebar}
+            >
               { canEdit
               && <FormattedMessage {...messages.sidebarToggle.showFilterEdit} />
               }
@@ -414,8 +421,23 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
         }
         { (this.state.visible || this.state.viewport >= VIEWPORTS.LARGE)
           && (
-            <SidebarWrapper onClick={this.onHideSidebar}>
-              <Sidebar onClick={(evt) => evt.stopPropagation()}>
+            <SidebarWrapper
+              onClick={this.onHideSidebar}
+              style={
+                this.state.visible && this.state.viewport < VIEWPORTS.LARGE ? {
+                  position: 'fixed',
+                  zIndex: 111111,
+                } : {}}
+            >
+              <Sidebar
+                ref={this.setWrapperRef}
+                role={this.state.viewport < VIEWPORTS.LARGE ? 'dialog' : 'region'}
+                aria-label={
+                  canEdit ? 'List filter and edit options' : 'List filter options'
+                }
+                aria-modal={this.state.viewport < VIEWPORTS.LARGE ? 'true' : undefined}
+                onClick={(evt) => evt.stopPropagation()}
+              >
                 {this.state.viewport >= VIEWPORTS.LARGE && (
                   <SkipContent
                     href="#main-content"

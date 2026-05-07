@@ -193,7 +193,7 @@ export class CategoryList extends React.PureComponent { // eslint-disable-line r
               onTaxonomyLink={onTaxonomyLink}
             />
           )}
-        <ContainerWrapperSidebar hasSidebar sidebarResponsiveSmall>
+        <ContainerWrapperSidebar id="main-container-wrapper" hasSidebar sidebarResponsiveSmall>
           <Container role="main" id="main-content">
             <Content>
               <ContentHeader
