@@ -103,7 +103,7 @@
     "rehype-external-links": "^3.0.0",
     "reselect": "5.1.1",
     "sanitize.css": "13.0.0",
-    "styled-components": "6.1.13",
+    "styled-components": "6.4.1",
     "styled-theme": "^0.3.3",
     "textarea-markdown-editor": "^1.0.4"
   },
