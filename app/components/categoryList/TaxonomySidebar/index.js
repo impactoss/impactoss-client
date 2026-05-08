@@ -212,7 +212,11 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
                     />
                     { this.state.viewport < VIEWPORTS.SMALL
                     && (
-                      <ToggleHide onClick={this.onHideSidebar}>
+                      <ToggleHide
+                        onClick={this.onHideSidebar}
+                        aria-label={intl.formatMessage(messages.hide)}
+                        title={intl.formatMessage(messages.hide)}
+                      >
                         <Icon name="close" />
                       </ToggleHide>
                     )

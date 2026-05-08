@@ -462,7 +462,11 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
                 <ScrollableWrapper>
                   <SidebarHeader hasButtons={canEdit}>
                     { this.state.viewport < VIEWPORTS.LARGE && (
-                      <ToggleHide onClick={this.onHideSidebar}>
+                      <ToggleHide
+                        onClick={this.onHideSidebar}
+                        aria-label={intl.formatMessage(messages.sidebarToggle[canEdit ? 'hideFilterEdit' : 'hideFilter'])}
+                        title={intl.formatMessage(messages.sidebarToggle[canEdit ? 'hideFilterEdit' : 'hideFilter'])}
+                      >
                         <Icon name="close" />
                       </ToggleHide>
                     )}

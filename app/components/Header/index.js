@@ -25,7 +25,6 @@ import {
 import appMessages from 'containers/App/messages';
 import Icon from 'components/Icon';
 import Button from 'components/buttons/Button';
-import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
 import PrintHide from 'components/styled/PrintHide';
 
 import Logo from './Logo';
@@ -323,7 +322,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
     this.forceUpdate();
   };
 
-  renderSecondary = (navItemsSecondary, search, hasSettings, onShowSettings, size) => {
+  renderSecondary = (navItemsSecondary, search, hasSettings, onShowSettings, size, intl) => {
     const bookmarks = navItemsSecondary && navItemsSecondary.find((i) => i.isBookmarks);
     const userAdmin = navItemsSecondary && navItemsSecondary.find((i) => i.isUserAdmin);
     const pageAdmin = navItemsSecondary && navItemsSecondary.find((i) => i.isPageAdmin);
@@ -332,10 +331,9 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
         <ShowSecondary
           visible={!this.state.showSecondary}
           onClick={this.onShowSecondary}
+          aria-label={intl.formatMessage(appMessages.screenreader.showSecondaryNavigation)}
+          title={intl.formatMessage(appMessages.screenreader.showSecondaryNavigation)}
         >
-          <ScreenReaderOnly>
-            <FormattedMessage {...appMessages.screenreader.showSecondaryNavigation} />
-          </ScreenReaderOnly>
           <Icon name="menu" hasStroke />
         </ShowSecondary>
         <NavSecondary
@@ -354,10 +352,9 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             <HideSecondaryWrap>
               <HideSecondary
                 onClick={this.onHideSecondary}
+                aria-label={intl.formatMessage(appMessages.screenreader.hideSecondaryNavigation)}
+                title={intl.formatMessage(appMessages.screenreader.hideSecondaryNavigation)}
               >
-                <ScreenReaderOnly>
-                  <FormattedMessage {...appMessages.screenreader.hideSecondaryNavigation} />
-                </ScreenReaderOnly>
                 <Icon name="close" size="30px" />
               </HideSecondary>
             </HideSecondaryWrap>
@@ -522,7 +519,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             {!SHOW_BRAND_ON_HOME && isHome
               && (
                 <HomeNavWrap>
-                  {this.renderSecondary(navItemsSecondary, search, hasSettings, onShowSettings, size)}
+                  {this.renderSecondary(navItemsSecondary, search, hasSettings, onShowSettings, size, intl)}
                 </HomeNavWrap>
               )
             }
@@ -560,7 +557,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                     )}
                   </Box>
                 </Brand>
-                {this.renderSecondary(navItemsSecondary, search, hasSettings, onShowSettings, size)}
+                {this.renderSecondary(navItemsSecondary, search, hasSettings, onShowSettings, size, intl)}
               </Banner>
             )}
             {(!isHome || SHOW_HOME_MAIN_NAV) && (

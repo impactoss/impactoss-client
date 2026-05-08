@@ -40,8 +40,12 @@ export default defineMessages({
       id: 'app.components.EntityListSidebar.sidebarToggle.showFilterEdit',
       defaultMessage: 'Show filter & edit options',
     },
-    hide: {
-      id: 'app.components.EntityListSidebar.sidebarToggle.hide',
+    hideFilter: {
+      id: 'app.components.EntityListSidebar.sidebarToggle.hideFilter',
+      defaultMessage: 'Hide options',
+    },
+    hideFilterEdit: {
+      id: 'app.components.EntityListSidebar.sidebarToggle.hideFilterEdit',
       defaultMessage: 'Hide options',
     },
   },
