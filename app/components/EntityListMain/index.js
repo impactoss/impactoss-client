@@ -212,7 +212,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
       }
     }
     return (
-      <ContainerWrapperSidebar hasSidebar ref={this.ScrollContainer}>
+      <ContainerWrapperSidebar id="main-container-wrapper" hasSidebar ref={this.ScrollContainer}>
         <Container
           ref={this.ScrollReference}
           noPaddingBottom

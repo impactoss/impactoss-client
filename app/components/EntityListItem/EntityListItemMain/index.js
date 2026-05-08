@@ -40,7 +40,10 @@ const Wrapper = styled((p) => <Component {...p} />)`
   padding-top: 8px;
   padding-bottom: 12px;
   box-shadow: ${({ isConnection }) => isConnection ? '0px 0px 6px 0px rgba(0,0,0,0.2)' : 'none'};
+  display: flex;
+  flex-direction: column;
   @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+    display: block;
     padding-right: ${(props) => (!props.theme.sizes)
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal
@@ -59,7 +62,6 @@ const EntityListItemMainTitleWrap = styled.a`
   text-decoration: none;
   display: block;
   padding: 6px 15px 8px 0;
-  margin-top: 15px;
   color: ${palette('mainListItem', 0)};
   &:hover, &:focus-visible {
     color: ${palette('mainListItemHover', 0)};
@@ -68,24 +70,44 @@ const EntityListItemMainTitleWrap = styled.a`
     outline: none;
     text-decoration: underline;
   }
+  order: 1;
+  @media (min-width: ${({ theme }) => theme && theme.breakpoints ? theme.breakpoints.small : '769px'}) {
+    margin-top: 15px;
+    order: unset;
+  }
   @media print {
     padding: 1px 15px 5px 0;
   }
 `;
 
 const EntityListItemMainTopWrap = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
   padding-top: 8px;
   padding-right: 6px;
-  @media (min-width: ${(props) => props.theme && props.theme.breakpoints ? props.theme.breakpoints.small : '769px'}) {
+  order: 0;
+  @media (min-width: ${({ theme }) => theme && theme.breakpoints ? theme.breakpoints.small : '769px'}) {
+    order: unset;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     padding-top: 15px;
     padding-right: ${(props) => (!props.theme.sizes)
     ? 0
     : props.theme.sizes.mainListItem.paddingHorizontal
 }px;
+  }
+`;
+
+const EntityListItemMainBottomWrap = styled.div`
+  order: 3;
+  @media (min-width: ${({ theme }) => theme && theme.breakpoints ? theme.breakpoints.small : '769px'}) {
+    order: unset;
+  }
+`;
+const SkipContentStyled = styled(SkipContent)`
+  order: 2;
+  @media (min-width: ${({ theme }) => theme && theme.breakpoints ? theme.breakpoints.small : '769px'}) {
+    order: unset;
   }
 `;
 
@@ -303,25 +325,27 @@ class EntityListItemMain extends React.PureComponent { // eslint-disable-line re
             )}
           </EntityListItemMainTitleWrap>
           {skipTargetId && (
-            <SkipContent
+            <SkipContentStyled
               href={skipTargetId}
               title="Skip to next list recommendation or group, continue to recommendation categories"
             >
               Skip to next list item or group, continue to recommendation categories
-            </SkipContent>
+            </SkipContentStyled>
           )}
           <EntityListItemMainTopWrap>
             <EntityListItemMainTop entity={entityItem} />
           </EntityListItemMainTopWrap>
           { (entityItem.categories || (entityItem.connectedCounts && this.props.wrapper))
             && (
-              <EntityListItemMainBottom
-                connections={entityItem.connectedCounts}
-                wrapper={this.props.wrapper}
-                categories={entityItem.categories}
-                taxonomies={bottomTaxonomies}
-                onEntityClick={onEntityClick}
-              />
+              <EntityListItemMainBottomWrap>
+                <EntityListItemMainBottom
+                  connections={entityItem.connectedCounts}
+                  wrapper={this.props.wrapper}
+                  categories={entityItem.categories}
+                  taxonomies={bottomTaxonomies}
+                  onEntityClick={onEntityClick}
+                />
+              </EntityListItemMainBottomWrap>
             )
           }
         </Wrapper>

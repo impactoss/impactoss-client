@@ -501,6 +501,7 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
             hasNav={!isHome || SHOW_HOME_MAIN_NAV}
             hasBrand={SHOW_BRAND_ON_HOME || !isHome}
             role="banner"
+            id="header"
           >
             {this.state.showFrameworks && (
               <FrameworkOptions ref={this.fwWrapperRef}>
