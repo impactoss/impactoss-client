@@ -43,7 +43,6 @@
     "lint:js": "npm run lint:eslint -- .",
     "lint:staged": "lint-staged",
     "pretest": "npm run test:clean && npm run lint",
-    "coveralls": "cat ./coverage/lcov.info | coveralls",
     "prettify": "prettier --write",
     "predeploy:copy": "rimraf ../human-rights-website/* && cp ./build/* ../human-rights-website/"
   },
@@ -133,7 +132,6 @@
     "compare-versions": "6.1.0",
     "compression-webpack-plugin": "11.1.0",
     "copy-webpack-plugin": "12.0.2",
-    "coveralls": "3.1.1",
     "cross-env": "^7.0.3",
     "css-loader": "7.1.2",
     "eslint": "8.57.0",
