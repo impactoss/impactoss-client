@@ -17,7 +17,7 @@ const Status = styled(Label)`
   font-weight: bold;
   font-size: ${(props) => props.theme.sizes && props.theme.sizes.text.listItemTop};
   margin-top: ${({ top }) => top ? '-7px' : 0};
-  color: ${palette('dark', 4)};
+  color: ${palette('dark', 3)};
   @media print {
     font-size: ${(props) => props.theme.sizes.print.listItemTop};
   }

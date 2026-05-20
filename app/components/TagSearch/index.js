@@ -35,7 +35,7 @@ const Search = styled.div`
   -ms-flex-pack: justify;
   justify-content: space-between;
   background-color: ${palette('primary', 3)};
-  border: 1px solid ${palette('light', 3)};
+  border: 1px solid ${palette('inputBorder', 0)};
   color: ${palette('dark', 1)};
   border-radius: 22px;
   min-height: ${(props) => props.small ? 30 : 40}px;
@@ -56,6 +56,10 @@ const SearchInput = styled((p) => <DebounceInput {...p} />)`
   font-size: 0.85em;
   &:focus-visible, &:focus {
     outline: 0;
+  }
+  &::placeholder {
+    color: ${palette('dark', 4)};
+    opacity: 1;
   }
   @media print {
     display: none;

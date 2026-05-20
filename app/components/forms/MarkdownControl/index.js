@@ -39,7 +39,7 @@ const StyledTextareaMarkdown = styled(
 )`
   background-color: ${palette('background', 0)};
   width: 100%;
-  border: 1px solid ${palette('light', 1)};
+  border: 1px solid ${palette('inputBorder', 0)};
   padding: 0.7em;
   border-radius: 0.5em;
   color: ${palette('text', 0)};
@@ -47,6 +47,10 @@ const StyledTextareaMarkdown = styled(
   resize: "none";
   max-height: ${MAX_TEXTAREA_HEIGHT}px;
   overflow-y: auto;
+  &::placeholder {
+    color: ${palette('dark', 4)};
+    opacity: 1;
+  }
 `;
 const Preview = styled((p) => <Box {...p} />)`
   background-color: ${palette('background', 0)};

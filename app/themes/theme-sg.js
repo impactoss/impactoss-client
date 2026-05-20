@@ -156,7 +156,7 @@ const secondary = coolorsToHex('https://coolors.co/ffffff-ffffff-ffffff-ffffff-f
 // 2:  dark (AA)
 // 3:  medium gray 1 (AA) --- !!! AA compatible with light[0]
 // 4:  medium gray 2 (AA large)
-const dark = coolorsToHex('https://coolors.co/333e48-333e48-333e48-6a7076-6a7076');
+const dark = coolorsToHex('https://coolors.co/333e48-333e48-333e48-686D73-71777D');
 // light grayscale: light to dark
 // 0:  lightest gray (background colour) - also used in global-styles.js !!! AA compatible with dark[3]
 // 1:  light gray (light lines, navigation filter panel)
@@ -352,7 +352,7 @@ theme.palette = {
   // BUTTONS / LINKS
   //
   // button: ['#colorPrimary', '#colorSecondary', #disabled],
-  buttonFlat: [primary[0], dark[3], dark[4]], // aka ghost button
+  buttonFlat: [primary[0], dark[3], dark[3]], // aka ghost button
   buttonFlatHover: [primary[0], primary[1]],
   buttonCancel: [dark[3]], // form footer cancel
   buttonCancelHover: [primary[1]],
@@ -374,6 +374,7 @@ theme.palette = {
   buttonInverseHover: [primary[0], primary[4]],
   // checkbox
   checkbox: [primary[1]],
+  inputBorder: ['#878A92'],
 };
 
 // fonts

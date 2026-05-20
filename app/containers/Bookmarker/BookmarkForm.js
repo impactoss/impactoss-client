@@ -49,9 +49,13 @@ const StyledForm = styled.form`
 const Input = styled(DebounceInput)`
   width: 100%;
   background-color: ${palette('light', 0)};
-  border: 1px solid ${palette('light', 1)};
+  border: 1px solid ${palette('inputBorder', 0)};
   padding: 0.7em;
   border-radius: 0.5em;
+  &::placeholder {
+    color: ${palette('dark', 3)};
+    opacity: 1;
+  }
 `;
 
 const StyledFieldGroupWrapper = styled(FieldGroupWrapper)`

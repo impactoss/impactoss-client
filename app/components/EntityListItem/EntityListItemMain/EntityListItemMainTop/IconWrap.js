@@ -3,7 +3,7 @@ import { palette } from 'styled-theme';
 
 const BottomIconWrap = styled.span`
   margin-right: 3px;
-  color: ${palette('dark', 4)};
+  color: ${palette('dark', 3)};
 `;
 
 export default BottomIconWrap;

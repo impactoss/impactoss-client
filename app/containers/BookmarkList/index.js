@@ -78,7 +78,7 @@ const Target = styled(Button)`
   text-align: left;
   color:  ${(props) => {
     if (props.disabled) {
-      return props.active ? palette('asideListItem', 1) : palette('dark', 4);
+      return props.active ? palette('asideListItem', 1) : palette('dark', 3);
     }
     return props.active ? palette('asideListItem', 1) : palette('asideListItem', 0);
   }};
@@ -87,7 +87,7 @@ const Target = styled(Button)`
   &:hover {
     color: ${(props) => {
     if (props.disabled) {
-      return props.active ? palette('asideListItem', 1) : palette('dark', 4);
+      return props.active ? palette('asideListItem', 1) : palette('dark', 3);
     }
     return props.active ? palette('asideListItemHover', 1) : palette('asideListItemHover', 0);
   }};
