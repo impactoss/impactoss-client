@@ -754,3 +754,10 @@ export const SETTINGS = {
     minRole: SEE_ARCHIVED_MIN_ROLE,
   },
 };
+
+export const PROTECTED_BY_PASSWORD = {
+  ATTRIBUTES: {
+    [API.USERS]: ['name'],
+  },
+  CONNECTIONS: ['userRoles'],
+};

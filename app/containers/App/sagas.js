@@ -37,7 +37,7 @@ import {
   VALIDATE_TOKEN,
   AUTHENTICATE_SUCCESS,
   INVALIDATE_ENTITIES,
-  SAVE_CONNECTIONS,
+  // SAVE_CONNECTIONS,
   UPDATE_ROUTE_QUERY,
   AUTHENTICATE_FORWARD,
   UPDATE_PATH,
@@ -62,6 +62,7 @@ import {
   ENABLE_AZURE,
   KEEP_QUERY_ARGS,
   SETTINGS,
+  PROTECTED_BY_PASSWORD,
 } from 'themes/config';
 
 import {
@@ -367,7 +368,7 @@ function stampPayload(payload, type) {
 
 
 function* createConnectionsSaga({
-  entityId, path, updates, keyPair, saveRef,
+  entityId, path, updates, keyPair, saveRef, currentPassword,
 }) {
   // make sure to use new entity id for full payload
   // we should have either the one (recommendation_id) or the other (measure_id)
@@ -377,17 +378,48 @@ function* createConnectionsSaga({
     [keyPair[1]]: create[keyPair[1]] || entityId,
   }));
 
-  yield call(saveConnectionsSaga, { data: { path, updates: updatesUpdated, saveRef } });
+  yield call(saveConnectionsSaga, {
+    data: { path, updates: updatesUpdated, saveRef },
+    currentPassword,
+  });
 }
 
-export function* saveEntitySaga({ data }, updateClient = true, multiple = false) {
+const checkNeedsPassword = ({ path, entity }) => {
+  if (!entity) return false;
+
+  // check gated attributes
+  const gatedAttributes = PROTECTED_BY_PASSWORD.ATTRIBUTES[path];
+  if (gatedAttributes && entity.changedAttributes) {
+    if (entity.changedAttributes.some((key) => gatedAttributes.indexOf(key) > -1)) {
+      return true;
+    }
+  }
+
+  // check gated connections
+  return PROTECTED_BY_PASSWORD.CONNECTIONS.some((key) => {
+    const updates = entity[key];
+    return !!updates && (
+      (updates.create && updates.create.length > 0)
+      || (updates.delete && updates.delete.length > 0)
+    );
+  });
+};
+export function* saveEntitySaga({ data, currentPassword }, updateClient = true, multiple = false) {
+  const needsPassword = checkNeedsPassword(data);
+  console.log('data, needsPassword', data, needsPassword);
+  // if (needsPassword && (!currentPassword || currentPassword.trim() === '')) {
+  //   yield put(openPasswordModal({
+  //     data,
+  //     call: 'saveEntitySaga',
+  //   }));
+  // } else {
   const dataTS = stampPayload(data, 'save');
   try {
     yield put(saveSending(dataTS));
 
     if (!data.entity.skipAttributes) {
       // update entity attributes
-      const entityUpdated = yield call(updateEntityRequest, data.path, data.entity);
+      const entityUpdated = yield call(updateEntityRequest, data.path, data.entity, currentPassword);
       // and on the client
       if (updateClient) {
         yield put(updateEntity(data.path, {
@@ -405,6 +437,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             updates: data.entity.userRoles,
             saveRef: data.saveRef,
           },
+          currentPassword,
         });
       }
 
@@ -416,6 +449,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             updates: data.entity.userCategories,
             saveRef: data.saveRef,
           },
+          currentPassword,
         });
       }
 
@@ -427,6 +461,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             updates: data.entity.recommendationMeasures,
             saveRef: data.saveRef,
           },
+          currentPassword,
         });
       }
       // update recommendation-indicator connections
@@ -437,6 +472,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             updates: data.entity.recommendationIndicators,
             saveRef: data.saveRef,
           },
+          currentPassword,
         });
       }
 
@@ -448,6 +484,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             updates: data.entity.measureIndicators,
             saveRef: data.saveRef,
           },
+          currentPassword,
         });
       }
 
@@ -459,6 +496,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             updates: data.entity.measureCategories,
             saveRef: data.saveRef,
           },
+          currentPassword,
         });
       }
 
@@ -470,6 +508,7 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
             updates: data.entity.recommendationCategories,
             saveRef: data.saveRef,
           },
+          currentPassword,
         });
       }
     }
@@ -483,13 +522,18 @@ export function* saveEntitySaga({ data }, updateClient = true, multiple = false)
   } catch (err) {
     console.log('ERROR in saveEntitySaga');
     if (err.response) {
-      err.response.json = yield err.response.json();
+      if (err.response) {
+        if (typeof err.response.json === 'function') {
+          err.response.json = yield err.response.json();
+        }
+      }
       yield put(saveError(err, dataTS));
     }
     if (updateClient) {
       yield put(invalidateEntities(data.path));
     }
   }
+  // }
 }
 
 export function* saveMultipleEntitiesSaga({ path, data }) {
@@ -640,7 +684,9 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
   } catch (err) {
     console.log('ERROR in newEntitySaga');
     if (err.response) {
-      err.response.json = yield err.response.json();
+      if (typeof err.response.json === 'function') {
+        err.response.json = yield err.response.json();
+      }
     }
     yield put(saveError(err, dataTS));
     if (updateClient) {
@@ -664,25 +710,26 @@ export function* newMultipleEntitiesSaga({ path, data }) {
   }
 }
 
-export function* saveConnectionsSaga({ data }) {
+function* saveConnectionsSaga({ data, currentPassword }) {
   if (data.updates && (
     (data.updates.create && data.updates.create.length > 0)
     || (data.updates.delete && data.updates.delete.length > 0)
   )) {
-    const dataTS = stampPayload(data);
+    const dataTS = stampPayload(data, 'save-connections');
     try {
       yield put(saveSending(dataTS));
       // on the server
-      const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
+      const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates, currentPassword);
       // and on the client
       yield put(updateConnections(data.path, connectionsUpdated));
       yield put(saveSuccess(dataTS));
     } catch (err) {
-      console.log('ERROR in saveConnectionsSaga', err);
+      console.log('ERROR in saveConnectionsSaga', err, dataTS);
       if (err.response) {
         err.response.json = yield err.response.json();
       }
       yield put(saveError(err, dataTS));
+      throw err;
       // yield put(invalidateEntities(data.path));
     }
   }
@@ -950,7 +997,7 @@ export default function* rootSaga() {
   yield takeEvery(NEW_MULTIPLE_ENTITIES, newMultipleEntitiesSaga);
   yield takeEvery(DELETE_ENTITY, deleteEntitySaga);
   yield takeEvery(DELETE_MULTIPLE_ENTITIES, deleteMultipleEntitiesSaga);
-  yield takeEvery(SAVE_CONNECTIONS, saveConnectionsSaga);
+  // yield takeEvery(SAVE_CONNECTIONS, saveConnectionsSaga);
 
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);
