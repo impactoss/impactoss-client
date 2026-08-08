@@ -52,8 +52,7 @@ import {
   resetProgress,
   showPanel,
   saveMultiple,
-  newMultipleConnections,
-  deleteMultipleConnections,
+  updateMultipleConnections,
   selectEntity,
   selectMultipleEntities,
   updateQuery,
@@ -774,34 +773,18 @@ function mapDispatchToProps(dispatch, props) {
           Map().set('creates', List()).set('deletes', List()),
         ); // reduce entities
         // associations
-        if (updates.get('creates') && updates.get('creates').size > 0) {
-          dispatch(newMultipleConnections(
+        if (
+          (updates.get('creates') && updates.get('creates').size > 0)
+          || (updates.get('deletes') && updates.get('deletes').size > 0)
+        ) {
+          dispatch(updateMultipleConnections(
             activeEditOption.path,
-            updates.get('creates').toJS(),
+            {
+              create: updates.get('creates') && updates.get('creates').toJS(),
+              delete: updates.get('deletes') && updates.get('deletes').toJS(),
+            },
           ));
         }
-        if (updates.get('deletes') && updates.get('deletes').size > 0) {
-          dispatch(deleteMultipleConnections(
-            activeEditOption.path,
-            updates.get('deletes').toJS(),
-          ));
-        }
-        // entityCreates.forEach((id) => dispatch(newConnection({
-        //   path: activeEditOption.path,
-        //   entity: {
-        //     attributes: {
-        //       [activeEditOption.ownKey]: entity.get('id'),
-        //       [activeEditOption.key]: id,
-        //     },
-        //   },
-        //   saveRef: entity.get('id'),
-        // })));
-        // existingAssignments
-        //   .forEach((assigned, id) => dispatch(deleteConnection({
-        //     path: activeEditOption.path,
-        //     id,
-        //     saveRef: entity.get('id'),
-        //   })));
       }
     },
   };

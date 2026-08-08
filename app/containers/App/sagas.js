@@ -27,9 +27,8 @@ import {
   SAVE_ENTITY,
   SAVE_MULTIPLE_ENTITIES,
   NEW_ENTITY,
-  NEW_MULTIPLE_ENTITIES,
   DELETE_ENTITY,
-  DELETE_MULTIPLE_ENTITIES,
+  CREATE_DELETE_MULTIPLE_ENTITIES,
   AUTHENTICATE,
   AUTHENTICATE_AZURE,
   LOGOUT,
@@ -385,7 +384,7 @@ function* createConnectionsSaga({
   });
 }
 
-const checkNeedsPassword = ({ path, entity }) => {
+const checkEntitySaveNeedsPassword = ({ path, entity }) => {
   if (!entity) return false;
 
   // check gated attributes
@@ -406,7 +405,7 @@ const checkNeedsPassword = ({ path, entity }) => {
   });
 };
 export function* saveEntitySaga({ data, currentPassword }, updateClient = true, multiple = false) {
-  const needsPassword = checkNeedsPassword(data);
+  const needsPassword = checkEntitySaveNeedsPassword(data);
   // console.log('data, needsPassword, currentPassword', data, needsPassword, currentPassword);
   if (needsPassword && (!currentPassword || currentPassword.trim() === '')) {
     yield put(openPasswordModal({
@@ -550,11 +549,11 @@ export function* saveMultipleEntitiesSaga({ path, data }) {
   }
 }
 
-export function* deleteEntitySaga({ data }, updateClient = true, multiple = false) {
+export function* deleteEntitySaga({ data, currentPassword }, updateClient = true, multiple = false) {
   const dataTS = stampPayload(data, 'delete');
   try {
     yield put(deleteSending(dataTS));
-    yield call(deleteEntityRequest, data.path, data.id);
+    yield call(deleteEntityRequest, data.path, data.id, currentPassword);
     if (!multiple && data.redirect !== false) {
       yield put(updatePath(
         `/${data.redirect || data.path}`,
@@ -577,12 +576,12 @@ export function* deleteEntitySaga({ data }, updateClient = true, multiple = fals
   }
 }
 
-export function* deleteMultipleEntitiesSaga({ path, data }) {
+function* deleteMultipleEntitiesSaga({ path, data, currentPassword }) {
   const updateClient = data && data.length <= 20;
   yield all(data.map(
     (datum) => call(
       deleteEntitySaga,
-      { data: datum },
+      { data: datum, currentPassword },
       updateClient, // do not update client
       true, // multiple
     ),
@@ -592,13 +591,18 @@ export function* deleteMultipleEntitiesSaga({ path, data }) {
   }
 }
 
-export function* newEntitySaga({ data }, updateClient = true, multiple = false) {
+export function* newEntitySaga({ data, currentPassword }, updateClient = true, multiple = false) {
   const dataTS = stampPayload(data, 'new');
   try {
     yield put(saveSending(dataTS));
     // update entity attributes
     // on the server
-    const entityCreated = yield call(newEntityRequest, data.path, data.entity.attributes);
+    const entityCreated = yield call(
+      newEntityRequest,
+      data.path,
+      data.entity.attributes,
+      currentPassword,
+    );
 
     if (!data.createAsGuest) {
       if (updateClient) {
@@ -694,18 +698,49 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
   }
 }
 
-export function* newMultipleEntitiesSaga({ path, data }) {
+function* newMultipleEntitiesSaga({ path, data, currentPassword }) {
   const updateClient = data && data.length <= 20;
   yield all(data.map(
     (datum) => call(
       newEntitySaga,
-      { data: datum },
+      { data: datum, currentPassword },
       updateClient, // do not update client
       true, // multiple
     ),
   ));
   if (!updateClient) {
     yield put(invalidateEntities(path));
+  }
+}
+
+const checkCreateDeleteMultipleNeedsPassword = ({ path, updates }) => {
+  if (!path) return false;
+
+  // check gated connections
+  return PROTECTED_BY_PASSWORD.CONNECTIONS.some((key) =>
+    key === path
+    && (
+      (updates.create && updates.create.length > 0)
+      || (updates.delete && updates.delete.length > 0)
+    ));
+};
+
+export function* createDeleteMultipleEntitiesSaga({ data, currentPassword }) {
+  const needsPassword = checkCreateDeleteMultipleNeedsPassword(data);
+  // console.log('path, updates, needsPassword, currentPassword', data, needsPassword, currentPassword);
+  if (needsPassword && (!currentPassword || currentPassword.trim() === '')) {
+    yield put(openPasswordModal({
+      data,
+      action: 'createDeleteMultipleEntities',
+    }));
+  } else {
+    const { path, updates } = data;
+    if (updates.create && updates.create.length > 0) {
+      yield call(newMultipleEntitiesSaga, { path, data: updates.create, currentPassword });
+    }
+    if (updates.delete && updates.delete.length > 0) {
+      yield call(deleteMultipleEntitiesSaga, { path, data: updates.delete, currentPassword });
+    }
   }
 }
 
@@ -993,9 +1028,8 @@ export default function* rootSaga() {
   yield takeEvery(SAVE_ENTITY, saveEntitySaga);
   yield takeEvery(SAVE_MULTIPLE_ENTITIES, saveMultipleEntitiesSaga);
   yield takeEvery(NEW_ENTITY, newEntitySaga);
-  yield takeEvery(NEW_MULTIPLE_ENTITIES, newMultipleEntitiesSaga);
+  yield takeEvery(CREATE_DELETE_MULTIPLE_ENTITIES, createDeleteMultipleEntitiesSaga);
   yield takeEvery(DELETE_ENTITY, deleteEntitySaga);
-  yield takeEvery(DELETE_MULTIPLE_ENTITIES, deleteMultipleEntitiesSaga);
   // yield takeEvery(SAVE_CONNECTIONS, saveConnectionsSaga);
 
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);

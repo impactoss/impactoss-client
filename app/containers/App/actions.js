@@ -39,9 +39,8 @@ import {
   UPDATE_CONNECTIONS,
   REMOVE_ENTITY,
   NEW_ENTITY,
-  NEW_MULTIPLE_ENTITIES,
   DELETE_ENTITY,
-  DELETE_MULTIPLE_ENTITIES,
+  CREATE_DELETE_MULTIPLE_ENTITIES,
   SAVE_ENTITY,
   SAVE_MULTIPLE_ENTITIES,
   INVALIDATE_ENTITIES,
@@ -230,11 +229,11 @@ export function deleteEntity(data) {
     data,
   };
 }
-export function deleteMultipleEntities(path, data) {
+export function createDeleteMultipleEntities(data, currentPassword) {
   return {
-    type: DELETE_MULTIPLE_ENTITIES,
-    path,
+    type: CREATE_DELETE_MULTIPLE_ENTITIES,
     data,
+    currentPassword,
   };
 }
 
@@ -258,13 +257,6 @@ export function saveMultipleEntities(path, data) {
 export function newEntity(data) {
   return {
     type: NEW_ENTITY,
-    data,
-  };
-}
-export function newMultipleEntities(path, data) {
-  return {
-    type: NEW_MULTIPLE_ENTITIES,
-    path,
     data,
   };
 }

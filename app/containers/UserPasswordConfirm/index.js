@@ -13,6 +13,7 @@ import { getPasswordCurrentField } from 'utils/forms';
 
 import {
   saveEntity,
+  createDeleteMultipleEntities,
   openPasswordModal,
 } from 'containers/App/actions';
 
@@ -66,8 +67,12 @@ function mapDispatchToProps(dispatch) {
       if (action === 'saveEntity') {
         // console.log(formValues)
         dispatch(saveEntity(data.toJS(), formValues.password));
-        dispatch(openPasswordModal(null));
       }
+      if (action === 'createDeleteMultipleEntities') {
+        // console.log(formValues)
+        dispatch(createDeleteMultipleEntities(data.toJS(), formValues.password));
+      }
+      dispatch(openPasswordModal(null));
     },
   };
 }
