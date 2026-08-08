@@ -67,6 +67,10 @@ export const selectNewEntityModal = createSelector(
   getGlobal,
   (globalState) => globalState.get('newEntityModal'),
 );
+export const selectPasswordModal = createSelector(
+  getGlobal,
+  (globalState) => globalState.get('passwordModal'),
+);
 export const selectShowSettings = createSelector(
   getGlobal,
   (globalState) => !!globalState.get('showSettings'),

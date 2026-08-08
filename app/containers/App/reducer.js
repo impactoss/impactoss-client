@@ -33,6 +33,7 @@ import {
   INVALIDATE_ENTITIES,
   DUEDATE_ASSIGNED,
   OPEN_NEW_ENTITY_MODAL,
+  OPEN_PASSWORD_MODAL,
   SHOW_SETTINGS_MODAL,
   INITIALIZE_SETTINGS,
   OTP_REQUIRED,
@@ -173,6 +174,8 @@ function appReducer(state = initialState, payload) {
       return state;
     case OPEN_NEW_ENTITY_MODAL:
       return state.set('newEntityModal', fromJS(payload.args));
+    case OPEN_PASSWORD_MODAL:
+      return state.set('passwordModal', fromJS(payload.args));
     case SHOW_SETTINGS_MODAL:
       return state.set('showSettings', fromJS(payload.open));
     case INITIALIZE_SETTINGS:
