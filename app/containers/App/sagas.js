@@ -396,7 +396,7 @@ const checkEntitySaveNeedsPassword = ({ path, entity }) => {
   }
 
   // check gated connections
-  return PROTECTED_BY_PASSWORD.CONNECTIONS.some((key) => {
+  return PROTECTED_BY_PASSWORD.CONNECTION_KEYS.some((key) => {
     const updates = entity[key];
     return !!updates && (
       (updates.create && updates.create.length > 0)
@@ -576,12 +576,14 @@ export function* deleteEntitySaga({ data, currentPassword }, updateClient = true
   }
 }
 
-function* deleteMultipleEntitiesSaga({ path, data, currentPassword }) {
+function* deleteMultipleEntitiesSaga({
+  path, data, currentPassword, context,
+}) {
   const updateClient = data && data.length <= 20;
   yield all(data.map(
     (datum) => call(
       deleteEntitySaga,
-      { data: datum, currentPassword },
+      { data: { ...datum, context }, currentPassword },
       updateClient, // do not update client
       true, // multiple
     ),
@@ -698,12 +700,14 @@ export function* newEntitySaga({ data, currentPassword }, updateClient = true, m
   }
 }
 
-function* newMultipleEntitiesSaga({ path, data, currentPassword }) {
+function* newMultipleEntitiesSaga({
+  path, data, currentPassword, context,
+}) {
   const updateClient = data && data.length <= 20;
   yield all(data.map(
     (datum) => call(
       newEntitySaga,
-      { data: datum, currentPassword },
+      { data: { ...datum, context }, currentPassword },
       updateClient, // do not update client
       true, // multiple
     ),
@@ -714,10 +718,10 @@ function* newMultipleEntitiesSaga({ path, data, currentPassword }) {
 }
 
 const checkCreateDeleteMultipleNeedsPassword = ({ path, updates }) => {
-  if (!path) return false;
+  if (!path || !updates) return false;
 
   // check gated connections
-  return PROTECTED_BY_PASSWORD.CONNECTIONS.some((key) =>
+  return PROTECTED_BY_PASSWORD.CONNECTION_PATHS.some((key) =>
     key === path
     && (
       (updates.create && updates.create.length > 0)
@@ -736,10 +740,14 @@ export function* createDeleteMultipleEntitiesSaga({ data, currentPassword }) {
   } else {
     const { path, updates } = data;
     if (updates.create && updates.create.length > 0) {
-      yield call(newMultipleEntitiesSaga, { path, data: updates.create, currentPassword });
+      yield call(newMultipleEntitiesSaga, {
+        path, data: updates.create, currentPassword, context: 'entityList',
+      });
     }
     if (updates.delete && updates.delete.length > 0) {
-      yield call(deleteMultipleEntitiesSaga, { path, data: updates.delete, currentPassword });
+      yield call(deleteMultipleEntitiesSaga, {
+        path, data: updates.delete, currentPassword, context: 'entityList',
+      });
     }
   }
 }

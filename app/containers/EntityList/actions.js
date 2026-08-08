@@ -8,7 +8,7 @@ import {
   SHOW_PANEL,
   SAVE,
   SAVE_MULTIPLE,
-  UDPATE_MULTIPLE_CONNECTIONS,
+  UPDATE_MULTIPLE_CONNECTIONS,
   RESET_STATE,
   RESET_PROGRESS,
   ENTITY_SELECTED,
@@ -54,7 +54,7 @@ export function saveMultiple(path, data) {
 }
 export function updateMultipleConnections(path, updates) {
   return {
-    type: UDPATE_MULTIPLE_CONNECTIONS,
+    type: UPDATE_MULTIPLE_CONNECTIONS,
     path,
     updates,
   };

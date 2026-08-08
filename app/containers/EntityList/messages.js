@@ -18,6 +18,10 @@ export default defineMessages({
     id: 'app.containers.EntityList.updatesSuccess',
     defaultMessage: 'All {successNo} {types} succeeded!',
   },
+  updatesFailedPassword: {
+    id: 'app.containers.EntityList.updatesFailedPassword',
+    defaultMessage: 'Your password could not be confirmed. No changes were saved. Please try again.',
+  },
   deleteSuccess: {
     id: 'app.containers.EntityList.deleteSuccess',
     defaultMessage: 'All {successNo} {types} succeeded!',

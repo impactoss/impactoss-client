@@ -151,6 +151,25 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
   filterByError = (entities, errors) => entities.filter((entity) => errors.has(entity.get('id')));
 
+  getErrorMessage = (errors, progressTypes, intl) => {
+    const hasPasswordError = errors.some(
+      (error) => error.error && error.error.status === 401,
+    );
+    if (hasPasswordError) {
+      return intl.formatMessage(messages.updatesFailedPassword);
+    }
+    return intl.formatMessage(
+      messages.updatesFailed,
+      {
+        errorNo: errors.size,
+        types:
+          intl.formatMessage(messages[
+            `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
+          ]),
+      },
+    );
+  };
+
   render() {
     // make sure selected entities are still actually on page
     const {
@@ -359,18 +378,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 <Messages
                   type="error"
                   withoutAriaLive
-                  message={
-                    intl.formatMessage(
-                      messages.updatesFailed,
-                      {
-                        errorNo: viewDomain.get('errors').size,
-                        types:
-                          intl.formatMessage(messages[
-                            `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
-                          ]),
-                      },
-                    )
-                  }
+                  message={this.getErrorMessage(viewDomain.get('errors'), progressTypes, intl)}
                   onDismiss={this.props.resetProgress}
                   preMessage={false}
                 />

@@ -10,7 +10,7 @@ import {
 import {
   SAVE,
   SAVE_MULTIPLE,
-  UDPATE_MULTIPLE_CONNECTIONS,
+  UPDATE_MULTIPLE_CONNECTIONS,
   UPDATE_QUERY,
   UPDATE_GROUP,
   PAGE_CHANGE,
@@ -136,5 +136,5 @@ export default function* entityList() {
 
   yield takeLatest(SAVE, save);
   yield takeLatest(SAVE_MULTIPLE, saveMultiple);
-  yield takeLatest(UDPATE_MULTIPLE_CONNECTIONS, updateMultipleConnectionsSaga);
+  yield takeLatest(UPDATE_MULTIPLE_CONNECTIONS, updateMultipleConnectionsSaga);
 }

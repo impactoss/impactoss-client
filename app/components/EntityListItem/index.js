@@ -68,19 +68,20 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
       || this.props.expandNo !== nextProps.expandNo;
   }
 
-  transformMessage = (type, msg, intl) => {
-    if (type === 'delete') {
-      return intl
-        ? intl.formatMessage(messages.associationNotExistent)
-        : msg;
-    }
-    if (type === 'new') {
-      return intl
-        ? intl.formatMessage(messages.associationAlreadyPresent)
-        : msg;
-    }
-    return msg;
-  };
+  // transformMessage = (type, msg, intl) => {
+  //   console.log(type, msg)
+  //   if (type === 'delete') {
+  //     return intl
+  //       ? intl.formatMessage(messages.associationNotExistent)
+  //       : msg;
+  //   }
+  //   if (type === 'new') {
+  //     return intl
+  //       ? intl.formatMessage(messages.associationAlreadyPresent)
+  //       : msg;
+  //   }
+  //   return msg;
+  // };
 
   render() {
     const {
@@ -113,7 +114,6 @@ class EntityListItem extends React.Component { // eslint-disable-line react/pref
               messages={
                 updateError
                   .getIn(['error', 'messages'])
-                  .map((msg) => this.transformMessage(updateError.get('type'), msg, intl))
                   .valueSeq()
                   .toArray()
               }

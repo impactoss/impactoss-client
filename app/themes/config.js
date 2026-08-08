@@ -186,6 +186,7 @@ export const SERVER_ERRORS = {
   PASSWORD_MISMATCH: "Password confirmation doesn't match Password",
   PASSWORD_SHORT: 'Password is too short (minimum is 6 characters)',
   PASSWORD_INVALID: 'Current password is invalid',
+  PASSWORD_CONFIRM_FAILURE: 'Current password: is incorrect or missing',
   TITLE_REQUIRED: "Title: can't be blank",
   REFERENCE_REQUIRED: "Reference: can't be blank",
 };
@@ -756,8 +757,8 @@ export const SETTINGS = {
 };
 
 export const PROTECTED_BY_PASSWORD = {
-  // ATTRIBUTES: {
-  //   [API.USERS]: ['name'],
-  // },
-  CONNECTIONS: ['userRoles', API.USER_ROLES],
+  ATTRIBUTES: {},
+  // [API.USERS]: ['name'],
+  CONNECTION_KEYS: ['userRoles'],
+  CONNECTION_PATHS: [API.USER_ROLES],
 };
