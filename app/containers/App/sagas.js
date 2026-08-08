@@ -523,10 +523,8 @@ export function* saveEntitySaga({ data, currentPassword }, updateClient = true, 
     } catch (err) {
       console.log('ERROR in saveEntitySaga');
       if (err.response) {
-        if (err.response) {
-          if (typeof err.response.json === 'function') {
-            err.response.json = yield err.response.json();
-          }
+        if (typeof err.response.json === 'function') {
+          err.response.json = yield err.response.json();
         }
         yield put(saveError(err, dataTS));
       }
