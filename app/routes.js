@@ -819,6 +819,13 @@ export default function createRoutes(store) {
       },
     },
     {
+      path: ROUTES.LINK_INVALID,
+      name: 'link-invalid',
+      getComponent(nextState, cb) {
+        import('containers/LinkInvalid').then(loadModule(cb)).catch(errorLoading);
+      },
+    },
+    {
       path: '*',
       name: 'notfound',
       getComponent(nextState, cb) {
