@@ -95,6 +95,9 @@ class Messages extends React.PureComponent { // eslint-disable-line react/prefer
     if (message === SERVER_ERRORS.PASSWORD_CONFIRM_FAILURE) {
       return intl && intl.formatMessage(appMessages.forms.passwordConfirmError);
     }
+    if (message === SERVER_ERRORS.RELATIONSHIP_EXISTS) {
+      return intl && intl.formatMessage(appMessages.forms.relationshipExistsError);
+    }
     return message;
   };
 

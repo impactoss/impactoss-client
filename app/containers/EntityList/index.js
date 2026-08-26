@@ -187,7 +187,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     const sending = viewDomain.get('sending');
     const success = viewDomain.get('success');
-    const errors = viewDomain.get('errors').size > 0 ? this.mapErrors(viewDomain.get('errors')) : Map();
+    const itemErrors = viewDomain.get('errors').filter(
+      (error) => !(error.error && error.error.status === 401),
+    );
+    const errors = itemErrors.size > 0 ? this.mapErrors(itemErrors) : Map();
     const entities = (errors.size > 0)
       ? this.filterByError(this.props.entities, errors)
       : this.props.entities;
@@ -356,7 +359,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 <FormattedMessage
                   {...messages.processingUpdates}
                   values={{
-                    processNo: Math.min(success.size + errors.size + 1, sending.size),
+                    processNo: Math.min(success.size + viewDomain.get('errors').size + 1, sending.size),
                     totalNo: sending.size,
                     types:
                       intl.formatMessage(messages[

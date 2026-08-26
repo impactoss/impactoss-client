@@ -247,6 +247,7 @@ class EntityListMain extends React.Component { // eslint-disable-line react/pref
                         onTagClick,
                         errors,
                         frameworks,
+                        onErrorsClick: onDismissAllErrors,
                       },
                       intl.formatMessage(messages.filterFormWithoutPrefix),
                       intl.formatMessage(messages.filterFormError),

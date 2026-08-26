@@ -637,7 +637,7 @@
   "app.containers.EntityList.type_delete": "Deleting",
   "app.containers.EntityList.type_new": "Creating",
   "app.containers.EntityList.type_save": "Updating",
-  "app.containers.EntityList.updatesFailed": "{types} of {errorNo} item(s) failed! Please wait for the items to be updated from the server and then carefully review the affected items above.",
+  "app.containers.EntityList.updatesFailed": "{types} of {errorNo} item(s) or connection(s) failed! Please wait for the items to be updated from the server and then carefully review the affected items above.",
   "app.containers.EntityList.updatesSuccess": "Successfully updated {successNo} item(s)!",
   "app.containers.EntityNew.categories.pageTitle": "New Category",
   "app.containers.EntityNew.categories.pageTitleTaxonomy": "New {taxonomy}",

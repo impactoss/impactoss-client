@@ -189,6 +189,7 @@ export const SERVER_ERRORS = {
   PASSWORD_CONFIRM_FAILURE: 'Current password: is incorrect or missing',
   TITLE_REQUIRED: "Title: can't be blank",
   REFERENCE_REQUIRED: "Reference: can't be blank",
+  RELATIONSHIP_EXISTS: 'Relationship: already exists',
 };
 
 // Map server attribute values **************************

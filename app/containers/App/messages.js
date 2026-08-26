@@ -307,6 +307,10 @@ export default defineMessages({
       id: 'app.containers.App.forms.passwordsMustMatch',
       defaultMessage: 'Must match Password',
     },
+    relationshipExistsError: {
+      id: 'app.containers.App.forms.relationshipExistsError',
+      defaultMessage: 'Relationship already exists.',
+    },
   },
 
   hints: {
