@@ -757,6 +757,18 @@ export const SETTINGS = {
   },
 };
 
+// Actions requiring the user to re-enter their current password.
+// The check runs in the App sagas, so it applies wherever a save is dispatched from.
+//
+// ATTRIBUTES: keyed by entity path, listing attributes that are gated when changed.
+//   Requires the dispatching container to set "changedAttributes" on the payload
+//   (see UserEdit), since the payload always carries the full attribute set.
+//   Note: only covers single entity saves. Batch attribute edits from the list view
+//   (SAVE_MULTIPLE_ENTITIES) are not gated - that path would need the same treatment.
+// CONNECTION_KEYS: keys on the entity payload holding create/delete lists,
+//   gated when either list is not empty (single entity save).
+// CONNECTION_PATHS: server paths gated for batch connection updates from the list view.
+
 export const PROTECTED_BY_PASSWORD = {
   ATTRIBUTES: {},
   // [API.USERS]: ['name'],

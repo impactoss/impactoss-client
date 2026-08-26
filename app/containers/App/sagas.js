@@ -564,6 +564,7 @@ export function* deleteEntitySaga({ data, currentPassword }, updateClient = true
       yield put(removeEntity(data.path, data.id));
     }
     yield put(deleteSuccess(dataTS));
+    return true;
   } catch (err) {
     console.log('ERROR in deleteEntitySaga');
     if (err.response) {
@@ -573,24 +574,39 @@ export function* deleteEntitySaga({ data, currentPassword }, updateClient = true
     if (updateClient) {
       yield put(invalidateEntities(data.path));
     }
+    return !(err.response && err.response.status === 401);
   }
 }
 
 function* deleteMultipleEntitiesSaga({
-  path, data, currentPassword, context,
+  path, data, currentPassword, context, sequential,
 }) {
   const updateClient = data && data.length <= 20;
-  yield all(data.map(
-    (datum) => call(
-      deleteEntitySaga,
-      { data: { ...datum, context }, currentPassword },
-      updateClient, // do not update client
-      true, // multiple
-    ),
-  ));
+  let ok = true;
+  if (sequential) {
+    for (let i = 0; i < data.length; i += 1) {
+      ok = yield call(
+        deleteEntitySaga,
+        { data: { ...data[i], context }, currentPassword },
+        updateClient,
+        true,
+      );
+      if (!ok) break;
+    }
+  } else {
+    yield all(data.map(
+      (datum) => call(
+        deleteEntitySaga,
+        { data: { ...datum, context }, currentPassword },
+        updateClient, // do not update client
+        true, // multiple
+      ),
+    ));
+  }
   if (!updateClient) {
     yield put(invalidateEntities(path));
   }
+  return ok;
 }
 
 export function* newEntitySaga({ data, currentPassword }, updateClient = true, multiple = false) {
@@ -686,6 +702,7 @@ export function* newEntitySaga({ data, currentPassword }, updateClient = true, m
     if (updateClient && data.invalidateEntitiesOnSuccess) {
       yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
     }
+    return true;
   } catch (err) {
     console.log('ERROR in newEntitySaga');
     if (err.response) {
@@ -697,21 +714,35 @@ export function* newEntitySaga({ data, currentPassword }, updateClient = true, m
     if (updateClient) {
       yield put(invalidateEntities(data.path));
     }
+    return !(err.response && err.response.status === 401);
   }
 }
 
 function* newMultipleEntitiesSaga({
-  path, data, currentPassword, context,
+  path, data, currentPassword, context, sequential,
 }) {
   const updateClient = data && data.length <= 20;
-  yield all(data.map(
-    (datum) => call(
-      newEntitySaga,
-      { data: { ...datum, context }, currentPassword },
-      updateClient, // do not update client
-      true, // multiple
-    ),
-  ));
+  let ok = true;
+  if (sequential) {
+    for (let i = 0; i < data.length; i += 1) {
+      ok = yield call(
+        newEntitySaga,
+        { data: { ...data[i], context }, currentPassword },
+        updateClient,
+        true,
+      );
+      if (!ok) break;
+    }
+  } else {
+    yield all(data.map(
+      (datum) => call(
+        newEntitySaga,
+        { data: { ...datum, context }, currentPassword },
+        updateClient, // do not update client
+        true, // multiple
+      ),
+    ));
+  }
   if (!updateClient) {
     yield put(invalidateEntities(path));
   }
@@ -741,12 +772,20 @@ export function* createDeleteMultipleEntitiesSaga({ data, currentPassword }) {
     const { path, updates } = data;
     if (updates.create && updates.create.length > 0) {
       yield call(newMultipleEntitiesSaga, {
-        path, data: updates.create, currentPassword, context: 'entityList',
+        path,
+        data: updates.create,
+        currentPassword,
+        context: 'entityList',
+        sequential: needsPassword,
       });
     }
     if (updates.delete && updates.delete.length > 0) {
       yield call(deleteMultipleEntitiesSaga, {
-        path, data: updates.delete, currentPassword, context: 'entityList',
+        path,
+        data: updates.delete,
+        currentPassword,
+        context: 'entityList',
+        sequential: needsPassword,
       });
     }
   }
