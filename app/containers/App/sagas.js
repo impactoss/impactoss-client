@@ -744,6 +744,7 @@ function* newMultipleEntitiesSaga({
   if (!updateClient) {
     yield put(invalidateEntities(path));
   }
+  return ok;
 }
 
 const checkCreateDeleteMultipleNeedsPassword = ({ path, updates }) => {
@@ -762,8 +763,9 @@ export function* createDeleteMultipleEntitiesSaga({ data, currentPassword }) {
     }));
   } else {
     const { path, updates } = data;
+    let ok = true;
     if (updates.create && updates.create.length > 0) {
-      yield call(newMultipleEntitiesSaga, {
+      ok = yield call(newMultipleEntitiesSaga, {
         path,
         data: updates.create,
         currentPassword,
@@ -771,7 +773,7 @@ export function* createDeleteMultipleEntitiesSaga({ data, currentPassword }) {
         sequential: needsPassword,
       });
     }
-    if (updates.delete && updates.delete.length > 0) {
+    if (ok && updates.delete && updates.delete.length > 0) {
       yield call(deleteMultipleEntitiesSaga, {
         path,
         data: updates.delete,
