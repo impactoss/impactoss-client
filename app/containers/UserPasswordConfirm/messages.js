@@ -10,4 +10,8 @@ export default defineMessages({
     id: 'app.containers.UserPasswordConfirm.submit',
     defaultMessage: 'Submit',
   },
+  reauthTitle: {
+    id: 'app.containers.UserPasswordConfirm.reauthTitle',
+    defaultMessage: 'Your password is required to update protected information',
+  },
 });

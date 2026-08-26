@@ -1,6 +1,6 @@
 /*
  *
- * EntityNew
+ * UserPasswordConfirm
  *
  */
 
@@ -34,7 +34,7 @@ export class UserPasswordConfirm extends React.PureComponent { // eslint-disable
           <AuthForm
             inModal
             initialValues={{ password: '' }}
-            headerTitle="Your password is required to update protected information"
+            headerTitle={intl.formatMessage(messages.reauthTitle)}
             handleSubmit={(formData) => this.props.handleSubmit(
               formData,
               action,

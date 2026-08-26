@@ -51,7 +51,6 @@ import {
   DELETE_SENDING,
   DELETE_SUCCESS,
   DELETE_ERROR,
-  // SAVE_CONNECTIONS,
   UPDATE_ROUTE_QUERY,
   UPDATE_PATH,
   AUTHENTICATE_FORWARD,
@@ -260,13 +259,6 @@ export function newEntity(data) {
     data,
   };
 }
-// // server side
-// export function saveConnections(data) {
-//   return {
-//     type: SAVE_CONNECTIONS,
-//     data,
-//   };
-// }
 
 // client side
 export function addEntity(path, entity) {

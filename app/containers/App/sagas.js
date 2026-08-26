@@ -36,7 +36,6 @@ import {
   VALIDATE_TOKEN,
   AUTHENTICATE_SUCCESS,
   INVALIDATE_ENTITIES,
-  // SAVE_CONNECTIONS,
   UPDATE_ROUTE_QUERY,
   AUTHENTICATE_FORWARD,
   UPDATE_PATH,
@@ -406,7 +405,6 @@ const checkEntitySaveNeedsPassword = ({ path, entity }) => {
 };
 export function* saveEntitySaga({ data, currentPassword }, updateClient = true, multiple = false) {
   const needsPassword = checkEntitySaveNeedsPassword(data);
-  // console.log('data, needsPassword, currentPassword', data, needsPassword, currentPassword);
   if (needsPassword && (!currentPassword || currentPassword.trim() === '')) {
     yield put(openPasswordModal({
       data,
@@ -750,19 +748,13 @@ function* newMultipleEntitiesSaga({
 
 const checkCreateDeleteMultipleNeedsPassword = ({ path, updates }) => {
   if (!path || !updates) return false;
-
-  // check gated connections
-  return PROTECTED_BY_PASSWORD.CONNECTION_PATHS.some((key) =>
-    key === path
-    && (
-      (updates.create && updates.create.length > 0)
-      || (updates.delete && updates.delete.length > 0)
-    ));
+  if (PROTECTED_BY_PASSWORD.CONNECTION_PATHS.indexOf(path) === -1) return false;
+  return (updates.create && updates.create.length > 0)
+    || (updates.delete && updates.delete.length > 0);
 };
 
 export function* createDeleteMultipleEntitiesSaga({ data, currentPassword }) {
   const needsPassword = checkCreateDeleteMultipleNeedsPassword(data);
-  // console.log('path, updates, needsPassword, currentPassword', data, needsPassword, currentPassword);
   if (needsPassword && (!currentPassword || currentPassword.trim() === '')) {
     yield put(openPasswordModal({
       data,
@@ -1060,7 +1052,6 @@ function* handleAuthSuccess() {
  * Root saga manages watcher lifecycle
  */
 export default function* rootSaga() {
-  // console.log('calling rootSaga');)
   yield takeLatest(VALIDATE_TOKEN, validateTokenSaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
@@ -1077,7 +1068,6 @@ export default function* rootSaga() {
   yield takeEvery(NEW_ENTITY, newEntitySaga);
   yield takeEvery(CREATE_DELETE_MULTIPLE_ENTITIES, createDeleteMultipleEntitiesSaga);
   yield takeEvery(DELETE_ENTITY, deleteEntitySaga);
-  // yield takeEvery(SAVE_CONNECTIONS, saveConnectionsSaga);
 
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);

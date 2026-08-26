@@ -760,7 +760,8 @@ export const SETTINGS = {
 // Actions requiring the user to re-enter their current password.
 // The check runs in the App sagas, so it applies wherever a save is dispatched from.
 //
-// ATTRIBUTES: keyed by entity path, listing attributes that are gated when changed.
+// ATTRIBUTES: object keyed by entity path, each value an array of attribute names
+//   that are gated when changed, e.g. {[API.USERS]: ['email']}.
 //   Requires the dispatching container to set "changedAttributes" on the payload
 //   (see UserEdit), since the payload always carries the full attribute set.
 //   Note: only covers single entity saves. Batch attribute edits from the list view
@@ -771,7 +772,6 @@ export const SETTINGS = {
 
 export const PROTECTED_BY_PASSWORD = {
   ATTRIBUTES: {},
-  // [API.USERS]: ['name'],
   CONNECTION_KEYS: ['userRoles'],
   CONNECTION_PATHS: [API.USER_ROLES],
 };

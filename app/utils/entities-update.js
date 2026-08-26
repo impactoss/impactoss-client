@@ -22,27 +22,6 @@ export function updateAssociationsRequest(path, associations, currentPassword) {
 
   return Promise.all(requests);
 }
-// export function updateAssociationsBatchRequest(path, associations) {
-//   let ops = [];
-//   if (associations.create) {
-//     ops = ops.concat(associations.create.map((payload) => ({
-//       method: 'post',
-//       url: `${path}`,
-//       params: payload,
-//     })));
-//   }
-//   if (associations.delete) {
-//     ops = ops.concat(associations.delete.map((associationId) => ({
-//       method: 'delete',
-//       url: `${path}/${associationId}`,
-//     })));
-//   }
-//   const payload = {
-//     ops,
-//     sequential: true,
-//   };
-//   return apiRequest('post', 'batchapi', payload);
-// }
 
 export function deleteEntityRequest(path, entityId, currentPassword) {
   return apiRequest(
@@ -54,13 +33,6 @@ export function deleteEntityRequest(path, entityId, currentPassword) {
     type: 'delete',
   }));
 }
-//
-// export function updateEntitiesRequest(path, entities) {
-//   let requests = [];
-//   requests = requests.concat(entities.map((payload) => updateEntityRequest(path, payload)));
-//   // update entity attributes
-//   return Promise.all(requests);
-// }
 
 export function updateEntityRequest(path, payload, currentPassword) {
   // update entity attributes
