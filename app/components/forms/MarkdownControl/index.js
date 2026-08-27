@@ -100,14 +100,12 @@ const ViewButton = styled((p) => (
 `;
 const MDButtonText = styled((p) => (
   <Text weight="bold" size="medium" {...p} />
-))``;
-const MDButtonTextOffset = styled((p) => (
-  <Text weight="bold" size="medium" {...p} />
 ))`
-  position: relative;
-  top: -1px;
+  ${({ $offset }) => $offset && `
+    position: relative;
+    top: -1px;
+  `}
 `;
-
 const MD_BUTTONS_COUNT = 7;
 
 
@@ -480,12 +478,13 @@ function MarkdownControl(props) {
                 }
               }}
             >
-              <MDButtonTextOffset
+              <MDButtonText
                 size="xxsmall"
                 aria-hidden="true"
+                $offset
               >
                 123
-              </MDButtonTextOffset>
+              </MDButtonText>
             </MDButton>
           </Box>
         </Box>

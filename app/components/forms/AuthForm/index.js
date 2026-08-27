@@ -67,7 +67,7 @@ const Hint = styled.div`
 
 const RotatedInfo = styled(CircleInformation)`
   transform: rotate(180deg);
-  ${({ faded }) => faded && 'opacity: 0.5;'}
+  ${({ $faded }) => $faded && 'opacity: 0.5;'}
 `;
 
 class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -209,7 +209,7 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
                                     aria-hidden="true"
                                     size="xxsmall"
                                     color="textSecondary"
-                                    faded
+                                    $faded
                                   />
                                 )}
                                 {valid && (

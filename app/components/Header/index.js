@@ -241,7 +241,7 @@ const FrameworkOption = styled(Button)`
 `;
 
 const Uppercase = styled.span`
-  textTransform: uppercase;
+  text-transform: uppercase;
 `;
 const STATE_INITIAL = {
   showSecondary: false,
