@@ -209,11 +209,12 @@ const GlobalStyle = createGlobalStyle`
     }
   }
 
-  .import-csv-modal,
-  .download-csv-modal,
+  .import-csv-modal-overlay,
+  .download-csv-modal-overlay,
   .overlay-modal-overlay,
   .global-settings-modal-overlay,
   .new-entity-modal-overlay {
+    z-index: 99999999;
     position: fixed;
     top: 0;
     left: 0;

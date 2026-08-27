@@ -139,6 +139,10 @@ const compileSearchAttributes = (config) => {
   return res;
 };
 
+const TargetHeader = styled((p) => <Text as="h2" size="medium" weight={600} {...p} />)`
+  margin: 0;
+`;
+
 export class Search extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   UNSAFE_componentWillMount() {
     this.props.loadEntitiesIfNeeded();
@@ -387,14 +391,7 @@ export class Search extends React.PureComponent { // eslint-disable-line react/p
                                                   >
                                                     <Box direction="row" gap="small" align="center" justify="between">
                                                       <Box direction="row" gap="xsmall" pad={{ vertical: 'xsmall' }}>
-                                                        <Text
-                                                          as="h2"
-                                                          size="medium"
-                                                          weight={600}
-                                                          style={{ margin: 0 }}
-                                                        >
-                                                          {`${count} ${title}`}
-                                                        </Text>
+                                                        <TargetHeader>{`${count} ${title}`}</TargetHeader>
                                                       </Box>
                                                       {otherTargets && active && (
                                                         <FormUp size="medium" color="text" aria-hidden="true" aria-label={null} />

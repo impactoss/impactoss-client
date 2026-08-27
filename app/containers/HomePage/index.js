@@ -65,6 +65,10 @@ const GraphicHome = styled(NormalImg)`
     max-width: ${HOME_GRAPHIC_WIDTH}px;
   }
 `;
+const BackgroundImage = styled(NormalImg)`
+  width: 100%;
+  height: auto;
+`;
 
 const SectionTop = styled.div`
   display: flex;
@@ -262,6 +266,10 @@ const SectionDescription = styled(Text)`
   }
 `;
 
+const DownWrapper = styled(Box)`
+  min-height: 58px;
+`;
+
 const CIRCLES = [
   {
     id: 2, size: 6, minSize: 30, x: 10, y: 25,
@@ -297,7 +305,6 @@ export function HomePage({ onPageLink, theme, intl }) {
         <SectionTop hasBrand={SHOW_BRAND_ON_HOME}>
           <SectionTopInner
             hasBrand={SHOW_BRAND_ON_HOME}
-            style={{ position: 'relative' }}
             align="center"
             justify="evenly"
             fill="vertical"
@@ -347,21 +354,19 @@ export function HomePage({ onPageLink, theme, intl }) {
                   />
                 </Box>
               )}
-              <Box
+              <DownWrapper
                 margin={{ top: 'small' }}
                 align="center"
-                style={{ minHeight: '58px' }}
               >
                 <Icon name="arrowDown" palette="primary" paletteIndex={0} />
-              </Box>
+              </DownWrapper>
             </Box>
           </SectionTopInner>
         </SectionTop>
         <BackgroundImageSection aria-hidden="true">
-          <NormalImg
+          <BackgroundImage
             src={theme.media.graphicHomeSection}
             alt=""
-            style={{ width: '100%', height: 'auto' }}
           />
         </BackgroundImageSection>
         <Section align="center">

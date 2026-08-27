@@ -20,5 +20,9 @@ const Sidebar = styled.div`
   @media (min-width: ${(props) => props.theme.breakpoints.large}) {
     width: ${(props) => props.theme.sizes.aside.width.large}px;
   }
+  ${({ overlay }) => overlay && `
+    position: fixed;
+    z-index: 111111;
+  `}
 `;
 export default Sidebar;

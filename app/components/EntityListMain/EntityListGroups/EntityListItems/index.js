@@ -1,14 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Map, List } from 'immutable';
+import styled from 'styled-components';
 
 import EntityListItemWrapper from './EntityListItemWrapper';
+
+const Styled = styled.div`
+  margin-top: 15px;
+`;
 
 export class EntityListItems extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
     const { entities, skipGroupTargetId } = this.props;
     return (
-      <div style={{ marginTop: '15px' }}>
+      <Styled>
         {entities.map((entity, index, list) => {
           let skipTargetId = null;
           if (list.size > index + 1) {
@@ -28,7 +33,7 @@ export class EntityListItems extends React.PureComponent { // eslint-disable-lin
             />
           );
         })}
-      </div>
+      </Styled>
     );
   }
 }

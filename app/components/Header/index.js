@@ -239,6 +239,10 @@ const FrameworkOption = styled(Button)`
     color:${palette('headerNavMainItemHover', 0)};
   }
 `;
+
+const Uppercase = styled.span`
+  text-transform: uppercase;
+`;
 const STATE_INITIAL = {
   showSecondary: false,
   showFrameworks: false,
@@ -548,9 +552,9 @@ class Header extends React.PureComponent { // eslint-disable-line react/prefer-s
                         <BrandClaim>
                           <FormattedMessage {...appMessages.app.claim} />
                           {!IS_PROD && (
-                            <span style={{ textTransform: 'uppercase' }}>
+                            <Uppercase>
                               {` [${SERVER}]`}
-                            </span>
+                            </Uppercase>
                           )}
                         </BrandClaim>
                       </BrandText>

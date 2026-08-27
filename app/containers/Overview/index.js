@@ -37,6 +37,7 @@ import TaxonomySidebar from 'components/categoryList/TaxonomySidebar';
 import EntityListSidebarLoading from 'components/EntityListSidebarLoading';
 import A from 'components/styled/A';
 import Description from 'components/styled/Description';
+import DivRelative from 'components/styled/DivRelative';
 
 // relative
 import VerticalDiagram from './VerticalDiagram';
@@ -202,11 +203,11 @@ export class Overview extends React.PureComponent { // eslint-disable-line react
               supTitle={intl.formatMessage(messages.supTitle)}
               title={intl.formatMessage(messages.title)}
             />
-            <div style={{ position: 'relative' }}>
+            <DivRelative>
               <Description>
                 {rendered}
               </Description>
-            </div>
+            </DivRelative>
             {!dataReady && <Loading />}
             {dataReady && allFrameworks.size > 1 && (
               <VerticalDiagram

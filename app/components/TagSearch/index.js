@@ -99,6 +99,10 @@ const ButtonTagSearch = styled(Button)`
   }
 `;
 
+const InfoOverlayWrapper = styled(Box)`
+  min-width: 36px;
+`;
+
 export class TagSearch extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor() {
     super();
@@ -262,7 +266,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                 </Box>
               </Search>
               {showHint && (
-                <Box style={{ minWidth: '36px' }}>
+                <InfoOverlayWrapper>
                   <InfoOverlay
                     title={intl.formatMessage(messages.searchInfoTitle)}
                     padButton="none"
@@ -274,7 +278,7 @@ export class TagSearch extends React.Component { // eslint-disable-line react/pr
                       />
                     )}
                   />
-                </Box>
+                </InfoOverlayWrapper>
               )}
             </Box>
           </>

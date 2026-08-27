@@ -187,11 +187,7 @@ class TaxonomySidebar extends React.PureComponent { // eslint-disable-line react
               role={this.state.viewport < VIEWPORTS.SMALL ? 'dialog' : 'region'}
               aria-modal={this.state.viewport < VIEWPORTS.SMALL ? 'true' : undefined}
               ref={this.setWrapperRef}
-              style={
-                this.state.visible && this.state.viewport < VIEWPORTS.LARGE ? {
-                  position: 'fixed',
-                  zIndex: 111111,
-                } : {}}
+              overlay={this.state.visible && this.state.viewport < VIEWPORTS.LARGE}
             >
               {this.state.viewport >= VIEWPORTS.SMALL && (
                 <SkipContent

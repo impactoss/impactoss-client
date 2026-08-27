@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { palette } from 'styled-theme';
 
-// import ProgressBar from 'components/ProgressBar';
-// import messages from './messages';
-
-const ANIMATION_INTERVAL = 10;
-const ANIMATION_STEP = 1;
 const ANIMATION_WIDTH = 20;
+
+const slide = keyframes`
+  from { left: -${ANIMATION_WIDTH}%; }
+  to { left: 100%; }
+`;
 
 const Styled = styled.div`
   display: block;
@@ -26,75 +26,33 @@ const Bar = styled.div`
   position: relative;
   background-color: ${palette('primary', 2)};
   left: 0;
+  width: ${({ progress }) => progress}%;
 `;
 
-const BarIndeterminate = styled(Bar)`
+const BarIndeterminate = styled.div`
+  display: block;
+  height: 3px;
+  position: relative;
+  background-color: ${palette('primary', 2)};
   width: ${ANIMATION_WIDTH}%;
-  left: ${(props) => props.progress}%;
+  animation: ${slide} 1.2s linear infinite;
 `;
 
-
-class Loading extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor() {
-    super();
-    this.state = { progress: -ANIMATION_WIDTH };
-  }
-
-  componentDidMount() {
-    // console.log('componentDidMount', this.state.progress)
-    this.loadInterval = this.props.progress < 0
-      ? setInterval(this.handleTimeout, ANIMATION_INTERVAL)
-      : false;
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (this.loadInterval && nextProps.progress >= 0) {
-      this.resetTimer();
-    }
-  }
-
-  componentWillUnmount() {
-    this.resetTimer();
-  }
-
-  resetTimer = () => {
-    if (this.loadInterval) {
-      clearInterval(this.loadInterval);
-      this.loadInterval = false;
-    }
-  };
-
-  handleTimeout = () => {
-    // Added timeout
-    this.setState(
-      (prevState) => ({
-        progress: prevState.progress < 100
-          ? (prevState.progress + ANIMATION_STEP)
-          : 0,
-      }),
-    );
-  };
-
-  render() {
-    return (
-      <Styled>
-        {this.props.progress >= 0
-          && <Bar style={{ width: `${Math.max(this.props.progress, 5)}%` }} />
-        }
-        {this.props.progress < 0
-          && <BarIndeterminate progress={this.state.progress} />
-        }
-      </Styled>
-    );
-  }
+function Loading({ progress = -1 }) {
+  return (
+    <Styled>
+      {progress >= 0
+        && <Bar progress={Math.max(Math.round(progress / 5) * 5, 5)} />
+      }
+      {progress < 0
+        && <BarIndeterminate />
+      }
+    </Styled>
+  );
 }
 
 Loading.propTypes = {
   progress: PropTypes.number,
-};
-
-Loading.defaultProps = {
-  progress: -1,
 };
 
 export default Loading;

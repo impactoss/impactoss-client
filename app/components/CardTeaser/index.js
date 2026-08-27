@@ -73,6 +73,10 @@ const Graphic = styled(NormalImg)`
   width: 100%;
   height: 100%;
 `;
+const GraphicBox = styled(Box)`
+  aspect-ratio: 1 / 1;
+  width: 55%;
+`;
 
 export function CardTeaser({
   onClick,
@@ -122,9 +126,8 @@ export function CardTeaser({
             gap="medium"
           >
             {graphicSrc && (
-              <Box
+              <GraphicBox
                 margin={{ top: 'small' }}
-                style={{ aspectRatio: '1 / 1', width: '55%' }}
                 flex={{ shrink: 0 }}
               >
                 <ScreenReaderHide>
@@ -134,7 +137,7 @@ export function CardTeaser({
                     role="presentation"
                   />
                 </ScreenReaderHide>
-              </Box>
+              </GraphicBox>
             )}
             <Box
               justify="between"

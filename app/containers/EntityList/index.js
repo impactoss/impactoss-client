@@ -244,9 +244,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             onRequestClose={() => this.onDownloadDismiss()}
             className="download-csv-modal"
             overlayClassName="download-csv-modal-overlay"
-            style={{
-              overlay: { zIndex: 99999999 },
-            }}
             appElement={document.getElementById('app')}
           >
             <EntityListDownload
@@ -269,9 +266,6 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
             className="import-csv-modal"
             overlayClassName="import-csv-modal-overlay"
             onRequestClose={() => this.onImportDismiss()}
-            style={{
-              overlay: { zIndex: 99999999 },
-            }}
             appElement={document.getElementById('app')}
           >
             <this.props.importComponent

@@ -54,16 +54,16 @@ export function OptionListHeader({
                 onChange={(checked) => onSelect(checked)}
               />
             </Select>
-            <Text as="label" htmlFor={`select-all-${listGroupId}`} style={{ fontWeight: 700 }}>
+            <Text as="label" htmlFor={`select-all-${listGroupId}`} weight="bold">
               {labels.attributes}
             </Text>
           </Box>
         )}
         {!hasSelectAll && labels.attributes && (
-          <Text style={{ fontWeight: 700 }}>{labels.attributes}</Text>
+          <Text weight="bold">{labels.attributes}</Text>
         )}
       </Box>
-      {labels.columns && (<Text style={{ fontWeight: 700 }}>{labels.columns}</Text>)}
+      {labels.columns && (<Text weight="bold">{labels.columns}</Text>)}
     </Box>
   );
 }
