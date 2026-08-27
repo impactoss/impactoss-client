@@ -65,6 +65,10 @@ const Hint = styled.div`
   }
 `;
 
+const RotatedInfo = styled(CircleInformation)`
+  transform: rotate(180deg);
+  ${({ faded }) => faded && 'opacity: 0.5;'}
+`;
 
 class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   renderError = ({ name, hasError }) => (
@@ -75,10 +79,9 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
           show="touched"
           component={(props) => (
             <Box direction="row" align="center" gap="xsmall" margin={{ top: 'small' }}>
-              <CircleInformation
+              <RotatedInfo
                 aria-hidden="true"
                 aria-label={null}
-                style={{ transform: 'rotate(180deg)' }}
                 size="xxsmall"
                 color="error"
               />
@@ -202,11 +205,11 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
                                 role="listitem"
                               >
                                 {!valid && (
-                                  <CircleInformation
+                                  <RotatedInfo
                                     aria-hidden="true"
-                                    style={{ transform: 'rotate(180deg)', opacity: 0.5 }}
                                     size="xxsmall"
                                     color="textSecondary"
+                                    faded
                                   />
                                 )}
                                 {valid && (

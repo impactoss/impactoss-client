@@ -69,9 +69,6 @@ function Overlay({
       }}
       className="overlay-modal"
       overlayClassName="overlay-modal-overlay"
-      style={{
-        overlay: { zIndex: 99999999 },
-      }}
     >
       <Box background="white" pad="large" round="small">
         <StyledContainer>

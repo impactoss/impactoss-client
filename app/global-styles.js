@@ -214,6 +214,7 @@ const GlobalStyle = createGlobalStyle`
   .overlay-modal-overlay,
   .global-settings-modal-overlay,
   .new-entity-modal-overlay {
+    z-index: 99999999;
     position: fixed;
     top: 0;
     left: 0;

@@ -11,6 +11,7 @@ import { DayPicker } from 'react-day-picker';
 import { useField, useFormikContext } from 'formik';
 
 import { DATE_FORMAT, API_DATE_FORMAT } from 'themes/config';
+import DivRelative from 'components/styled/DivRelative';
 
 import InputComponent from './InputComponent';
 import DatePickerStyle from './styles';
@@ -78,7 +79,7 @@ const DateControl = (props) => {
   };
 
   return (
-    <div onBlur={handleInputBlur} style={{ position: 'relative' }}>
+    <DivRelative onBlur={handleInputBlur}>
       <InputComponent
         {...props}
         ref={inputRef}
@@ -102,7 +103,7 @@ const DateControl = (props) => {
         />
       )}
       <DatePickerStyle />
-    </div>
+    </DivRelative>
   );
 };
 

@@ -81,6 +81,10 @@ const ReactS3UploaderLabelWrap = styled.label`
   }
 `;
 
+const HiddenUploader = styled(ReactS3Uploader)`
+  display: none;
+`;
+
 class UploadControl extends React.Component { // eslint-disable-line react/prefer-stateless-function
   state = {
     progress: null,
@@ -152,8 +156,7 @@ class UploadControl extends React.Component { // eslint-disable-line react/prefe
             <ReactS3UploaderLabelWrap>
               <FormattedMessage {...appMessages.attributes.document_upload} />
               <Icon name="add" text textRight />
-              <ReactS3Uploader
-                style={{ display: 'none' }}
+              <HiddenUploader
                 signingUrl={ENDPOINTS.SIGNING_URL}
                 signingUrlMethod="GET"
                 signingUrlWithCredentials={false}

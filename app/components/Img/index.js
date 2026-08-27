@@ -15,7 +15,6 @@ function Img({
   src,
   alt,
   className,
-  style,
 }) {
   const isArray = Array.isArray(src);
   return (
@@ -24,7 +23,6 @@ function Img({
       src={isArray ? src[0] : src}
       srcSet={isArray && src.length > 1 ? generateSrcSet(src) : undefined}
       alt={alt}
-      style={style}
     />
   );
 }
@@ -37,7 +35,6 @@ Img.propTypes = {
   ]).isRequired,
   alt: PropTypes.string.isRequired,
   className: PropTypes.string,
-  style: PropTypes.object,
 };
 
 export default Img;

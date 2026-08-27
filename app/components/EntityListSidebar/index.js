@@ -83,10 +83,7 @@ const ToggleHide = styled(Button)`
   right:0;
   top:0;
 `;
-// color: ${palette('link', 3)};
-// &:hover {
-//   color: ${palette('linkHover', 3)};
-// }
+
 const SidebarWrapper = styled.div`
   pointer-events: all;
   position: absolute;
@@ -102,6 +99,10 @@ const SidebarWrapper = styled.div`
     background-color: transparent;
     z-index: auto;
   }
+  ${({ overlay }) => overlay && `
+    position: fixed;
+    z-index: 111111;
+  `}
 `;
 
 const STATE_INITIAL = {
@@ -423,11 +424,7 @@ export class EntityListSidebar extends React.Component { // eslint-disable-line 
           && (
             <SidebarWrapper
               onClick={this.onHideSidebar}
-              style={
-                this.state.visible && this.state.viewport < VIEWPORTS.LARGE ? {
-                  position: 'fixed',
-                  zIndex: 111111,
-                } : {}}
+              overlay={this.state.visible && this.state.viewport < VIEWPORTS.LARGE}
             >
               <Sidebar
                 ref={this.setWrapperRef}

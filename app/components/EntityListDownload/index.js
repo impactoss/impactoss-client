@@ -82,12 +82,17 @@ const TextInput = styled(DebounceInput)`
   flex: 1;
   font-size: 0.85em;
   width: 200px;
+  max-width: 250px;
   border-radius: 0.5em;
+  text-align: left;
+  border: 1px solid #878A92;
+  @media (min-width: ${({ theme }) => theme.breakpoints.small}) {
+    text-align: right;
+  }
   &:focus {
-    outline: none;
+    outline: 2px solid ${palette('primary', 0)};
   }
 `;
-
 const StyledInput = styled.input`
   accent-color: ${({ theme }) => theme.global.colors.highlight};
   &:focus-visible {
@@ -413,7 +418,6 @@ export function EntityListDownload({
                     debounceTimeout={500}
                     value={csvFilename}
                     onChange={(evt) => setCSVFilename(evt.target.value)}
-                    style={{ maxWidth: '250px', textAlign: isMinSize(size, 'small') ? 'right' : 'left' }}
                   />
                   <Text size="xsmall">
                     {`${csvSuffix ? csvDateSuffix : ''}.csv`}

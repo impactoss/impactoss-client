@@ -127,7 +127,9 @@ const HeaderWrap = styled.div`
     padding-left: 24px;
   }
 `;
-
+const FormikFieldWrap = styled.div`
+  margin-bottom: 20px;
+`;
 
 // These props will be omitted before being passed to the Control component
 const nonControlProps = ['label', 'component', 'controlType', 'children', 'errorMessages'];
@@ -270,7 +272,7 @@ function ImportEntitiesForm({
                       )}
                       <Field noPadding>
                         <FormFieldWrap>
-                          <div style={{ marginBottom: '20px' }}>
+                          <FormikFieldWrap>
                             <FormikField name={field.name}>
                               {({ field: formikField, form }) =>
                                 (
@@ -286,7 +288,7 @@ function ImportEntitiesForm({
                                 )
                               }
                             </FormikField>
-                          </div>
+                          </FormikFieldWrap>
                           {progress !== null && (
                             <div>
                               {progress < 100 && (

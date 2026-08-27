@@ -305,9 +305,6 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
               onRequestClose={this.props.onCloseModal}
               className="new-entity-modal"
               overlayClassName="new-entity-modal-overlay"
-              style={{
-                overlay: { zIndex: 99999999 },
-              }}
             >
               <EntityNew
                 path={newEntityModal.get('path')}
@@ -330,9 +327,6 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
             onRequestClose={() => onShowSettings(false)}
             className="global-settings-modal"
             overlayClassName="global-settings-modal-overlay"
-            style={{
-              overlay: { zIndex: 99999999 },
-            }}
           >
             <GlobalSettings
               onClose={() => onShowSettings(false)}

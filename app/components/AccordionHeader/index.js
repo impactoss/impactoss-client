@@ -27,7 +27,7 @@ const StyledHeading = styled((p) => (
   margin: 0;
 `;
 
-function AccordionHeader({ title, open, level = 1 }) {
+function AccordionHeader({ title, open }) {
   // prettier-ignore
   return (
     <StyledBox>
@@ -36,7 +36,6 @@ function AccordionHeader({ title, open, level = 1 }) {
           responsive={false}
           level={2}
           margin={{ vertical: 'xsmall' }}
-          style={level === 2 ? { fontWeight: 400 } : {}}
         >
           {title}
         </StyledHeading>
@@ -57,7 +56,6 @@ function AccordionHeader({ title, open, level = 1 }) {
 AccordionHeader.propTypes = {
   title: PropTypes.string,
   open: PropTypes.bool,
-  level: PropTypes.number,
 };
 
 export default AccordionHeader;
