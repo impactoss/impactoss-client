@@ -8,10 +8,7 @@ import {
   SHOW_PANEL,
   SAVE,
   SAVE_MULTIPLE,
-  NEW_CONNECTION,
-  NEW_MULTIPLE_CONNECTIONS,
-  DELETE_CONNECTION,
-  DELETE_MULTIPLE_CONNECTIONS,
+  UPDATE_MULTIPLE_CONNECTIONS,
   RESET_STATE,
   RESET_PROGRESS,
   ENTITY_SELECTED,
@@ -55,30 +52,11 @@ export function saveMultiple(path, data) {
     data,
   };
 }
-export function newConnection(data) {
+export function updateMultipleConnections(path, updates) {
   return {
-    type: NEW_CONNECTION,
-    data,
-  };
-}
-export function newMultipleConnections(path, data) {
-  return {
-    type: NEW_MULTIPLE_CONNECTIONS,
+    type: UPDATE_MULTIPLE_CONNECTIONS,
     path,
-    data,
-  };
-}
-export function deleteConnection(data) {
-  return {
-    type: DELETE_CONNECTION,
-    data,
-  };
-}
-export function deleteMultipleConnections(path, data) {
-  return {
-    type: DELETE_MULTIPLE_CONNECTIONS,
-    path,
-    data,
+    updates,
   };
 }
 

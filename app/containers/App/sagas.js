@@ -27,9 +27,8 @@ import {
   SAVE_ENTITY,
   SAVE_MULTIPLE_ENTITIES,
   NEW_ENTITY,
-  NEW_MULTIPLE_ENTITIES,
   DELETE_ENTITY,
-  DELETE_MULTIPLE_ENTITIES,
+  CREATE_DELETE_MULTIPLE_ENTITIES,
   AUTHENTICATE,
   AUTHENTICATE_AZURE,
   LOGOUT,
@@ -37,7 +36,6 @@ import {
   VALIDATE_TOKEN,
   AUTHENTICATE_SUCCESS,
   INVALIDATE_ENTITIES,
-  SAVE_CONNECTIONS,
   UPDATE_ROUTE_QUERY,
   AUTHENTICATE_FORWARD,
   UPDATE_PATH,
@@ -62,6 +60,7 @@ import {
   ENABLE_AZURE,
   KEEP_QUERY_ARGS,
   SETTINGS,
+  PROTECTED_BY_PASSWORD,
 } from 'themes/config';
 
 import {
@@ -90,6 +89,7 @@ import {
   updatePath,
   initializeSettings,
   otpRequired,
+  openPasswordModal,
 } from 'containers/App/actions';
 
 import {
@@ -367,7 +367,7 @@ function stampPayload(payload, type) {
 
 
 function* createConnectionsSaga({
-  entityId, path, updates, keyPair, saveRef,
+  entityId, path, updates, keyPair, saveRef, currentPassword,
 }) {
   // make sure to use new entity id for full payload
   // we should have either the one (recommendation_id) or the other (measure_id)
@@ -377,117 +377,157 @@ function* createConnectionsSaga({
     [keyPair[1]]: create[keyPair[1]] || entityId,
   }));
 
-  yield call(saveConnectionsSaga, { data: { path, updates: updatesUpdated, saveRef } });
+  yield call(saveConnectionsSaga, {
+    data: { path, updates: updatesUpdated, saveRef },
+    currentPassword,
+  });
 }
 
-export function* saveEntitySaga({ data }, updateClient = true, multiple = false) {
-  const dataTS = stampPayload(data, 'save');
-  try {
-    yield put(saveSending(dataTS));
+const checkEntitySaveNeedsPassword = ({ path, entity }) => {
+  if (!entity) return false;
 
-    if (!data.entity.skipAttributes) {
-      // update entity attributes
-      const entityUpdated = yield call(updateEntityRequest, data.path, data.entity);
-      // and on the client
+  // check gated attributes
+  const gatedAttributes = PROTECTED_BY_PASSWORD.ATTRIBUTES[path];
+  if (gatedAttributes && entity.changedAttributes) {
+    if (entity.changedAttributes.some((key) => gatedAttributes.indexOf(key) > -1)) {
+      return true;
+    }
+  }
+
+  // check gated connections
+  return PROTECTED_BY_PASSWORD.CONNECTION_KEYS.some((key) => {
+    const updates = entity[key];
+    return !!updates && (
+      (updates.create && updates.create.length > 0)
+      || (updates.delete && updates.delete.length > 0)
+    );
+  });
+};
+export function* saveEntitySaga({ data, currentPassword }, updateClient = true, multiple = false) {
+  const needsPassword = checkEntitySaveNeedsPassword(data);
+  if (needsPassword && (!currentPassword || currentPassword.trim() === '')) {
+    yield put(openPasswordModal({
+      data,
+      action: 'saveEntity',
+    }));
+  } else {
+    const dataTS = stampPayload(data, 'save');
+    try {
+      yield put(saveSending(dataTS));
+
+      if (!data.entity.skipAttributes) {
+        // update entity attributes
+        const entityUpdated = yield call(updateEntityRequest, data.path, data.entity, currentPassword);
+        // and on the client
+        if (updateClient) {
+          yield put(updateEntity(data.path, {
+            id: entityUpdated.data.id,
+            attributes: entityUpdated.data.attributes,
+          }));
+        }
+      }
+      if (!multiple) {
+        // update user-roles connections
+        if (data.entity.userRoles) {
+          yield call(saveConnectionsSaga, {
+            data: {
+              path: 'user_roles',
+              updates: data.entity.userRoles,
+              saveRef: data.saveRef,
+            },
+            currentPassword,
+          });
+        }
+
+        // update user-category connections
+        if (data.entity.userCategories) {
+          yield call(saveConnectionsSaga, {
+            data: {
+              path: 'user_categories',
+              updates: data.entity.userCategories,
+              saveRef: data.saveRef,
+            },
+            currentPassword,
+          });
+        }
+
+        // update recommendation-measure connections
+        if (data.entity.recommendationMeasures) {
+          yield call(saveConnectionsSaga, {
+            data: {
+              path: 'recommendation_measures',
+              updates: data.entity.recommendationMeasures,
+              saveRef: data.saveRef,
+            },
+            currentPassword,
+          });
+        }
+        // update recommendation-indicator connections
+        if (data.entity.recommendationIndicators) {
+          yield call(saveConnectionsSaga, {
+            data: {
+              path: 'recommendation_indicators',
+              updates: data.entity.recommendationIndicators,
+              saveRef: data.saveRef,
+            },
+            currentPassword,
+          });
+        }
+
+        // update measure-indicatos connections
+        if (data.entity.measureIndicators) {
+          yield call(saveConnectionsSaga, {
+            data: {
+              path: 'measure_indicators',
+              updates: data.entity.measureIndicators,
+              saveRef: data.saveRef,
+            },
+            currentPassword,
+          });
+        }
+
+        // update measure-category connections
+        if (data.entity.measureCategories) {
+          yield call(saveConnectionsSaga, {
+            data: {
+              path: 'measure_categories',
+              updates: data.entity.measureCategories,
+              saveRef: data.saveRef,
+            },
+            currentPassword,
+          });
+        }
+
+        // update recommendation-category connections
+        if (data.entity.recommendationCategories) {
+          yield call(saveConnectionsSaga, {
+            data: {
+              path: 'recommendation_categories',
+              updates: data.entity.recommendationCategories,
+              saveRef: data.saveRef,
+            },
+            currentPassword,
+          });
+        }
+      }
+      yield put(saveSuccess(dataTS));
+      if (!multiple && data.redirect) {
+        yield put(updatePath(data.redirect, { replace: true }));
+      }
+      if (updateClient && data.invalidateEntitiesOnSuccess) {
+        yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
+      }
+    } catch (err) {
+      console.log('ERROR in saveEntitySaga');
+      if (err.response) {
+        if (typeof err.response.json === 'function') {
+          err.response.json = yield err.response.json();
+        }
+        yield put(saveError(err, dataTS));
+      }
       if (updateClient) {
-        yield put(updateEntity(data.path, {
-          id: entityUpdated.data.id,
-          attributes: entityUpdated.data.attributes,
-        }));
+        yield put(invalidateEntities(data.path));
       }
-    }
-    if (!multiple) {
-      // update user-roles connections
-      if (data.entity.userRoles) {
-        yield call(saveConnectionsSaga, {
-          data: {
-            path: 'user_roles',
-            updates: data.entity.userRoles,
-            saveRef: data.saveRef,
-          },
-        });
-      }
-
-      // update user-category connections
-      if (data.entity.userCategories) {
-        yield call(saveConnectionsSaga, {
-          data: {
-            path: 'user_categories',
-            updates: data.entity.userCategories,
-            saveRef: data.saveRef,
-          },
-        });
-      }
-
-      // update recommendation-measure connections
-      if (data.entity.recommendationMeasures) {
-        yield call(saveConnectionsSaga, {
-          data: {
-            path: 'recommendation_measures',
-            updates: data.entity.recommendationMeasures,
-            saveRef: data.saveRef,
-          },
-        });
-      }
-      // update recommendation-indicator connections
-      if (data.entity.recommendationIndicators) {
-        yield call(saveConnectionsSaga, {
-          data: {
-            path: 'recommendation_indicators',
-            updates: data.entity.recommendationIndicators,
-            saveRef: data.saveRef,
-          },
-        });
-      }
-
-      // update measure-indicatos connections
-      if (data.entity.measureIndicators) {
-        yield call(saveConnectionsSaga, {
-          data: {
-            path: 'measure_indicators',
-            updates: data.entity.measureIndicators,
-            saveRef: data.saveRef,
-          },
-        });
-      }
-
-      // update measure-category connections
-      if (data.entity.measureCategories) {
-        yield call(saveConnectionsSaga, {
-          data: {
-            path: 'measure_categories',
-            updates: data.entity.measureCategories,
-            saveRef: data.saveRef,
-          },
-        });
-      }
-
-      // update recommendation-category connections
-      if (data.entity.recommendationCategories) {
-        yield call(saveConnectionsSaga, {
-          data: {
-            path: 'recommendation_categories',
-            updates: data.entity.recommendationCategories,
-            saveRef: data.saveRef,
-          },
-        });
-      }
-    }
-    yield put(saveSuccess(dataTS));
-    if (!multiple && data.redirect) {
-      yield put(updatePath(data.redirect, { replace: true }));
-    }
-    if (updateClient && data.invalidateEntitiesOnSuccess) {
-      yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
-    }
-  } catch (err) {
-    console.log('ERROR in saveEntitySaga');
-    if (err.response) {
-      err.response.json = yield err.response.json();
-      yield put(saveError(err, dataTS));
-    }
-    if (updateClient) {
-      yield put(invalidateEntities(data.path));
     }
   }
 }
@@ -507,11 +547,11 @@ export function* saveMultipleEntitiesSaga({ path, data }) {
   }
 }
 
-export function* deleteEntitySaga({ data }, updateClient = true, multiple = false) {
+export function* deleteEntitySaga({ data, currentPassword }, updateClient = true, multiple = false) {
   const dataTS = stampPayload(data, 'delete');
   try {
     yield put(deleteSending(dataTS));
-    yield call(deleteEntityRequest, data.path, data.id);
+    yield call(deleteEntityRequest, data.path, data.id, currentPassword);
     if (!multiple && data.redirect !== false) {
       yield put(updatePath(
         `/${data.redirect || data.path}`,
@@ -522,6 +562,7 @@ export function* deleteEntitySaga({ data }, updateClient = true, multiple = fals
       yield put(removeEntity(data.path, data.id));
     }
     yield put(deleteSuccess(dataTS));
+    return true;
   } catch (err) {
     console.log('ERROR in deleteEntitySaga');
     if (err.response) {
@@ -531,31 +572,53 @@ export function* deleteEntitySaga({ data }, updateClient = true, multiple = fals
     if (updateClient) {
       yield put(invalidateEntities(data.path));
     }
+    return !(err.response && err.response.status === 401);
   }
 }
 
-export function* deleteMultipleEntitiesSaga({ path, data }) {
+function* deleteMultipleEntitiesSaga({
+  path, data, currentPassword, context, sequential,
+}) {
   const updateClient = data && data.length <= 20;
-  yield all(data.map(
-    (datum) => call(
-      deleteEntitySaga,
-      { data: datum },
-      updateClient, // do not update client
-      true, // multiple
-    ),
-  ));
+  let ok = true;
+  if (sequential) {
+    for (let i = 0; i < data.length; i += 1) {
+      ok = yield call(
+        deleteEntitySaga,
+        { data: { ...data[i], context }, currentPassword },
+        updateClient,
+        true,
+      );
+      if (!ok) break;
+    }
+  } else {
+    yield all(data.map(
+      (datum) => call(
+        deleteEntitySaga,
+        { data: { ...datum, context }, currentPassword },
+        updateClient, // do not update client
+        true, // multiple
+      ),
+    ));
+  }
   if (!updateClient) {
     yield put(invalidateEntities(path));
   }
+  return ok;
 }
 
-export function* newEntitySaga({ data }, updateClient = true, multiple = false) {
+export function* newEntitySaga({ data, currentPassword }, updateClient = true, multiple = false) {
   const dataTS = stampPayload(data, 'new');
   try {
     yield put(saveSending(dataTS));
     // update entity attributes
     // on the server
-    const entityCreated = yield call(newEntityRequest, data.path, data.entity.attributes);
+    const entityCreated = yield call(
+      newEntityRequest,
+      data.path,
+      data.entity.attributes,
+      currentPassword,
+    );
 
     if (!data.createAsGuest) {
       if (updateClient) {
@@ -637,52 +700,111 @@ export function* newEntitySaga({ data }, updateClient = true, multiple = false) 
     if (updateClient && data.invalidateEntitiesOnSuccess) {
       yield put(invalidateEntities(data.invalidateEntitiesOnSuccess));
     }
+    return true;
   } catch (err) {
     console.log('ERROR in newEntitySaga');
     if (err.response) {
-      err.response.json = yield err.response.json();
+      if (typeof err.response.json === 'function') {
+        err.response.json = yield err.response.json();
+      }
     }
     yield put(saveError(err, dataTS));
     if (updateClient) {
       yield put(invalidateEntities(data.path));
     }
+    return !(err.response && err.response.status === 401);
   }
 }
 
-export function* newMultipleEntitiesSaga({ path, data }) {
+function* newMultipleEntitiesSaga({
+  path, data, currentPassword, context, sequential,
+}) {
   const updateClient = data && data.length <= 20;
-  yield all(data.map(
-    (datum) => call(
-      newEntitySaga,
-      { data: datum },
-      updateClient, // do not update client
-      true, // multiple
-    ),
-  ));
+  let ok = true;
+  if (sequential) {
+    for (let i = 0; i < data.length; i += 1) {
+      ok = yield call(
+        newEntitySaga,
+        { data: { ...data[i], context }, currentPassword },
+        updateClient,
+        true,
+      );
+      if (!ok) break;
+    }
+  } else {
+    yield all(data.map(
+      (datum) => call(
+        newEntitySaga,
+        { data: { ...datum, context }, currentPassword },
+        updateClient, // do not update client
+        true, // multiple
+      ),
+    ));
+  }
   if (!updateClient) {
     yield put(invalidateEntities(path));
   }
+  return ok;
 }
 
-export function* saveConnectionsSaga({ data }) {
+const checkCreateDeleteMultipleNeedsPassword = ({ path, updates }) => {
+  if (!path || !updates) return false;
+  if (PROTECTED_BY_PASSWORD.CONNECTION_PATHS.indexOf(path) === -1) return false;
+  return (updates.create && updates.create.length > 0)
+    || (updates.delete && updates.delete.length > 0);
+};
+
+export function* createDeleteMultipleEntitiesSaga({ data, currentPassword }) {
+  const needsPassword = checkCreateDeleteMultipleNeedsPassword(data);
+  if (needsPassword && (!currentPassword || currentPassword.trim() === '')) {
+    yield put(openPasswordModal({
+      data,
+      action: 'createDeleteMultipleEntities',
+    }));
+  } else {
+    const { path, updates } = data;
+    let ok = true;
+    if (updates.create && updates.create.length > 0) {
+      ok = yield call(newMultipleEntitiesSaga, {
+        path,
+        data: updates.create,
+        currentPassword,
+        context: 'entityList',
+        sequential: needsPassword,
+      });
+    }
+    if (ok && updates.delete && updates.delete.length > 0) {
+      yield call(deleteMultipleEntitiesSaga, {
+        path,
+        data: updates.delete,
+        currentPassword,
+        context: 'entityList',
+        sequential: needsPassword,
+      });
+    }
+  }
+}
+
+function* saveConnectionsSaga({ data, currentPassword }) {
   if (data.updates && (
     (data.updates.create && data.updates.create.length > 0)
     || (data.updates.delete && data.updates.delete.length > 0)
   )) {
-    const dataTS = stampPayload(data);
+    const dataTS = stampPayload(data, 'save-connections');
     try {
       yield put(saveSending(dataTS));
       // on the server
-      const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates);
+      const connectionsUpdated = yield call(updateAssociationsRequest, data.path, data.updates, currentPassword);
       // and on the client
       yield put(updateConnections(data.path, connectionsUpdated));
       yield put(saveSuccess(dataTS));
     } catch (err) {
-      console.log('ERROR in saveConnectionsSaga', err);
+      console.log('ERROR in saveConnectionsSaga', err, dataTS);
       if (err.response) {
         err.response.json = yield err.response.json();
       }
       yield put(saveError(err, dataTS));
+      throw err;
       // yield put(invalidateEntities(data.path));
     }
   }
@@ -932,7 +1054,6 @@ function* handleAuthSuccess() {
  * Root saga manages watcher lifecycle
  */
 export default function* rootSaga() {
-  // console.log('calling rootSaga');)
   yield takeLatest(VALIDATE_TOKEN, validateTokenSaga);
 
   yield takeLatest(AUTHENTICATE, authenticateSaga);
@@ -947,10 +1068,8 @@ export default function* rootSaga() {
   yield takeEvery(SAVE_ENTITY, saveEntitySaga);
   yield takeEvery(SAVE_MULTIPLE_ENTITIES, saveMultipleEntitiesSaga);
   yield takeEvery(NEW_ENTITY, newEntitySaga);
-  yield takeEvery(NEW_MULTIPLE_ENTITIES, newMultipleEntitiesSaga);
+  yield takeEvery(CREATE_DELETE_MULTIPLE_ENTITIES, createDeleteMultipleEntitiesSaga);
   yield takeEvery(DELETE_ENTITY, deleteEntitySaga);
-  yield takeEvery(DELETE_MULTIPLE_ENTITIES, deleteMultipleEntitiesSaga);
-  yield takeEvery(SAVE_CONNECTIONS, saveConnectionsSaga);
 
   yield takeEvery(LOAD_ENTITIES_IF_NEEDED, checkEntitiesSaga);
   yield takeLatest(REDIRECT_IF_NOT_PERMITTED, checkRoleSaga);

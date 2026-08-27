@@ -3,20 +3,14 @@ import { takeLatest, put } from 'redux-saga/effects';
 import {
   saveEntity,
   saveMultipleEntities,
-  newEntity,
-  newMultipleEntities,
-  deleteEntity,
-  deleteMultipleEntities,
+  createDeleteMultipleEntities,
   updateRouteQuery,
 } from 'containers/App/actions';
 
 import {
   SAVE,
   SAVE_MULTIPLE,
-  NEW_CONNECTION,
-  NEW_MULTIPLE_CONNECTIONS,
-  DELETE_CONNECTION,
-  DELETE_MULTIPLE_CONNECTIONS,
+  UPDATE_MULTIPLE_CONNECTIONS,
   UPDATE_QUERY,
   UPDATE_GROUP,
   PAGE_CHANGE,
@@ -126,31 +120,8 @@ export function* save({ data }) {
 export function* saveMultiple({ path, data }) {
   yield put(saveMultipleEntities(path, data));
 }
-export function* newMultiple({ path, data }) {
-  yield put(newMultipleEntities(path, data));
-}
-export function* deleteMultiple({ path, data }) {
-  yield put(deleteMultipleEntities(path, data));
-}
-
-export function* newConnection({ data }) {
-  yield put(newEntity({
-    path: data.path,
-    entity: data.entity,
-    saveRef: data.saveRef,
-    redirect: false,
-    context: 'entityList',
-  }));
-}
-
-export function* deleteConnection({ data }) {
-  yield put(deleteEntity({
-    path: data.path,
-    id: data.id,
-    saveRef: data.saveRef,
-    redirect: false,
-    context: 'entityList',
-  }));
+export function* updateMultipleConnectionsSaga({ path, updates }) {
+  yield put(createDeleteMultipleEntities({ path, updates }));
 }
 
 export default function* entityList() {
@@ -165,8 +136,5 @@ export default function* entityList() {
 
   yield takeLatest(SAVE, save);
   yield takeLatest(SAVE_MULTIPLE, saveMultiple);
-  yield takeLatest(NEW_CONNECTION, newConnection);
-  yield takeLatest(DELETE_CONNECTION, deleteConnection);
-  yield takeLatest(NEW_MULTIPLE_CONNECTIONS, newMultiple);
-  yield takeLatest(DELETE_MULTIPLE_CONNECTIONS, deleteMultiple);
+  yield takeLatest(UPDATE_MULTIPLE_CONNECTIONS, updateMultipleConnectionsSaga);
 }

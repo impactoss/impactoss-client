@@ -44,10 +44,8 @@ export const UPDATE_CONNECTIONS = 'impactoss/App/UPDATE_CONNECTIONS';
 export const SAVE_ENTITY = 'impactoss/App/SAVE_ENTITY';
 export const SAVE_MULTIPLE_ENTITIES = 'impactoss/App/SAVE_MULTIPLE_ENTITIES';
 export const NEW_ENTITY = 'impactoss/App/NEW_ENTITY';
-export const NEW_MULTIPLE_ENTITIES = 'impactoss/App/NEW_MULTIPLE_ENTITIES';
 export const DELETE_ENTITY = 'impactoss/App/DELETE_ENTITY';
-export const DELETE_MULTIPLE_ENTITIES = 'impactoss/App/DELETE_MULTIPLE_ENTITIES';
-export const SAVE_CONNECTIONS = 'impactoss/App/SAVE_CONNECTIONS';
+export const CREATE_DELETE_MULTIPLE_ENTITIES = 'impactoss/App/CREATE_DELETE_MULTIPLE_ENTITIES';
 export const DUEDATE_ASSIGNED = 'impactoss/App/DUEDATE_ASSIGNED';
 export const DUEDATE_UNASSIGNED = 'impactoss/App/DUEDATE_UNASSIGNED';
 
@@ -76,6 +74,7 @@ export const CLOSE_ENTITY = 'impactoss/App/CLOSE_ENTITY';
 export const OPEN_BOOKMARK = 'impactoss/App/OPEN_BOOKMARK';
 export const OPEN_NEW_ENTITY_MODAL = 'impactoss/App/OPEN_NEW_ENTITY_MODAL';
 export const SHOW_SETTINGS_MODAL = 'impactoss/App/SHOW_SETTINGS_MODAL';
+export const OPEN_PASSWORD_MODAL = 'impactoss/App/OPEN_PASSWORD_MODAL';
 
 export const DISMISS_QUERY_MESSAGES = 'impactoss/App/DISMISS_QUERY_MESSAGES';
 export const SET_FRAMEWORK = 'impactoss/App/SET_FRAMEWORK';

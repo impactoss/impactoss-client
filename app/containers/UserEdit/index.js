@@ -357,6 +357,13 @@ function mapDispatchToProps(dispatch) {
       if (saveData.get('attributes').equals(viewEntity.get('attributes'))) {
         saveData = saveData.set('skipAttributes', true);
       }
+      // list changed attributes
+      saveData = saveData.set('changedAttributes', saveData.get('attributes').reduce(
+        (memo, value, key) => qe(value, viewEntity.getIn(['attributes', key]))
+          ? memo
+          : memo.push(key),
+        List(),
+      ));
 
       dispatch(save(saveData.toJS()));
     },

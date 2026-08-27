@@ -39,9 +39,8 @@ import {
   UPDATE_CONNECTIONS,
   REMOVE_ENTITY,
   NEW_ENTITY,
-  NEW_MULTIPLE_ENTITIES,
   DELETE_ENTITY,
-  DELETE_MULTIPLE_ENTITIES,
+  CREATE_DELETE_MULTIPLE_ENTITIES,
   SAVE_ENTITY,
   SAVE_MULTIPLE_ENTITIES,
   INVALIDATE_ENTITIES,
@@ -52,7 +51,6 @@ import {
   DELETE_SENDING,
   DELETE_SUCCESS,
   DELETE_ERROR,
-  SAVE_CONNECTIONS,
   UPDATE_ROUTE_QUERY,
   UPDATE_PATH,
   AUTHENTICATE_FORWARD,
@@ -75,6 +73,7 @@ import {
   INITIALIZE_SETTINGS,
   OTP_REQUIRED,
   RESET_OTP,
+  OPEN_PASSWORD_MODAL,
 } from './constants';
 
 export function resetProgress() {
@@ -229,19 +228,20 @@ export function deleteEntity(data) {
     data,
   };
 }
-export function deleteMultipleEntities(path, data) {
+export function createDeleteMultipleEntities(data, currentPassword) {
   return {
-    type: DELETE_MULTIPLE_ENTITIES,
-    path,
+    type: CREATE_DELETE_MULTIPLE_ENTITIES,
     data,
+    currentPassword,
   };
 }
 
 // server side
-export function saveEntity(data) {
+export function saveEntity(data, currentPassword) {
   return {
     type: SAVE_ENTITY,
     data,
+    currentPassword,
   };
 }
 export function saveMultipleEntities(path, data) {
@@ -256,20 +256,6 @@ export function saveMultipleEntities(path, data) {
 export function newEntity(data) {
   return {
     type: NEW_ENTITY,
-    data,
-  };
-}
-export function newMultipleEntities(path, data) {
-  return {
-    type: NEW_MULTIPLE_ENTITIES,
-    path,
-    data,
-  };
-}
-// server side
-export function saveConnections(data) {
-  return {
-    type: SAVE_CONNECTIONS,
     data,
   };
 }
@@ -504,6 +490,14 @@ export function closeEntity(path) {
 export function openNewEntityModal(args) {
   return {
     type: OPEN_NEW_ENTITY_MODAL,
+    args,
+  };
+}
+
+// args: { data, action }
+export function openPasswordModal(args) {
+  return {
+    type: OPEN_PASSWORD_MODAL,
     args,
   };
 }

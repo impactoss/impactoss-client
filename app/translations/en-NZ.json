@@ -54,8 +54,6 @@
   "app.components.EntityListGroups.nestedListEmpty.reports": "No report yet created",
   "app.components.EntityListGroups.subgroupHeaderTitle": "Subgroup {type}: {label}",
   "app.components.EntityListGroups.without": "Without",
-  "app.components.EntityListItem.associationAlreadyPresent": "Connection or category already assigned.",
-  "app.components.EntityListItem.associationNotExistent": "Connection or category assignment already removed.",
   "app.components.EntityListItem.due": "{total} due",
   "app.components.EntityListItem.overdue": "{total} overdue",
   "app.components.EntityListItem.selectLabel": "Click to select {entityTitle}",

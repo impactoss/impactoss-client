@@ -283,6 +283,10 @@ export default defineMessages({
       id: 'app.containers.App.forms.referenceRequiredError',
       defaultMessage: '"Reference" is required. ',
     },
+    passwordConfirmError: {
+      id: 'app.containers.App.forms.passwordConfirmError',
+      defaultMessage: 'Password entered does not match password on file. ',
+    },
     passwordNeedsUpperCaseError: {
       id: 'app.containers.App.forms.passwordNeedsUpperCaseError',
       defaultMessage: 'At least one uppercase letter is required.',
@@ -302,6 +306,10 @@ export default defineMessages({
     passwordsMustMatch: {
       id: 'app.containers.App.forms.passwordsMustMatch',
       defaultMessage: 'Must match Password',
+    },
+    relationshipExistsError: {
+      id: 'app.containers.App.forms.relationshipExistsError',
+      defaultMessage: 'Relationship already exists.',
     },
   },
 

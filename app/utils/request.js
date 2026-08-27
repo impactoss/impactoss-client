@@ -63,14 +63,16 @@ export function checkResponseError(error) {
 }
 
 function mapErrors(errors) {
-  return map(errors, (error, key) => `${capitalize(key)}: ${error}`);
+  return map(errors, (error, key) => `${capitalize(key.replace(/_/g, ' '))}: ${error}`);
 }
 
 export function checkErrorMessagesExist(response) {
   if (response && response.json && response.json.errors && response.json.errors.full_messages) {
     return response.json.errors.full_messages;
   } if (response && response.json && response.json.errors) {
-    return response.json.errors;
+    return Array.isArray(response.json.errors)
+      ? response.json.errors
+      : mapErrors(response.json.errors);
   } if (response && response.json && response.json.error) {
     return response.json.error === Object(response.json.error)
       ? mapErrors(response.json.error)

@@ -14,14 +14,6 @@ export default defineMessages({
     id: 'app.components.EntityListItem.overdue',
     defaultMessage: '{total} overdue',
   },
-  associationNotExistent: {
-    id: 'app.components.EntityListItem.associationNotExistent',
-    defaultMessage: 'Association no longer present.',
-  },
-  associationAlreadyPresent: {
-    id: 'app.components.EntityListItem.associationAlreadyPresent',
-    defaultMessage: 'Association already created.',
-  },
   selectLabel: {
     id: 'app.components.EntityListItem.selectLabel',
     defaultMessage: 'Click to select {entityTitle}',

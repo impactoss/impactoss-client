@@ -16,6 +16,11 @@ import { CircleInformation, StatusGood } from 'grommet-icons';
 import { omit } from 'lodash/object';
 import { startCase } from 'lodash/string';
 
+import {
+  CONTENT_MODAL,
+  CONTENT_EDIT,
+} from 'containers/App/constants';
+
 import { validateField } from 'utils/forms';
 
 import appMessages from 'containers/App/messages';
@@ -28,6 +33,7 @@ import ViewPanel from 'components/EntityView/ViewPanel';
 import FieldGroupWrapper from 'components/fields/FieldGroupWrapper';
 import Field from 'components/fields/Field';
 import ScreenReaderOnly from 'components/styled/ScreenReaderOnly';
+import ContentHeader from 'components/ContentHeader';
 
 import ErrorWrapper from '../ErrorWrapper';
 import FormWrapper from '../FormWrapper';
@@ -244,49 +250,62 @@ class AuthForm extends React.PureComponent { // eslint-disable-line react/prefer
 
   render() {
     const {
-      initialValues, fields, handleSubmit, handleCancel, labels, sending,
+      initialValues,
+      fields,
+      handleSubmit,
+      handleCancel,
+      labels,
+      sending,
+      headerTitle,
+      inModal,
     } = this.props;
-
     return (
-      <FormWrapper>
-        <Formik
-          initialValues={initialValues}
-          onSubmit={handleSubmit}
-        >
-          {({ values, isValid, dirty }) => {
-            const submitDisabled = !dirty // disabled if no changes are made
-              || !isValid // or if validations fail
-              || sending; // or already submitted
-
-            return (
-              <StyledForm>
-                {fields && this.renderBody(fields, values)}
-                <FormFooter>
-                  <FormFooterButtons>
-                    <ButtonCancel type="button" onClick={handleCancel}>
-                      <FormattedMessage {...appMessages.buttons.cancel} />
-                    </ButtonCancel>
-                    {submitDisabled && (
-                      <ScreenReaderOnly id="submit-disabled-hint">
-                        The form is missing required input data or has validation errors
-                      </ScreenReaderOnly>
-                    )}
-                    <ButtonSubmit
-                      type="submit"
-                      disabled={submitDisabled}
-                      aria-disabled={submitDisabled ? 'true' : null}
-                      aria-describedby={submitDisabled ? 'submit-disabled-hint' : null}
-                    >
-                      {labels.submit}
-                    </ButtonSubmit>
-                  </FormFooterButtons>
-                  <Clear />
-                </FormFooter>
-              </StyledForm>
-            );
-          }}
-        </Formik>
-      </FormWrapper>
+      <>
+        {headerTitle && (
+          <ContentHeader
+            title={headerTitle}
+            type={inModal ? CONTENT_MODAL : CONTENT_EDIT}
+          />
+        )}
+        <FormWrapper withoutShadow={inModal}>
+          <Formik
+            initialValues={initialValues}
+            onSubmit={handleSubmit}
+          >
+            {({ values, isValid, dirty }) => {
+              const submitDisabled = !dirty // disabled if no changes are made
+                || !isValid // or if validations fail
+                || sending; // or already submitted
+              return (
+                <StyledForm>
+                  {fields && this.renderBody(fields, values)}
+                  <FormFooter>
+                    <FormFooterButtons>
+                      <ButtonCancel type="button" onClick={handleCancel}>
+                        <FormattedMessage {...appMessages.buttons.cancel} />
+                      </ButtonCancel>
+                      {submitDisabled && (
+                        <ScreenReaderOnly id="submit-disabled-hint">
+                          The form is missing required input data or has validation errors
+                        </ScreenReaderOnly>
+                      )}
+                      <ButtonSubmit
+                        type="submit"
+                        disabled={submitDisabled}
+                        aria-disabled={submitDisabled ? 'true' : null}
+                        aria-describedby={submitDisabled ? 'submit-disabled-hint' : null}
+                      >
+                        {labels.submit}
+                      </ButtonSubmit>
+                    </FormFooterButtons>
+                    <Clear />
+                  </FormFooter>
+                </StyledForm>
+              );
+            }}
+          </Formik>
+        </FormWrapper>
+      </>
     );
   }
 }
@@ -295,6 +314,8 @@ AuthForm.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
   handleCancel: PropTypes.func.isRequired,
   labels: PropTypes.object,
+  inModal: PropTypes.bool,
+  headerTitle: PropTypes.string,
   fields: PropTypes.array,
   sending: PropTypes.bool,
   initialValues: PropTypes.object, // Map?

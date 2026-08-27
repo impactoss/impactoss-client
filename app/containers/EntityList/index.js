@@ -52,8 +52,7 @@ import {
   resetProgress,
   showPanel,
   saveMultiple,
-  newMultipleConnections,
-  deleteMultipleConnections,
+  updateMultipleConnections,
   selectEntity,
   selectMultipleEntities,
   updateQuery,
@@ -152,6 +151,25 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
   filterByError = (entities, errors) => entities.filter((entity) => errors.has(entity.get('id')));
 
+  getErrorMessage = (errors, progressTypes, intl) => {
+    const hasPasswordError = errors.some(
+      (error) => error.error && error.error.status === 401,
+    );
+    if (hasPasswordError) {
+      return intl.formatMessage(messages.updatesFailedPassword);
+    }
+    return intl.formatMessage(
+      messages.updatesFailed,
+      {
+        errorNo: errors.size,
+        types:
+          intl.formatMessage(messages[
+            `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
+          ]),
+      },
+    );
+  };
+
   render() {
     // make sure selected entities are still actually on page
     const {
@@ -169,7 +187,10 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
 
     const sending = viewDomain.get('sending');
     const success = viewDomain.get('success');
-    const errors = viewDomain.get('errors').size > 0 ? this.mapErrors(viewDomain.get('errors')) : Map();
+    const itemErrors = viewDomain.get('errors').filter(
+      (error) => !(error.error && error.error.status === 401),
+    );
+    const errors = itemErrors.size > 0 ? this.mapErrors(itemErrors) : Map();
     const entities = (errors.size > 0)
       ? this.filterByError(this.props.entities, errors)
       : this.props.entities;
@@ -338,7 +359,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 <FormattedMessage
                   {...messages.processingUpdates}
                   values={{
-                    processNo: Math.min(success.size + errors.size + 1, sending.size),
+                    processNo: Math.min(success.size + viewDomain.get('errors').size + 1, sending.size),
                     totalNo: sending.size,
                     types:
                       intl.formatMessage(messages[
@@ -360,18 +381,7 @@ export class EntityList extends React.PureComponent { // eslint-disable-line rea
                 <Messages
                   type="error"
                   withoutAriaLive
-                  message={
-                    intl.formatMessage(
-                      messages.updatesFailed,
-                      {
-                        errorNo: viewDomain.get('errors').size,
-                        types:
-                          intl.formatMessage(messages[
-                            `type_${progressTypes.size === 1 ? progressTypes.first() : 'save'}`
-                          ]),
-                      },
-                    )
-                  }
+                  message={this.getErrorMessage(viewDomain.get('errors'), progressTypes, intl)}
                   onDismiss={this.props.resetProgress}
                   preMessage={false}
                 />
@@ -774,34 +784,18 @@ function mapDispatchToProps(dispatch, props) {
           Map().set('creates', List()).set('deletes', List()),
         ); // reduce entities
         // associations
-        if (updates.get('creates') && updates.get('creates').size > 0) {
-          dispatch(newMultipleConnections(
+        if (
+          (updates.get('creates') && updates.get('creates').size > 0)
+          || (updates.get('deletes') && updates.get('deletes').size > 0)
+        ) {
+          dispatch(updateMultipleConnections(
             activeEditOption.path,
-            updates.get('creates').toJS(),
+            {
+              create: updates.get('creates') && updates.get('creates').toJS(),
+              delete: updates.get('deletes') && updates.get('deletes').toJS(),
+            },
           ));
         }
-        if (updates.get('deletes') && updates.get('deletes').size > 0) {
-          dispatch(deleteMultipleConnections(
-            activeEditOption.path,
-            updates.get('deletes').toJS(),
-          ));
-        }
-        // entityCreates.forEach((id) => dispatch(newConnection({
-        //   path: activeEditOption.path,
-        //   entity: {
-        //     attributes: {
-        //       [activeEditOption.ownKey]: entity.get('id'),
-        //       [activeEditOption.key]: id,
-        //     },
-        //   },
-        //   saveRef: entity.get('id'),
-        // })));
-        // existingAssignments
-        //   .forEach((assigned, id) => dispatch(deleteConnection({
-        //     path: activeEditOption.path,
-        //     id,
-        //     saveRef: entity.get('id'),
-        //   })));
       }
     },
   };

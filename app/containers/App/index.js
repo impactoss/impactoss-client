@@ -20,6 +20,7 @@ import HelmetCanonical from 'components/HelmetCanonical';
 import Header from 'components/Header';
 import SkipContent from 'components/styled/SkipContent';
 import EntityNew from 'containers/EntityNew';
+import UserPasswordConfirm from 'containers/UserPasswordConfirm';
 import GlobalSettings from 'containers/GlobalSettings';
 
 import { sortEntities } from 'utils/sort';
@@ -47,6 +48,7 @@ import {
   selectShowSettings,
   selectHasPreviousCycles,
   selectSettingsConfig,
+  selectPasswordModal,
 } from './selectors';
 
 import {
@@ -55,6 +57,7 @@ import {
   updatePath,
   updateRouteQuery,
   openNewEntityModal,
+  openPasswordModal,
   showSettingsModal,
   initializeSettings,
 } from './actions';
@@ -246,6 +249,9 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
       dataReady,
       settings,
       intl,
+      passwordModal,
+      onCloseModal,
+      onClosePasswordModal,
     } = this.props;
     const title = intl.formatMessage(messages.app.title);
     const isHome = location.pathname === ROUTES.INTRO || location.pathname === `${ROUTES.INTRO}/`;
@@ -302,7 +308,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
               isOpen
               appElement={document.getElementById('app')}
               contentLabel={newEntityModal.get('path')}
-              onRequestClose={this.props.onCloseModal}
+              onRequestClose={onCloseModal}
               className="new-entity-modal"
               overlayClassName="new-entity-modal-overlay"
               style={{
@@ -312,8 +318,31 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
               <EntityNew
                 path={newEntityModal.get('path')}
                 attributes={newEntityModal.get('attributes')}
-                onSaveSuccess={this.props.onCloseModal}
-                onCancel={this.props.onCloseModal}
+                onSaveSuccess={onCloseModal}
+                onCancel={onCloseModal}
+                inModal
+              />
+            </ReactModal>
+          )
+        }
+        {passwordModal
+          && (
+            <ReactModal
+              isOpen
+              appElement={document.getElementById('app')}
+              contentLabel="Enter password for sensitive update"
+              onRequestClose={onClosePasswordModal}
+              className="new-entity-modal"
+              overlayClassName="new-entity-modal-overlay"
+              style={{
+                overlay: { zIndex: 99999999 },
+              }}
+            >
+              <UserPasswordConfirm
+                action={passwordModal.get('action')}
+                data={passwordModal.get('data')}
+                onSaveSuccess={onClosePasswordModal}
+                onCancel={onClosePasswordModal}
                 inModal
               />
             </ReactModal>
@@ -356,7 +385,9 @@ App.propTypes = {
   onPageLink: PropTypes.func.isRequired,
   location: PropTypes.object.isRequired,
   newEntityModal: PropTypes.object,
+  passwordModal: PropTypes.object,
   onCloseModal: PropTypes.func,
+  onClosePasswordModal: PropTypes.func,
   onSelectFramework: PropTypes.func,
   currentFrameworkId: PropTypes.string,
   viewRecommendationFramework: PropTypes.string,
@@ -377,6 +408,7 @@ const mapStateToProps = (state, props) => ({
   user: selectSessionUserAttributes(state),
   pages: selectPublishedPages(state),
   newEntityModal: selectNewEntityModal(state),
+  passwordModal: selectPasswordModal(state),
   showSettings: selectShowSettings(state),
   currentFrameworkId: selectCurrentFrameworkId(state),
   frameworks: selectFrameworks(state),
@@ -402,6 +434,9 @@ export function mapDispatchToProps(dispatch) {
     },
     onCloseModal: () => {
       dispatch(openNewEntityModal(null));
+    },
+    onClosePasswordModal: () => {
+      dispatch(openPasswordModal(null));
     },
     onSelectFramework: (framework) => {
       dispatch(updateRouteQuery(

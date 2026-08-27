@@ -186,8 +186,10 @@ export const SERVER_ERRORS = {
   PASSWORD_MISMATCH: "Password confirmation doesn't match Password",
   PASSWORD_SHORT: 'Password is too short (minimum is 6 characters)',
   PASSWORD_INVALID: 'Current password is invalid',
+  PASSWORD_CONFIRM_FAILURE: 'Current password: is incorrect or missing',
   TITLE_REQUIRED: "Title: can't be blank",
   REFERENCE_REQUIRED: "Reference: can't be blank",
+  RELATIONSHIP_EXISTS: 'Relationship: already exists',
 };
 
 // Map server attribute values **************************
@@ -753,4 +755,23 @@ export const SETTINGS = {
     value: false, // default value
     minRole: SEE_ARCHIVED_MIN_ROLE,
   },
+};
+
+// Actions requiring the user to re-enter their current password.
+// The check runs in the App sagas, so it applies wherever a save is dispatched from.
+//
+// ATTRIBUTES: object keyed by entity path, each value an array of attribute names
+//   that are gated when changed, e.g. {[API.USERS]: ['email']}.
+//   Requires the dispatching container to set "changedAttributes" on the payload
+//   (see UserEdit), since the payload always carries the full attribute set.
+//   Note: only covers single entity saves. Batch attribute edits from the list view
+//   (SAVE_MULTIPLE_ENTITIES) are not gated - that path would need the same treatment.
+// CONNECTION_KEYS: keys on the entity payload holding create/delete lists,
+//   gated when either list is not empty (single entity save).
+// CONNECTION_PATHS: server paths gated for batch connection updates from the list view.
+
+export const PROTECTED_BY_PASSWORD = {
+  ATTRIBUTES: {},
+  CONNECTION_KEYS: ['userRoles'],
+  CONNECTION_PATHS: [API.USER_ROLES],
 };

@@ -48,13 +48,17 @@ export const currentFilters = (
     onTagClick,
     errors,
     frameworks,
+    onErrorsClick,
   },
   withoutLabel,
   errorLabel,
 ) => {
   let filterTags = [];
   if (errors && errors.size > 0) {
-    filterTags.push(getErrorTag(errorLabel));
+    filterTags.push(getErrorTag(
+      errorLabel,
+      onErrorsClick,
+    ));
   }
   if (config.frameworks && frameworks && frameworks.size > 1) {
     filterTags = filterTags.concat(getCurrentFrameworkFilter(
@@ -102,10 +106,11 @@ export const currentFilters = (
   return filterTags;
 };
 
-const getErrorTag = (label) => ({
+const getErrorTag = (label, onErrorsClick) => ({
   id: 'error',
   type: 'error',
   label,
+  onClick: onErrorsClick,
 });
 const getConnectionLabel = (connection, value) => {
   const label = connection
