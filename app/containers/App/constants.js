@@ -148,4 +148,5 @@ export const ROUTES = {
   ID: '/:id',
   NEW: '/new',
   EDIT: '/edit',
+  LINK_INVALID: '/link-invalid',
 };
