@@ -51,6 +51,7 @@ import {
   OPEN_BOOKMARK,
   ACTIVITY_PING_INTERVAL,
   SESSION_ACTIVITY,
+  SESSION_EXPIRED,
 } from 'containers/App/constants';
 
 import {
@@ -1060,7 +1061,7 @@ export function* activityPingSaga() {
   try {
     const response = yield call(apiRequest, 'post', ENDPOINTS.ACTIVITY);
 
-    if (response && response.seconds_remaining) {
+    if (response && typeof response.seconds_remaining === 'number') {
       yield put(setSessionExpiry(Date.now() + (response.seconds_remaining * 1000)));
     }
   } catch (err) {
@@ -1124,4 +1125,5 @@ export default function* rootSaga() {
 
   yield takeEvery(CLOSE_ENTITY, closeEntitySaga);
   yield throttle(ACTIVITY_PING_INTERVAL, SESSION_ACTIVITY, activityPingSaga);
+  yield takeLatest(SESSION_EXPIRED, sessionExpiredSaga);
 }
