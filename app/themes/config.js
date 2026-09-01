@@ -164,6 +164,7 @@ export const ENDPOINTS = {
   SIGN_IN_AZURE: 'auth/azure_activedirectory_v2',
   VERIFY_OTP: 'auth/verify_multi_factor',
   RESEND_OTP: 'auth/resend_multi_factor',
+  ACTIVITY: 'auth/activity',
 };
 
 // API request Authentification keys

@@ -3,7 +3,7 @@
  */
 
 import {
-  call, put, select, takeLatest, takeEvery, race, take, all,
+  call, put, select, takeLatest, takeEvery, race, take, all, throttle,
 } from 'redux-saga/effects';
 import {
   push, replace, goBack, LOCATION_CHANGE,
@@ -49,6 +49,8 @@ import {
   SET_LOAD_ARCHIVED,
   SET_LOAD_NONCURRENT,
   OPEN_BOOKMARK,
+  ACTIVITY_PING_INTERVAL,
+  SESSION_ACTIVITY,
 } from 'containers/App/constants';
 
 import {
@@ -90,6 +92,7 @@ import {
   initializeSettings,
   otpRequired,
   openPasswordModal,
+  setSessionExpiry,
 } from 'containers/App/actions';
 
 import {
@@ -1048,6 +1051,43 @@ function* handleLocationChange(action) {
 function* handleAuthSuccess() {
   const pathname = yield select(selectCurrentPathname);
   yield call(guardAuthRoutes, pathname);
+  yield call(activityPingSaga);
+}
+
+export function* activityPingSaga() {
+  const signedIn = yield select(selectIsSignedIn);
+  if (!signedIn) return;
+  try {
+    const response = yield call(apiRequest, 'post', ENDPOINTS.ACTIVITY);
+
+    if (response && response.seconds_remaining) {
+      yield put(setSessionExpiry(Date.now() + (response.seconds_remaining * 1000)));
+    }
+  } catch (err) {
+    if (err.response && err.response.status === 401) {
+      yield call(sessionExpiredSaga);
+    } else {
+      console.error(err); // eslint-disable-line no-console
+    }
+  }
+}
+
+export function* sessionExpiredSaga() {
+  yield call(clearAuthValues);
+  yield put(logoutSuccess());
+  // yield put(invalidateEntities());
+  if (ENABLE_AZURE) {
+    // forward to home to prevent second login
+    yield put(updatePath('/', { replace: true }));
+  } else {
+    yield put(updatePath(
+      ROUTES.LOGIN,
+      {
+        replace: true,
+        query: { info: PARAMS.SESSION_EXPIRED },
+      },
+    ));
+  }
 }
 
 /**
@@ -1083,4 +1123,5 @@ export default function* rootSaga() {
   yield takeEvery(DISMISS_QUERY_MESSAGES, dismissQueryMessagesSaga);
 
   yield takeEvery(CLOSE_ENTITY, closeEntitySaga);
+  yield throttle(ACTIVITY_PING_INTERVAL, SESSION_ACTIVITY, activityPingSaga);
 }

@@ -74,6 +74,9 @@ import {
   OTP_REQUIRED,
   RESET_OTP,
   OPEN_PASSWORD_MODAL,
+  SESSION_ACTIVITY,
+  SESSION_EXPIRED,
+  SET_SESSION_EXPIRY,
 } from './constants';
 
 export function resetProgress() {
@@ -542,5 +545,22 @@ export function initializeSettings(settings) { // Immutable Map
   return {
     type: INITIALIZE_SETTINGS,
     settings,
+  };
+}
+export function sessionActivity() {
+  return {
+    type: SESSION_ACTIVITY,
+  };
+}
+export function sessionExpired() {
+  return {
+    type: SESSION_EXPIRED,
+  };
+}
+
+export function setSessionExpiry(expiresAt) {
+  return {
+    type: SET_SESSION_EXPIRY,
+    expiresAt,
   };
 }

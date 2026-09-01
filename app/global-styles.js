@@ -180,7 +180,8 @@ const GlobalStyle = createGlobalStyle`
   .global-settings-modal,
   .import-csv-modal,
   .download-csv-modal,
-  .new-entity-modal {
+  .new-entity-modal,
+  .session-warning-modal {
     position: absolute;
     top: 10px;
     left: 10px;
@@ -200,7 +201,8 @@ const GlobalStyle = createGlobalStyle`
     .global-settings-modal,
     .download-csv-modal,
     .import-csv-modal,
-    .new-entity-modal {
+    .new-entity-modal,
+    .session-warning-modal {
       padding: 20px;
       top: 40px;
       left: 40px;
@@ -213,7 +215,8 @@ const GlobalStyle = createGlobalStyle`
   .download-csv-modal-overlay,
   .overlay-modal-overlay,
   .global-settings-modal-overlay,
-  .new-entity-modal-overlay {
+  .new-entity-modal-overlay,
+  .session-warning-modal-overlay {
     z-index: 99999999;
     position: fixed;
     top: 0;

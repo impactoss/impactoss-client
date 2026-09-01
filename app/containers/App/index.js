@@ -22,6 +22,8 @@ import SkipContent from 'components/styled/SkipContent';
 import EntityNew from 'containers/EntityNew';
 import UserPasswordConfirm from 'containers/UserPasswordConfirm';
 import GlobalSettings from 'containers/GlobalSettings';
+import SessionTimer from 'containers/SessionTimer';
+import SessionWarningModal from 'containers/SessionWarningModal';
 
 import { sortEntities } from 'utils/sort';
 import { canUserManageUsers, canUserManagePages } from 'utils/permissions';
@@ -33,7 +35,7 @@ import {
   FEATURES,
 } from 'themes/config';
 
-import { ROUTES, DEPENDENCIES } from './constants';
+import { ROUTES, DEPENDENCIES, ACTIVITY_DISPATCH_INTERVAL } from './constants';
 
 import {
   selectIsSignedIn,
@@ -60,6 +62,7 @@ import {
   openPasswordModal,
   showSettingsModal,
   initializeSettings,
+  sessionActivity,
 } from './actions';
 
 import messages from './messages';
@@ -99,10 +102,22 @@ const Content = styled.div`
   }
 `;
 
+const ACTIVITY_EVENTS = ['click', 'keydown', 'scroll'];
+
 class App extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  lastActivityDispatch = 0;
+
   UNSAFE_componentWillMount() {
     this.props.validateToken();
     this.props.loadEntitiesIfNeeded();
+  }
+
+  componentDidMount() {
+    ACTIVITY_EVENTS.forEach((type) => document.addEventListener(
+      type,
+      this.onActivity,
+      { capture: true, passive: true },
+    ));
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -230,6 +245,21 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
     return navItems;
   };
 
+  componentWillUnmount() {
+    ACTIVITY_EVENTS.forEach((type) => document.removeEventListener(
+      type,
+      this.onActivity,
+      { capture: true },
+    ));
+  }
+
+  onActivity = () => {
+    const now = Date.now();
+    if (now - this.lastActivityDispatch < ACTIVITY_DISPATCH_INTERVAL) return;
+    this.lastActivityDispatch = now;
+    this.props.onSessionActivity();
+  };
+
   render() {
     const {
       pages,
@@ -265,6 +295,7 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
           <FormattedMessage {...messages.screenreader.skipToContent} />
         </SkipContent>
         <HelmetCanonical titleTemplate={`${title} - %s`} defaultTitle={title} />
+        <SessionTimer />
         <Header
           isSignedIn={isUserSignedIn}
           user={user}
@@ -331,9 +362,6 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
               onRequestClose={onClosePasswordModal}
               className="new-entity-modal"
               overlayClassName="new-entity-modal-overlay"
-              style={{
-                overlay: { zIndex: 99999999 },
-              }}
             >
               <UserPasswordConfirm
                 action={passwordModal.get('action')}
@@ -361,6 +389,9 @@ class App extends React.PureComponent { // eslint-disable-line react/prefer-stat
               onClose={() => onShowSettings(false)}
             />
           </ReactModal>
+        )}
+        { isUserSignedIn && (
+          <SessionWarningModal />
         )}
         <GlobalStyle />
       </div>
@@ -393,6 +424,7 @@ App.propTypes = {
   settings: PropTypes.object,
   dataReady: PropTypes.bool,
   intl: PropTypes.object.isRequired,
+  onSessionActivity: PropTypes.func,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -461,6 +493,9 @@ export function mapDispatchToProps(dispatch) {
         return updated;
       });
       dispatch(initializeSettings(updatedSettings));
+    },
+    onSessionActivity: () => {
+      dispatch(sessionActivity());
     },
   };
 }
