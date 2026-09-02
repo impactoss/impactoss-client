@@ -94,6 +94,7 @@ import {
   otpRequired,
   openPasswordModal,
   setSessionExpiry,
+  sessionExpired,
 } from 'containers/App/actions';
 
 import {
@@ -115,7 +116,10 @@ import {
   updateEntityRequest,
   updateAssociationsRequest,
 } from 'utils/entities-update';
+
 import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
+
+import { storeSessionExpiry, readSessionExpiry } from 'utils/session-storage';
 
 /**
  * Check if entities already present
@@ -313,6 +317,7 @@ export function* logoutSaga() {
   try {
     yield call(apiRequest, 'delete', ENDPOINTS.SIGN_OUT);
     yield call(clearAuthValues);
+    yield call(storeSessionExpiry, null);
     yield put(logoutSuccess());
     if (ENABLE_AZURE) {
       // forward to home to prevent second login
@@ -322,6 +327,7 @@ export function* logoutSaga() {
     }
   } catch (err) {
     yield call(clearAuthValues);
+    yield call(storeSessionExpiry, null);
     yield put(authenticateError(err));
   }
 }
@@ -347,13 +353,16 @@ export function* validateTokenSaga() {
       );
       if (!response.success) {
         yield call(clearAuthValues);
+        yield call(storeSessionExpiry, null);
         yield put(invalidateEntities());
+      } else {
+        yield put(authenticateSuccess(response.data)); // need to store currentUserData
       }
-      yield put(authenticateSuccess(response.data)); // need to store currentUserData
     }
   } catch (err) {
     console.log('ERROR in validateTokenSaga', err);
     yield call(clearAuthValues);
+    yield call(storeSessionExpiry, null);
     if (err.response) {
       err.response.json = yield err.response.json();
     }
@@ -1052,6 +1061,11 @@ function* handleLocationChange(action) {
 function* handleAuthSuccess() {
   const pathname = yield select(selectCurrentPathname);
   yield call(guardAuthRoutes, pathname);
+
+  // seed from storage so a tab opened alongside an existing session has an
+  // expiry before the ping returns; the ping then supersedes it
+  const expiresAt = yield call(readSessionExpiry);
+  if (expiresAt) yield put(setSessionExpiry(expiresAt));
   yield call(activityPingSaga);
 }
 
@@ -1062,11 +1076,13 @@ export function* activityPingSaga() {
     const response = yield call(apiRequest, 'post', ENDPOINTS.ACTIVITY);
 
     if (response && typeof response.seconds_remaining === 'number') {
-      yield put(setSessionExpiry(Date.now() + (response.seconds_remaining * 1000)));
+      const expiresAt = Date.now() + (response.seconds_remaining * 1000);
+      yield call(storeSessionExpiry, expiresAt);
+      yield put(setSessionExpiry(expiresAt));
     }
   } catch (err) {
     if (err.response && err.response.status === 401) {
-      yield call(sessionExpiredSaga);
+      yield put(sessionExpired());
     } else {
       console.error(err); // eslint-disable-line no-console
     }
@@ -1075,6 +1091,7 @@ export function* activityPingSaga() {
 
 export function* sessionExpiredSaga() {
   yield call(clearAuthValues);
+  yield call(storeSessionExpiry, null);
   yield put(logoutSuccess());
   // let the store settle before navigating: the login route's onEnter guard
   // reads isSignedIn synchronously during the transition, and without this

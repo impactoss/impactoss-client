@@ -12,11 +12,12 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { sessionExpired } from 'containers/App/actions';
+import { sessionExpired, setSessionExpiry } from 'containers/App/actions';
 import { selectSessionExpiresAt } from 'containers/App/selectors';
 import { SESSION_TICK_INTERVAL } from 'containers/App/constants';
+import { SESSION_EXPIRES_AT_KEY } from 'themes/config';
 
-export function SessionTimer({ expiresAt, onExpired }) {
+export function SessionTimer({ expiresAt, onExpired, onExpirySet }) {
   useEffect(() => {
     if (!expiresAt) return undefined;
     // compare against the stored expiry rather than counting down, so that
@@ -29,12 +30,26 @@ export function SessionTimer({ expiresAt, onExpired }) {
     );
     return () => clearInterval(interval);
   }, [expiresAt, onExpired]);
+
+  // tabs share one token and one server-side activity row, so an expiry set by
+  // a ping in another tab applies here too. Without this an idle tab would tear
+  // down a session another tab is keeping alive.
+  useEffect(() => {
+    const onStorage = (event) => {
+      if (event.key !== SESSION_EXPIRES_AT_KEY) return;
+      onExpirySet(event.newValue ? parseInt(event.newValue, 10) : null);
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [onExpirySet]);
+
   return null;
 }
 
 SessionTimer.propTypes = {
   expiresAt: PropTypes.number,
   onExpired: PropTypes.func.isRequired,
+  onExpirySet: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -45,6 +60,9 @@ export function mapDispatchToProps(dispatch) {
   return {
     onExpired: () => {
       dispatch(sessionExpired());
+    },
+    onExpirySet: (expiresAt) => {
+      dispatch(setSessionExpiry(expiresAt));
     },
   };
 }

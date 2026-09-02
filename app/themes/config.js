@@ -178,6 +178,11 @@ export const KEYS = {
   TEMP_TOKEN: 'temp_token',
 };
 
+// localStorage key for the shared session expiry. Not a DTA header, so kept
+// out of KEYS: the value is client-side state, written by the activity
+// heartbeat and read by other tabs via the storage event.
+export const SESSION_EXPIRES_AT_KEY = 'session-expires-at';
+
 // Map server messages *********************************
 
 // Map server error messages to allow client-side translation
