@@ -3,7 +3,7 @@
  */
 
 import {
-  call, put, select, takeLatest, takeEvery, race, take, all, throttle,
+  call, put, select, takeLatest, takeEvery, race, take, all, throttle, delay,
 } from 'redux-saga/effects';
 import {
   push, replace, goBack, LOCATION_CHANGE,
@@ -286,7 +286,7 @@ export function* recoverSaga(payload) {
       ROUTES.LOGIN,
       {
         replace: true,
-        query: { info: PARAMS.RECOVER_SUCCESS },
+        query: { arg: 'info', value: PARAMS.RECOVER_SUCCESS },
       },
     ));
   } catch (err) {
@@ -1076,7 +1076,12 @@ export function* activityPingSaga() {
 export function* sessionExpiredSaga() {
   yield call(clearAuthValues);
   yield put(logoutSuccess());
-  // yield put(invalidateEntities());
+  // let the store settle before navigating: the login route's onEnter guard
+  // reads isSignedIn synchronously during the transition, and without this
+  // it still sees the pre-teardown value and redirects to / with an
+  // alreadySignedIn message, losing the inactivity message.
+  yield delay(0);
+
   if (ENABLE_AZURE) {
     // forward to home to prevent second login
     yield put(updatePath('/', { replace: true }));
@@ -1085,7 +1090,7 @@ export function* sessionExpiredSaga() {
       ROUTES.LOGIN,
       {
         replace: true,
-        query: { info: PARAMS.SESSION_EXPIRED },
+        query: { arg: 'info', value: PARAMS.SESSION_EXPIRED },
       },
     ));
   }

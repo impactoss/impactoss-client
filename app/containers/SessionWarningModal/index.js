@@ -12,18 +12,20 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import ReactModal from 'react-modal';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, injectIntl } from 'react-intl';
 import { Box, Text } from 'grommet';
 import styled from 'styled-components';
 import { palette } from 'styled-theme';
 
 import ButtonDefault from 'components/buttons/ButtonDefault';
 import Loading from 'components/Loading';
+import FormattedMessageMarkdown from 'components/FormattedMessageMarkdown';
 
 import { sessionActivity } from 'containers/App/actions';
 import { selectSessionExpiresAt } from 'containers/App/selectors';
 import { SESSION_TICK_INTERVAL, SESSION_WARNING_THRESHOLD } from 'containers/App/constants';
 
+import appMessages from 'containers/App//messages';
 import messages from './messages';
 
 
@@ -42,7 +44,7 @@ const StyledBodyText = styled(Text)`
 
 const SESSION_EXTEND_TIMEOUT = 10000;
 
-export function SessionWarningModal({ expiresAt, onExtend }) {
+export function SessionWarningModal({ expiresAt, onExtend, intl }) {
   const [remaining, setRemaining] = useState(null);
   const [extending, setExtending] = useState(false);
 
@@ -104,15 +106,18 @@ export function SessionWarningModal({ expiresAt, onExtend }) {
               size="large"
               weight="bold"
             >
-              <FormattedMessage {...messages.title} />
+              <FormattedMessage
+                {...messages.title}
+                values={{ appTitle: intl.formatMessage(appMessages.app.title) }}
+              />
             </StyledTitle>
           </TitleWrapper>
         </Box>
         <Box gap="xsmall" id="session-dialog-desc">
           <StyledBodyText>
             {remaining >= 60
-              ? <FormattedMessage {...messages.remainingMinutes} values={{ minutes }} />
-              : <FormattedMessage {...messages.remainingSeconds} values={{ seconds: remaining }} />}
+              ? <FormattedMessageMarkdown message={messages.remainingMinutes} values={{ minutes }} />
+              : <FormattedMessageMarkdown message={messages.remainingSeconds} values={{ seconds: remaining }} />}
           </StyledBodyText>
           <StyledBodyText>
             <FormattedMessage {...messages.extendHint} />
@@ -139,6 +144,7 @@ export function SessionWarningModal({ expiresAt, onExtend }) {
 SessionWarningModal.propTypes = {
   expiresAt: PropTypes.number,
   onExtend: PropTypes.func.isRequired,
+  intl: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -153,4 +159,4 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SessionWarningModal);
+export default connect(mapStateToProps, mapDispatchToProps)(injectIntl(SessionWarningModal));

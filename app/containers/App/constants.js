@@ -162,6 +162,6 @@ export const ACTIVITY_DISPATCH_INTERVAL = 3000; // 3 s
 export const ACTIVITY_PING_INTERVAL = 60000; // 1 min
 
 // show countdown when less than this many ms remain
-export const SESSION_WARNING_THRESHOLD = 5 * 60 * 1000; // 5 min
+export const SESSION_WARNING_THRESHOLD = 5 * 60000; // 5 min
 // how often to compare against the stored expiry, ms
 export const SESSION_TICK_INTERVAL = 1000; // 1 s
