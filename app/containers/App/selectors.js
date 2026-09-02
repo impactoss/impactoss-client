@@ -1028,3 +1028,7 @@ export const selectHasPreviousCycles = createSelector(
       && CURRENT_TAXONOMY_IDS.indexOf(parseInt(cat.getIn(['attributes', 'taxonomy_id']), 10)) > -1,
   ),
 );
+export const selectSessionExpiresAt = createSelector(
+  getGlobal,
+  (state) => state.getIn(['session', 'expiresAt']),
+);

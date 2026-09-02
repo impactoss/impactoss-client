@@ -82,6 +82,10 @@ export const SET_LOAD_ARCHIVED = 'impactoss/App/SET_LOAD_ARCHIVED';
 export const SET_LOAD_NONCURRENT = 'impactoss/App/SET_LOAD_NONCURRENT';
 export const INITIALIZE_SETTINGS = 'impactoss/App/INITIALIZE_SETTINGS';
 
+export const SESSION_ACTIVITY = 'impactoss/App/SESSION_ACTIVITY';
+export const SESSION_EXPIRED = 'impactoss/App/SESSION_EXPIRED';
+export const SET_SESSION_EXPIRY = 'impactoss/App/SET_SESSION_EXPIRY';
+
 export const FILTERS_PANEL = 'filters';
 export const EDIT_PANEL = 'edit';
 
@@ -112,6 +116,7 @@ export const PARAMS = {
   RECOVER_SUCCESS: 'recoverSuccess',
   ALREADY_SIGNED_IN: 'alreadySignedIn',
   NOT_SIGNED_IN: 'notSignedIn',
+  SESSION_EXPIRED: 'sessionExpired',
 };
 
 export const VIEWPORTS = {
@@ -150,3 +155,13 @@ export const ROUTES = {
   EDIT: '/edit',
   LINK_INVALID: '/link-invalid',
 };
+
+// minimum interval between activity dispatches, ms
+export const ACTIVITY_DISPATCH_INTERVAL = 3000; // 3 s
+// minimum interval between activity pings, ms
+export const ACTIVITY_PING_INTERVAL = 60000; // 1 min
+
+// show countdown when less than this many ms remain
+export const SESSION_WARNING_THRESHOLD = 5 * 60000; // 5 min
+// how often to compare against the stored expiry, ms
+export const SESSION_TICK_INTERVAL = 1000; // 1 s
