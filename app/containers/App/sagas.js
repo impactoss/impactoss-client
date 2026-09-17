@@ -3,7 +3,7 @@
  */
 
 import {
-  call, put, select, takeLatest, takeEvery, race, take, all,
+  call, put, select, takeLatest, takeEvery, race, take, all, throttle, delay,
 } from 'redux-saga/effects';
 import {
   push, replace, goBack, LOCATION_CHANGE,
@@ -49,6 +49,9 @@ import {
   SET_LOAD_ARCHIVED,
   SET_LOAD_NONCURRENT,
   OPEN_BOOKMARK,
+  ACTIVITY_PING_INTERVAL,
+  SESSION_ACTIVITY,
+  SESSION_EXPIRED,
 } from 'containers/App/constants';
 
 import {
@@ -90,6 +93,8 @@ import {
   initializeSettings,
   otpRequired,
   openPasswordModal,
+  setSessionExpiry,
+  sessionExpired,
 } from 'containers/App/actions';
 
 import {
@@ -111,7 +116,10 @@ import {
   updateEntityRequest,
   updateAssociationsRequest,
 } from 'utils/entities-update';
+
 import apiRequest, { getAuthValues, clearAuthValues } from 'utils/api-request';
+
+import { storeSessionExpiry, readSessionExpiry } from 'utils/session-storage';
 
 /**
  * Check if entities already present
@@ -282,7 +290,7 @@ export function* recoverSaga(payload) {
       ROUTES.LOGIN,
       {
         replace: true,
-        query: { info: PARAMS.RECOVER_SUCCESS },
+        query: { arg: 'info', value: PARAMS.RECOVER_SUCCESS },
       },
     ));
   } catch (err) {
@@ -309,6 +317,7 @@ export function* logoutSaga() {
   try {
     yield call(apiRequest, 'delete', ENDPOINTS.SIGN_OUT);
     yield call(clearAuthValues);
+    yield call(storeSessionExpiry, null);
     yield put(logoutSuccess());
     if (ENABLE_AZURE) {
       // forward to home to prevent second login
@@ -318,6 +327,7 @@ export function* logoutSaga() {
     }
   } catch (err) {
     yield call(clearAuthValues);
+    yield call(storeSessionExpiry, null);
     yield put(authenticateError(err));
   }
 }
@@ -343,13 +353,16 @@ export function* validateTokenSaga() {
       );
       if (!response.success) {
         yield call(clearAuthValues);
+        yield call(storeSessionExpiry, null);
         yield put(invalidateEntities());
+      } else {
+        yield put(authenticateSuccess(response.data)); // need to store currentUserData
       }
-      yield put(authenticateSuccess(response.data)); // need to store currentUserData
     }
   } catch (err) {
     console.log('ERROR in validateTokenSaga', err);
     yield call(clearAuthValues);
+    yield call(storeSessionExpiry, null);
     if (err.response) {
       err.response.json = yield err.response.json();
     }
@@ -1048,6 +1061,56 @@ function* handleLocationChange(action) {
 function* handleAuthSuccess() {
   const pathname = yield select(selectCurrentPathname);
   yield call(guardAuthRoutes, pathname);
+
+  // seed from storage so a tab opened alongside an existing session has an
+  // expiry before the ping returns; the ping then supersedes it
+  const expiresAt = yield call(readSessionExpiry);
+  if (expiresAt) yield put(setSessionExpiry(expiresAt));
+  yield call(activityPingSaga);
+}
+
+export function* activityPingSaga() {
+  const signedIn = yield select(selectIsSignedIn);
+  if (!signedIn) return;
+  try {
+    const response = yield call(apiRequest, 'post', ENDPOINTS.ACTIVITY);
+
+    if (response && typeof response.seconds_remaining === 'number') {
+      const expiresAt = Date.now() + (response.seconds_remaining * 1000);
+      yield call(storeSessionExpiry, expiresAt);
+      yield put(setSessionExpiry(expiresAt));
+    }
+  } catch (err) {
+    if (err.response && err.response.status === 401) {
+      yield put(sessionExpired());
+    } else {
+      console.error(err); // eslint-disable-line no-console
+    }
+  }
+}
+
+export function* sessionExpiredSaga() {
+  yield call(clearAuthValues);
+  yield call(storeSessionExpiry, null);
+  yield put(logoutSuccess());
+  // let the store settle before navigating: the login route's onEnter guard
+  // reads isSignedIn synchronously during the transition, and without this
+  // it still sees the pre-teardown value and redirects to / with an
+  // alreadySignedIn message, losing the inactivity message.
+  yield delay(0);
+
+  if (ENABLE_AZURE) {
+    // forward to home to prevent second login
+    yield put(updatePath('/', { replace: true }));
+  } else {
+    yield put(updatePath(
+      ROUTES.LOGIN,
+      {
+        replace: true,
+        query: { arg: 'info', value: PARAMS.SESSION_EXPIRED },
+      },
+    ));
+  }
 }
 
 /**
@@ -1083,4 +1146,6 @@ export default function* rootSaga() {
   yield takeEvery(DISMISS_QUERY_MESSAGES, dismissQueryMessagesSaga);
 
   yield takeEvery(CLOSE_ENTITY, closeEntitySaga);
+  yield throttle(ACTIVITY_PING_INTERVAL, SESSION_ACTIVITY, activityPingSaga);
+  yield takeLatest(SESSION_EXPIRED, sessionExpiredSaga);
 }

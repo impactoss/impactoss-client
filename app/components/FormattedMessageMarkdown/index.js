@@ -14,9 +14,10 @@ const md = new Remarkable({ html: false, breaks: false });
 const FormattedMessageMarkdown = ({
   message,
   intl,
+  values = {},
 }) => {
   const text = message
-    ? intl.formatMessage(message).trim()
+    ? intl.formatMessage(message, values).trim()
     : 'MESSAGE NOT FOUND';
 
   const inlineHtml = md.renderInline(text);
@@ -27,6 +28,7 @@ const FormattedMessageMarkdown = ({
 FormattedMessageMarkdown.propTypes = {
   message: PropTypes.object,
   intl: PropTypes.object,
+  values: PropTypes.object,
 };
 
 export default injectIntl(FormattedMessageMarkdown);

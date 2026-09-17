@@ -38,6 +38,7 @@ import {
   INITIALIZE_SETTINGS,
   OTP_REQUIRED,
   RESET_OTP,
+  SET_SESSION_EXPIRY,
 } from './constants';
 
 // The initial state of the App
@@ -50,6 +51,9 @@ const initialState = fromJS({
     error: false,
     messages: [],
     otpTempToken: null,
+  },
+  session: {
+    expiresAt: null,
   },
   /* eslint-disable no-param-reassign */
   // Record the time that entities where requested from the server
@@ -180,6 +184,8 @@ function appReducer(state = initialState, payload) {
       return state.set('showSettings', fromJS(payload.open));
     case INITIALIZE_SETTINGS:
       return state.set('settings', fromJS(payload.settings));
+    case SET_SESSION_EXPIRY:
+      return state.setIn(['session', 'expiresAt'], payload.expiresAt);
     default:
       return state;
   }

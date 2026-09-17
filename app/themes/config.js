@@ -164,6 +164,7 @@ export const ENDPOINTS = {
   SIGN_IN_AZURE: 'auth/azure_activedirectory_v2',
   VERIFY_OTP: 'auth/verify_multi_factor',
   RESEND_OTP: 'auth/resend_multi_factor',
+  ACTIVITY: 'auth/activity',
 };
 
 // API request Authentification keys
@@ -176,6 +177,11 @@ export const KEYS = {
   RESET_PASSWORD: 'reset_password',
   TEMP_TOKEN: 'temp_token',
 };
+
+// localStorage key for the shared session expiry. Not a DTA header, so kept
+// out of KEYS: the value is client-side state, written by the activity
+// heartbeat and read by other tabs via the storage event.
+export const SESSION_EXPIRES_AT_KEY = 'session-expires-at';
 
 // Map server messages *********************************
 

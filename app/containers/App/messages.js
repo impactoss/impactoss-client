@@ -1656,6 +1656,10 @@ export default defineMessages({
       id: 'app.containers.App.messages.registeringServer',
       defaultMessage: 'Note: registering for {server} database',
     },
+    sessionExpired: {
+      id: 'app.containers.App.messages.sessionExpired',
+      defaultMessage: 'You have been signed out due to inactivity. Please sign in again.',
+    },
   },
   ui: {
     userRoles: {
