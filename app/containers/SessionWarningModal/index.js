@@ -77,7 +77,7 @@ export function SessionWarningModal({ expiresAt, onExtend, intl }) {
 
   if (remaining === null) return null;
 
-  const minutes = Math.ceil(remaining / 60);
+  const minutes = Math.floor(remaining / 60);
 
   return (
     <ReactModal
