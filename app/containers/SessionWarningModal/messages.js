@@ -12,15 +12,15 @@ export default defineMessages({
   },
   remainingMinutes: {
     id: 'app.containers.SessionWarningModal.remainingMinutes',
-    defaultMessage: 'You will be automatically **signed out in {minutes, plural, one {# minute} other {# minutes}}**. ',
+    defaultMessage: 'For your security, you will be automatically **signed out in {minutes, plural, one {# minute} other {# minutes}}**. ',
   },
   remainingSeconds: {
     id: 'app.containers.SessionWarningModal.remainingSeconds',
-    defaultMessage: 'You will be automatically **signed out in {seconds, plural, one {# second} other {# seconds}}**. ',
+    defaultMessage: 'For your security, you will be automatically **signed out in {seconds, plural, one {# second} other {# seconds}}**. ',
   },
   extendHint: {
     id: 'app.containers.SessionWarningModal.extendHint',
-    defaultMessage: 'Any activity will keep you signed in, or use the button below.',
+    defaultMessage: 'To remain signed in, continue using the Tracker or select the button below.',
   },
   extendButton: {
     id: 'app.containers.SessionWarningModal.extendButton',
