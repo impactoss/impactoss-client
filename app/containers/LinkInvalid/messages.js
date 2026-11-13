@@ -27,7 +27,7 @@ export default defineMessages({
     defaultMessage: 'Sign in here',
   },
   recoverLinkBefore: {
-    id: 'app.containers.LinkInvalid.loginLink',
+    id: 'app.containers.LinkInvalid.recoverLinkBefore',
     defaultMessage: 'Need a new reset link? ',
   },
   recoverPasswordLink: {
